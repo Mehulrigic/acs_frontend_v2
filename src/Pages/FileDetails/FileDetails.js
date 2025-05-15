@@ -696,7 +696,7 @@ const FileDetails = () => {
 
     var folderData = {
       folder_name: e.target.elements.folderName.value ?? "",
-      broker_id: selectBroker,
+      broker_id: selectBroker ? selectBroker : "",
       start_date: startDate ? startDate : "",
       end_date: endDate ? endDate : ""
     };
@@ -1704,7 +1704,7 @@ const FileDetails = () => {
                     {flashMessage.message}
                   </div>
                 )}
-                <Form.Group className="mb-2 mx-w-320" controlId="exampleForm.ControlInput1">
+                <Form.Group className="mb-4 mx-w-320" controlId="exampleForm.ControlInput1">
                   <Form.Label>N° de dossier <span>*</span></Form.Label>
                   <Form.Control
                     type="text"
@@ -1714,8 +1714,18 @@ const FileDetails = () => {
                   />
                 </Form.Group>
 
+                <Form.Group className="mb-4 mx-w-320" controlId="exampleForm.ControlInput1">
+                  <Form.Label>Numéro de contrat</Form.Label>
+                  <Form.Control
+                    type="text"
+                    placeholder="Numéro de contrat"
+                    name="contract_no"
+                    defaultValue={showUserDocumentData?.contract_no || ""}
+                  />
+                </Form.Group>
+
                 <Form.Group className="mb-4 mx-w-320" controlId="formBasicEmail">
-                  <Form.Label>Choisir un Courtier <span>*</span></Form.Label>
+                  <Form.Label>Choisir un Courtier</Form.Label>
                   <Form.Select
                     className="full-width mb-3"
                     aria-label={"statusSelectAria"}
@@ -1729,7 +1739,7 @@ const FileDetails = () => {
                   </Form.Select>
                 </Form.Group>
 
-                <Form.Group className="mb-2 mx-w-320" controlId="names">
+                <Form.Group className="mb-4 mx-w-320" controlId="names">
                   <Form.Label className="d-block">Début de chantier</Form.Label>
                   <DatePicker
                     placeholderText="Selectionner une date"

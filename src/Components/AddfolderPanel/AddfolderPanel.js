@@ -24,6 +24,7 @@ const AddfolderPanel = (props) => {
   const [flashMessage, setFlashMessage] = useState({ type: "", message: "" });
 
   const [folderName, setFolderName] = useState("");
+  const [contractNo, setContractNo] = useState("");
   const [selectBroker, setSelectBroker] = useState("");
   const [fileListStep2, setFileListStep2] = useState([]);
   const [fileListStep3, setFileListStep3] = useState([]);
@@ -38,6 +39,7 @@ const AddfolderPanel = (props) => {
     setShowStep4(false);
     setShowStep5(false);
     setFolderName("");
+    setContractNo("");
     setSelectBroker("");
     setSelectDocumentTypeStep3("");
     setSelectDocumentTypeNameStep3("");
@@ -121,6 +123,7 @@ const AddfolderPanel = (props) => {
         folder_name: folderName ?? "",
         broker_id: userRole == "Courtier" ? userId : selectBroker,
         documents: documents,
+        contract_no: contractNo ? contractNo : ""
       };
       const response = await AddFolderPanelService.store_document(useData);
       if (response.data.status) {
@@ -406,6 +409,17 @@ const AddfolderPanel = (props) => {
                     }}
                   />
                 </Form.Group>
+
+                <Form.Group className="mt-32" controlId="formBasicEmail">
+                  <Form.Label>Numéro de contrat</Form.Label>
+                  <Form.Control
+                    type="text"
+                    placeholder="Numéro de contrat"
+                    value={contractNo}
+                    onChange={(e) => setContractNo(e.target.value)}
+                  />
+                </Form.Group>
+
                 {userRole != "Courtier" && 
                   <Form.Group className="mt-32" controlId="formBasicEmail">
                     <Form.Label>Sélectionner Courtier</Form.Label>
