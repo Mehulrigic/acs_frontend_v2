@@ -138,12 +138,14 @@ const AddfolderPanel = (props) => {
           GetStatistics();
         }
       } else {
+        setUploadingDoc(false);
         setFlashMessage({
           type: "error",
           message: response.data.message || t("somethingWentWrong"),
         });
       }
     } catch (error) {
+      setUploadingDoc(false);
       if(error.response.data.message == "La valeur du champ folder name a déjà été prise.") {
         setFlashMessage({
           type: "error",
