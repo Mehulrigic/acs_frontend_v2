@@ -273,9 +273,25 @@ const MyAccount = () => {
   const handleChangeRightPanel = (color) => {
     setRightPanelThemeColor(color.hex);
   };
+
   const handleChangeButtonColor = (color) => {
     setButtonColor(color.hex);
   };
+
+  useEffect(() => {
+    const preventDropOutside = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+    };
+
+    window.addEventListener("dragover", preventDropOutside);
+    window.addEventListener("drop", preventDropOutside);
+
+    return () => {
+      window.removeEventListener("dragover", preventDropOutside);
+      window.removeEventListener("drop", preventDropOutside);
+    };
+  }, []);
 
   return (
     <Fragment>
@@ -499,7 +515,16 @@ const MyAccount = () => {
                           controlId="formFile"
                           className="file-upload-container"
                         >
-                          <div className="custom-upload-box">
+                          <div 
+                            className="custom-upload-box"
+                            onDrop={(e) => {
+                              e.preventDefault();
+                              const files = e.dataTransfer.files;
+                              if (files.length) {
+                                handleFileUpload({ target: { files } });
+                              }
+                            }}
+                          >
                             <svg
                               width="48"
                               height="32"

@@ -217,6 +217,21 @@ const RoleManagementList = () => {
     setButtonColorIn(color.hex);
   };
 
+  useEffect(() => {
+    const preventDropOutside = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+    };
+
+    window.addEventListener("dragover", preventDropOutside);
+    window.addEventListener("drop", preventDropOutside);
+
+    return () => {
+      window.removeEventListener("dragover", preventDropOutside);
+      window.removeEventListener("drop", preventDropOutside);
+    };
+  }, []);
+
   return (
     <Fragment>
       <style> {` button.btn.btn-primary  { background-color: ${localStorage.getItem('button_color') ? JSON.parse(localStorage.getItem('button_color')) : "#e84455"} !Important};`} </style>
@@ -363,7 +378,16 @@ const RoleManagementList = () => {
                 controlId="formFile"
                 className="file-upload-container"
               >
-                <div className="custom-upload-box">
+                <div 
+                  className="custom-upload-box"
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    const files = e.dataTransfer.files;
+                    if (files.length) {
+                      handleFileUpload({ target: { files } });
+                    }
+                  }}
+                >
                   <svg
                     width="48"
                     height="32"

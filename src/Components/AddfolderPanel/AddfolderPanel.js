@@ -217,7 +217,7 @@ const AddfolderPanel = (props) => {
     "application/vnd.openxmlformats-officedocument.presentationml.presentation", // .pptx
   ];
 
-  const maxFileSize = 10 * 1024 * 1024;
+  const maxFileSize = 50 * 1024 * 1024;
 
   const handleFileChangeStep2 = async (e) => {
     const files = Array.from(e.target.files);
@@ -244,7 +244,7 @@ const AddfolderPanel = (props) => {
       if (file.size > maxFileSize) {
         setFlashMessage({
           type: "error",
-          message: `Limite de taille atteinte. Vos fichiers ne doivent pas dépasser 10 Mo: ${file.name}`,
+          message: `Limite de taille atteinte. Vos fichiers ne doivent pas dépasser 50 Mo: ${file.name}`,
         });
         continue;
       }
@@ -294,7 +294,7 @@ const AddfolderPanel = (props) => {
       if (file.size > maxFileSize) {
         setFlashMessage({
           type: "error",
-          message: `Limite de taille atteinte. Vos fichiers ne doivent pas dépasser 10 Mo: ${file.name}`,
+          message: `Limite de taille atteinte. Vos fichiers ne doivent pas dépasser 50 Mo: ${file.name}`,
         });
         continue;
       }
@@ -326,6 +326,22 @@ const AddfolderPanel = (props) => {
   const handleRemoveFileStep3 = (index) => {
     setFileListStep3((prevFiles) => prevFiles.filter((_, i) => i !== index));
   };
+
+  useEffect(() => {
+    const preventDropOutside = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+    };
+
+    window.addEventListener("dragover", preventDropOutside);
+    window.addEventListener("drop", preventDropOutside);
+
+    return () => {
+      window.removeEventListener("dragover", preventDropOutside);
+      window.removeEventListener("drop", preventDropOutside);
+    };
+  }, []);
+
 
   return (
     <Fragment>
@@ -443,7 +459,18 @@ const AddfolderPanel = (props) => {
                   controlId="formFile"
                   className="file-upload-container mt-4"
                 >
-                  <div className="custom-upload-box">
+                  <div 
+                    className="custom-upload-box"
+                    onDragOver={(e) => e.preventDefault()}
+                    onDrop={(e) => {
+                      e.preventDefault();
+
+                      const files = e.dataTransfer.files;
+                      if (files.length) {
+                        handleFileChangeStep2({ target: { files } });
+                      }
+                    }}
+                  >
                     <svg
                       width="48"
                       height="32"
@@ -540,7 +567,18 @@ const AddfolderPanel = (props) => {
                   controlId="formFile"
                   className="file-upload-container mt-4"
                 >
-                  <div className="custom-upload-box">
+                  <div 
+                    className="custom-upload-box"
+                    onDragOver={(e) => e.preventDefault()}
+                    onDrop={(e) => {
+                      e.preventDefault();
+
+                      const files = e.dataTransfer.files;
+                      if (files.length) {
+                        handleFileChangeStep3({ target: { files } });
+                      }
+                    }}
+                  >
                     <svg
                       width="48"
                       height="32"
