@@ -1,0 +1,21 @@
+.modal-body .side-form{
+    display: flex;
+    align-items: center;flex-wrap: wrap;
+    margin: 0 -8px;
+  }
+  .modal-body .side-form .mt-16{
+    padding: 0 8px;
+  }
+  .modal-body .side-form .mt-16:first-child{
+    flex: 0 0 175px;
+    max-width: 175px;
+  }
+  .modal-body .side-form .mt-16{
+    flex: 1;
+  }
+
+  @media(min-width:576px){
+    .modal-dialog{
+        max-width: 650px;
+    }
+  }

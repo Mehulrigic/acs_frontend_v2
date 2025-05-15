@@ -1,0 +1,10 @@
+input[type="search"] {
+  border: 1px solid var(--Color-Border, #acd8d1);
+  border-radius: 60px;
+  padding: 11.5px 14.5px;
+  color: #596a68;
+  font-size: 16px;
+  font-weight: 300;
+  line-height: 21.86px;
+  min-height: auto;
+}

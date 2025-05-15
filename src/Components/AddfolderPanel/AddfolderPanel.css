@@ -1,0 +1,226 @@
+
+.add-folder-panel.offcanvas .offcanvas-header .btn-close{
+    padding: 9px 9px;
+    background-color: transparent;
+    background-image: url("data:image/svg+xml,<svg width=\"14\" height=\"14\" viewBox=\"0 0 14 14\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M14 1.41L12.59 0L7 5.59L1.41 0L0 1.41L5.59 7L0 12.59L1.41 14L7 8.41L12.59 14L14 12.59L8.41 7L14 1.41Z\" fill=\"%23e84455\"/></svg>");
+    opacity: 1;
+}
+
+.add-folder-panel.offcanvas .offcanvas-header .btn-close:hover{
+  background-color: #ffadb6;
+    box-shadow: none;   
+}
+.add-folder-panel.offcanvas{
+    box-shadow: 0px 4px 10px 0px #00000026;
+    background-color: var(--white-color); z-index: 2999;
+}
+.add-folder-panel.offcanvas .offcanvas-title.h5{
+    color: #76787B;
+    font-family: "Nunito", serif;
+font-size: 16px;
+font-weight: 400;
+line-height: 21.82px;
+
+}
+.add-folder-panel.offcanvas h2{
+    font-weight: 700;
+    color: var(--primary-dark);
+}
+.add-folder-panel.offcanvas .offcanvas-header,.add-folder-panel.offcanvas .offcanvas-body,.add-folder-panel.offcanvas .offcanvas-footer{
+    padding: 24px 24px;
+}
+.add-folder-panel.offcanvas .complete-process{
+    color: #76787B;font-family: Manrope;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 21.86px;
+}
+.add-folder-panel.offcanvas .form-label span{
+    color: var(--tertiary-color);
+}
+.add-folder-panel .offcanvas-footer {
+    border-top: 1px solid var(--Couleurs-Border, #C1CBD4);
+    padding: 12px 24px;
+}
+.add-folder-panel .offcanvas-footer button {
+    background-color: var(--tertiary-color);
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 21.86px;
+    text-align: center;
+    border: none;
+    padding: 12px 24px;
+    transition: all 0.4s ease;
+}
+.add-folder-panel .offcanvas-footer button:hover {
+   
+}
+.add-folder-panel .offcanvas-footer .previous-btn{
+    background-color: transparent;
+    color: #76787B;
+font-size: 16px;
+font-weight: 400;
+line-height: 21.86px;
+display: flex;
+    align-items: center;
+    gap: 4px;
+}
+.add-folder-panel .offcanvas-footer .previous-btn:hover{
+    color: var(--white-color);
+}
+.add-folder-panel .offcanvas-footer .previous-btn:hover svg polygon{
+    fill: var(--white-color);
+}
+.file-upload-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+  }
+  
+  .custom-upload-box {
+    border: 2px dashed var(--Couleurs-Border, #C1CBD4);
+    border-radius: 16px;
+    background-color: #9CAC1C0D;
+    text-align: center;
+    padding: 24px 24px;
+    position: relative;
+    width: 100%;
+  }
+  
+  .custom-upload-box:hover {
+    border-color: #003366;
+  }
+  
+  .upload-text {
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 21.86px;
+    text-align: center;
+    color: #292C2F;
+    margin-top: 18px;
+    
+  }
+  
+  .browse-link {
+    color: var(--tertiary-color);
+    font-weight: bold;
+    cursor: pointer;
+    text-decoration: underline;
+  }
+  
+  .file-input {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+  }
+  .file-name {
+    font-size: 16px;
+    color: #003366;
+    font-weight: bold;
+  }
+  .upload-file{
+    background-image: url('data:image/svg+xml,<svg width="20" height="10" viewBox="0 0 20 10" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1.9 5C1.9 3.29 3.29 1.9 5 1.9H9V0H5C2.24 0 0 2.24 0 5C0 7.76 2.24 10 5 10H9V8.1H5C3.29 8.1 1.9 6.71 1.9 5ZM6 6H14V4H6V6ZM15 0H11V1.9H15C16.71 1.9 18.1 3.29 18.1 5C18.1 6.71 16.71 8.1 15 8.1H11V10H15C17.76 10 20 7.76 20 5C20 2.24 17.76 0 15 0Z" fill="%23292C2F"/></svg>');
+font-size: 16px;
+font-weight: 700;
+line-height: 21.86px;
+padding: 13px 13px 13px 40px;
+background-color: #9CAC1C0D;
+background-repeat: no-repeat;
+background-position: center left 10px;
+margin-top: 13px;
+border-radius: 8px;
+color: #292C2F;
+display: flex
+;
+    align-items: center;
+    justify-content: space-between;
+    gap: 5px;
+  }
+  .add-folder-panel .form-select{
+    color: #76787B;
+    background-image: url('data:image/svg+xml,<svg width="8" height="12" viewBox="0 0 8 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0.294922 10.59L4.87492 5.99997L0.294922 1.40997L1.70492 -3.05176e-05L7.70492 5.99997L1.70492 12L0.294922 10.59Z" fill="%2376787B"/></svg>');
+    max-width: 320px;
+    background-size: 8px;
+  }
+  .add-folder-panel .css-b62m3t-container{
+    max-width: 320px;
+  }
+  .add-folder-panel .css-13cymwt-control{
+    color: #292C2F;
+    border-radius: 8px;
+    /* padding: 7px 36px 7px 12px;     */
+    border: var(--bs-border-width) solid var(--bs-border-color);
+    max-width: 320px;
+  }
+  .add-folder-panel .css-t3ipsp-control{
+    border: var(--bs-border-width) solid var(--bs-border-color);
+    box-shadow: none;
+  }
+  .add-folder-panel .css-t3ipsp-control:hover{
+    border: var(--bs-border-width) solid var(--bs-border-color);
+  }
+  .add-folder-panel  .css-13cymwt-control:hover{
+    border: var(--bs-border-width) solid var(--bs-border-color);
+  }
+  .add-folder-panel .step-4 .file-name{
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 21.86px;
+    color: #292C2F;
+    
+  }
+  .add-folder-panel .step-4 .file-number{
+    color: #292C2F;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 21.86px;
+    
+  }
+  .add-folder-panel .css-b62m3t-container input[type="text"]{
+    min-height: 38px;
+  }
+  .add-folder-panel  .css-1xc3v61-indicatorContainer,  .add-folder-panel  .css-1xc3v61-indicatorContainer{
+    color: #76787B;
+  }
+  span.filename {
+    width: 450px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.add-folder-panel .close-sutter,.link-wrap{
+color: var(--tertiary-color);
+font-size: 16px;
+font-weight: 700;
+line-height: 21.86px;
+text-align: left;
+text-decoration-line: underline;
+text-decoration-style: solid;
+text-underline-position: from-font;
+text-decoration-skip-ink: none;
+
+}
+.add-folder-panel .final-submit {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    min-height: 370px;
+    margin-top: 50px;
+
+}
+.add-folder-panel .form-select.full-width{
+    max-width: 100%;
+}
+@media(min-width:991px){
+    .add-folder-panel.offcanvas{
+    width: 50%;
+}
+}

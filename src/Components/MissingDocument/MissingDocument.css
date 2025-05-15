@@ -1,0 +1,18 @@
+.modal{
+    z-index: 33333;
+}
+.missing-doc-modal .modal-body span.complete-process{
+    color: var(--light-grey);
+}
+.missing-doc-modal .modal-body textarea{
+    background-color: #9CAC1C0D;
+    border: none;
+    color: #76787B;
+    min-height: 168px;
+    margin-bottom: 96px;
+}
+@media(max-width:767px){
+    .missing-doc-modal .modal-body textarea{
+        margin-bottom: 15px;
+    }
+}

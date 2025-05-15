@@ -1,0 +1,35 @@
+ul.pagination {
+    justify-content: center;
+    margin-top: 15px;
+  }
+  .insurers-dashboard ul.pagination  .active>.page-link{
+    background-color: var(--primary-dark);
+    border-color: var(--primary-dark);
+    color: var(--white-color);
+  }
+  .broker-dashboard ul.pagination  .active>.page-link{
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: var(--white-color);
+  }
+  .broker-dashboard  ul.pagination .page-link{
+    color: var(--primary-color);
+  }
+  .insurers-dashboard ul.pagination .page-link{
+    color: var(--primary-dark);
+  }
+  ul.pagination .page-link:focus{
+    box-shadow: none;
+  }
+  ul.pagination .page-link{
+    padding: 10px 15px;
+  }
+  @media(max-width:767px){
+    ul.pagination{
+      flex-wrap: wrap;
+    }
+    ul.pagination li.page-item{
+      margin-bottom: 10px;
+    }
+  }
+  

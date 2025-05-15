@@ -1,0 +1,69 @@
+.broker-dashboard .top-header a svg path{
+    fill: var(--primary-color);
+}
+.broker-dashboard .check-status .status{
+    border: 1px solid var(--Couleurs-Main, #ED2994);
+    background-color: #ED29941A;
+}
+.broker-dashboard .detail-header{
+    border: 1px solid var(--Alert, #FF0000);
+    color:#FF0000;
+}
+.broker-dashboard .detail-header svg path{
+    fill:#FF0000 ;
+}
+.broker-dashboard .nav-tabs{
+    background-color: var(--broker-light);
+}
+.broker-dashboard .nav-tabs .nav-link.active{
+    color: var(--broker-color);
+}
+.broker-dashboard  .nav-tabs .nav-link.active::after{
+   background:var(--broker-color) ;
+}
+.dashboard-main-content.broker-dashboard  .table-wrap th.select-drop {
+    padding: 8px;
+}
+.broker-dashboard .action-btn a svg path{
+    fill: var(--primary-color);
+}
+.broker-dashboard .inner-tab.nav-tabs + .tab-content .action-btn a:hover {
+    background-color: #d5bce7;
+}
+.broker-dashboard .inner-tab.nav-tabs {
+    background-color: transparent;
+    border: none;
+}
+.broker-dashboard .inner-tab.nav-tabs .nav-link.active {
+    color: var(--primary-color);
+    border-bottom: 2px solid var(--primary-color);
+}
+.note-box .top-part p{
+font-size: 12px;
+font-weight: 700;
+line-height: 16.39px;
+color: #FF0000;
+}
+.note-box .top-part p.create-date{
+    font-weight: 500;
+    color: #76787B;
+}
+.note-box .inner-box{
+    background-color: #ED29940D;
+    padding: 16px;
+    min-height: 167px;
+    margin-top: 8px;
+    color: #292C2F;
+    border-radius: 8px;
+}
+.note-box .inner-box .file-names{
+
+font-size: 12px;
+font-weight: 400;
+line-height: 16.39px;
+margin-left: 10px;
+}
+.note-box .inner-box p{
+    color: #292C2F;
+    font-weight: 500;
+}

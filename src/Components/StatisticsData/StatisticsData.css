@@ -1,0 +1,77 @@
+.statistics-container{
+    margin-top: 32px;
+    background-color: #fcdad9;
+    border-radius: 12px;
+    padding: 16px;
+}
+.statistics-container .over-period{
+    color: #292C2F;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 21.86px;   
+    display: flex;
+    align-items: center;
+    gap: 0;
+}
+.over-period select.form-select {
+    margin: 0 8px;
+}
+.statistics-container .over-period span{
+    font-weight: 700;
+}
+.statistic-row {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0 -8px;
+    margin-top: 16px;
+}
+.statistic-row .statistic-col{
+    flex: 0 0 33.333%;
+    max-width: 33.333%;
+    padding: 0 8px;
+}
+.statistic-row .statistic-col .each-box{
+    background-color: var(--white-color);
+    border-radius: 12px;
+    padding: 16px;
+}
+.statistic-row .statistic-col .each-box h6{
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 16.39px; 
+    margin: 0 0 0 0; 
+    color: #596A68;
+}
+.statistic-row .statistic-col .each-box h2{
+font-size: 48px;
+font-weight: 700;
+line-height: 65.57px;
+margin: 0 0 4px 0; 
+}
+@media(max-width:767px){
+    .over-period select.form-select{
+        margin: 8px 0;
+    }
+    .statistics-container .over-period{
+        flex-direction: column;
+    }
+    .statistic-row .statistic-col{
+        flex: 0 0 100%;
+        max-width: 100%;
+        margin-bottom: 16px;
+    }
+}
+@media(min-width:767px){
+
+    .statistics-container .over-period{
+        /* flex: 0 0 300px; */
+    }
+    .statistics-container .over-period p {
+        flex: 0 0 109px;
+    }
+}
+@media(min-width:550px){
+    .over-period .react-datepicker-popper{
+        margin-left: -76px;
+    }
+}

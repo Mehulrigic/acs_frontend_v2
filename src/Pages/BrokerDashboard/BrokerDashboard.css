@@ -1,0 +1,127 @@
+.broker-side-pannel .side-panel-container{
+    background-color: var(--primary-color);
+}
+.broker-side-pannel  .side-panel-container .link-section ul li a:hover {
+    /* color: var(--broker-color); */
+}
+.dashboard-main-content.broker-dashboard {
+    background-color: var(--broker-light);
+}
+.dashboard-main-content.broker-dashboard .top-header h4{
+    color: var(--broker-color);
+}
+.dashboard-main-content.broker-dashboard .top-header .big-btn-icon {
+    background-color: var(--primary-color);
+    color: var(--white-color);
+}
+.dashboard-main-content.broker-dashboard .top-header .big-btn-icon:hover{
+    background-color: var(--broker-dark);
+}
+.broker-dashboard .statistic-row .statistic-col .each-box h2{
+    color: var(--primary-dark);
+}
+.broker-dashboard .table-wrap th{
+    /* border-bottom: 1px solid #ED299480;
+    background-color: var(--broker-light); */
+}
+.broker-add-panel.add-folder-panel.offcanvas .offcanvas-header .btn-close{
+    background-image: url('data:image/svg+xml,<svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M14 1.41L12.59 0L7 5.59L1.41 0L0 1.41L5.59 7L0 12.59L1.41 14L7 8.41L12.59 14L14 12.59L8.41 7L14 1.41Z" fill="%23683191"/></svg>');
+}
+.broker-add-panel.add-folder-panel.offcanvas h2{
+    color: var(--primary-color);
+}
+.broker-add-panel.add-folder-panel.offcanvas .custom-upload-box svg path{
+    fill: var(--primary-color); 
+}
+.broker-add-panel.add-folder-panel.offcanvas .browse-link{
+    color: var(--primary-color);
+}
+.broker-add-panel.add-folder-panel.offcanvas  .custom-upload-box{
+    background-color: #ED29940D;
+}
+.broker-add-panel.add-folder-panel.offcanvas .upload-file{
+    background-color: #ED29940D;
+}
+.broker-add-panel.add-folder-panel.offcanvas .upload-file svg path{
+    fill: var(--primary-color);  
+}
+.broker-add-panel.add-folder-panel .offcanvas-footer button{
+    background-color: var(--primary-color);
+    color: var(--white-color);
+}
+.broker-add-panel.add-folder-panel .offcanvas-footer button.previous-btn svg polygon{
+    fill: var(--white-color);  
+}
+.broker-add-panel.add-folder-panel .offcanvas-footer button:hover{
+    background-color: var(--broker-dark);
+}
+.broker-add-panel.add-folder-panel.offcanvas .form-label span{
+    color: var(--primary-color);
+}
+.broker-add-panel.add-folder-panel .close-sutter, .broker-dashboard .link-wrap{
+    color: var(--primary-color);
+}
+.broker-add-panel.add-folder-panel .final-submit svg path{
+    fill: var(--primary-color);  
+}
+.broker-add-panel.add-folder-panel.offcanvas .offcanvas-header .btn-close:hover{
+    background-color: var(--broker-light);
+}
+.broker-add-panel .btn.btn-primary{
+    background-color: var(--primary-color);
+}
+.broker-add-panel .btn.btn-primary:hover{
+    background-color: var(--broker-dark);
+}
+.broker-dashboard .btn.btn-primary{
+    background-color: var(--primary-color);
+    color: var(--white-color);
+}
+.broker-dashboard .react-datepicker__day--selected, 
+.broker-dashboard .react-datepicker__day--in-selecting-range, 
+.broker-dashboard .react-datepicker__day--in-range, 
+.broker-dashboard .react-datepicker__month-text--selected, 
+.broker-dashboard .react-datepicker__month-text--in-selecting-range, 
+.broker-dashboard .react-datepicker__month-text--in-range, 
+.broker-dashboard .react-datepicker__quarter-text--selected,
+.broker-dashboard .react-datepicker__quarter-text--in-selecting-range, 
+.broker-dashboard .react-datepicker__quarter-text--in-range,
+.broker-dashboard .react-datepicker__year-text--selected, 
+.broker-dashboard .react-datepicker__year-text--in-selecting-range,
+.broker-dashboard .react-datepicker__year-text--in-range {
+    background-color: var(--primary-color);
+    color: var(--white-color);
+}
+.broker-dashboard  .react-datepicker__day--keyboard-selected,
+.broker-dashboard  .react-datepicker__month-text--keyboard-selected, 
+.broker-dashboard  .react-datepicker__quarter-text--keyboard-selected, 
+.broker-dashboard  .react-datepicker__year-text--keyboard-selected {
+    background-color: var(--primary-color);
+    color: var(--white-color);
+}
+.broker-modal .btn.btn-primary{
+    background-color: var(--primary-color);
+    color: var(--white-color);
+}
+.broker-modal h2{
+   color: var(--primary-color); 
+}
+.broker-modal .modal-header .btn-close{
+    background-image: url('data:image/svg+xml,<svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M14 1.41L12.59 0L7 5.59L1.41 0L0 1.41L5.59 7L0 12.59L1.41 14L7 8.41L12.59 14L14 12.59L8.41 7L14 1.41Z" fill="%23683191"/></svg>');
+}
+.broker-modal  .modal-header .btn-close:hover {
+    background-color: var(--broker-light);
+    box-shadow: none;
+}
+.broker-modal input[type="checkbox"]:checked {
+    background-image: url("data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"12\" height=\"9\" viewBox=\"0 0 12 9\" fill=\"none\"><path d=\"M11 1L4.125 8L1 4.81818\" stroke=\"%23683191\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg>"), url("data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"20\" height=\"24\" viewBox=\"0 0 20 24\" fill=\"none\"><g filter=\"url%28%23filter0_d_1_9612%29\"><rect width=\"20\" height=\"20\" rx=\"4\" fill=\"white\"/><rect x=\"0.5\" y=\"0.5\" width=\"19\" height=\"19\" rx=\"3.5\" stroke=\"%23c1cbd4\"/></g><defs><filter id=\"filter0_d_1_9612\" x=\"0\" y=\"0\" width=\"20\" height=\"24\" filterUnits=\"userSpaceOnUse\" color-interpolation-filters=\"sRGB\"><feFlood flood-opacity=\"0\" result=\"BackgroundImageFix\"/><feColorMatrix in=\"SourceAlpha\" type=\"matrix\" values=\"0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0\" result=\"hardAlpha\"/><feMorphology radius=\"5\" operator=\"erode\" in=\"SourceAlpha\" result=\"effect1_dropShadow_1_9612\"/><feOffset dy=\"5\"/><feGaussianBlur stdDeviation=\"2\"/><feColorMatrix type=\"matrix\" values=\"0 0 0 0 0.0666667 0 0 0 0 0.176471 0 0 0 0 0.305882 0 0 0 0.08 0\"/><feBlend mode=\"normal\" in2=\"BackgroundImageFix\" result=\"effect1_dropShadow_1_9612\"/><feBlend mode=\"normal\" in=\"SourceGraphic\" in2=\"effect1_dropShadow_1_9612\" result=\"shape\"/></filter></defs></svg>");
+    background-repeat: no-repeat, no-repeat;
+    background-position: center top 5px, center top 0px;
+    background-size: auto, auto;
+}
+.broker-dashboard .eye-icon svg path{
+    fill: var(--primary-color);
+}
+.broker-dashboard  a.eye-icon::after {
+    background:  var(--primary-color);
+}

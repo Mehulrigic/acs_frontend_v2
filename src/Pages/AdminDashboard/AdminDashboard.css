@@ -1,0 +1,6 @@
+.admin-dashboard .action-btn svg path,
+.user-management .action-btn svg path,
+.user-management .edit svg path{
+    /* fill: var(--tertiary-color);    */
+    fill: #e84455;
+}

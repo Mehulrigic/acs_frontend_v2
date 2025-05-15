@@ -1,0 +1,49 @@
+{
+  "name": "acs-frontend",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@cyntler/react-doc-viewer": "^1.17.0",
+    "axios": "^1.7.9",
+    "bootstrap": "^5.3.3",
+    "cors": "^2.8.5",
+    "cra-template": "1.2.0",
+    "i18next": "^24.2.0",
+    "react": "^19.0.0",
+    "react-bootstrap": "^2.10.7",
+    "react-color": "^2.19.3",
+    "react-color-picker": "^4.0.2",
+    "react-datepicker": "^7.5.0",
+    "react-doc-viewer": "^0.1.5",
+    "react-dom": "^19.0.0",
+    "react-i18next": "^15.2.0",
+    "react-router-dom": "^7.0.2",
+    "react-scripts": "5.0.1",
+    "react-select": "^5.9.0",
+    "web-vitals": "^4.2.4"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}

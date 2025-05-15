@@ -1,0 +1,9 @@
+.sketch-picker > div:first-child{
+    padding-bottom: 25% !important;
+}
+@media(max-width:550px){
+    .my-account .inner-tab.nav-tabs .nav-link{
+        padding: 8px 3px;
+        font-size: 13px;
+    }
+}
