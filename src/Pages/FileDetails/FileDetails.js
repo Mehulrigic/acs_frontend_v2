@@ -1503,7 +1503,8 @@ const FileDetails = () => {
               </div>
               {/* Check Document */}
               <div className="check-document">
-                <Link onClick={handleCheckShow}>Vérifier le document</Link>
+                {/* Location ‘ Insurer ’ / Folders / In a folder Hide the link to check documents for the Insurer for the time being */}
+                {/* <Link onClick={handleCheckShow}>Vérifier le document</Link> */}
                 <Offcanvas
                   className="add-folder-panel check-document-panel"
                   placement={"end"}
