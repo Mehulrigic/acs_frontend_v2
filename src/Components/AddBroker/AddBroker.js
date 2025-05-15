@@ -11,6 +11,7 @@ const AddBroker = (props) => {
   const { t } = useTranslation();
   const [show, setShow] = useState(false);
   const [flashMessage, setFlashMessage] = useState({ type: "", message: "" });
+  const [brokerCode, setBrokerCode] = useState("");
 
   const handleModalClose = () => setShow(false);
   const handleModalShow = () => setShow(true);
@@ -27,15 +28,15 @@ const AddBroker = (props) => {
 
   const AddNewBroker = async (e) => {
     e.preventDefault();
-    if (e.target.elements.firstName.value == "" || e.target.elements.lastName.value == "" || e.target.elements.broker_orias.value == "") {
+    if (e.target.elements.broker_name.value == "" || e.target.elements.broker_city.value == "" || e.target.elements.broker_code.value == "") {
       setFlashMessage({ type: "error", message: t("requriedErrorMessageLabel") });
       return;
     }
     try {
       var useData = {
-        first_name: e.target.elements.firstName.value,
-        last_name: e.target.elements.lastName.value ?? "",
-        broker_orias: e.target.elements.broker_orias.value ?? "",
+        broker_name: e.target.elements.broker_name.value,
+        broker_city: e.target.elements.broker_city.value,
+        broker_code: e.target.elements.broker_code.value,
       };
 
       const response = await AddFolderPanelService.add_broker(useData);
@@ -49,12 +50,12 @@ const AddBroker = (props) => {
       setFlashMessage({ type: "error", message: error.response.data.message || t("somethingWentWrong") });
     }
   };
-  const [orias, setOrias] = useState("");
 
-  const handleChangeOrias = (e) => {
-    const onlyNumbers = e.target.value.replace(/\D/g, ""); // Remove non-numeric characters
-    setOrias(onlyNumbers);
+  const handleChangeBrokerCode = (e) => {
+    const onlyNumbers = e.target.value;
+    setBrokerCode(onlyNumbers);
   };
+
   return (
     <Fragment>
       <Button variant="primary" onClick={handleModalShow}>
@@ -76,31 +77,30 @@ const AddBroker = (props) => {
                 {flashMessage.message}
               </div>
             )}
-            <Form.Group className='mt-16' controlId="firstName">
-              <Form.Label>{t("firstName")} <span>*</span></Form.Label>
+            <Form.Group className='mt-16' controlId="broker_name">
+              <Form.Label>Nom <span>*</span></Form.Label>
               <Form.Control
                 type="text"
-                placeholder={t("firstName")}
-                name="firstName"
+                placeholder={"Nom"}
+                name="broker_name"
               />
             </Form.Group>
-            <Form.Group className='mt-16' controlId="lastName">
-              <Form.Label>{t("lastName")} <span>*</span></Form.Label>
+            <Form.Group className='mt-16' controlId="broker_city">
+              <Form.Label>City <span>*</span></Form.Label>
               <Form.Control
                 type="text"
-                placeholder={t("lastName")}
-                name="lastName"
+                placeholder={"City"}
+                name="broker_city"
               />
             </Form.Group>
-            <Form.Group className='mt-16' controlId="ORIAS">
-              <Form.Label>{t("ORIAS")} <span>*</span></Form.Label>
+            <Form.Group className='mt-16' controlId="broker_code">
+              <Form.Label>Code du courtier <span>*</span></Form.Label>
               <Form.Control
                 type="text"
-                placeholder={t("ORIAS")}
-                name="broker_orias"
-                value={orias}
-                maxLength={8}
-                onChange={handleChangeOrias}
+                placeholder={"Code du courtier"}
+                name="broker_code"
+                value={brokerCode}
+                onChange={handleChangeBrokerCode}
               />
             </Form.Group>
           </Modal.Body>
