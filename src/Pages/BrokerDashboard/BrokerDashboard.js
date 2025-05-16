@@ -52,7 +52,7 @@ const BrokerDashboard = () => {
   const [modalColumns, setModalColumns] = useState({
     fileNumber: true,
     client: true,
-    Date: true,
+    "Date de création": true,
     status: true,
   });
 
@@ -354,10 +354,10 @@ const BrokerDashboard = () => {
                           </div>
                         </th>
                       }
-                      {selectedColumns.includes("Date") &&
+                      {selectedColumns.includes("Date de création") &&
                         <th>
                           <div className="d-flex align-items-center">
-                            <span>Date</span>
+                            <span>Date de création</span>
                             <Link
                               className={`sorting-icon ms-2`}
                               onClick={() => handleClickRotate("created_at")}
@@ -437,7 +437,7 @@ const BrokerDashboard = () => {
                         <tr onClick={() => navigate(`/courtier-file-detail/${data.id}`)}>
                           {selectedColumns.includes("fileNumber") && <td className="bold-font">{data.folder_name}</td>}
                           {selectedColumns.includes("client") && <td>{data.customer_name}</td>}
-                          {selectedColumns.includes("Date") && <td>{data.created_at}</td>}
+                          {selectedColumns.includes("Date de création") && <td>{data.created_at}</td>}
                           {selectedColumns.includes("status") &&
                             <td>
                               {

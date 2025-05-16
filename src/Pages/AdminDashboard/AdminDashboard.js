@@ -31,7 +31,7 @@ const AdminDashboard = () => {
     fileNumber: true,
     client: true,
     brokerlabel: true,
-    Date: true,
+    "Date de création": true,
     lastModifiedDateLabel: true,
     status: true,
     "Etat du chantier": true,
@@ -318,10 +318,10 @@ const AdminDashboard = () => {
                           </div>
                         </th>
                       }
-                      {selectedColumns.includes("Date") &&
+                      {selectedColumns.includes("Date de création") &&
                         <th>
                           <div className="d-flex align-items-center">
-                            <span>Date</span>
+                            <span>Date de création</span>
                             <Link
                               className={`sorting-icon ms-2`}
                               onClick={() => handleClickRotate("created_at")}
@@ -470,7 +470,7 @@ const AdminDashboard = () => {
                                 : "Sans"}
                             </td>
                           )}
-                          {selectedColumns.includes("Date") && <td>{data.created_at}</td>}
+                          {selectedColumns.includes("Date de création") && <td>{data.created_at}</td>}
                           {selectedColumns.includes("lastModifiedDateLabel") && (
                             <td>{data.updated_at}</td>
                           )}
