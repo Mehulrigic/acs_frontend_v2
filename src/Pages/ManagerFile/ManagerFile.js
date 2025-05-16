@@ -42,7 +42,7 @@ const ManagerFile = () => {
 
   const [modalColumns, setModalColumns] = useState({
     Police: true,
-    client: true,
+    // client: true,
     brokerlabel: true,
     "Date de création": true,
     status: true,
@@ -279,7 +279,7 @@ const ManagerFile = () => {
                         </div>
                       </th>
                     }
-                    {selectedColumns.includes("client") &&
+                    {/* {selectedColumns.includes("client") &&
                       <th>
                         <div className="d-flex align-items-center">
                           <span>{t("client")}</span>
@@ -303,7 +303,7 @@ const ManagerFile = () => {
                           </Link>
                         </div>
                       </th>
-                    }
+                    } */}
                     {selectedColumns.includes("brokerlabel") &&
                       <th>
                         <div className="d-flex align-items-center">
@@ -448,9 +448,8 @@ const ManagerFile = () => {
                   {(fileList?.length > 0 && selectedColumns?.length > 0) ?
                     fileList?.map((data, index) => (
                       <tr key={index} onClick={() => navigate(`/manager-file-detail/${data.id}`)}>
-                        {/* {selectedColumns.includes("Assureur") && <td>{data.uploader.first_name + ' ' + data.uploader.last_name}</td>} */}
                         {selectedColumns.includes("Police") && <td className="bold-font">{data.folder_name}</td>}
-                        {selectedColumns.includes("client") && <td className="bold-font">{data.customer_name}</td>}
+                        {/* {selectedColumns.includes("client") && <td className="bold-font">{data.customer_name}</td>} */}
                         {selectedColumns.includes("brokerlabel") && <td className="bold-font">{data.broker?.first_name ? data.broker?.first_name : "Sans"}</td>}
                         {selectedColumns.includes("Date de création") && <td className="bold-font">{data?.start_date}</td>}
                         {selectedColumns.includes("status") &&

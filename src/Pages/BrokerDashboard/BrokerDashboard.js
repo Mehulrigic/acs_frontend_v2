@@ -51,7 +51,7 @@ const BrokerDashboard = () => {
 
   const [modalColumns, setModalColumns] = useState({
     fileNumber: true,
-    client: true,
+    // client: true,
     "Date de création": true,
     status: true,
   });
@@ -329,7 +329,7 @@ const BrokerDashboard = () => {
                           </div>
                         </th>
                       }
-                      {selectedColumns.includes("client") &&
+                      {/* {selectedColumns.includes("client") &&
                         <th>
                           <div className="d-flex align-items-center">
                             <span>{t("client")}</span>
@@ -353,7 +353,7 @@ const BrokerDashboard = () => {
                             </Link>
                           </div>
                         </th>
-                      }
+                      } */}
                       {selectedColumns.includes("Date de création") &&
                         <th>
                           <div className="d-flex align-items-center">
@@ -436,7 +436,7 @@ const BrokerDashboard = () => {
                       userDocumentData?.map((data) => (
                         <tr onClick={() => navigate(`/courtier-file-detail/${data.id}`)}>
                           {selectedColumns.includes("fileNumber") && <td className="bold-font">{data.folder_name}</td>}
-                          {selectedColumns.includes("client") && <td>{data.customer_name}</td>}
+                          {/* {selectedColumns.includes("client") && <td>{data.customer_name}</td>} */}
                           {selectedColumns.includes("Date de création") && <td>{data.created_at}</td>}
                           {selectedColumns.includes("status") &&
                             <td>

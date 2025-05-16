@@ -29,7 +29,7 @@ const AdminDashboard = () => {
 
   const [modalColumns, setModalColumns] = useState({
     fileNumber: true,
-    client: true,
+    // client: true,
     brokerlabel: true,
     "Date de création": true,
     lastModifiedDateLabel: true,
@@ -268,7 +268,7 @@ const AdminDashboard = () => {
                           </div>
                         </th>
                       }
-                      {selectedColumns.includes("client") &&
+                      {/* {selectedColumns.includes("client") &&
                         <th>
                           <div className="d-flex align-items-center">
                             <span>{t("client")}</span>
@@ -292,7 +292,7 @@ const AdminDashboard = () => {
                             </Link>
                           </div>
                         </th>
-                      }
+                      } */}
                       {selectedColumns.includes("brokerlabel") &&
                         <th>
                           <div className="d-flex align-items-center">
@@ -462,7 +462,7 @@ const AdminDashboard = () => {
                           {selectedColumns.includes("fileNumber") && (
                             <td className="bold-font">{data.folder_name}</td>
                           )}
-                          {selectedColumns.includes("client") && <td>{data.customer_name}</td>}
+                          {/* {selectedColumns.includes("client") && <td>{data.customer_name}</td>} */}
                           {selectedColumns.includes("brokerlabel") && (
                             <td>
                               {data.broker

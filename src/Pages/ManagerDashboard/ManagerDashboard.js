@@ -42,7 +42,7 @@ const ManagerDashboard = () => {
 
   const [modalColumns, setModalColumns] = useState({
     Police: true,
-    client: true,
+    // client: true,
     brokerlabel: true,
     "Date de création": true,
     status: true,
@@ -219,31 +219,6 @@ const ManagerDashboard = () => {
               <Table responsive hover>
                 <thead>
                   <tr>
-                    {/* {selectedColumns.includes("client") &&
-                      <th>
-                        <div className="d-flex align-items-center">
-                          <span>Assureur</span>
-                          <Link
-                            className={`sorting-icon ms-2`}
-                            onClick={() => handleClickRotate("uploader.first_name")}
-                          >
-                            {sort.value === "asc" &&
-                              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z" fill="black" />
-                                <path d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z" fill="black" fill-opacity="0.5" />
-                              </svg>
-                            }
-
-                            {sort.value === "desc" &&
-                              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z" fill="black" fill-opacity="0.5" />
-                                <path d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z" fill="black" />
-                              </svg>
-                            }
-                          </Link>
-                        </div>
-                      </th>
-                    } */}
                     {selectedColumns.includes("Police") &&
                       <th>
                         <div className="d-flex align-items-center">
@@ -269,7 +244,7 @@ const ManagerDashboard = () => {
                         </div>
                       </th>
                     }
-                    {selectedColumns.includes("client") &&
+                    {/* {selectedColumns.includes("client") &&
                       <th>
                         <div className="d-flex align-items-center">
                           <span>{t("client")}</span>
@@ -293,7 +268,7 @@ const ManagerDashboard = () => {
                           </Link>
                         </div>
                       </th>
-                    }
+                    } */}
                     {selectedColumns.includes("brokerlabel") &&
                       <th>
                         <div className="d-flex align-items-center">
@@ -405,9 +380,8 @@ const ManagerDashboard = () => {
                   {(tobeProceedList?.length > 0 && selectedColumns?.length > 0) ?
                     tobeProceedList?.map((data, index) => (
                       <tr key={index} onClick={() => navigate(`/manager-file-detail/${data.id}`)}>
-                        {/* {selectedColumns.includes("client") && <td>{data.uploader.first_name + ' ' + data.uploader.last_name}</td>} */}
                         {selectedColumns.includes("Police") && <td className="bold-font">{data.folder_name}</td>}
-                        {selectedColumns.includes("client") && <td className="bold-font">{data.customer_name}</td>}
+                        {/* {selectedColumns.includes("client") && <td className="bold-font">{data.customer_name}</td>} */}
                         {selectedColumns.includes("brokerlabel") && <td className="bold-font">{data.broker?.first_name ? data.broker?.first_name : "Sans"}</td>}
                         {selectedColumns.includes("Date de création") && <td className="bold-font">{data?.start_date}</td>}
                         {selectedColumns.includes("status") &&
