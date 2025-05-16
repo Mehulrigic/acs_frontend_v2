@@ -1723,73 +1723,77 @@ const FileDetails = () => {
                     {flashMessage.message}
                   </div>
                 )}
-                <Form.Group className="mb-4 mx-w-320" controlId="exampleForm.ControlInput1">
-                  <Form.Label>N° de dossier <span>*</span></Form.Label>
-                  <Form.Control
-                    type="text"
-                    placeholder="N° de dossier"
-                    name="folderName"
-                    defaultValue={showUserDocumentData?.folder_name || ""}
-                  />
-                </Form.Group>
+                <div className="d-flex gap-4 flex-wrap">
+                  <div className="flex-fill" style={{ minWidth: "300px" }}>
+                    <Form.Group className="mb-4 mx-w-320" controlId="exampleForm.ControlInput1">
+                      <Form.Label>N° de dossier <span>*</span></Form.Label>
+                      <Form.Control
+                        type="text"
+                        placeholder="N° de dossier"
+                        name="folderName"
+                        defaultValue={showUserDocumentData?.folder_name || ""}
+                      />
+                    </Form.Group>
 
-                <Form.Group className="mb-4 mx-w-320" controlId="exampleForm.ControlInput1">
-                  <Form.Label>Numéro de contrat</Form.Label>
-                  <Form.Control
-                    type="text"
-                    placeholder="Numéro de contrat"
-                    name="contract_no"
-                    defaultValue={showUserDocumentData?.contract_no || ""}
-                  />
-                </Form.Group>
+                    <Form.Group className="mb-4 mx-w-320" controlId="exampleForm.ControlInput1">
+                      <Form.Label>Numéro de contrat</Form.Label>
+                      <Form.Control
+                        type="text"
+                        placeholder="Numéro de contrat"
+                        name="contract_no"
+                        defaultValue={showUserDocumentData?.contract_no || ""}
+                      />
+                    </Form.Group>
 
-                <Form.Group className="mb-4 mx-w-320" controlId="formBasicEmail">
-                  <Form.Label>Choisir un Courtier</Form.Label>
-                  <Form.Select
-                    className="full-width mb-3"
-                    aria-label={"statusSelectAria"}
-                    value={selectBroker}
-                    onChange={handleBrokerChange}
-                  >
-                    <option value="" disabled>Choisir un Courtier</option>
-                    {brokerList?.map((broker) => (
-                      <option value={broker.id}>{broker.first_name}</option>
-                    ))}
-                  </Form.Select>
-                </Form.Group>
+                    <Form.Group className="mb-4 mx-w-320" controlId="formBasicEmail">
+                      <Form.Label>Choisir un Courtier</Form.Label>
+                      <Form.Select
+                        className="full-width mb-3"
+                        aria-label={"statusSelectAria"}
+                        value={selectBroker}
+                        onChange={handleBrokerChange}
+                      >
+                        <option value="" disabled>Choisir un Courtier</option>
+                        {brokerList?.map((broker) => (
+                          <option value={broker.id}>{broker.first_name}</option>
+                        ))}
+                      </Form.Select>
+                    </Form.Group>
+                  </div>
+                  <div className="flex-fill" style={{ minWidth: "300px" }}>
+                    <Form.Group className="mb-4 mx-w-320" controlId="names">
+                      <Form.Label className="d-block">Date de début du site</Form.Label>
+                      <DatePicker
+                        placeholderText="Selectionner une date de début du site"
+                        selected={startDate ? getFormattedDate(startDate) : null}
+                        onChange={(date) => setStartDate(formatDate(date))}
+                        dateFormat="dd/MM/yyyy"
+                        locale={fr}
+                      />
+                    </Form.Group>
 
-                <Form.Group className="mb-4 mx-w-320" controlId="names">
-                  <Form.Label className="d-block">Date de début du site</Form.Label>
-                  <DatePicker
-                    placeholderText="Selectionner une date de début du site"
-                    selected={startDate ? getFormattedDate(startDate) : null}
-                    onChange={(date) => setStartDate(formatDate(date))}
-                    dateFormat="dd/MM/yyyy"
-                    locale={fr}
-                  />
-                </Form.Group>
+                    <Form.Group className="mb-4 mx-w-320" controlId="names">
+                      <Form.Label className="d-block">Date d'achèvement définitive</Form.Label>
+                      <DatePicker
+                        placeholderText="Selectionner une date d'achèvement définitive"
+                        selected={endDate ? getFormattedDate(endDate) : null}
+                        onChange={(date) => setEndDate(formatDate(date))}
+                        dateFormat="dd/MM/yyyy"
+                        locale={fr}
+                      />
+                    </Form.Group>
 
-                <Form.Group className="mb-4 mx-w-320" controlId="names">
-                  <Form.Label className="d-block">Date d'achèvement définitive</Form.Label>
-                  <DatePicker
-                    placeholderText="Selectionner une date d'achèvement définitive"
-                    selected={endDate ? getFormattedDate(endDate) : null}
-                    onChange={(date) => setEndDate(formatDate(date))}
-                    dateFormat="dd/MM/yyyy"
-                    locale={fr}
-                  />
-                </Form.Group>
-                
-                <Form.Group className="mb-4 mx-w-320" controlId="exampleForm.ControlInput1">
-                  <Form.Label>Coût final du chantier</Form.Label>
-                  <Form.Control
-                    type="text"
-                    placeholder="Entrez le coût final du site"
-                    name="estimated_site_cost"
-                    defaultValue={showUserDocumentData?.estimated_site_cost || ""}
-                  />
-                </Form.Group>
-
+                    <Form.Group className="mb-4 mx-w-320" controlId="exampleForm.ControlInput1">
+                      <Form.Label>Coût final du chantier</Form.Label>
+                      <Form.Control
+                        type="text"
+                        placeholder="Entrez le coût final du site"
+                        name="estimated_site_cost"
+                        defaultValue={showUserDocumentData?.estimated_site_cost || ""}
+                      />
+                    </Form.Group>
+                  </div>
+                </div>
                 <Button className="btn-secondary" type="submit">
                   Valider
                 </Button>
