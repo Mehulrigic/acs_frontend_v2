@@ -7,6 +7,8 @@ import AddBroker from "../AddBroker/AddBroker";
 import AddFolderPanelService from "../../API/AddFolderPanel/AddFolderPanelService";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
+import DatePicker from "react-datepicker";
+import { fr } from "date-fns/locale";
 
 const AddfolderPanel = (props) => {
   const { t } = useTranslation();
@@ -25,6 +27,10 @@ const AddfolderPanel = (props) => {
 
   const [folderName, setFolderName] = useState("");
   const [contractNo, setContractNo] = useState("");
+  const [policyholderName, setPolicyholderName] = useState("");
+  const [estimatedStartDate, setEstimatedStartDate] = useState(null);
+  const [estimatedCompletionDate, setEstimatedCompletionDate] = useState(null);
+  const [estimatedSiteCost, setEstimatedSiteCost] = useState("");
   const [selectBroker, setSelectBroker] = useState("");
   const [fileListStep2, setFileListStep2] = useState([]);
   const [fileListStep3, setFileListStep3] = useState([]);
@@ -122,10 +128,16 @@ const AddfolderPanel = (props) => {
       var userData = {
         folder_name: folderName ?? "",
         broker_id: userRole == "Courtier" ? userId : selectBroker,
+        contract_no: contractNo ? contractNo : "",
+        insurance_policyholder_name: policyholderName ? policyholderName : "",
+        estimated_start_date: estimatedStartDate ? estimatedStartDate : "",
+        estimated_completion_date: estimatedCompletionDate ? estimatedCompletionDate: "",
+        estimated_site_cost: estimatedSiteCost ? estimatedSiteCost : "",
         documents: documents,
-        contract_no: contractNo ? contractNo : ""
       };
+      
       const response = await AddFolderPanelService.store_document(userData);
+
       if (response.data.status) {
         setShowStep5(true);
         setShowStep4(false);
@@ -347,6 +359,23 @@ const AddfolderPanel = (props) => {
     };
   }, []);
 
+  const formatDate = (dateString) => {
+    if (dateString) {
+      const date = new Date(dateString);
+      const day = String(date.getDate()).padStart(2, '0');
+      const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+      const year = date.getFullYear();
+      return `${day}/${month}/${year}`;
+    } else {
+      return "";
+    }
+  };
+
+  const getFormattedDate = (dateString) => {
+    const [day, month, year] = dateString.split("/");
+    return new Date(`${month}/${day}/${year}`); // Convert to MM/DD/YYYY format
+  };
+
 
   return (
     <Fragment>
@@ -419,6 +448,48 @@ const AddfolderPanel = (props) => {
                     placeholder="Numéro de contrat"
                     value={contractNo}
                     onChange={(e) => setContractNo(e.target.value)}
+                  />
+                </Form.Group>
+
+                <Form.Group className="mt-32" controlId="formBasicEmail">
+                  <Form.Label>Nom du preneur d'assurance</Form.Label>
+                  <Form.Control
+                    type="text"
+                    placeholder="Nom du preneur d'assurance"
+                    value={policyholderName}
+                    onChange={(e) => setPolicyholderName(e.target.value)}
+                  />
+                </Form.Group>
+
+                <Form.Group className="mt-32" controlId="names">
+                  <Form.Label className="d-block">Date de début estimée</Form.Label>
+                  <DatePicker
+                    placeholderText="Selectionner une date de début estimée"
+                    selected={estimatedStartDate ? getFormattedDate(estimatedStartDate) : null}
+                    onChange={(date) => setEstimatedStartDate(formatDate(date))}
+                    dateFormat="dd/MM/yyyy"
+                    locale={fr}
+                  />
+                </Form.Group>
+
+                <Form.Group className="mt-32" controlId="names">
+                  <Form.Label className="d-block">Date d'achèvement estimée</Form.Label>
+                  <DatePicker
+                    placeholderText="Selectionner une date d'achèvement estimée"
+                    selected={estimatedCompletionDate ? getFormattedDate(estimatedCompletionDate) : null}
+                    onChange={(date) => setEstimatedCompletionDate(formatDate(date))}
+                    dateFormat="dd/MM/yyyy"
+                    locale={fr}
+                  />
+                </Form.Group>
+
+                <Form.Group className="mt-32" controlId="formBasicEmail">
+                  <Form.Label>Coût estimé du chantier</Form.Label>
+                  <Form.Control
+                    type="text"
+                    placeholder="Entrez le coût estimé du site"
+                    value={estimatedSiteCost}
+                    onChange={(e) => setEstimatedSiteCost(e.target.value)}
                   />
                 </Form.Group>
 

@@ -81,6 +81,7 @@ const FileDetails = () => {
   const [recordsToShowNOte, setRecordsToShowNote] = useState(3);
   const [logoImageShow, setLogoImageShow] = useState("");
   const [rightPanelThemeColor, setRightPanelThemeColor] = useState("");
+  const [userRole, setUserRole] = useState(null);
   const [search, setSearch] = useState("");
   const [isRotated, setIsRotated] = useState(false);
   const [sort, setSort] = useState({ key: "created_at", value: "desc" });
@@ -388,8 +389,8 @@ const FileDetails = () => {
           doc_type_id: file.docType?.id
         }));
         setShowUserDocumentData(response.data.documents);
-        setStartDate(response.data.documents.start_date);
-        setEndDate(response.data.documents.complete_date);
+        setStartDate(response.data.documents.estimated_start_date);
+        setEndDate(response.data.documents.estimated_completion_date);
         setShowUserFolderName(response.data.documents.folder_name);
         setSelectBroker(response.data.documents?.broker?.id);
         setTotalRecordOther(response.data.documents.user_document_files?.length);
@@ -697,8 +698,11 @@ const FileDetails = () => {
     e.preventDefault();
 
     var folderData = {
-      folder_name: e.target.elements.folderName.value ?? "",
+      folder_name: e.target.elements.folderName.value ? e.target.elements.folderName.value : "",
       broker_id: selectBroker ? selectBroker : "",
+      estimated_start_date: startDate ? startDate : "",
+      estimated_completion_date: endDate ? endDate : "",
+      estimated_site_cost: e.target.elements.estimated_site_cost.value ? e.target.elements.estimated_site_cost.value : "",
       start_date: startDate ? startDate : "",
       end_date: endDate ? endDate : ""
     };
@@ -1755,9 +1759,9 @@ const FileDetails = () => {
                 </Form.Group>
 
                 <Form.Group className="mb-4 mx-w-320" controlId="names">
-                  <Form.Label className="d-block">Début de chantier</Form.Label>
+                  <Form.Label className="d-block">Date de début du site</Form.Label>
                   <DatePicker
-                    placeholderText="Selectionner une date"
+                    placeholderText="Selectionner une date de début du site"
                     selected={startDate ? getFormattedDate(startDate) : null}
                     onChange={(date) => setStartDate(formatDate(date))}
                     dateFormat="dd/MM/yyyy"
@@ -1766,15 +1770,26 @@ const FileDetails = () => {
                 </Form.Group>
 
                 <Form.Group className="mb-4 mx-w-320" controlId="names">
-                  <Form.Label className="d-block">Fin de chantier</Form.Label>
+                  <Form.Label className="d-block">Date d'achèvement définitive</Form.Label>
                   <DatePicker
-                    placeholderText="Selectionner une date"
+                    placeholderText="Selectionner une date d'achèvement définitive"
                     selected={endDate ? getFormattedDate(endDate) : null}
                     onChange={(date) => setEndDate(formatDate(date))}
                     dateFormat="dd/MM/yyyy"
                     locale={fr}
                   />
                 </Form.Group>
+                
+                <Form.Group className="mb-4 mx-w-320" controlId="exampleForm.ControlInput1">
+                  <Form.Label>Coût final du chantier</Form.Label>
+                  <Form.Control
+                    type="text"
+                    placeholder="Entrez le coût final du site"
+                    name="estimated_site_cost"
+                    defaultValue={showUserDocumentData?.estimated_site_cost || ""}
+                  />
+                </Form.Group>
+
                 <Button className="btn-secondary" type="submit">
                   Valider
                 </Button>
