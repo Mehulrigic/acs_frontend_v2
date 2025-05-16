@@ -395,6 +395,7 @@ const FileDetails = () => {
         setTotalRecordOther(response.data.documents.user_document_files?.length);
         setTotalMissingRecords(response.data.documents.total_missing_doc);
         setShowUserDocumentFileData(response.data.documents.user_document_files);
+        setTotalSpeaker(response.data.documents.total_speakers);
         setUserDocumentFileDataChanges(fileDataChanges);
       }
     } catch (error) {
@@ -607,6 +608,7 @@ const FileDetails = () => {
       const response = await AcsManagerFileService.delete_speaker(id, showSpeakerId);
       if (response.data.status) {
         handleCloseDeleteSpeakerModal();
+        ShowUserDocumentData(id);
         setActiveTab(activeTab);
         SpeakerList(id, sort, search, 1);
       }
@@ -800,25 +802,19 @@ const FileDetails = () => {
   const AddMissingDocument = async (e) => {
     e.preventDefault();
     try {
-      const convertToBase64 = (file) => {
-        return new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onload = () => resolve(reader.result.split(",")[1]);
-          reader.onerror = (error) => reject(error);
-          reader.readAsDataURL(file);
-        });
-      };
+      const documents = [];
+      if (fileList?.length) {
+        documents.push(...fileList);
+      }
 
-      const base64Files = await Promise.all(
-        fileList.map(async (file) => ({
-          filename: file.name,
-          file: await convertToBase64(file),
-          missing_document_id: missingDocumentId,
-          speaker_id: showSpeakerId
-        }))
-      );
+      var userData = {
+        speaker_id: showSpeakerId,
+        missing_document_id: missingDocumentId,
+        documents: documents
+      }
 
-      const response = await FilePageService.add_missing_document(id, base64Files[0]);
+      const response = await FilePageService.add_missing_document(id, userData);
+
       if (response.data.status) {
         setFileList([]);
         setFlashMessageStoreDoc({
@@ -944,9 +940,20 @@ const FileDetails = () => {
     e.target.value = ""; // Reset the file input
   };
 
-  const handleUpdateFileChange = (event) => {
-    const file = event.target.files[0]; // Only get the first selected file
-    if (file) {
+  const handleUpdateFileChange = async (event) => {
+    const files = Array.from(event.target.files); // Only get the first selected file
+    const newFiles = [];
+
+    const convertToBase64 = (file) => {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result.split(",")[1]); // Extract only Base64 content
+        reader.onerror = (error) => reject(error);
+        reader.readAsDataURL(file);
+      });
+    };
+
+    for (const file of files) {
       if (!allowedFileTypes.includes(file.type)) {
         setFlashMessage({
           type: "error",
@@ -963,8 +970,15 @@ const FileDetails = () => {
         return; // Exit if file size is too large
       }
 
-      // Replace fileList with the new file
-      setFileList([file]);
+      const base64File = await convertToBase64(file);
+
+      newFiles.push({
+        file: base64File,
+        name: file.name,
+      });
+    }
+    if (newFiles.length > 0) {
+      setFileList((prevFiles) => [...prevFiles, ...newFiles]);
     }
 
     event.target.value = ""; // Reset the file input
@@ -1424,6 +1438,7 @@ const FileDetails = () => {
                           >
                             <div 
                               className="custom-upload-box"
+                              onDragOver={(e) => e.preventDefault()}
                               onDrop={(e) => {
                                 e.preventDefault();
                                 const files = e.dataTransfer.files;
@@ -2604,6 +2619,7 @@ const FileDetails = () => {
                             >
                               <div 
                                 className="custom-upload-box"
+                                onDragOver={(e) => e.preventDefault()}
                                 onDrop={(e) => {
                                   e.preventDefault();
                                   const files = e.dataTransfer.files;
@@ -2636,6 +2652,7 @@ const FileDetails = () => {
                                 <Form.Control
                                   type="file"
                                   className="file-input"
+                                  multiple
                                   onChange={handleUpdateFileChange}
                                 />
                               </div>
@@ -2948,6 +2965,7 @@ const FileDetails = () => {
                 >
                   <div 
                     className="custom-upload-box"
+                    onDragOver={(e) => e.preventDefault()}
                     onDrop={(e) => {
                       e.preventDefault();
                       const files = e.dataTransfer.files;

@@ -361,11 +361,21 @@ const ManagerFileDetail = () => {
     }
   };
 
-  const handleUpdateFileChange = (event) => {
-    console.log(555);
+  const handleUpdateFileChange = async (event) => {
+    const files = Array.from(event.target.files); // Only get the first selected file
 
-    const file = event.target.files[0]; // Only get the first selected file
-    if (file) {
+    const newFiles = [];
+
+    const convertToBase64 = (file) => {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result.split(",")[1]); // Extract only Base64 content
+        reader.onerror = (error) => reject(error);
+        reader.readAsDataURL(file);
+      });
+    };
+
+    for (const file of files) {
       if (!allowedFileTypes.includes(file.type)) {
         setFlashMessage({
           type: "error",
@@ -382,8 +392,15 @@ const ManagerFileDetail = () => {
         return; // Exit if file size is too large
       }
 
-      // Replace fileList with the new file
-      setFileList([file]);
+      const base64File = await convertToBase64(file);
+
+      newFiles.push({
+        file: base64File,
+        name: file.name,
+      });
+    }
+    if (newFiles.length > 0) {
+      setFileList((prevFiles) => [...prevFiles, ...newFiles]);
     }
 
     event.target.value = ""; // Reset the file input
@@ -404,25 +421,19 @@ const ManagerFileDetail = () => {
   const AddMissingDocument = async (e) => {
     e.preventDefault();
     try {
-      const convertToBase64 = (file) => {
-        return new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onload = () => resolve(reader.result.split(",")[1]);
-          reader.onerror = (error) => reject(error);
-          reader.readAsDataURL(file);
-        });
-      };
+      const documents = [];
 
-      const base64Files = await Promise.all(
-        fileList.map(async (file) => ({
-          filename: file.name,
-          file: await convertToBase64(file),
-          missing_document_id: missingDocumentId,
-          speaker_id: showSpeakerId
-        }))
-      );
+      if (fileList?.length) {
+        documents.push(...fileList);
+      }
 
-      const response = await FilePageService.add_missing_document(id, base64Files[0]);
+      var userData = {
+        speaker_id: showSpeakerId,
+        missing_document_id: missingDocumentId,
+        documents: documents
+      }
+
+      const response = await FilePageService.add_missing_document(id, userData);
       if (response.data.status) {
         setFileList([]);
         setFlashMessageStoreDoc({
@@ -2905,6 +2916,7 @@ const ManagerFileDetail = () => {
                             >
                               <div 
                                 className="custom-upload-box"
+                                onDragOver={(e) => e.preventDefault()}
                                 onDrop={(e) => {
                                   e.preventDefault();
                                   const files = e.dataTransfer.files;
@@ -2937,6 +2949,7 @@ const ManagerFileDetail = () => {
                                 <Form.Control
                                   type="file"
                                   className="file-input"
+                                  multiple
                                   onChange={handleUpdateFileChange}
                                 />
                               </div>

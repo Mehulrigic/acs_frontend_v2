@@ -517,6 +517,7 @@ const MyAccount = () => {
                         >
                           <div 
                             className="custom-upload-box"
+                            onDragOver={(e) => e.preventDefault()}
                             onDrop={(e) => {
                               e.preventDefault();
                               const files = e.dataTransfer.files;

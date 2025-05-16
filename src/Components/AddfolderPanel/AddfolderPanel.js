@@ -119,13 +119,13 @@ const AddfolderPanel = (props) => {
         documents.push(...fileListStep3);
       }
 
-      var useData = {
+      var userData = {
         folder_name: folderName ?? "",
         broker_id: userRole == "Courtier" ? userId : selectBroker,
         documents: documents,
         contract_no: contractNo ? contractNo : ""
       };
-      const response = await AddFolderPanelService.store_document(useData);
+      const response = await AddFolderPanelService.store_document(userData);
       if (response.data.status) {
         setShowStep5(true);
         setShowStep4(false);
