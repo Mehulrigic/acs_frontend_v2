@@ -49,7 +49,7 @@ const InsurersDashboard = () => {
 
   const [modalColumns, setModalColumns] = useState({
     fileNumber: true,
-    // client: true,
+    client: true,
     "Nom du preneur d'assurance": true,
     brokerlabel: true,
     "Date de création": true,
@@ -373,7 +373,7 @@ const InsurersDashboard = () => {
                             <span>Nom du preneur d'assurance</span>
                             <Link
                               className={`sorting-icon ms-2`}
-                              onClick={() => handleClickRotate("customer_name")}
+                              onClick={() => handleClickRotate("insurance_policyholder_name")}
                             >
                               {sort.value === "asc" &&
                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -528,7 +528,7 @@ const InsurersDashboard = () => {
                             <td className="bold-font">{data.folder_name}</td>
                           )}
                           {/* {selectedColumns.includes("client") && <td>{data.customer_name}</td>} */}
-                          {selectedColumns.includes("Nom du preneur d'assurance") && <td>{data.customer_name}</td>}
+                          {selectedColumns.includes("Nom du preneur d'assurance") && <td>{data.insurance_policyholder_name}</td>}
                           {selectedColumns.includes("brokerlabel") && (
                             <td>
                               {data.broker
