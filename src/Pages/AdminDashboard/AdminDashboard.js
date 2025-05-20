@@ -447,6 +447,12 @@ const AdminDashboard = () => {
                                 <option value="to_be_checked">{t("toBeCheckedLabel")}</option>
                                 <option value="validated">{t("validatedLabel")}</option>
                                 <option value="invalid">{t("invalidLabel")}</option>
+                                <option value="transfer_to_manager">{t("transfer_to_manager")}</option>
+                                <option value="transfer_to_broker">{t("transfer_to_broker")}</option>
+                                <option value="transfer_to_insurer">{t("transfer_to_insurer")}</option>
+                                <option value="formal_notice">{t("formal_notice")}</option>
+                                <option value="to_be_decided">{t("to_be_decided")}</option>
+
                               </Form.Select>
                             </div>
                             <div>
