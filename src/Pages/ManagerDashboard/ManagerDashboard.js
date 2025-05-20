@@ -12,6 +12,7 @@ import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 import Loading from '../../Common/Loading';
 import DashboardManagementService from "../../API/DashboardManagement/DashboardManagementService";
+import { Tab,Tabs } from 'react-bootstrap';
 
 const ManagerDashboard = () => {
   const { t } = useTranslation();
@@ -77,7 +78,7 @@ const ManagerDashboard = () => {
       const right_panel_color = JSON.parse(localStorage.getItem("right_panel_color"));
       setRightPanelThemeColor(right_panel_color);
       setLogoImageShow(logo_image);
-      TobeProceedList(search, sort, currentPage, editTobeProceedStatus);
+      TobeProceedList(search, sort, currentPage, editTobeProceedStatus,activeTab);
       setEditTobeProceedStatus("");
     } else {
       navigate("/");
@@ -85,10 +86,10 @@ const ManagerDashboard = () => {
   }, [sort]);
 
   const handlePageChange = (page) => {
-    TobeProceedList(search, sort, page, editTobeProceedStatus);
+    TobeProceedList(search, sort, page, editTobeProceedStatus,activeTab);
   };
 
-  const TobeProceedList = async (search, sort, page = 1, status) => {
+  const TobeProceedList = async (search, sort, page = 1, status,key) => {
     setIsLoading(true);
     try {
       const userData = {
@@ -98,7 +99,9 @@ const ManagerDashboard = () => {
           value: sort.value
         },
         status: status,
-        page
+        page,
+        filter_type:key
+
       };
       const response = await AcsManagerFileService.tobeproceed(userData);
       if (response.data.status) {
@@ -117,7 +120,7 @@ const ManagerDashboard = () => {
 
   const handleSearchChange = (search) => {
     setSearch(search);
-    TobeProceedList(search, sort, 1, editUserStatus);
+    TobeProceedList(search, sort, 1, editUserStatus,activeTab);
   };
 
   const handleKeyPress = (e) => {
@@ -130,7 +133,7 @@ const ManagerDashboard = () => {
 
   const handleStatusChange = (status) => {
     setEditUserStatus(status);
-    TobeProceedList(search, sort, 1, status);
+    TobeProceedList(search, sort, 1, status,activeTab);
   };
 
   const handleCheckboxChange = (key) => {
@@ -157,11 +160,17 @@ const ManagerDashboard = () => {
       if (response.data.status) {
         handleCloseDeleteModal();
         setShowFolderId("");
-        TobeProceedList(search, sort, currentPage, editTobeProceedStatus);
+        TobeProceedList(search, sort, currentPage, editTobeProceedStatus,activeTab);
       }
     } catch (error) {
       console.log(error);
     }
+  };
+  const [activeTab, setActiveTab] = useState('toProcess');
+
+  const handleTabSelect = (key) => {
+    setActiveTab(key);
+    TobeProceedList(search, sort, currentPage, editTobeProceedStatus,key);
   };
 
   return (
@@ -172,6 +181,8 @@ const ManagerDashboard = () => {
         sidebarLogo={
           (logoImageShow == "" || logoImageShow == null || logoImageShow == undefined) ? logo : `${process.env.REACT_APP_IMAGE_URL}/${logoImageShow}`}
       />
+
+      
       <div className="dashboard-main-content manager-dashboard" style={{ backgroundColor: rightPanelThemeColor }}>
         <div className="top-header">
           <h4>Dossiers</h4>
@@ -179,7 +190,19 @@ const ManagerDashboard = () => {
             <h1 className="m-0">Dossier à traiter ({totalRecords})</h1>
           </div>
         </div>
-        <div className="table-wrapper mt-32">
+
+        <Tabs
+                              id="controlled-tab-example"
+                              activeKey={activeTab}
+                              onSelect={handleTabSelect}
+                              className="mt-5"
+                              >
+                                <Tab
+                                  title="À traiter"
+                                  eventKey="toProcess"
+                                >
+
+<div className="table-wrapper mt-32">
           <div className="d-flex align-aitems-center gap-2 justify-content-between">
             <h2 className='m-0'>
               {/* Dossier à traiter ({totalRecords}) */}
@@ -492,6 +515,648 @@ const ManagerDashboard = () => {
             />
           }
         </div>
+                                </Tab>
+                                <Tab
+                                  title="Reçus à venir"
+                                  eventKey="receipts_to_come"
+                                >
+  
+  <div className="table-wrapper mt-32">
+          <div className="d-flex align-aitems-center gap-2 justify-content-between">
+            <h2 className='m-0'>
+              {/* Dossier à traiter ({totalRecords}) */}
+            </h2>
+            <Form.Group
+              className="relative"
+              controlId="exampleForm.ControlInput1"
+            >
+              <Form.Control
+                type="search"
+                placeholder="Rechercher"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                onKeyDown={handleKeyPress}
+              />
+              <div
+                className="search-icon"
+                style={{ cursor: "pointer" }}
+                onClick={() => handleSearchChange(search, 1, editUserStatus)}
+              >
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 18 18"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M12.7549 11.2549H11.9649L11.6849 10.9849C12.6649 9.84488 13.2549 8.36488 13.2549 6.75488C13.2549 3.16488 10.3449 0.254883 6.75488 0.254883C3.16488 0.254883 0.254883 3.16488 0.254883 6.75488C0.254883 10.3449 3.16488 13.2549 6.75488 13.2549C8.36488 13.2549 9.84488 12.6649 10.9849 11.6849L11.2549 11.9649V12.7549L16.2549 17.7449L17.7449 16.2549L12.7549 11.2549ZM6.75488 11.2549C4.26488 11.2549 2.25488 9.24488 2.25488 6.75488C2.25488 4.26488 4.26488 2.25488 6.75488 2.25488C9.24488 2.25488 11.2549 4.26488 11.2549 6.75488C11.2549 9.24488 9.24488 11.2549 6.75488 11.2549Z"
+                    fill="#998f90"
+                  />
+                </svg>
+              </div>
+            </Form.Group>
+          </div>
+          {isLoading ? <Loading /> :
+            <div className="table-wrap mt-24">
+              <Table responsive hover>
+                <thead>
+                  <tr>
+                    {selectedColumns.includes("Police") &&
+                      <th>
+                        <div className="d-flex align-items-center">
+                          <span>Police</span>
+                          <Link
+                            className={`sorting-icon ms-2`}
+                            onClick={() => handleClickRotate("folder_name")}
+                          >
+                            {sort.value === "asc" &&
+                              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z" fill="black" />
+                                <path d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z" fill="black" fill-opacity="0.5" />
+                              </svg>
+                            }
+
+                            {sort.value === "desc" &&
+                              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z" fill="black" fill-opacity="0.5" />
+                                <path d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z" fill="black" />
+                              </svg>
+                            }
+                          </Link>
+                        </div>
+                      </th>
+                    }
+                    {/* {selectedColumns.includes("client") &&
+                      <th>
+                        <div className="d-flex align-items-center">
+                          <span>{t("client")}</span>
+                          <Link
+                            className={`sorting-icon ms-2`}
+                            onClick={() => handleClickRotate("customer_name")}
+                          >
+                            {sort.value === "asc" &&
+                              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z" fill="black" />
+                                <path d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z" fill="black" fill-opacity="0.5" />
+                              </svg>
+                            }
+
+                            {sort.value === "desc" &&
+                              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z" fill="black" fill-opacity="0.5" />
+                                <path d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z" fill="black" />
+                              </svg>
+                            }
+                          </Link>
+                        </div>
+                      </th>
+                    } */}
+                    {selectedColumns.includes("client") &&
+                      <th>
+                        <div className="d-flex align-items-center">
+                          <span>Assureurs</span>
+                          <Link
+                            className={`sorting-icon ms-2`}
+                            onClick={() => handleClickRotate("customer_name")}
+                          >
+                            {sort.value === "asc" &&
+                              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z" fill="black" />
+                                <path d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z" fill="black" fill-opacity="0.5" />
+                              </svg>
+                            }
+
+                            {sort.value === "desc" &&
+                              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z" fill="black" fill-opacity="0.5" />
+                                <path d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z" fill="black" />
+                              </svg>
+                            }
+                          </Link>
+                        </div>
+                      </th>
+                    }
+                            {selectedColumns.includes("Nom du preneur d'assurance") &&
+                      <th>
+                        <div className="d-flex align-items-center">
+                          <span>Nom du preneur d'assurance</span>
+                          <Link
+                            className={`sorting-icon ms-2`}
+                            onClick={() => handleClickRotate("customer_name")}
+                          >
+                            {sort.value === "asc" &&
+                              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z" fill="black" />
+                                <path d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z" fill="black" fill-opacity="0.5" />
+                              </svg>
+                            }
+
+                            {sort.value === "desc" &&
+                              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z" fill="black" fill-opacity="0.5" />
+                                <path d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z" fill="black" />
+                              </svg>
+                            }
+                          </Link>
+                        </div>
+                      </th>
+                    }
+                    {selectedColumns.includes("brokerlabel") &&
+                      <th>
+                        <div className="d-flex align-items-center">
+                          <span>{t('brokerlabel')}</span>
+                          <Link
+                            className={`sorting-icon ms-2`}
+                            onClick={() => handleClickRotate("broker.first_name")}
+                          >
+                            {sort.value === "asc" &&
+                              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z" fill="black" />
+                                <path d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z" fill="black" fill-opacity="0.5" />
+                              </svg>
+                            }
+
+                            {sort.value === "desc" &&
+                              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z" fill="black" fill-opacity="0.5" />
+                                <path d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z" fill="black" />
+                              </svg>
+                            }
+                          </Link>
+                        </div>
+                      </th>
+                    }
+                    {selectedColumns.includes("Date de création") &&
+                      <th>
+                        <div className="d-flex align-items-center">
+                          <span>Date de création</span>
+                          <Link
+                            className={`sorting-icon ms-2`}
+                            onClick={() => handleClickRotate("start_date")}
+                          >
+                            {sort.value === "asc" &&
+                              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z" fill="black" />
+                                <path d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z" fill="black" fill-opacity="0.5" />
+                              </svg>
+                            }
+
+                            {sort.value === "desc" &&
+                              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z" fill="black" fill-opacity="0.5" />
+                                <path d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z" fill="black" />
+                              </svg>
+                            }
+                          </Link>
+                        </div>
+                      </th>
+                    }
+                    {selectedColumns.includes("status") && (
+                      <th className="select-drop">
+                        <div className="d-flex align-items-center">
+                          <div>
+                            <Form.Select
+                              aria-label="statusSelectAria"
+                              value={editUserStatus}
+                              onChange={(e) => handleStatusChange(e.target.value)}
+                            >
+                              <option value="">{t("status")}</option>
+                              <option value="to_be_checked">{t("toBeCheckedLabel")}</option>
+                              <option value="validated">{t("validatedLabel")}</option>
+                              <option value="invalid">{t("invalidLabel")}</option>
+                            </Form.Select>
+                          </div>
+                          <div>
+                            <Link
+                              className={`sorting-icon ms-2`}
+                              onClick={() => handleClickRotate("status")}
+                            >
+                              {sort.value === "asc" &&
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                  <path d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z" fill="black" />
+                                  <path d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z" fill="black" fill-opacity="0.5" />
+                                </svg>
+                              }
+
+                              {sort.value === "desc" &&
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                  <path d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z" fill="black" fill-opacity="0.5" />
+                                  <path d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z" fill="black" />
+                                </svg>
+                              }
+                            </Link>
+                          </div>
+                        </div>
+                      </th>
+                    )}
+                    {selectedColumns.includes("Action") && deletePermission && <th>Action</th>}
+                    <th style={{ textAlign: "right" }}>
+                      <Link onClick={handleAddcolShow}>
+                        <svg
+                          width="16"
+                          height="16"
+                          viewBox="0 0 14 14"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M14 8H8V14H6V8H0V6H6V0H8V6H14V8Z"
+                            fill="black"
+                          />
+                        </svg>
+                      </Link>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {(tobeProceedList?.length > 0 && selectedColumns?.length > 0) ?
+                    tobeProceedList?.map((data, index) => (
+                      <tr key={index} onClick={() => navigate(`/manager-file-detail/${data.id}`)}>
+                        {selectedColumns.includes("Police") && <td className="bold-font">{data.folder_name}</td>}
+                        {selectedColumns.includes("client") && <td className="bold-font">{data.customer_name}</td>}
+                        {selectedColumns.includes("Nom du preneur d'assurance") && <td className="bold-font">{data.insurance_policyholder_name}</td>}
+                        {selectedColumns.includes("brokerlabel") && <td className="bold-font">{data.broker?.first_name ? data.broker?.first_name : "Sans"}</td>}
+                        {selectedColumns.includes("Date de création") && <td className="bold-font">{data?.start_date}</td>}
+                        {selectedColumns.includes("status") &&
+                          <td>
+                            {
+                              data.status === "to_be_checked" ? <span className="checked badges">{t("toBeCheckedLabel")}</span> :
+                              data.status === "validated" ? <span className="verified badges">{t("validatedLabel")}</span> :
+                              <span className="incomplete badges">{t("invalidLabel")}</span>
+                            }
+                          </td>
+                        }
+                        {selectedColumns.includes("Action") && deletePermission && (
+                          <td>
+                            <div className="action-btn">
+                              <Link
+                                className="delete"
+                                href="/user-management"
+                                data-discover="true"
+                                title="Supprimer"
+                                onClick={(e) => { e.stopPropagation(); handleShowDeleteModal(); setShowFolderId(data.id); }}
+                              >
+                                <svg
+                                  width="24"
+                                  height="24"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                >
+                                  <path
+                                    d="M16 9V19H8V9H16ZM14.5 3H9.5L8.5 4H5V6H19V4H15.5L14.5 3ZM18 7H6V19C6 20.1 6.9 21 8 21H16C17.1 21 18 20.1 18 19V7Z"
+                                    fill="#00366B"
+                                  />
+                                </svg>
+                              </Link>
+                            </div>
+                          </td>
+                        )}
+                        <td></td>
+                      </tr>
+                    )) :
+                    <tr style={{ textAlign: "center" }}>
+                      <td colSpan="7">
+                        {t("NorecordsfoundLabel")}
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </Table>
+            </div>
+          }
+          {totalRecords > 10 &&
+            <Paginations
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+            />
+          }
+        </div>
+                                </Tab>
+                                <Tab
+                                  eventKey="receipts_past"
+                                  title="Recettes passées"
+                                >
+
+<div className="table-wrapper mt-32">
+          <div className="d-flex align-aitems-center gap-2 justify-content-between">
+            <h2 className='m-0'>
+              {/* Dossier à traiter ({totalRecords}) */}
+            </h2>
+            <Form.Group
+              className="relative"
+              controlId="exampleForm.ControlInput1"
+            >
+              <Form.Control
+                type="search"
+                placeholder="Rechercher"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                onKeyDown={handleKeyPress}
+              />
+              <div
+                className="search-icon"
+                style={{ cursor: "pointer" }}
+                onClick={() => handleSearchChange(search, 1, editUserStatus)}
+              >
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 18 18"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M12.7549 11.2549H11.9649L11.6849 10.9849C12.6649 9.84488 13.2549 8.36488 13.2549 6.75488C13.2549 3.16488 10.3449 0.254883 6.75488 0.254883C3.16488 0.254883 0.254883 3.16488 0.254883 6.75488C0.254883 10.3449 3.16488 13.2549 6.75488 13.2549C8.36488 13.2549 9.84488 12.6649 10.9849 11.6849L11.2549 11.9649V12.7549L16.2549 17.7449L17.7449 16.2549L12.7549 11.2549ZM6.75488 11.2549C4.26488 11.2549 2.25488 9.24488 2.25488 6.75488C2.25488 4.26488 4.26488 2.25488 6.75488 2.25488C9.24488 2.25488 11.2549 4.26488 11.2549 6.75488C11.2549 9.24488 9.24488 11.2549 6.75488 11.2549Z"
+                    fill="#998f90"
+                  />
+                </svg>
+              </div>
+            </Form.Group>
+          </div>
+          {isLoading ? <Loading /> :
+            <div className="table-wrap mt-24">
+              <Table responsive hover>
+                <thead>
+                  <tr>
+                    {selectedColumns.includes("Police") &&
+                      <th>
+                        <div className="d-flex align-items-center">
+                          <span>Police</span>
+                          <Link
+                            className={`sorting-icon ms-2`}
+                            onClick={() => handleClickRotate("folder_name")}
+                          >
+                            {sort.value === "asc" &&
+                              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z" fill="black" />
+                                <path d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z" fill="black" fill-opacity="0.5" />
+                              </svg>
+                            }
+
+                            {sort.value === "desc" &&
+                              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z" fill="black" fill-opacity="0.5" />
+                                <path d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z" fill="black" />
+                              </svg>
+                            }
+                          </Link>
+                        </div>
+                      </th>
+                    }
+                    {/* {selectedColumns.includes("client") &&
+                      <th>
+                        <div className="d-flex align-items-center">
+                          <span>{t("client")}</span>
+                          <Link
+                            className={`sorting-icon ms-2`}
+                            onClick={() => handleClickRotate("customer_name")}
+                          >
+                            {sort.value === "asc" &&
+                              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z" fill="black" />
+                                <path d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z" fill="black" fill-opacity="0.5" />
+                              </svg>
+                            }
+
+                            {sort.value === "desc" &&
+                              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z" fill="black" fill-opacity="0.5" />
+                                <path d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z" fill="black" />
+                              </svg>
+                            }
+                          </Link>
+                        </div>
+                      </th>
+                    } */}
+                    {selectedColumns.includes("client") &&
+                      <th>
+                        <div className="d-flex align-items-center">
+                          <span>Assureurs</span>
+                          <Link
+                            className={`sorting-icon ms-2`}
+                            onClick={() => handleClickRotate("customer_name")}
+                          >
+                            {sort.value === "asc" &&
+                              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z" fill="black" />
+                                <path d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z" fill="black" fill-opacity="0.5" />
+                              </svg>
+                            }
+
+                            {sort.value === "desc" &&
+                              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z" fill="black" fill-opacity="0.5" />
+                                <path d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z" fill="black" />
+                              </svg>
+                            }
+                          </Link>
+                        </div>
+                      </th>
+                    }
+                            {selectedColumns.includes("Nom du preneur d'assurance") &&
+                      <th>
+                        <div className="d-flex align-items-center">
+                          <span>Nom du preneur d'assurance</span>
+                          <Link
+                            className={`sorting-icon ms-2`}
+                            onClick={() => handleClickRotate("customer_name")}
+                          >
+                            {sort.value === "asc" &&
+                              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z" fill="black" />
+                                <path d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z" fill="black" fill-opacity="0.5" />
+                              </svg>
+                            }
+
+                            {sort.value === "desc" &&
+                              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z" fill="black" fill-opacity="0.5" />
+                                <path d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z" fill="black" />
+                              </svg>
+                            }
+                          </Link>
+                        </div>
+                      </th>
+                    }
+                    {selectedColumns.includes("brokerlabel") &&
+                      <th>
+                        <div className="d-flex align-items-center">
+                          <span>{t('brokerlabel')}</span>
+                          <Link
+                            className={`sorting-icon ms-2`}
+                            onClick={() => handleClickRotate("broker.first_name")}
+                          >
+                            {sort.value === "asc" &&
+                              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z" fill="black" />
+                                <path d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z" fill="black" fill-opacity="0.5" />
+                              </svg>
+                            }
+
+                            {sort.value === "desc" &&
+                              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z" fill="black" fill-opacity="0.5" />
+                                <path d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z" fill="black" />
+                              </svg>
+                            }
+                          </Link>
+                        </div>
+                      </th>
+                    }
+                    {selectedColumns.includes("Date de création") &&
+                      <th>
+                        <div className="d-flex align-items-center">
+                          <span>Date de création</span>
+                          <Link
+                            className={`sorting-icon ms-2`}
+                            onClick={() => handleClickRotate("start_date")}
+                          >
+                            {sort.value === "asc" &&
+                              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z" fill="black" />
+                                <path d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z" fill="black" fill-opacity="0.5" />
+                              </svg>
+                            }
+
+                            {sort.value === "desc" &&
+                              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z" fill="black" fill-opacity="0.5" />
+                                <path d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z" fill="black" />
+                              </svg>
+                            }
+                          </Link>
+                        </div>
+                      </th>
+                    }
+                    {selectedColumns.includes("status") && (
+                      <th className="select-drop">
+                        <div className="d-flex align-items-center">
+                          <div>
+                            <Form.Select
+                              aria-label="statusSelectAria"
+                              value={editUserStatus}
+                              onChange={(e) => handleStatusChange(e.target.value)}
+                            >
+                              <option value="">{t("status")}</option>
+                              <option value="to_be_checked">{t("toBeCheckedLabel")}</option>
+                              <option value="validated">{t("validatedLabel")}</option>
+                              <option value="invalid">{t("invalidLabel")}</option>
+                            </Form.Select>
+                          </div>
+                          <div>
+                            <Link
+                              className={`sorting-icon ms-2`}
+                              onClick={() => handleClickRotate("status")}
+                            >
+                              {sort.value === "asc" &&
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                  <path d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z" fill="black" />
+                                  <path d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z" fill="black" fill-opacity="0.5" />
+                                </svg>
+                              }
+
+                              {sort.value === "desc" &&
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                  <path d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z" fill="black" fill-opacity="0.5" />
+                                  <path d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z" fill="black" />
+                                </svg>
+                              }
+                            </Link>
+                          </div>
+                        </div>
+                      </th>
+                    )}
+                    {selectedColumns.includes("Action") && deletePermission && <th>Action</th>}
+                    <th style={{ textAlign: "right" }}>
+                      <Link onClick={handleAddcolShow}>
+                        <svg
+                          width="16"
+                          height="16"
+                          viewBox="0 0 14 14"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M14 8H8V14H6V8H0V6H6V0H8V6H14V8Z"
+                            fill="black"
+                          />
+                        </svg>
+                      </Link>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {(tobeProceedList?.length > 0 && selectedColumns?.length > 0) ?
+                    tobeProceedList?.map((data, index) => (
+                      <tr key={index} onClick={() => navigate(`/manager-file-detail/${data.id}`)}>
+                        {selectedColumns.includes("Police") && <td className="bold-font">{data.folder_name}</td>}
+                        {selectedColumns.includes("client") && <td className="bold-font">{data.customer_name}</td>}
+                        {selectedColumns.includes("Nom du preneur d'assurance") && <td className="bold-font">{data.insurance_policyholder_name}</td>}
+                        {selectedColumns.includes("brokerlabel") && <td className="bold-font">{data.broker?.first_name ? data.broker?.first_name : "Sans"}</td>}
+                        {selectedColumns.includes("Date de création") && <td className="bold-font">{data?.start_date}</td>}
+                        {selectedColumns.includes("status") &&
+                          <td>
+                            {
+                              data.status === "to_be_checked" ? <span className="checked badges">{t("toBeCheckedLabel")}</span> :
+                              data.status === "validated" ? <span className="verified badges">{t("validatedLabel")}</span> :
+                              <span className="incomplete badges">{t("invalidLabel")}</span>
+                            }
+                          </td>
+                        }
+                        {selectedColumns.includes("Action") && deletePermission && (
+                          <td>
+                            <div className="action-btn">
+                              <Link
+                                className="delete"
+                                href="/user-management"
+                                data-discover="true"
+                                title="Supprimer"
+                                onClick={(e) => { e.stopPropagation(); handleShowDeleteModal(); setShowFolderId(data.id); }}
+                              >
+                                <svg
+                                  width="24"
+                                  height="24"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                >
+                                  <path
+                                    d="M16 9V19H8V9H16ZM14.5 3H9.5L8.5 4H5V6H19V4H15.5L14.5 3ZM18 7H6V19C6 20.1 6.9 21 8 21H16C17.1 21 18 20.1 18 19V7Z"
+                                    fill="#00366B"
+                                  />
+                                </svg>
+                              </Link>
+                            </div>
+                          </td>
+                        )}
+                        <td></td>
+                      </tr>
+                    )) :
+                    <tr style={{ textAlign: "center" }}>
+                      <td colSpan="7">
+                        {t("NorecordsfoundLabel")}
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </Table>
+            </div>
+          }
+          {totalRecords > 10 &&
+            <Paginations
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+            />
+          }
+        </div>
+                                </Tab>
+     </Tabs>
+
+
       </div>
 
       {/* Add Col Modal */}
