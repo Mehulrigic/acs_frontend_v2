@@ -50,20 +50,41 @@ const StatisticsData = (props) => {
         <div className="statistic-row">
           <div className="statistic-col">
             <div className="each-box">
-              <h2>{statisticsData?.invalid_count}</h2>
-              <h6>{t("documentInvalidLabel")}</h6>
+              <h2>{statisticsData?.integrated_file_count}</h2>
+              <h6>Dossiers Intégrés</h6>
             </div>
           </div>
           <div className="statistic-col">
             <div className="each-box">
-              <h2>{statisticsData?.missing_count}</h2>
-              <h6>{t("documentMissingLabel")}</h6>
+              <h2>{statisticsData?.validated_file_count}</h2>
+              <h6>Dossiers Validés</h6>
             </div>
           </div>
           <div className="statistic-col">
             <div className="each-box">
               <h2>{statisticsData?.awaiting_count}</h2>
               <h6>{t("filesAwaitingVerificationLabel")}</h6>
+            </div>
+          </div>
+        </div>
+
+        <div className="statistic-row">
+          <div className="statistic-col">
+            <div className="each-box">
+              <h2>{statisticsData?.under_verification_by_acs_count}</h2>
+              <h6>Dossiers en Vérification par ACS</h6>
+            </div>
+          </div>
+          <div className="statistic-col">
+            <div className="each-box">
+              <h2>{statisticsData?.in_progress_count}</h2>
+              <h6>Dossiers en Cours</h6>
+            </div>
+          </div>
+          <div className="statistic-col">
+            <div className="each-box">
+              <h2>{statisticsData?.end_of_worksite_count}</h2>
+              <h6> Dossiers Fin de Chantier</h6>
             </div>
           </div>
         </div>
