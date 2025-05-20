@@ -484,14 +484,20 @@ const AddfolderPanel = (props) => {
                 </Form.Group>
 
                 <Form.Group className="mt-32" controlId="formBasicEmail">
-                  <Form.Label>Coût estimé du chantier</Form.Label>
-                  <Form.Control
-                    type="text"
-                    placeholder="Entrez le coût estimé du site"
-                    value={estimatedSiteCost}
-                    onChange={(e) => setEstimatedSiteCost(e.target.value)}
-                  />
-                </Form.Group>
+                    <Form.Label>Coût estimé du chantier</Form.Label>
+                    <Form.Control
+                      type="text"
+                      placeholder="Entrez le coût estimé du site"
+                      value={estimatedSiteCost}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        // Replace non-digit characters
+                        const onlyNumbers = value.replace(/[^0-9]/g, '');
+                        setEstimatedSiteCost(onlyNumbers);
+                      }}
+                    />
+                  </Form.Group>
+
 
                 {userRole != "Courtier" && 
                   <Form.Group className="mt-32" controlId="formBasicEmail">

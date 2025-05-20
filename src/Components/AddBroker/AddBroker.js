@@ -42,6 +42,7 @@ const AddBroker = (props) => {
       const response = await AddFolderPanelService.add_broker(useData);
       if (response.data.status) {
         setShow(false);
+        setBrokerCode("");
         BrokerList();
       } else {
         setFlashMessage({ type: "error", message: response.data.message || t("somethingWentWrong") });
