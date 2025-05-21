@@ -183,6 +183,13 @@ const ManagerFileDetail = () => {
 
   const [rightPanelThemeColor, setRightPanelThemeColor] = useState("");
   const [logoImageShow, setLogoImageShow] = useState("");
+  const [sendToFileStatus, setSendToFileStatus] = useState("");
+  const [showSendFileChange, setShowSendFileChange] = useState(false);
+  const handleSendFileShow = (status) => {
+    setSendToFileStatus(status);
+    setShowSendFileChange(true);
+  };
+  const handleSendFileClose = () => setShowSendFileChange(false);
 
   useEffect(() => {
     if (flashMessage.message) {
@@ -361,6 +368,21 @@ const ManagerFileDetail = () => {
     }
   };
 
+  const SendFileToUpdate = async () => {
+    try {
+      var userData = {
+        status: sendToFileStatus,
+      }
+      const response = await FilePageService.update_document_status(id, userData);
+      if (response.data.status) {
+        handleSendFileClose();
+        ShowUserDocumentData(id);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const handleUpdateFileChange = async (event) => {
     const files = Array.from(event.target.files); // Only get the first selected file
 
@@ -487,6 +509,7 @@ const ManagerFileDetail = () => {
         setTotalPaperRecords(response.data.documents.user_document_files?.length);
         setStartDate(response.data.documents.start_date);
         setEndDate(response.data.documents.complete_date);
+        setSendToFileStatus(response.data.documents.status);
         setShowUserDocumentFileData(
           response.data.documents.user_document_files
         );
@@ -1425,6 +1448,7 @@ const ManagerFileDetail = () => {
             <h1 className="m-0 mb-md-0 mb-3">
               Dossier {showUserFolderName}
             </h1>
+            
             <div className="d-flex align-items-center check-status">
               <div className="d-flex align-items-center check-status">
                 <p className="m-0" style={{ paddingRight: "10px" }}>Etat du chantier : </p>
@@ -1439,12 +1463,24 @@ const ManagerFileDetail = () => {
               <div className="status">
                 {
                   showUserDocumentData?.status === "to_be_checked" ? t("toBeCheckedLabel") :
-                  showUserDocumentData?.status === "validated" ? t("validatedLabel") : t("invalidLabel")
+                  showUserDocumentData?.status === "validated" ? t("validatedLabel") : 
+                  showUserDocumentData?.status === "transfer_to_manager" ? "Transfert au Gestionnaire" : 
+                  showUserDocumentData?.status === "transfer_to_broker" ? "Transfert au Courtier" : 
+                  showUserDocumentData?.status === "formal_notice" ? "Mise en demeure" : t("invalidLabel")
                 }
               </div>
             </div>
           </div>
-        </div>
+            <div className="detail-header" style={{display: "flex", justifyContent: "right"}}>
+              <p className="m-0" style={{paddingRight: "10px"}}>Envoyer à : </p>
+              <Form.Select aria-label="Etat du chantier" class="form-select" style={{  minHeight: "30px", width: "25%"}} value={sendToFileStatus} onChange={(e) => handleSendFileShow(e.target.value)}>
+                  <option value="" disabled selected>Envoyer à</option>
+                  <option value="transfer_to_manager">Transfert au Gestionnaire</option>
+                  <option value="transfer_to_broker">Transfert au Courtier</option>
+                  <option value="formal_notice">Mise en demeure</option>
+                </Form.Select>
+            </div>
+          </div>
         <Tabs
           activeKey={activeTab}
           onSelect={handleSelect}
@@ -3913,6 +3949,27 @@ const ManagerFileDetail = () => {
           </Modal.Footer>
         </Modal>
       </div>
+
+      {/* Send To Manager, Broker, file  */}
+      <Modal className='missing-doc-modal' show={showSendFileChange} onHide={() => setShowSendFileChange(true)}>
+        <Modal.Header closeButton onHide={handleSendFileClose}>
+          <Modal.Title>
+            <h2>Confirmer</h2>
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <span className="complete-process">
+            Êtes-vous sûr de vouloir transférer ceci ?
+          </span>
+        </Modal.Body>
+        <Modal.Footer>
+          <div className="text-end">
+            <Button variant="primary" onClick={() => SendFileToUpdate()}>
+              {t("confirmbtnLabel")}
+            </Button>
+          </div>
+        </Modal.Footer>
+      </Modal>
     </Fragment>
   );
 };

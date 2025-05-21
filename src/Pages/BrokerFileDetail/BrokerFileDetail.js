@@ -242,6 +242,7 @@ const BrokerFileDetail = () => {
       if (response.data.status) {
         setIsLoading(false);
         setShowUserDocumentData(response.data.documents);
+        setSendToFileStatus(response.data.documents.status);
         setShowUserFolderName(response.data.documents.folder_name);
         setTotalMissingRecords(response.data.documents.total_missing_doc);
         setTotalRecordOther(response.data.documents.user_document_files?.length);
@@ -1039,7 +1040,10 @@ const BrokerFileDetail = () => {
               <div className="status">
                 {
                   showUserDocumentData?.status === "to_be_checked" ? t("toBeCheckedLabel") :
-                  showUserDocumentData?.status === "validated" ? t("validatedLabel") : t("invalidLabel")
+                  showUserDocumentData?.status === "validated" ? t("toBeCheckedLabel") :
+                  showUserDocumentData?.status === "transfer_to_manager" ? "Transfert au Gestionnaire" :
+                  showUserDocumentData?.status === "transfer_to_broker" ? "Transfert au Courtier" :
+                  showUserDocumentData?.status === "formal_notice" ? "Mise en demeure" : t("invalidLabel")
                 }
               </div>
             </div>
@@ -1065,8 +1069,8 @@ const BrokerFileDetail = () => {
                 <div>
                   <Form.Select aria-label="Etat du chantier" style={{ minHeight: "30px" }} value={sendToFileStatus} onChange={(e) => handleSendFileShow(e.target.value)}>
                     <option value="" disabled selected>Envoyer à</option>
-                    <option value="transfer_to_manager">Gestionnaire</option>
-                    <option value="transfer_to_broker">Courtier</option>
+                    <option value="transfer_to_manager">Transfert au Gestionnaire</option>
+                    <option value="transfer_to_broker">Transfert au Courtier</option>
                     <option value="formal_notice">Mise en demeure</option>
                   </Form.Select>
                 </div>

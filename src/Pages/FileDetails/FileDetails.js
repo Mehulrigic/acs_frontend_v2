@@ -926,19 +926,19 @@ const FileDetails = () => {
   };
 
   const SendFileToUpdate = async () => {
-      try {
-        var userData = {
-          status: sendToFileStatus,
-        }
-        const response = await FilePageService.update_document_status(id, userData);
-        if (response.data.status) {
-          handleSendFileClose();
-          ShowUserDocumentData(id);
-        }
-      } catch (error) {
-        console.log(error);
+    try {
+      var userData = {
+        status: sendToFileStatus,
       }
-    };
+      const response = await FilePageService.update_document_status(id, userData);
+      if (response.data.status) {
+        handleSendFileClose();
+        ShowUserDocumentData(id);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const allowedFileTypes = [
     "application/msword", // .doc
@@ -1423,7 +1423,10 @@ const FileDetails = () => {
               <div className="status">
                 {
                   showUserDocumentData?.status === "to_be_checked" ? t("toBeCheckedLabel") :
-                  showUserDocumentData?.status === "validated" ? t("validatedLabel") : t("invalidLabel")
+                  showUserDocumentData?.status === "validated" ? t("validatedLabel") :
+                  showUserDocumentData?.status === "transfer_to_manager" ? "Transfert au Gestionnaire" :
+                  showUserDocumentData?.status === "transfer_to_broker" ? "Transfert au Courtier" :
+                  showUserDocumentData?.status === "formal_notice" ? "Mise en demeure" : t("invalidLabel")
                 }
               </div>
             </div>
@@ -1449,8 +1452,8 @@ const FileDetails = () => {
               <div>
                 <Form.Select aria-label="Etat du chantier" style={{ minHeight: "30px" }} value={sendToFileStatus} onChange={(e) => handleSendFileShow(e.target.value)}>
                   <option value="" disabled selected>Envoyer à</option>
-                  <option value="transfer_to_manager">Gestionnaire</option>
-                  <option value="transfer_to_broker">Courtier</option>
+                  <option value="transfer_to_manager">Transfert au Gestionnaire</option>
+                  <option value="transfer_to_broker">Transfert au Courtier</option>
                   <option value="formal_notice">Mise en demeure</option>
                 </Form.Select>
               </div>
