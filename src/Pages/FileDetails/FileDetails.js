@@ -782,50 +782,94 @@ const FileDetails = () => {
   };
 
   const HandleAddDocument = async (e) => {
-    e.preventDefault();
-    try {
-      const convertToBase64 = (file) => {
-        return new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onload = () => resolve(reader.result.split(",")[1]);
-          reader.onerror = (error) => reject(error);
-          reader.readAsDataURL(file);
-        });
-      };
+  e.preventDefault();
 
-      const filterDocType = documentTypeList?.find((doctype) => doctype.name === "Police");
+  if (fileList.length === 0) {
+    handleClose();
+    return;
+  }
 
-      const base64Files = await Promise.all(
-        fileList.map(async (file) => ({
-          filename: file.name,
-          file: await convertToBase64(file),
-          doc_type_id: filterDocType?.id,
-        }))
-      );
+  try {
+    const formData = new FormData();
+    const filterDocType = documentTypeList?.find((doctype) => doctype.name === "Police");
 
-      var useData = {
-        documents: base64Files,
-      };
+    fileList.forEach((file, index) => {
+      formData.append(`documents[${index}][file]`, file);
+      formData.append(`documents[${index}][filename]`, file.name);
+      formData.append(`documents[${index}][doc_type_id]`, filterDocType?.id || '1');
+    });
 
-      const response = await FilePageService.add_document_files(id, useData);
-      if (response.data.status) {
-        setFileList([]);
-        ShowUserDocumentData(id);
-        handleClose();
-        setFlashMessage({
-          type: "success",
-          message: response.data.message || t("somethingWentWrong"),
-        });
-      } else {
-        setFlashMessage({
-          type: "error",
-          message: response.data.message || t("somethingWentWrong"),
-        });
-      }
-    } catch (error) {
-      console.log(error);
+    const response = await FilePageService.add_document_files(id, formData);
+
+    if (response.data.status) {
+      setFileList([]);
+      ShowUserDocumentData(id);
+      handleClose();
+
+      setFlashMessage({
+        type: "success",
+        message: response.data.message || t("somethingWentWrong"),
+      });
+    } else {
+      setFlashMessage({
+        type: "error",
+        message: response.data.message || t("somethingWentWrong"),
+      });
     }
-  };
+  } catch (error) {
+    console.error(error);
+    setFlashMessage({
+      type: "error",
+      message: t("somethingWentWrong"),
+    });
+  }
+};
+
+  // const HandleAddDocument = async (e) => {
+  //   e.preventDefault();
+  //   try {
+  //     const convertToBase64 = (file) => {
+  //       return new Promise((resolve, reject) => {
+  //         const reader = new FileReader();
+  //         reader.onload = () => resolve(reader.result.split(",")[1]);
+  //         reader.onerror = (error) => reject(error);
+  //         reader.readAsDataURL(file);
+  //       });
+  //     };
+
+  //     const filterDocType = documentTypeList?.find((doctype) => doctype.name === "Police");
+
+  //     const base64Files = await Promise.all(
+  //       fileList.map(async (file) => ({
+  //         filename: file.name,
+  //         file: await convertToBase64(file),
+  //         doc_type_id: filterDocType?.id,
+  //       }))
+  //     );
+
+  //     var useData = {
+  //       documents: base64Files,
+  //     };
+
+  //     const response = await FilePageService.add_document_files(id, useData);
+  //     if (response.data.status) {
+  //       setFileList([]);
+  //       ShowUserDocumentData(id);
+  //       handleClose();
+  //       setFlashMessage({
+  //         type: "success",
+  //         message: response.data.message || t("somethingWentWrong"),
+  //       });
+  //     } else {
+  //       setFlashMessage({
+  //         type: "error",
+  //         message: response.data.message || t("somethingWentWrong"),
+  //       });
+  //     }
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
 
   const AddMissingDocument = async (e) => {
     e.preventDefault();
