@@ -88,6 +88,10 @@ const FileDetails = () => {
   const [selectSpeakerId, setSelectSpeakerId] = useState("");
   const [speakerDropDownList, setSpeakerDropDownList] = useState([]);
 
+  const [policyholderName, setPolicyholderName] = useState("");
+  const [estimatedStartDate, setEstimatedStartDate] = useState(null);
+  const [estimatedCompletionDate, setEstimatedCompletionDate] = useState(null);
+  
   const [speakerModalColumns, setSpeakerModalColumns] = useState({
     "N° de SIRET": true,
     "Intervenant": true,
@@ -389,8 +393,11 @@ const FileDetails = () => {
           doc_type_id: file.docType?.id
         }));
         setShowUserDocumentData(response.data.documents);
-        setStartDate(response.data.documents.estimated_start_date);
-        setEndDate(response.data.documents.estimated_completion_date);
+        setStartDate(response.data.documents.final_start_date);
+        setEndDate(response.data.documents.final_completion_date);
+        setPolicyholderName(response.data.documents.insurance_policyholder_name);
+        setEstimatedStartDate(response.data.documents.estimated_start_date);
+        setEstimatedCompletionDate(response.data.documents.estimated_completion_date);
         setShowUserFolderName(response.data.documents.folder_name);
         setSelectBroker(response.data.documents?.broker?.id);
         setTotalRecordOther(response.data.documents.user_document_files?.length);
@@ -699,12 +706,15 @@ const FileDetails = () => {
 
     var folderData = {
       folder_name: e.target.elements.folderName.value ? e.target.elements.folderName.value : "",
-      broker_id: selectBroker ? selectBroker : "",
-      estimated_start_date: startDate ? startDate : "",
-      estimated_completion_date: endDate ? endDate : "",
+      final_start_date: startDate ? startDate : "",
+      final_completion_date: endDate ? endDate : "",
+      contract_no: e.target.elements.contract_no.value ? e.target.elements.contract_no.value : "",
+      insurance_policyholder_name: policyholderName ? policyholderName : "",
+      estimated_start_date: estimatedStartDate ? estimatedStartDate : "",
+      estimated_completion_date: estimatedCompletionDate ? estimatedCompletionDate : "",
       estimated_site_cost: e.target.elements.estimated_site_cost.value ? e.target.elements.estimated_site_cost.value : "",
-      start_date: startDate ? startDate : "",
-      end_date: endDate ? endDate : ""
+      final_site_cost: e.target.elements.final_site_cost.value ? e.target.elements.final_site_cost.value : "",
+      broker_id: selectBroker ? selectBroker : ""
     };
     try {
       const response = await FilePageService.folder_info_update(id, folderData);
@@ -1407,6 +1417,9 @@ const FileDetails = () => {
               <span>Dossier à vérifier</span>
             </div>
             <div className="d-sm-flex align-items-center gap-3">
+              <div>
+                <Link > Send to</Link>
+              </div>
               <div className="add-document mb-sm-0 mb-2 mt-sm-0 mt-2">
                 <Link onClick={handleShow}>{t("addDocumentLabel")}</Link>
                 <Offcanvas
@@ -1520,6 +1533,7 @@ const FileDetails = () => {
                   </div>
                 </Offcanvas>
               </div>
+
               {/* Check Document */}
               <div className="check-document">
                 {/* Location ‘ Insurer ’ / Folders / In a folder Hide the link to check documents for the Insurer for the time being */}
@@ -1745,22 +1759,6 @@ const FileDetails = () => {
                       />
                     </Form.Group>
 
-                    <Form.Group className="mb-4 mx-w-320" controlId="formBasicEmail">
-                      <Form.Label>Choisir un Courtier</Form.Label>
-                      <Form.Select
-                        className="full-width mb-3"
-                        aria-label={"statusSelectAria"}
-                        value={selectBroker}
-                        onChange={handleBrokerChange}
-                      >
-                        <option value="" disabled>Choisir un Courtier</option>
-                        {brokerList?.map((broker) => (
-                          <option value={broker.id}>{broker.first_name}</option>
-                        ))}
-                      </Form.Select>
-                    </Form.Group>
-                  </div>
-                  <div className="flex-fill" style={{ minWidth: "300px" }}>
                     <Form.Group className="mb-4 mx-w-320" controlId="names">
                       <Form.Label className="d-block">Date de début du site</Form.Label>
                       <DatePicker
@@ -1769,6 +1767,60 @@ const FileDetails = () => {
                         onChange={(date) => setStartDate(formatDate(date))}
                         dateFormat="dd/MM/yyyy"
                         locale={fr}
+                      />
+                    </Form.Group>
+
+                    <Form.Group className="mb-4 mx-w-320" controlId="names">
+                      <Form.Label className="d-block">Date de début estimée</Form.Label>
+                      <DatePicker
+                        placeholderText="Selectionner une date de début estimée"
+                        selected={estimatedStartDate ? getFormattedDate(estimatedStartDate) : null}
+                        onChange={(date) => setEstimatedStartDate(formatDate(date))}
+                        dateFormat="dd/MM/yyyy"
+                        locale={fr}
+                      />
+                    </Form.Group>
+
+                    <Form.Group className="mb-4 mx-w-320" controlId="names">
+                      <Form.Label className="d-block">Date d'achèvement estimée</Form.Label>
+                      <DatePicker
+                        placeholderText="Selectionner une date d'achèvement estimée"
+                        selected={estimatedCompletionDate ? getFormattedDate(estimatedCompletionDate) : null}
+                        onChange={(date) => setEstimatedCompletionDate(formatDate(date))}
+                        dateFormat="dd/MM/yyyy"
+                        locale={fr}
+                      />
+                    </Form.Group>
+                    
+                  </div>
+                  <div className="flex-fill" style={{ minWidth: "300px" }}>
+                    <Form.Group className="mb-4 mx-w-320" controlId="formBasicEmail">
+                      <Form.Label>Nom du preneur d'assurance</Form.Label>
+                      <Form.Control
+                        type="text"
+                        placeholder="Nom du preneur d'assurance"
+                        value={policyholderName}
+                        onChange={(e) => setPolicyholderName(e.target.value)}
+                      />
+                    </Form.Group>
+
+                    <Form.Group className="mb-4 mx-w-320" controlId="exampleForm.ControlInput1">
+                      <Form.Label>coût estimé du chantier</Form.Label>
+                      <Form.Control
+                        type="text"
+                        placeholder="Entrez le coût estimé du site"
+                        name="estimated_site_cost"
+                        defaultValue={showUserDocumentData?.estimated_site_cost || ""}
+                      />
+                    </Form.Group>
+
+                    <Form.Group className="mb-4 mx-w-320" controlId="exampleForm.ControlInput1">
+                      <Form.Label>Coût final du chantier</Form.Label>
+                      <Form.Control
+                        type="text"
+                        placeholder="Entrez le coût final du site"
+                        name="final_site_cost"
+                        defaultValue={showUserDocumentData?.final_site_cost || ""}
                       />
                     </Form.Group>
 
@@ -1782,15 +1834,20 @@ const FileDetails = () => {
                         locale={fr}
                       />
                     </Form.Group>
-
-                    <Form.Group className="mb-4 mx-w-320" controlId="exampleForm.ControlInput1">
-                      <Form.Label>Coût final du chantier</Form.Label>
-                      <Form.Control
-                        type="text"
-                        placeholder="Entrez le coût final du site"
-                        name="estimated_site_cost"
-                        defaultValue={showUserDocumentData?.estimated_site_cost || ""}
-                      />
+                    
+                    <Form.Group className="mb-4 mx-w-320" controlId="formBasicEmail">
+                      <Form.Label>Choisir un Courtier</Form.Label>
+                      <Form.Select
+                        className="full-width mb-3"
+                        aria-label={"statusSelectAria"}
+                        value={selectBroker}
+                        onChange={handleBrokerChange}
+                      >
+                        <option value="" disabled>Choisir un Courtier</option>
+                        {brokerList?.map((broker) => (
+                          <option value={broker.id}>{broker.first_name}</option>
+                        ))}
+                      </Form.Select>
                     </Form.Group>
                   </div>
                 </div>
