@@ -100,7 +100,7 @@ const FileDetails = () => {
   const handleSendFileShow = (status) => {
     setSendToFileStatus(status);
     setShowSendFileChange(true);
-  }
+  };
   const handleSendFileClose = () => setShowSendFileChange(false);
   
   const [speakerModalColumns, setSpeakerModalColumns] = useState({
@@ -3791,7 +3791,7 @@ const FileDetails = () => {
         </Modal.Footer>
       </Modal>
 
-      {/*  */}
+      {/* Send To Manager, Broker, file  */}
       <Modal className='missing-doc-modal' show={showSendFileChange} onHide={() => setShowSendFileChange(true)}>
         <Modal.Header closeButton onHide={handleSendFileClose}>
           <Modal.Title>

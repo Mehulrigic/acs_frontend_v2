@@ -137,6 +137,14 @@ const BrokerFileDetail = () => {
   const handleInvalidReasonModalOpen = () => setInvalidReasonModal(true);
   const handleInvalidReasonModalClose = () => setInvalidReasonModal(false);
 
+  const [sendToFileStatus, setSendToFileStatus] = useState("");
+  const [showSendFileChange, setShowSendFileChange] = useState(false);
+    const handleSendFileShow = (status) => {
+      setSendToFileStatus(status);
+      setShowSendFileChange(true);
+    };
+    const handleSendFileClose = () => setShowSendFileChange(false);
+
   const [showViewSpeaker, setShowViewSpeaker] = useState(false);
   const handleViewShowSpeaker = () => setShowViewSpeaker(true);
   const handleViewCloseSpeaker = () => {
@@ -971,6 +979,21 @@ const BrokerFileDetail = () => {
     };
   }, []);
 
+  const SendFileToUpdate = async () => {
+    try {
+      var userData = {
+        status: sendToFileStatus,
+      }
+      const response = await FilePageService.update_document_status(id, userData);
+      if (response.data.status) {
+        handleSendFileClose();
+        ShowUserDocumentData(id);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <Fragment>
       <style> {` button.btn.btn-primary  { background-color: ${localStorage.getItem('button_color') ? JSON.parse(localStorage.getItem('button_color')) : "#e84455"} !Important};`} </style>
@@ -1039,87 +1062,95 @@ const BrokerFileDetail = () => {
               <span>Dossier à vérifier</span>
             </div>
             <div className="d-sm-flex align-items-center gap-3">
-              <div className="add-document mb-sm-0 mb-2 mt-sm-0 mt-2">
-                <Link className="link-wrap" onClick={handleNoteShow}>
-                  Voir les raisons
-                </Link>
-                <Offcanvas
-                  className="add-folder-panel broker-add-panel"
-                  placement={"end"}
-                  show={showNote}
-                  onHide={handleNoteClose}
-                >
-                  <Offcanvas.Header closeButton>
-                    <Offcanvas.Title>Dossier incomplet</Offcanvas.Title>
-                  </Offcanvas.Header>
-                  <Offcanvas.Body>
-                    <div className="step-1">
-                      <div className="div">
-                        <div className="step-2">
-                          <h2>Notes du gestionnaire</h2>
-                          {displayedRecordsNote?.length > 0 ? (
-                            <div
-                              className="scroll-container"
-                              onScroll={handleScrollNote}
-                              style={{
-                                maxHeight: "400px",
-                                overflowY: "auto",
-                                scrollbarWidth: "thin"
-                              }}
-                            >
-                              <div style={{ height: "400px" }}>
-                                {displayedRecordsNote?.map((data) => (
-                                  <Fragment>
-                                    <div className="note-box mb-3">
-                                      <div className="d-flex justify-content-between align-items-center top-part">
-                                        <p className="m-0">{data.type == "note" ? "Note" : "Invalide"}</p>
-                                        <p className="m-0 create-date">créé le {data.created_on}</p>
-                                      </div>
-                                      <div className="inner-box">
-                                        <div className="d-md-flex justify-content-between align-items-center mb-2">
-                                          <div className="d-flex align-items-center mb-3">
-                                            {data.type != "note" &&
-                                              <div className="icon d-flex">
-                                                <svg
-                                                  width="16"
-                                                  height="16"
-                                                  viewBox="0 0 8 14"
-                                                  fill="none"
-                                                  xmlns="http://www.w3.org/2000/svg"
-                                                >
-                                                  <path
-                                                    d="M6.42457 3.36368V10.3334C6.42457 11.6728 5.33972 12.7576 4.00033 12.7576C2.66093 12.7576 1.57608 11.6728 1.57608 10.3334V2.75762C1.57608 1.92125 2.25487 1.24246 3.09123 1.24246C3.9276 1.24246 4.60639 1.92125 4.60639 2.75762V9.12125C4.60639 9.45459 4.33366 9.72731 4.00033 9.72731C3.66699 9.72731 3.39426 9.45459 3.39426 9.12125V3.36368H2.48517V9.12125C2.48517 9.95762 3.16396 10.6364 4.00033 10.6364C4.83669 10.6364 5.51548 9.95762 5.51548 9.12125V2.75762C5.51548 1.41822 4.43063 0.333374 3.09123 0.333374C1.75184 0.333374 0.666992 1.41822 0.666992 2.75762V10.3334C0.666992 12.1758 2.1579 13.6667 4.00033 13.6667C5.84275 13.6667 7.33366 12.1758 7.33366 10.3334V3.36368H6.42457Z"
-                                                    fill="#683191"
-                                                  ></path>
-                                                </svg>
-                                              </div>
-                                            }
-                                            <div className="file-names">{data.user_document_filename}</div>
-                                          </div>
+                <div>
+                  <Form.Select aria-label="Etat du chantier" style={{ minHeight: "30px" }} value={sendToFileStatus} onChange={(e) => handleSendFileShow(e.target.value)}>
+                    <option value="" disabled selected>Envoyer à</option>
+                    <option value="transfer_to_manager">Gestionnaire</option>
+                    <option value="transfer_to_broker">Courtier</option>
+                    <option value="formal_notice">Mise en demeure</option>
+                  </Form.Select>
+                </div>
+                <div className="add-document mb-sm-0 mb-2 mt-sm-0 mt-2">
+                  <Link className="link-wrap" onClick={handleNoteShow}>
+                    Voir les raisons
+                  </Link>
+                  <Offcanvas
+                    className="add-folder-panel broker-add-panel"
+                    placement={"end"}
+                    show={showNote}
+                    onHide={handleNoteClose}
+                  >
+                    <Offcanvas.Header closeButton>
+                      <Offcanvas.Title>Dossier incomplet</Offcanvas.Title>
+                    </Offcanvas.Header>
+                    <Offcanvas.Body>
+                      <div className="step-1">
+                        <div className="div">
+                          <div className="step-2">
+                            <h2>Notes du gestionnaire</h2>
+                            {displayedRecordsNote?.length > 0 ? (
+                              <div
+                                className="scroll-container"
+                                onScroll={handleScrollNote}
+                                style={{
+                                  maxHeight: "400px",
+                                  overflowY: "auto",
+                                  scrollbarWidth: "thin"
+                                }}
+                              >
+                                <div style={{ height: "400px" }}>
+                                  {displayedRecordsNote?.map((data) => (
+                                    <Fragment>
+                                      <div className="note-box mb-3">
+                                        <div className="d-flex justify-content-between align-items-center top-part">
+                                          <p className="m-0">{data.type == "note" ? "Note" : "Invalide"}</p>
+                                          <p className="m-0 create-date">créé le {data.created_on}</p>
                                         </div>
-                                        <p className="">
-                                          {data.reason}
-                                        </p>
+                                        <div className="inner-box">
+                                          <div className="d-md-flex justify-content-between align-items-center mb-2">
+                                            <div className="d-flex align-items-center mb-3">
+                                              {data.type != "note" &&
+                                                <div className="icon d-flex">
+                                                  <svg
+                                                    width="16"
+                                                    height="16"
+                                                    viewBox="0 0 8 14"
+                                                    fill="none"
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                  >
+                                                    <path
+                                                      d="M6.42457 3.36368V10.3334C6.42457 11.6728 5.33972 12.7576 4.00033 12.7576C2.66093 12.7576 1.57608 11.6728 1.57608 10.3334V2.75762C1.57608 1.92125 2.25487 1.24246 3.09123 1.24246C3.9276 1.24246 4.60639 1.92125 4.60639 2.75762V9.12125C4.60639 9.45459 4.33366 9.72731 4.00033 9.72731C3.66699 9.72731 3.39426 9.45459 3.39426 9.12125V3.36368H2.48517V9.12125C2.48517 9.95762 3.16396 10.6364 4.00033 10.6364C4.83669 10.6364 5.51548 9.95762 5.51548 9.12125V2.75762C5.51548 1.41822 4.43063 0.333374 3.09123 0.333374C1.75184 0.333374 0.666992 1.41822 0.666992 2.75762V10.3334C0.666992 12.1758 2.1579 13.6667 4.00033 13.6667C5.84275 13.6667 7.33366 12.1758 7.33366 10.3334V3.36368H6.42457Z"
+                                                      fill="#683191"
+                                                    ></path>
+                                                  </svg>
+                                                </div>
+                                              }
+                                              <div className="file-names">{data.user_document_filename}</div>
+                                            </div>
+                                          </div>
+                                          <p className="">
+                                            {data.reason}
+                                          </p>
+                                        </div>
                                       </div>
-                                    </div>
-                                  </Fragment>
-                                ))}
+                                    </Fragment>
+                                  ))}
+                                </div>
                               </div>
-                            </div>
-                          )
-                            :
-                            (
-                              <div>
-                                {t("NorecordsfoundLabel")}
-                              </div>
-                            )}
+                            )
+                              :
+                              (
+                                <div>
+                                  {t("NorecordsfoundLabel")}
+                                </div>
+                              )}
+                          </div>
                         </div>
                       </div>
-                    </div>
 
-                  </Offcanvas.Body>
-                </Offcanvas>
-              </div>
+                    </Offcanvas.Body>
+                  </Offcanvas>
+                </div>
             </div>
           </div>
         </div>
@@ -3044,6 +3075,27 @@ const BrokerFileDetail = () => {
           </Offcanvas.Body>
         </Offcanvas>
       </div>
+
+      {/* Send To Manager, Broker, file  */}
+      <Modal className='missing-doc-modal' show={showSendFileChange} onHide={() => setShowSendFileChange(true)}>
+        <Modal.Header closeButton onHide={handleSendFileClose}>
+          <Modal.Title>
+            <h2>Confirmer</h2>
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <span className="complete-process">
+            Êtes-vous sûr de vouloir transférer ceci ?
+          </span>
+        </Modal.Body>
+        <Modal.Footer>
+          <div className="text-end">
+            <Button variant="primary" onClick={() => SendFileToUpdate()}>
+              {t("confirmbtnLabel")}
+            </Button>
+          </div>
+        </Modal.Footer>
+      </Modal>
     </Fragment>
   );
 };
