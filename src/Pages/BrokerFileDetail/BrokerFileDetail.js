@@ -242,7 +242,11 @@ const BrokerFileDetail = () => {
       if (response.data.status) {
         setIsLoading(false);
         setShowUserDocumentData(response.data.documents);
-        setSendToFileStatus(response.data.documents.status);
+        if(response.data.documents.status == "transfer_to_manager" || response.data.documents.status == "transfer_to_broker" || response.data.documents.status == "formal_notice"){
+          setSendToFileStatus(response.data.documents.status);
+        } else {
+          setSendToFileStatus("");
+        }
         setShowUserFolderName(response.data.documents.folder_name);
         setTotalMissingRecords(response.data.documents.total_missing_doc);
         setTotalRecordOther(response.data.documents.user_document_files?.length);

@@ -409,7 +409,11 @@ const FileDetails = () => {
         setPolicyholderName(response.data.documents.insurance_policyholder_name);
         setEstimatedSiteCost(response.data.documents.estimated_site_cost);
         setFinaldSiteCost(response.data.documents.final_site_cost);
-        setSendToFileStatus(response.data.documents.status);
+        if(response.data.documents.status == "transfer_to_manager" || response.data.documents.status == "transfer_to_broker" || response.data.documents.status == "formal_notice"){
+          setSendToFileStatus(response.data.documents.status);
+        } else {
+          setSendToFileStatus("");
+        }
         setEstimatedStartDate(response.data.documents.estimated_start_date);
         setEstimatedCompletionDate(response.data.documents.estimated_completion_date);
         setShowUserFolderName(response.data.documents.folder_name);

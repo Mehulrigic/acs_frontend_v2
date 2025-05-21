@@ -509,7 +509,11 @@ const ManagerFileDetail = () => {
         setTotalPaperRecords(response.data.documents.user_document_files?.length);
         setStartDate(response.data.documents.start_date);
         setEndDate(response.data.documents.complete_date);
-        setSendToFileStatus(response.data.documents.status);
+        if(response.data.documents.status == "transfer_to_manager" || response.data.documents.status == "transfer_to_broker" || response.data.documents.status == "formal_notice"){
+          setSendToFileStatus(response.data.documents.status);
+        } else {
+          setSendToFileStatus("");
+        }
         setShowUserDocumentFileData(
           response.data.documents.user_document_files
         );
