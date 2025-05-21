@@ -91,6 +91,17 @@ const FileDetails = () => {
   const [policyholderName, setPolicyholderName] = useState("");
   const [estimatedStartDate, setEstimatedStartDate] = useState(null);
   const [estimatedCompletionDate, setEstimatedCompletionDate] = useState(null);
+  const [sendToFileStatus, setSendToFileStatus] = useState("");
+  const [estimatedSiteCost, setEstimatedSiteCost] = useState("");
+  const [finalSiteCost, setFinaldSiteCost] = useState("");
+  
+
+  const [showSendFileChange, setShowSendFileChange] = useState(false);
+  const handleSendFileShow = (status) => {
+    setSendToFileStatus(status);
+    setShowSendFileChange(true);
+  }
+  const handleSendFileClose = () => setShowSendFileChange(false);
   
   const [speakerModalColumns, setSpeakerModalColumns] = useState({
     "N° de SIRET": true,
@@ -396,6 +407,9 @@ const FileDetails = () => {
         setStartDate(response.data.documents.final_start_date);
         setEndDate(response.data.documents.final_completion_date);
         setPolicyholderName(response.data.documents.insurance_policyholder_name);
+        setEstimatedSiteCost(response.data.documents.estimated_site_cost);
+        setFinaldSiteCost(response.data.documents.final_site_cost);
+        setSendToFileStatus(response.data.documents.status);
         setEstimatedStartDate(response.data.documents.estimated_start_date);
         setEstimatedCompletionDate(response.data.documents.estimated_completion_date);
         setShowUserFolderName(response.data.documents.folder_name);
@@ -911,6 +925,21 @@ const FileDetails = () => {
     }
   };
 
+  const SendFileToUpdate = async () => {
+      try {
+        var userData = {
+          status: sendToFileStatus,
+        }
+        const response = await FilePageService.update_document_status(id, userData);
+        if (response.data.status) {
+          handleSendFileClose();
+          ShowUserDocumentData(id);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
   const allowedFileTypes = [
     "application/msword", // .doc
     "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // .docx
@@ -1418,7 +1447,12 @@ const FileDetails = () => {
             </div>
             <div className="d-sm-flex align-items-center gap-3">
               <div>
-                <Link > Send to</Link>
+                <Form.Select aria-label="Etat du chantier" style={{ minHeight: "30px" }} value={sendToFileStatus} onChange={(e) => handleSendFileShow(e.target.value)}>
+                  <option value="" disabled selected>Envoyer à</option>
+                  <option value="transfer_to_manager">Gestionnaire</option>
+                  <option value="transfer_to_broker">Courtier</option>
+                  <option value="formal_notice">Mise en demeure</option>
+                </Form.Select>
               </div>
               <div className="add-document mb-sm-0 mb-2 mt-sm-0 mt-2">
                 <Link onClick={handleShow}>{t("addDocumentLabel")}</Link>
@@ -1763,7 +1797,7 @@ const FileDetails = () => {
                       <Form.Label className="d-block">Date de début du site</Form.Label>
                       <DatePicker
                         placeholderText="Selectionner une date de début du site"
-                        selected={startDate ? getFormattedDate(startDate) : null}
+                        selected={startDate ? getFormattedDate(startDate) : ""}
                         onChange={(date) => setStartDate(formatDate(date))}
                         dateFormat="dd/MM/yyyy"
                         locale={fr}
@@ -1774,7 +1808,7 @@ const FileDetails = () => {
                       <Form.Label className="d-block">Date de début estimée</Form.Label>
                       <DatePicker
                         placeholderText="Selectionner une date de début estimée"
-                        selected={estimatedStartDate ? getFormattedDate(estimatedStartDate) : null}
+                        selected={estimatedStartDate ? getFormattedDate(estimatedStartDate) : ""}
                         onChange={(date) => setEstimatedStartDate(formatDate(date))}
                         dateFormat="dd/MM/yyyy"
                         locale={fr}
@@ -1785,7 +1819,7 @@ const FileDetails = () => {
                       <Form.Label className="d-block">Date d'achèvement estimée</Form.Label>
                       <DatePicker
                         placeholderText="Selectionner une date d'achèvement estimée"
-                        selected={estimatedCompletionDate ? getFormattedDate(estimatedCompletionDate) : null}
+                        selected={estimatedCompletionDate ? getFormattedDate(estimatedCompletionDate) : ""}
                         onChange={(date) => setEstimatedCompletionDate(formatDate(date))}
                         dateFormat="dd/MM/yyyy"
                         locale={fr}
@@ -1810,7 +1844,12 @@ const FileDetails = () => {
                         type="text"
                         placeholder="Entrez le coût estimé du site"
                         name="estimated_site_cost"
-                        defaultValue={showUserDocumentData?.estimated_site_cost || ""}
+                        value={estimatedSiteCost}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          const onlyNumbers = value.replace(/[^0-9.]/g, '');
+                          setEstimatedSiteCost(onlyNumbers);
+                        }}
                       />
                     </Form.Group>
 
@@ -1820,7 +1859,12 @@ const FileDetails = () => {
                         type="text"
                         placeholder="Entrez le coût final du site"
                         name="final_site_cost"
-                        defaultValue={showUserDocumentData?.final_site_cost || ""}
+                        value={finalSiteCost}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          const onlyNumbers = value.replace(/[^0-9.]/g, '');
+                          setFinaldSiteCost(onlyNumbers);
+                        }}
                       />
                     </Form.Group>
 
@@ -1828,7 +1872,7 @@ const FileDetails = () => {
                       <Form.Label className="d-block">Date d'achèvement définitive</Form.Label>
                       <DatePicker
                         placeholderText="Selectionner une date d'achèvement définitive"
-                        selected={endDate ? getFormattedDate(endDate) : null}
+                        selected={endDate ? getFormattedDate(endDate) : ""}
                         onChange={(date) => setEndDate(formatDate(date))}
                         dateFormat="dd/MM/yyyy"
                         locale={fr}
@@ -3744,6 +3788,27 @@ const FileDetails = () => {
           <Button variant="primary" onClick={handleAddOtherColSubmit}>
             Ajouter
           </Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/*  */}
+      <Modal className='missing-doc-modal' show={showSendFileChange} onHide={() => setShowSendFileChange(true)}>
+        <Modal.Header closeButton onHide={handleSendFileClose}>
+          <Modal.Title>
+            <h2>Confirmer</h2>
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <span className="complete-process">
+            Êtes-vous sûr de vouloir transférer ceci ?
+          </span>
+        </Modal.Body>
+        <Modal.Footer>
+          <div className="text-end">
+            <Button variant="primary" onClick={() => SendFileToUpdate()}>
+              {t("confirmbtnLabel")}
+            </Button>
+          </div>
         </Modal.Footer>
       </Modal>
     </Fragment>

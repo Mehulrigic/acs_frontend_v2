@@ -42,6 +42,7 @@ const FilePageService = {
   validate_document_files: (id, userData) => apiClient.post(`/user/user_document/validate-document-files/${id}`, userData),
   invalidreson: (id) => apiClient.post(`/user/user_document/show-invalid-message/${id}`),
   sitestatusUpdate: (userDate) => apiClient.post(`/acsmanager/files/sitestatus`, userDate),
+  update_document_status: (id, userDate) => apiClient.post(`/user/user_document/update-document-status/${id}`, userDate),
 };
 
 export default FilePageService;

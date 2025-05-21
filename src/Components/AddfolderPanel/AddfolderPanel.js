@@ -491,8 +491,7 @@ const AddfolderPanel = (props) => {
                       value={estimatedSiteCost}
                       onChange={(e) => {
                         const value = e.target.value;
-                        // Replace non-digit characters
-                        const onlyNumbers = value.replace(/[^0-9]/g, '');
+                        const onlyNumbers = value.replace(/[^0-9.]/g, '');
                         setEstimatedSiteCost(onlyNumbers);
                       }}
                     />
