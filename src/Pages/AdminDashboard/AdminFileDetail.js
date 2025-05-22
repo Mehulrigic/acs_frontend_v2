@@ -440,21 +440,30 @@ const AdminFileDetail = () => {
 
   const handleUpdateFileChange = (event) => {
   const files = Array.from(event.target.files);
-  
-  const validFiles = files.filter(file => {
-    if (!allowedFileTypes.includes(file.type)) {
-      setFlashMessage({ type: "error", message: `Type not supported: ${file.name}` });
-      return false;
-    }
-    if (file.size > maxFileSize) {
-      setFlashMessage({ type: "error", message: `File too large: ${file.name}` });
-      return false;
-    }
-    return true;
-  });
+  const newFiles = [];
 
-  if (validFiles.length > 0) {
-    setFileList(prevFiles => [...prevFiles, ...validFiles]);  // Store actual File objects here!
+  for (const file of files) {
+    if (!allowedFileTypes.includes(file.type)) {
+      setFlashMessage({
+        type: "error",
+        message: `Ce type de document n'est pas pris en charge: ${file.name}`,
+      });
+      return;
+    }
+
+    if (file.size > maxFileSize) {
+      setFlashMessage({
+        type: "error",
+        message: `Limite de taille atteinte. Vos fichiers ne doivent pas dépasser 50 Mo: ${file.name}`,
+      });
+      return;
+    }
+
+    newFiles.push(file); // Keep File object
+  }
+
+  if (newFiles.length > 0) {
+    setFileList((prevFiles) => [...prevFiles, ...newFiles]);
   }
 
   event.target.value = ""; // Reset file input
@@ -521,20 +530,19 @@ const AdminFileDetail = () => {
 
 const AddMissingDocument = async (e) => {
   e.preventDefault();
-
   try {
     const formData = new FormData();
+    formData.append("speaker_id", showSpeakerId);
+    formData.append("missing_document_id", missingDocumentId);
 
-    formData.append('speaker_id', showSpeakerId);
-    formData.append('missing_document_id', missingDocumentId);
-
-    // Append all files from fileList (which now stores File objects)
-    fileList.forEach((fileObj, index) => {
-      formData.append('documents[]', fileObj);
-    });
+    if (fileList?.length) {
+      fileList.forEach((file) => {
+        formData.append("documents[]", file); // Use array-style key for multiple files
+      });
+    }
 
     const response = await FilePageService.add_missing_document(id, formData, {
-      headers: { 'Content-Type': 'multipart/form-data' }
+      headers: { "Content-Type": "multipart/form-data" },
     });
 
     if (response.data.status) {
@@ -543,7 +551,17 @@ const AddMissingDocument = async (e) => {
         type: "success",
         message: response.data.message || t("somethingWentWrong"),
       });
-      // ... rest of your success handling
+
+      if (activeTab === "speakerdocument") {
+        if (activeSubTab === "documentType") {
+          SpeakerDocumentTypeList(id, showSpeakerId);
+        }
+      }
+      if (activeTab === "missingdocument") {
+        GetMissingDocumentList(id, sort, 1, selectIsRequired);
+      }
+
+      ShowUserDocumentData(id);
     } else {
       setFlashMessageStoreDoc({
         type: "error",
