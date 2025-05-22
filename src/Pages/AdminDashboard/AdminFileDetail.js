@@ -383,50 +383,72 @@ const AdminFileDetail = () => {
     }
   };
 
-  const handleUpdateFileChange = async (event) => {
-    const files = Array.from(event.target.files); // Only get the first selected file
+  // const handleUpdateFileChange = async (event) => {
+  //   const files = Array.from(event.target.files); // Only get the first selected file
 
-    const newFiles = [];
+  //   const newFiles = [];
 
-    const convertToBase64 = (file) => {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result.split(",")[1]); // Extract only Base64 content
-        reader.onerror = (error) => reject(error);
-        reader.readAsDataURL(file);
-      });
-    };
+  //   const convertToBase64 = (file) => {
+  //     return new Promise((resolve, reject) => {
+  //       const reader = new FileReader();
+  //       reader.onload = () => resolve(reader.result.split(",")[1]); // Extract only Base64 content
+  //       reader.onerror = (error) => reject(error);
+  //       reader.readAsDataURL(file);
+  //     });
+  //   };
 
-    for (const file of files) {
-      if (!allowedFileTypes.includes(file.type)) {
-        setFlashMessage({
-          type: "error",
-          message: `Ce type de document n'est pas pris en charge: ${file.name}`,
-        });
-        return; // Exit if invalid file type
-      }
-      console.log(file);
-      if (file.size > maxFileSize) {
-        setFlashMessage({
-          type: "error",
-          message: `Limite de taille atteinte. Vos fichiers ne doivent pas dépasser 50 Mo: ${file.name}`,
-        });
-        return; // Exit if file size is too large
-      }
+  //   for (const file of files) {
+  //     if (!allowedFileTypes.includes(file.type)) {
+  //       setFlashMessage({
+  //         type: "error",
+  //         message: `Ce type de document n'est pas pris en charge: ${file.name}`,
+  //       });
+  //       return; // Exit if invalid file type
+  //     }
+  //     console.log(file);
+  //     if (file.size > maxFileSize) {
+  //       setFlashMessage({
+  //         type: "error",
+  //         message: `Limite de taille atteinte. Vos fichiers ne doivent pas dépasser 50 Mo: ${file.name}`,
+  //       });
+  //       return; // Exit if file size is too large
+  //     }
 
-      const base64File = await convertToBase64(file);
+  //     const base64File = await convertToBase64(file);
 
-      newFiles.push({
-        file: base64File,
-        name: file.name,
-      });
+  //     newFiles.push({
+  //       file: base64File,
+  //       name: file.name,
+  //     });
+  //   }
+  //   if (newFiles.length > 0) {
+  //     setFileList((prevFiles) => [...prevFiles, ...newFiles]);
+  //   }
+
+  //   event.target.value = ""; // Reset the file input
+  // };
+
+  const handleUpdateFileChange = (event) => {
+  const files = Array.from(event.target.files);
+  
+  const validFiles = files.filter(file => {
+    if (!allowedFileTypes.includes(file.type)) {
+      setFlashMessage({ type: "error", message: `Type not supported: ${file.name}` });
+      return false;
     }
-    if (newFiles.length > 0) {
-      setFileList((prevFiles) => [...prevFiles, ...newFiles]);
+    if (file.size > maxFileSize) {
+      setFlashMessage({ type: "error", message: `File too large: ${file.name}` });
+      return false;
     }
+    return true;
+  });
 
-    event.target.value = ""; // Reset the file input
-  };
+  if (validFiles.length > 0) {
+    setFileList(prevFiles => [...prevFiles, ...validFiles]);  // Store actual File objects here!
+  }
+
+  event.target.value = ""; // Reset file input
+};
 
   const allowedFileTypes = [
     "application/msword", // .doc
@@ -440,52 +462,91 @@ const AdminFileDetail = () => {
 
   const maxFileSize = 50 * 1024 * 1024;
 
-  const AddMissingDocument = async (e) => {
-    e.preventDefault();
-    try {
-      const documents = [];
+  // const AddMissingDocument = async (e) => {
+  //   e.preventDefault();
+  //   try {
+  //     const documents = [];
 
-      if (fileList?.length) {
-        documents.push(...fileList);
-      }
+  //     if (fileList?.length) {
+  //       documents.push(...fileList);
+  //     }
 
-      var userData = {
-        speaker_id: showSpeakerId,
-        missing_document_id: missingDocumentId,
-        documents: documents
-      }
+  //     var userData = {
+  //       speaker_id: showSpeakerId,
+  //       missing_document_id: missingDocumentId,
+  //       documents: documents
+  //     }
 
-      const response = await FilePageService.add_missing_document(id, userData);
+  //     const response = await FilePageService.add_missing_document(id, userData);
       
-      if (response.data.status) {
-        setFileList([]);
-        setFlashMessageStoreDoc({
-          type: "success",
-          message: response.data.message || t("somethingWentWrong"),
-        });
+  //     if (response.data.status) {
+  //       setFileList([]);
+  //       setFlashMessageStoreDoc({
+  //         type: "success",
+  //         message: response.data.message || t("somethingWentWrong"),
+  //       });
 
-        if (activeTab === "speakerdocument") {
-          if (activeSubTab === "documentType") {
-            SpeakerDocumentTypeList(id, showSpeakerId);
-          }
-        }
-        if (activeTab === "missingdocument") {
-          GetMissingDocumentList(id, sort, 1, selectIsRequired);
-        }
-        ShowUserDocumentData(id);
-      } else {
-        setFlashMessageStoreDoc({
-          type: "error",
-          message: response.data.message || t("somethingWentWrong"),
-        });
-      }
-    } catch (error) {
+  //       if (activeTab === "speakerdocument") {
+  //         if (activeSubTab === "documentType") {
+  //           SpeakerDocumentTypeList(id, showSpeakerId);
+  //         }
+  //       }
+  //       if (activeTab === "missingdocument") {
+  //         GetMissingDocumentList(id, sort, 1, selectIsRequired);
+  //       }
+  //       ShowUserDocumentData(id);
+  //     } else {
+  //       setFlashMessageStoreDoc({
+  //         type: "error",
+  //         message: response.data.message || t("somethingWentWrong"),
+  //       });
+  //     }
+  //   } catch (error) {
+  //     setFlashMessageStoreDoc({
+  //       type: "error",
+  //       message: t("somethingWentWrong"),
+  //     });
+  //   }
+  // };
+
+const AddMissingDocument = async (e) => {
+  e.preventDefault();
+
+  try {
+    const formData = new FormData();
+
+    formData.append('speaker_id', showSpeakerId);
+    formData.append('missing_document_id', missingDocumentId);
+
+    // Append all files from fileList (which now stores File objects)
+    fileList.forEach((fileObj, index) => {
+      formData.append('documents[]', fileObj);
+    });
+
+    const response = await FilePageService.add_missing_document(id, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+
+    if (response.data.status) {
+      setFileList([]);
+      setFlashMessageStoreDoc({
+        type: "success",
+        message: response.data.message || t("somethingWentWrong"),
+      });
+      // ... rest of your success handling
+    } else {
       setFlashMessageStoreDoc({
         type: "error",
-        message: t("somethingWentWrong"),
+        message: response.data.message || t("somethingWentWrong"),
       });
     }
-  };
+  } catch (error) {
+    setFlashMessageStoreDoc({
+      type: "error",
+      message: t("somethingWentWrong"),
+    });
+  }
+};
 
   const ShowUserDocumentData = async (id) => {
     try {
