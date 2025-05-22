@@ -112,67 +112,75 @@ const AddfolderPanel = (props) => {
     }
   };
 
-  const HandleStoreDocument = async (e) => {
-    setUploadingDoc(true);
-    e.preventDefault();
-    try {
-      const documents = [];
-      if (fileListStep2?.length) {
-        documents.push(...fileListStep2);
-      }
+const HandleStoreDocument = async (e) => {
+  e.preventDefault();
+  setUploadingDoc(true);
 
-      if (fileListStep3?.length) {
-        documents.push(...fileListStep3);
-      }
-
-      var userData = {
-        folder_name: folderName ?? "",
-        broker_id: userRole == "Courtier" ? userId : selectBroker,
-        contract_no: contractNo ? contractNo : "",
-        insurance_policyholder_name: policyholderName ? policyholderName : "",
-        estimated_start_date: estimatedStartDate ? estimatedStartDate : "",
-        estimated_completion_date: estimatedCompletionDate ? estimatedCompletionDate: "",
-        estimated_site_cost: estimatedSiteCost ? estimatedSiteCost : "",
-        documents: documents,
-      };
-      
-      const response = await AddFolderPanelService.store_document(userData);
-
-      if (response.data.status) {
-        setShowStep5(true);
-        setShowStep4(false);
-        setUploadingDoc(false);
-        handleClose();
-        if((userRole.includes("Courtier") || userRole.includes("Assureur")) && file){
-          FolderList(search, sort, currentPage, editUserStatus);
-        } else {
-          UserDocument(search, sort, currentPage, editUserStatus);
-          GetStatistics();
-        }
-      } else {
-        setUploadingDoc(false);
-        setFlashMessage({
-          type: "error",
-          message: response.data.message || t("somethingWentWrong"),
-        });
-      }
-    } catch (error) {
-      setUploadingDoc(false);
-      if(error.response.data.message == "La valeur du champ folder name a déjà été prise.") {
-        setFlashMessage({
-          type: "error",
-          message: error.response.data.message,
-        });
-        setShowStep4(false);
-        setShowStep1(true);
-      } else{
-        setFlashMessage({
-          type: "error",
-          message: t("somethingWentWrong"),
-        });
-      }
+  try {
+    const documents = [];
+    if (fileListStep2?.length) {
+      documents.push(...fileListStep2);
     }
-  };
+    if (fileListStep3?.length) {
+      documents.push(...fileListStep3);
+    }
+
+    const formData = new FormData();
+    formData.append("folder_name", folderName ?? "");
+    formData.append("broker_id", userRole === "Courtier" ? userId : selectBroker);
+    formData.append("contract_no", contractNo ?? "");
+    formData.append("insurance_policyholder_name", policyholderName ?? "");
+    formData.append("estimated_start_date", estimatedStartDate ?? "");
+    formData.append("estimated_completion_date", estimatedCompletionDate ?? "");
+    formData.append("estimated_site_cost", estimatedSiteCost ?? "");
+
+    documents.forEach((doc, index) => {
+      formData.append(`documents[${index}][file]`, doc.file); // Actual file
+      formData.append(`documents[${index}][filename]`, doc.filename);
+      formData.append(`documents[${index}][doc_type_id]`, doc.doc_type_id);
+      formData.append(`documents[${index}][doc_Type_Name]`, doc.doc_Type_Name);
+    });
+
+    const response = await AddFolderPanelService.store_document(formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+
+    if (response.data.status) {
+      setShowStep5(true);
+      setShowStep4(false);
+      handleClose();
+      if ((userRole.includes("Courtier") || userRole.includes("Assureur")) && file) {
+        FolderList(search, sort, currentPage, editUserStatus);
+      } else {
+        UserDocument(search, sort, currentPage, editUserStatus);
+        GetStatistics();
+      }
+    } else {
+      setFlashMessage({
+        type: "error",
+        message: response.data.message || t("somethingWentWrong"),
+      });
+    }
+
+  } catch (error) {
+    if (error.response?.data?.message === "La valeur du champ folder name a déjà été prise.") {
+      setFlashMessage({
+        type: "error",
+        message: error.response.data.message,
+      });
+      setShowStep4(false);
+      setShowStep1(true);
+    } else {
+      setFlashMessage({
+        type: "error",
+        message: t("somethingWentWrong"),
+      });
+    }
+  } finally {
+    setUploadingDoc(false);
+  }
+};
+
 
   const HandlePreviousPage = () => {
     if (showstep2) {
@@ -236,55 +244,45 @@ const AddfolderPanel = (props) => {
 
   const maxFileSize = 50 * 1024 * 1024;
 
-  const handleFileChangeStep2 = async (e) => {
-    const files = Array.from(e.target.files);
-    const newFiles = [];
+const handleFileChangeStep2 = (e) => {
+  const files = Array.from(e.target.files);
+  const newFiles = [];
 
-    const convertToBase64 = (file) => {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result.split(",")[1]); // Extract only Base64 content
-        reader.onerror = (error) => reject(error);
-        reader.readAsDataURL(file);
+  for (const file of files) {
+    if (!allowedFileTypes.includes(file.type)) {
+      setFlashMessage({
+        type: "error",
+        message: `Ce type de document n'est pas pris en charge: ${file.name}`,
       });
-    };
-
-    for (const file of files) {
-      if (!allowedFileTypes.includes(file.type)) {
-        setFlashMessage({
-          type: "error",
-          message: `Ce type de document n'est pas pris en charge: ${file.name}`,
-        });
-        continue;
-      }
-
-      if (file.size > maxFileSize) {
-        setFlashMessage({
-          type: "error",
-          message: `Limite de taille atteinte. Vos fichiers ne doivent pas dépasser 50 Mo: ${file.name}`,
-        });
-        continue;
-      }
-
-      const base64File = await convertToBase64(file);
-
-      const filterDocType = documentTypeList?.find((doctype) => doctype.name === "Police");
-      const filterDocTypeBroker = documentTypeList?.find((doctype) => doctype.name === "Questionnaire");
-
-      newFiles.push({
-        filename: file.name,
-        file: base64File, // Store Base64 string
-        doc_type_id: userRole.includes("Courtier") ? filterDocTypeBroker?.id : filterDocType?.id,
-        doc_Type_Name: userRole.includes("Courtier") ? filterDocTypeBroker?.name : filterDocType?.name
-      });
+      continue;
     }
 
-    if (newFiles.length > 0) {
-      setFileListStep2((prevFiles) => [...prevFiles, ...newFiles]);
+    if (file.size > maxFileSize) {
+      setFlashMessage({
+        type: "error",
+        message: `Limite de taille atteinte. Vos fichiers ne doivent pas dépasser 50 Mo: ${file.name}`,
+      });
+      continue;
     }
 
-    e.target.value = ""; // Reset the file input
-  };
+    const filterDocType = documentTypeList?.find((doctype) => doctype.name === "Police");
+    const filterDocTypeBroker = documentTypeList?.find((doctype) => doctype.name === "Questionnaire");
+
+    newFiles.push({
+      file, // actual File object
+      filename: file.name,
+      doc_type_id: userRole.includes("Courtier") ? filterDocTypeBroker?.id : filterDocType?.id,
+      doc_Type_Name: userRole.includes("Courtier") ? filterDocTypeBroker?.name : filterDocType?.name
+    });
+  }
+
+  if (newFiles.length > 0) {
+    setFileListStep2((prev) => [...prev, ...newFiles]);
+  }
+
+  e.target.value = ""; // Reset the file input
+};
+
 
   const handleFileChangeStep3 = async (e) => {
     const files = Array.from(e.target.files);
@@ -322,7 +320,7 @@ const AddfolderPanel = (props) => {
       const filterDocTypeBroker = documentTypeList?.find((doctype) => doctype.name === "Questionnaire");
 
       newFiles.push({
-        filename: file.name,
+       file, // actual File object
         file: base64File, // Store Base64 string
         doc_type_id: selectDocumentTypeStep3 ? selectDocumentTypeStep3 : userRole.includes("Courtier") ? filterDocTypeBroker?.id : filterDocType?.id,
         doc_Type_Name: selectDocumentTypeNameStep3 ? selectDocumentTypeNameStep3 : userRole.includes("Courtier") ? filterDocTypeBroker?.name : filterDocType?.name

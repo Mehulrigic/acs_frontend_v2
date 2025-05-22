@@ -591,55 +591,47 @@ const HandleAddDocument = async (e) => {
   }
 };
 
-  const HandleUpdateDocument = async (e) => {
-    e.preventDefault();
-    try {
-      const convertToBase64 = (file) => {
-        return new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onload = () => resolve(reader.result.split(",")[1]);
-          reader.onerror = (error) => reject(error);
-          reader.readAsDataURL(file);
-        });
-      };
+const HandleUpdateDocument = async (e) => {
+  e.preventDefault();
 
-      const base64Files = await Promise.all(
-        fileList.map(async (file) => ({
-          filename: file.name,
-          file: await convertToBase64(file),
-        }))
-      );
+  try {
+    if (fileList.length === 0) return;
 
-      var useData = {
-        filename: base64Files[0].filename,
-        file: base64Files[0].file,
-      };
-      const response = await FilePageService.update_document_files(showDocumentId, useData);
-      if (response.data.status) {
-        setFileList([]);
-        setShowDocumentName(useData.filename);
-        setFlashMessageStoreDoc({
-          type: "success",
-          message: response.data.message || t("somethingWentWrong"),
-        });
-        if (activeTab === "otherdocument") {
-          ShowOtherDocument(id, sort, currentPage, editUserStatus, selectDocumentType);
-          SpeakerDropDownList("", 1);
-          DocumentTypeList();
-        }
-      } else {
-        setFlashMessageStoreDoc({
-          type: "error",
-          message: response.data.message || t("somethingWentWrong"),
-        });
+    const formData = new FormData();
+
+    // Use same key names: `filename` and `file`
+    formData.append("filename", fileList[0].name); // plain text name
+    formData.append("file", fileList[0]); // actual binary file
+
+    const response = await FilePageService.update_document_files(showDocumentId, formData);
+
+    if (response.data.status) {
+      setFileList([]);
+      setShowDocumentName(fileList[0].name);
+      setFlashMessageStoreDoc({
+        type: "success",
+        message: response.data.message || t("somethingWentWrong"),
+      });
+
+      if (activeTab === "otherdocument") {
+        ShowOtherDocument(id, sort, currentPage, editUserStatus, selectDocumentType);
+        SpeakerDropDownList("", 1);
+        DocumentTypeList();
       }
-    } catch (error) {
+    } else {
       setFlashMessageStoreDoc({
         type: "error",
-        message: t("somethingWentWrong"),
+        message: response.data.message || t("somethingWentWrong"),
       });
     }
-  };
+  } catch (error) {
+    setFlashMessageStoreDoc({
+      type: "error",
+      message: t("somethingWentWrong"),
+    });
+  }
+};
+
 
   const AddMissingDocument = async (e) => {
     e.preventDefault();

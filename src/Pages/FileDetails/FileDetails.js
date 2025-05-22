@@ -923,55 +923,45 @@ const FileDetails = () => {
     }
   };
 
-  const HandleUpdateDocument = async (e) => {
-    if (fileList.length == 0) {
+const HandleUpdateDocument = async (e) => {
+  if (fileList.length === 0) {
+    handleReplaceClose();
+    return;
+  }
+
+  e.preventDefault();
+
+  try {
+    const formData = new FormData();
+
+    // Append actual file content as a blob
+    formData.append("file", fileList[0]); // sends the file as binary
+
+    // Append the filename separately if your backend expects it
+    formData.append("filename", fileList[0].name);
+
+    const response = await FilePageService.update_document_files(showDocumentId, formData);
+
+    if (response.data.status) {
       handleReplaceClose();
-      return;
-    }
-    e.preventDefault();
-    try {
-      const convertToBase64 = (file) => {
-        return new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onload = () => resolve(reader.result.split(",")[1]);
-          reader.onerror = (error) => reject(error);
-          reader.readAsDataURL(file);
-        });
-      };
-
-      const base64Files = await Promise.all(
-        fileList.map(async (file) => ({
-          filename: file.name,
-          file: await convertToBase64(file),
-        }))
-      );
-
-      var useData = {
-        filename: base64Files[0].filename,
-        file: base64Files[0].file,
-      };
-
-      const response = await FilePageService.update_document_files(showDocumentId, useData);
-
-      if (response.data.status) {
-        handleReplaceClose();
-        ShowUserDocumentData(id);
-        SpeakerList(id, sort, search, currentPage);
-        ShowOtherDocument(id, sort, currentPage, editUserStatus, selectDocumentType);
-        setFileList([]);
-      } else {
-        setFlashMessageStoreDoc({
-          type: "error",
-          message: response.data.message || t("somethingWentWrong"),
-        });
-      }
-    } catch (error) {
+      ShowUserDocumentData(id);
+      SpeakerList(id, sort, search, currentPage);
+      ShowOtherDocument(id, sort, currentPage, editUserStatus, selectDocumentType);
+      setFileList([]);
+    } else {
       setFlashMessageStoreDoc({
         type: "error",
-        message: t("somethingWentWrong"),
+        message: response.data.message || t("somethingWentWrong"),
       });
     }
-  };
+  } catch (error) {
+    setFlashMessageStoreDoc({
+      type: "error",
+      message: t("somethingWentWrong"),
+    });
+  }
+};
+
 
   const SendFileToUpdate = async () => {
     try {
