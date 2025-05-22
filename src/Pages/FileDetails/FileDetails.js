@@ -244,6 +244,8 @@ const FileDetails = () => {
   const handleInvalidReasonModalOpen = () => setInvalidReasonModal(true);
   const handleInvalidReasonModalClose = () => setInvalidReasonModal(false);
 
+  const [contractNo, setContractNo] = useState("");
+
   useEffect(() => {
     if (flashMessage.message) {
       const timer = setTimeout(() => {
@@ -403,6 +405,16 @@ const FileDetails = () => {
           filename: file.filename,
           doc_type_id: file.docType?.id
         }));
+
+        let ContractNo = response.data.documents.contract_no.includes('.');
+
+        setContractNo(response.data.documents.contract_no);
+        if(!ContractNo){
+         setFlashMessage({
+          type: "error",
+          message: "Le num du contrat doit contenir au moins un point (.)",
+        });
+        }
         setShowUserDocumentData(response.data.documents);
         setFinalStartDate(response.data.documents.final_start_date);
         setFinalCompletionDate(response.data.documents.final_completion_date);
@@ -1430,6 +1442,20 @@ const FileDetails = () => {
     };
   }, []);
 
+  const handleChange = (e) => {
+    const value = e.target.value;
+    let isValid = value.includes('.');
+    if (isValid) {
+      setContractNo(value);
+    } else {
+      setContractNo(value);
+      setFlashMessage({
+        type: "error",
+        message: "Le num du contrat doit contenir au moins un point (.)",
+      });
+    }
+  };
+
   return (
     <Fragment>
       <style> {` button.btn.btn-primary  { background-color: ${localStorage.getItem('button_color') ? JSON.parse(localStorage.getItem('button_color')) : "#e84455"} !Important};`} </style>
@@ -1841,7 +1867,8 @@ const FileDetails = () => {
                         type="text"
                         placeholder="Numéro de contrat"
                         name="contract_no"
-                        defaultValue={showUserDocumentData?.contract_no || ""}
+                        value={contractNo}
+                        onChange={handleChange}
                       />
                     </Form.Group>
 
