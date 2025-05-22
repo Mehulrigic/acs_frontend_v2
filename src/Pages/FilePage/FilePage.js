@@ -524,9 +524,9 @@ const FilePage = () => {
                         {selectedColumns.includes("Nom du preneur d'assurance") &&  <td>{data.insurance_policyholder_name}</td>}
                         {selectedColumns.includes("brokerlabel") && (
                           <td>
-                            {data.broker
-                              ? `${data.broker.first_name} ${data.broker.last_name}`
-                              : "Sans"}
+                                {data.broker
+                                    ? `${data.broker?.first_name} ${data.broker?.last_name == null ? '': data.broker?.last_name }`
+                                    : "Sans"}
                           </td>
                         )}
                         {selectedColumns.includes("Date de création") && <td>{data.created_at}</td>}

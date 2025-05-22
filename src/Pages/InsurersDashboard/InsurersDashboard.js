@@ -555,7 +555,7 @@ const InsurersDashboard = () => {
                               {selectedColumns.includes("brokerlabel") && (
                                 <td>
                                   {data.broker
-                                    ? `${data.broker?.first_name} ${data.broker?.last_name}`
+                                    ? `${data.broker?.first_name} ${data.broker?.last_name == null ? '': data.broker?.last_name }`
                                     : "Sans"}
                                 </td>
                               )}
@@ -889,8 +889,8 @@ const InsurersDashboard = () => {
                               {selectedColumns.includes("Nom du preneur d'assurance") && <td>{data.insurance_policyholder_name}</td>}
                               {selectedColumns.includes("brokerlabel") && (
                                 <td>
-                                  {data.broker
-                                    ? `${data.broker?.first_name} ${data.broker?.last_name}`
+                              {data.broker
+                                    ? `${data.broker?.first_name} ${data.broker?.last_name == null ? '': data.broker?.last_name }`
                                     : "Sans"}
                                 </td>
                               )}
@@ -1224,8 +1224,8 @@ const InsurersDashboard = () => {
                               {selectedColumns.includes("Nom du preneur d'assurance") && <td>{data.insurance_policyholder_name}</td>}
                               {selectedColumns.includes("brokerlabel") && (
                                 <td>
-                                  {data.broker
-                                    ? `${data.broker?.first_name} ${data.broker?.last_name}`
+                                   {data.broker
+                                    ? `${data.broker?.first_name} ${data.broker?.last_name == null ? '': data.broker?.last_name }`
                                     : "Sans"}
                                 </td>
                               )}

@@ -462,7 +462,11 @@ const ManagerDashboard = () => {
                         {selectedColumns.includes("Police") && <td className="bold-font">{data.folder_name}</td>}
                         {selectedColumns.includes("client") && <td className="bold-font">{data.customer_name}</td>}
                         {selectedColumns.includes("Nom du preneur d'assurance") && <td className="bold-font">{data.insurance_policyholder_name}</td>}
-                        {selectedColumns.includes("brokerlabel") && <td className="bold-font">{data.broker?.first_name ? data.broker?.first_name : "Sans"}</td>}
+                        {selectedColumns.includes("brokerlabel") && <td className="bold-font">
+                              {data.broker
+                                    ? `${data.broker?.first_name} ${data.broker?.last_name == null ? '': data.broker?.last_name }`
+                                    : "Sans"}
+                          </td>}
                         {selectedColumns.includes("Date de création") && <td className="bold-font">{data?.start_date}</td>}
                         {selectedColumns.includes("status") &&
                           <td>
@@ -791,7 +795,10 @@ const ManagerDashboard = () => {
                         {selectedColumns.includes("Police") && <td className="bold-font">{data.folder_name}</td>}
                         {selectedColumns.includes("client") && <td className="bold-font">{data.customer_name}</td>}
                         {selectedColumns.includes("Nom du preneur d'assurance") && <td className="bold-font">{data.insurance_policyholder_name}</td>}
-                        {selectedColumns.includes("brokerlabel") && <td className="bold-font">{data.broker?.first_name ? data.broker?.first_name : "Sans"}</td>}
+                        {selectedColumns.includes("brokerlabel") && <td className="bold-font">
+  {data.broker
+                                    ? `${data.broker?.first_name} ${data.broker?.last_name == null ? '': data.broker?.last_name }`
+                                    : "Sans"}                          </td>}
                         {selectedColumns.includes("Date de création") && <td className="bold-font">{data?.start_date}</td>}
                         {selectedColumns.includes("status") &&
                           <td>
@@ -1120,7 +1127,11 @@ const ManagerDashboard = () => {
                         {selectedColumns.includes("Police") && <td className="bold-font">{data.folder_name}</td>}
                         {selectedColumns.includes("client") && <td className="bold-font">{data.customer_name}</td>}
                         {selectedColumns.includes("Nom du preneur d'assurance") && <td className="bold-font">{data.insurance_policyholder_name}</td>}
-                        {selectedColumns.includes("brokerlabel") && <td className="bold-font">{data.broker?.first_name ? data.broker?.first_name : "Sans"}</td>}
+                        {selectedColumns.includes("brokerlabel") && <td className="bold-font">
+                           {data.broker
+                                    ? `${data.broker?.first_name} ${data.broker?.last_name == null ? '': data.broker?.last_name }`
+                                    : "Sans"}
+                          </td>}
                         {selectedColumns.includes("Date de création") && <td className="bold-font">{data?.start_date}</td>}
                         {selectedColumns.includes("status") &&
                           <td>
