@@ -9,6 +9,7 @@
     transition: all 0.4s ease;
     position: fixed;
     width: 300px;
+    z-index: 99;
 }
 .side-panel-container .logo-section img{
   width: auto;
