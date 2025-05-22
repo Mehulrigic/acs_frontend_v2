@@ -30,8 +30,8 @@ const FileDetails = () => {
 
   const [isLoading, setIsLoading] = useState(false);
   const [currentFileIndex, setCurrentFileIndex] = useState(0);
-  const [startDate, setStartDate] = useState(null);
-  const [endDate, setEndDate] = useState(null);
+  const [finalStartDate, setFinalStartDate] = useState(null);
+  const [finalCompletionDate, setFinalCompletionDate] = useState(null);
   const [activeTab, setActiveTab] = useState("contactinfo");
   const [activeSubTab, setActiveSubTab] = useState("speaker");
   const [showSpeakerId, setShowSpeakerId] = useState("");
@@ -404,8 +404,8 @@ const FileDetails = () => {
           doc_type_id: file.docType?.id
         }));
         setShowUserDocumentData(response.data.documents);
-        setStartDate(response.data.documents.final_start_date);
-        setEndDate(response.data.documents.final_completion_date);
+        setFinalStartDate(response.data.documents.final_start_date);
+        setFinalCompletionDate(response.data.documents.final_completion_date);
         setPolicyholderName(response.data.documents.insurance_policyholder_name);
         setEstimatedSiteCost(response.data.documents.estimated_site_cost);
         setFinaldSiteCost(response.data.documents.final_site_cost);
@@ -724,8 +724,8 @@ const FileDetails = () => {
 
     var folderData = {
       folder_name: e.target.elements.folderName.value ? e.target.elements.folderName.value : "",
-      final_start_date: startDate ? startDate : "",
-      final_completion_date: endDate ? endDate : "",
+      final_start_date: finalStartDate ? finalStartDate : "",
+      final_completion_date: finalCompletionDate ? finalCompletionDate : "",
       contract_no: e.target.elements.contract_no.value ? e.target.elements.contract_no.value : "",
       insurance_policyholder_name: policyholderName ? policyholderName : "",
       estimated_start_date: estimatedStartDate ? estimatedStartDate : "",
@@ -1487,6 +1487,7 @@ const HandleUpdateDocument = async (e) => {
               <span>Dossier à vérifier</span>
             </div>
             <div className="d-sm-flex align-items-center gap-3">
+              <p className="m-0">Envoyer à : </p>
               <div>
                 <Form.Select aria-label="Etat du chantier" style={{ minHeight: "30px" }} value={sendToFileStatus} onChange={(e) => handleSendFileShow(e.target.value)}>
                   <option value="" disabled selected>Envoyer à</option>
@@ -1834,14 +1835,18 @@ const HandleUpdateDocument = async (e) => {
                       />
                     </Form.Group>
 
-                    <Form.Group className="mb-4 mx-w-320" controlId="names">
-                      <Form.Label className="d-block">Date de début du site</Form.Label>
-                      <DatePicker
-                        placeholderText="Selectionner une date de début du site"
-                        selected={startDate ? getFormattedDate(startDate) : ""}
-                        onChange={(date) => setStartDate(formatDate(date))}
-                        dateFormat="dd/MM/yyyy"
-                        locale={fr}
+                    <Form.Group className="mb-4 mx-w-320" controlId="exampleForm.ControlInput1">
+                      <Form.Label>Coût estimé du chantier</Form.Label>
+                      <Form.Control
+                        type="text"
+                        placeholder="Entrez le coût estimé du site"
+                        name="estimated_site_cost"
+                        value={estimatedSiteCost}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          const onlyNumbers = value.replace(/[^0-9.]/g, '');
+                          setEstimatedSiteCost(onlyNumbers);
+                        }}
                       />
                     </Form.Group>
 
@@ -1866,8 +1871,8 @@ const HandleUpdateDocument = async (e) => {
                         locale={fr}
                       />
                     </Form.Group>
-                    
                   </div>
+
                   <div className="flex-fill" style={{ minWidth: "300px" }}>
                     <Form.Group className="mb-4 mx-w-320" controlId="formBasicEmail">
                       <Form.Label>Nom du preneur d'assurance</Form.Label>
@@ -1879,19 +1884,19 @@ const HandleUpdateDocument = async (e) => {
                       />
                     </Form.Group>
 
-                    <Form.Group className="mb-4 mx-w-320" controlId="exampleForm.ControlInput1">
-                      <Form.Label>coût estimé du chantier</Form.Label>
-                      <Form.Control
-                        type="text"
-                        placeholder="Entrez le coût estimé du site"
-                        name="estimated_site_cost"
-                        value={estimatedSiteCost}
-                        onChange={(e) => {
-                          const value = e.target.value;
-                          const onlyNumbers = value.replace(/[^0-9.]/g, '');
-                          setEstimatedSiteCost(onlyNumbers);
-                        }}
-                      />
+                    <Form.Group className="mb-4 mx-w-320" controlId="formBasicEmail">
+                      <Form.Label>Choisir un Courtier</Form.Label>
+                      <Form.Select
+                        className="full-width mb-3"
+                        aria-label={"statusSelectAria"}
+                        value={selectBroker}
+                        onChange={handleBrokerChange}
+                      >
+                        <option value="" disabled>Choisir un Courtier</option>
+                        {brokerList?.map((broker) => (
+                          <option value={broker.id}>{broker.first_name}</option>
+                        ))}
+                      </Form.Select>
                     </Form.Group>
 
                     <Form.Group className="mb-4 mx-w-320" controlId="exampleForm.ControlInput1">
@@ -1910,29 +1915,25 @@ const HandleUpdateDocument = async (e) => {
                     </Form.Group>
 
                     <Form.Group className="mb-4 mx-w-320" controlId="names">
-                      <Form.Label className="d-block">Date d'achèvement définitive</Form.Label>
+                      <Form.Label className="d-block">Date de début définitive</Form.Label>
                       <DatePicker
-                        placeholderText="Selectionner une date d'achèvement définitive"
-                        selected={endDate ? getFormattedDate(endDate) : ""}
-                        onChange={(date) => setEndDate(formatDate(date))}
+                        placeholderText="Selectionner une date de début du site"
+                        selected={finalStartDate ? getFormattedDate(finalStartDate) : ""}
+                        onChange={(date) => setFinalStartDate(formatDate(date))}
                         dateFormat="dd/MM/yyyy"
                         locale={fr}
                       />
                     </Form.Group>
-                    
-                    <Form.Group className="mb-4 mx-w-320" controlId="formBasicEmail">
-                      <Form.Label>Choisir un Courtier</Form.Label>
-                      <Form.Select
-                        className="full-width mb-3"
-                        aria-label={"statusSelectAria"}
-                        value={selectBroker}
-                        onChange={handleBrokerChange}
-                      >
-                        <option value="" disabled>Choisir un Courtier</option>
-                        {brokerList?.map((broker) => (
-                          <option value={broker.id}>{broker.first_name}</option>
-                        ))}
-                      </Form.Select>
+
+                    <Form.Group className="mb-4 mx-w-320" controlId="names">
+                      <Form.Label className="d-block">Date d'achèvement définitive</Form.Label>
+                      <DatePicker
+                        placeholderText="Selectionner une date d'achèvement définitive"
+                        selected={finalCompletionDate ? getFormattedDate(finalCompletionDate) : ""}
+                        onChange={(date) => setFinalCompletionDate(formatDate(date))}
+                        dateFormat="dd/MM/yyyy"
+                        locale={fr}
+                      />
                     </Form.Group>
                   </div>
                 </div>

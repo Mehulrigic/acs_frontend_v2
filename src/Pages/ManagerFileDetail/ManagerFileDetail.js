@@ -1479,9 +1479,9 @@ const ManagerFileDetail = () => {
               <p className="m-0" style={{paddingRight: "10px"}}>Envoyer à : </p>
               <Form.Select aria-label="Etat du chantier" class="form-select" style={{  minHeight: "30px", width: "25%"}} value={sendToFileStatus} onChange={(e) => handleSendFileShow(e.target.value)}>
                   <option value="" disabled selected>Envoyer à</option>
-                  <option value="transfer_to_manager">Transfert au Gestionnaire</option>
+                  <option value="transfer_to_insurer">Transfert à l'assureur</option>
                   <option value="transfer_to_broker">Transfert au Courtier</option>
-                  <option value="formal_notice">Mise en demeure</option>
+                  <option value="to_be_decided">A décider</option>
                 </Form.Select>
             </div>
           </div>
