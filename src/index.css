@@ -579,3 +579,10 @@ a.sorting-icon.rotate svg {
     width: 170px;
   }
 }
+
+.form-grid-2x2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* 2 columns of equal width */
+  gap: 1rem 2rem; /* row and column gaps */
+  align-items: start;
+}

@@ -191,6 +191,14 @@ const ManagerFileDetail = () => {
   };
   const handleSendFileClose = () => setShowSendFileChange(false);
 
+  const [policyholderName, setPolicyholderName] = useState("");
+  const [estimatedSiteCost, setEstimatedSiteCost] = useState("");
+  const [estimatedStartDate, setEstimatedStartDate] = useState(null);
+  const [estimatedCompletionDate, setEstimatedCompletionDate] = useState(null);
+  const [finalSiteCost, setFinaldSiteCost] = useState("");
+  const [finalStartDate, setFinalStartDate] = useState(null);
+  const [finalCompletionDate, setFinalCompletionDate] = useState(null);
+
   useEffect(() => {
     if (flashMessage.message) {
       const timer = setTimeout(() => {
@@ -499,6 +507,14 @@ const AddMissingDocument = async (e) => {
         setTotalPaperRecords(response.data.documents.user_document_files?.length);
         setStartDate(response.data.documents.start_date);
         setEndDate(response.data.documents.complete_date);
+
+        setPolicyholderName(response.data.documents.insurance_policyholder_name);
+        setEstimatedSiteCost(response.data.documents.estimated_site_cost);
+        setEstimatedStartDate(response.data.documents.estimated_start_date);
+        setEstimatedCompletionDate(response.data.documents.estimated_completion_date);
+        setFinaldSiteCost(response.data.documents.final_site_cost);
+        setFinalStartDate(response.data.documents.final_start_date);
+        setFinalCompletionDate(response.data.documents.final_completion_date);
         if(response.data.documents.status == "transfer_to_manager" || response.data.documents.status == "transfer_to_broker" || response.data.documents.status == "formal_notice"){
           setSendToFileStatus(response.data.documents.status);
         } else {
@@ -1397,6 +1413,41 @@ const AddMissingDocument = async (e) => {
     };
   }, []);
 
+  const UpdateFolderInfo = async (e) => {
+    e.preventDefault();
+
+    const folderData = {
+      folder_name: folderDetail.folder_name,
+      final_site_cost: finalSiteCost || "",
+      final_start_date: finalStartDate ? finalStartDate : "",
+      final_completion_date: finalCompletionDate ? finalCompletionDate : "",
+      insurance_policyholder_name: policyholderName || "",
+      estimated_site_cost: estimatedSiteCost || "",
+      estimated_start_date: estimatedStartDate ? estimatedStartDate : "",
+      estimated_completion_date: estimatedCompletionDate ? estimatedCompletionDate : "",
+    };
+
+    try {
+      const response = await FilePageService.folder_info_update(id, folderData);
+      if (response.data.status) {
+        setFlashMessage({
+          type: "success",
+          message: response.data.message || t("somethingWentWrong"),
+        });
+      } else {
+        setFlashMessage({
+          type: "error",
+          message: response.data.message || t("somethingWentWrong"),
+        });
+      }
+    } catch (error) {
+      setFlashMessage({
+        type: "error",
+        message: t("somethingWentWrong"),
+      });
+    }
+  };
+
   return (
     <Fragment>
       <style> {` button.btn.btn-primary  { background-color: ${localStorage.getItem('button_color') ? JSON.parse(localStorage.getItem('button_color')) : "#e84455"} !Important};`} </style>
@@ -1489,62 +1540,184 @@ const AddMissingDocument = async (e) => {
                 <Loading />
               </div>
             }
+            <Form className="mt-24 " onSubmit={UpdateFolderInfo}>
+              {flashMessage.message && (
+                <div
+                  className={`mt-3 mx-w-320 alert ${flashMessage.type === "success"
+                    ? "alert-success"
+                    : "alert-danger"
+                    } text-center`}
+                  role="alert"
+                >
+                  {flashMessage.message}
+                </div>
+              )}
             <div className="table-wrapper mt-0 p-0">
               <h2 class="mb-3">Général</h2>
-              <Form.Group className="mb-3" controlId="insurercode">
-                <Form.Label>Code assureur</Form.Label>
-                <Form.Control
-                  disabled
-                  type="text"
-                  placeholder="Code assureur"
-                  value={folderDetail.insurer_code}
-                />
-              </Form.Group>
 
-              <Form.Group className="mb-3" controlId="filenumber">
-                <Form.Label>Numéro de dossier</Form.Label>
-                <Form.Control
-                  disabled
-                  type="text"
-                  placeholder="Numéro de dossier"
-                  value={folderDetail.folder_name}
-                />
-              </Form.Group>
+              <div className="form-grid-2x2">
+                <Form.Group className="mb-3" controlId="insurercode">
+                  <Form.Label>Code assureur</Form.Label>
+                  <Form.Control
+                    disabled
+                    type="text"
+                    placeholder="Code assureur"
+                    value={folderDetail.insurer_code}
+                  />
+                </Form.Group>
 
-              <Form.Group className="mb-3" controlId="insurername">
-                <Form.Label>Nom de l'assureur</Form.Label>
-                <Form.Control
-                  type="text"
-                  placeholder="Nom de l'assureur"
-                  value={folderDetail.insurer_name}
-                />
-              </Form.Group>
+                <Form.Group className="mb-3" controlId="filenumber">
+                  <Form.Label>Numéro de dossier</Form.Label>
+                  <Form.Control
+                    disabled
+                    type="text"
+                    placeholder="Numéro de dossier"
+                    value={folderDetail.folder_name}
+                  />
+                </Form.Group>
 
-              <Form.Group className="mb-4" controlId="insurername">
-                <Form.Label className="d-block">
-                  Date de création du fichier
-                </Form.Label>
-                <DatePicker
-                  placeholderText="Selectionner une date"
-                  selected={startDate4 ? getFormattedDate(startDate4) : null}
-                  onChange={(date) => setStartDate4(formatDate(date))}
-                  dateFormat="dd/MM/yyyy"
-                  locale={fr}
-                />
-              </Form.Group>
+                <Form.Group className="mb-3" controlId="insurername">
+                  <Form.Label>Nom de l'assureur</Form.Label>
+                  <Form.Control
+                    type="text"
+                    placeholder="Nom de l'assureur"
+                    value={folderDetail.insurer_name}
+                  />
+                </Form.Group>
+
+                <Form.Group className="mb-4" controlId="insurername">
+                  <Form.Label className="d-block">
+                    Date de création du fichier
+                  </Form.Label>
+                  <DatePicker
+                    placeholderText="Selectionner une date"
+                    selected={startDate4 ? getFormattedDate(startDate4) : null}
+                    onChange={(date) => setStartDate4(formatDate(date))}
+                    dateFormat="dd/MM/yyyy"
+                    locale={fr}
+                  />
+                </Form.Group>
+              </div>
 
               <h2 class="mb-3">Police</h2>
 
-              <Form.Group className="mb-3" controlId="names">
+              <div className="table-wrapper mt-0 p-0">
+                <div className="form-grid-2x2">
+                  <Form.Group className="mb-3" controlId="names">
+                    <Form.Label>Nom et prénom du demandeur</Form.Label>
+                    <Form.Control
+                      type="text"
+                      placeholder="Nom et prénom du demandeur"
+                      value={folderDetail.customer_name || "-"}
+                    />
+                  </Form.Group>
+
+                  <Form.Group className="mb-3" controlId="formBasicEmail">
+                    <Form.Label>Nom du preneur d'assurance</Form.Label>
+                    <Form.Control
+                      type="text"
+                      placeholder="Nom du preneur d'assurance"
+                      value={policyholderName}
+                      onChange={(e) => setPolicyholderName(e.target.value)}
+                    />
+                  </Form.Group>
+
+                  <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
+                    <Form.Label>Coût estimé du chantier</Form.Label>
+                    <Form.Control
+                      type="text"
+                      placeholder="Entrez le coût estimé du site"
+                      name="estimated_site_cost"
+                      value={estimatedSiteCost}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        const onlyNumbers = value.replace(/[^0-9.]/g, '');
+                        setEstimatedSiteCost(onlyNumbers);
+                      }}
+                    />
+                  </Form.Group>
+
+                  <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
+                    <Form.Label>Coût final du chantier</Form.Label>
+                    <Form.Control
+                      type="text"
+                      placeholder="Entrez le coût final du site"
+                      name="final_site_cost"
+                      value={finalSiteCost}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        const onlyNumbers = value.replace(/[^0-9.]/g, '');
+                        setFinaldSiteCost(onlyNumbers);
+                      }}
+                    />
+                  </Form.Group>
+
+                  <Form.Group className="mb-3" controlId="names">
+                    <Form.Label className="d-block">Date de début estimée</Form.Label>
+                    <DatePicker
+                      placeholderText="Selectionner une date de début estimée"
+                      selected={estimatedStartDate ? getFormattedDate(estimatedStartDate) : ""}
+                      onChange={(date) => setEstimatedStartDate(formatDate(date))}
+                      dateFormat="dd/MM/yyyy"
+                      locale={fr}
+                    />
+                  </Form.Group>
+
+                  <Form.Group className="mb-3" controlId="names">
+                    <Form.Label className="d-block">Date de début définitive</Form.Label>
+                    <DatePicker
+                      placeholderText="Selectionner une date de début du site"
+                      selected={finalStartDate ? getFormattedDate(finalStartDate) : ""}
+                      onChange={(date) => setFinalStartDate(formatDate(date))}
+                      dateFormat="dd/MM/yyyy"
+                      locale={fr}
+                    />
+                  </Form.Group>
+
+                  <Form.Group className="mb-3" controlId="names">
+                    <Form.Label className="d-block">Date d'achèvement estimée</Form.Label>
+                    <DatePicker
+                      placeholderText="Selectionner une date d'achèvement estimée"
+                      selected={estimatedCompletionDate ? getFormattedDate(estimatedCompletionDate) : ""}
+                      onChange={(date) => setEstimatedCompletionDate(formatDate(date))}
+                      dateFormat="dd/MM/yyyy"
+                      locale={fr}
+                    />
+                  </Form.Group>
+
+                  <Form.Group className="mb-3" controlId="names">
+                    <Form.Label className="d-block">Date d'achèvement définitive</Form.Label>
+                    <DatePicker
+                      placeholderText="Selectionner une date d'achèvement définitive"
+                      selected={finalCompletionDate ? getFormattedDate(finalCompletionDate) : ""}
+                      onChange={(date) => setFinalCompletionDate(formatDate(date))}
+                      dateFormat="dd/MM/yyyy"
+                      locale={fr}
+                    />
+                  </Form.Group>
+                </div>
+                <Button className="btn-secondary" type="submit" onClick={(e) => UpdateFolderInfo(e)}>
+                  Valider
+                </Button>
+                <Button
+                  className="btn-transperant ms-2"
+                  onClick={() => navigate("/manager-files")}
+                >
+                  Annuler
+                </Button>
+              </div>
+              
+
+              {/* <Form.Group className="mb-3" controlId="names">
                 <Form.Label>Nom et prénom du demandeur</Form.Label>
                 <Form.Control
                   type="text"
                   placeholder="Nom et prénom du demandeur"
                   value={folderDetail.customer_name || "-"}
                 />
-              </Form.Group>
+              </Form.Group> */}
 
-              <Form.Group className="mb-3" controlId="start-date">
+              {/* <Form.Group className="mb-3" controlId="start-date">
                 <Form.Label className="d-block">Début du chantier</Form.Label>
                 <DatePicker
                   placeholderText="Selectionner une date"
@@ -1553,9 +1726,9 @@ const AddMissingDocument = async (e) => {
                   dateFormat="dd/MM/yyyy"
                   locale={fr}
                 />
-              </Form.Group>
+              </Form.Group> */}
 
-              <Form.Group className="mb-3" controlId="end-date">
+              {/* <Form.Group className="mb-3" controlId="end-date">
                 <Form.Label className="d-block">Fin du chantier</Form.Label>
                 <DatePicker
                   placeholderText="Selectionner une date"
@@ -1564,8 +1737,9 @@ const AddMissingDocument = async (e) => {
                   dateFormat="dd/MM/yyyy"
                   locale={fr}
                 />
-              </Form.Group>
+              </Form.Group> */}
             </div>
+            </Form>
           </Tab>
 
           {/* Paper Tab */}
