@@ -124,10 +124,10 @@ const HandleStoreDocument = async (e) => {
     if (fileListStep3?.length) {
       documents.push(...fileListStep3);
     }
-
+    
     const formData = new FormData();
     formData.append("folder_name", folderName ?? "");
-    formData.append("broker_id", userRole === "Courtier" ? userId : selectBroker);
+    formData.append("broker_id", userRole == "Courtier" ? userId : selectBroker);
     formData.append("contract_no", contractNo ?? "");
     formData.append("insurance_policyholder_name", policyholderName ?? "");
     formData.append("estimated_start_date", estimatedStartDate ?? "");
@@ -320,8 +320,8 @@ const handleFileChangeStep2 = (e) => {
       const filterDocTypeBroker = documentTypeList?.find((doctype) => doctype.name === "Questionnaire");
 
       newFiles.push({
-       file, // actual File object
-        file: base64File, // Store Base64 string
+     file, // actual File object
+      filename: file.name,
         doc_type_id: selectDocumentTypeStep3 ? selectDocumentTypeStep3 : userRole.includes("Courtier") ? filterDocTypeBroker?.id : filterDocType?.id,
         doc_Type_Name: selectDocumentTypeNameStep3 ? selectDocumentTypeNameStep3 : userRole.includes("Courtier") ? filterDocTypeBroker?.name : filterDocType?.name
       });
