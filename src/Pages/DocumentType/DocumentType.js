@@ -312,7 +312,7 @@ const DocumentType = () => {
                       </div>
                     </th>
                     <th> Fin de chantier</th>
-                    <th width={165} className="select-drop">
+                    <th width={165} className="select-drop elips-dropdown">
                       <div className="d-flex align-items-center">
                         <div>
                           <Form.Select aria-label="statusSelectAria" value={editDocumentTypeStatus} onChange={(e) => HandleFilterStatus(e.target.value)}>
