@@ -469,6 +469,7 @@ const AdminFileDetail = () => {
   event.target.value = ""; // Reset file input
 };
 
+
   const allowedFileTypes = [
     "application/msword", // .doc
     "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // .docx
@@ -575,6 +576,7 @@ const AddMissingDocument = async (e) => {
     });
   }
 };
+
 
   const ShowUserDocumentData = async (id) => {
     try {
@@ -1603,6 +1605,7 @@ const AddMissingDocument = async (e) => {
             <h1 className="m-0 mb-md-0 mb-3">
               Dossier {showUserFolderName}
             </h1>
+            
             <div className="d-flex align-items-center check-status">
               <div className="d-flex align-items-center check-status">
                 <p className="m-0" style={{ paddingRight: "10px" }}>Etat du chantier : </p>
@@ -3357,7 +3360,6 @@ const AddMissingDocument = async (e) => {
                                 onDragOver={(e) => e.preventDefault()}
                                 onDrop={(e) => {
                                   e.preventDefault();
-
                                   const files = e.dataTransfer.files;
                                   if (files.length) {
                                     handleUpdateFileChange({ target: { files } });
