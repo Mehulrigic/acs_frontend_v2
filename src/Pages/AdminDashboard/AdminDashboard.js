@@ -435,7 +435,7 @@ const AdminDashboard = () => {
                         </th>
                       }
                       {selectedColumns.includes("status") && (
-                        <th className="select-drop">
+                        <th className="select-drop elips-dropdown">
                           <div className="d-flex align-items-center">
                             <div>
                               <Form.Select
@@ -478,7 +478,7 @@ const AdminDashboard = () => {
                         </th>
                       )}
                       {selectedColumns.includes("Etat du chantier") &&
-                        <th className="select-drop">
+                        <th className="select-drop elips-dropdown">
                           <div className="d-flex align-items-center">
                             <div>
                               <Form.Select aria-label="Etat du chantier" value={editUserSiteStatus} onChange={(e) => handleSiteStatusChange(e.target.value)}>
