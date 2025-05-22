@@ -540,64 +540,56 @@ const BrokerFileDetail = () => {
     });
   };
 
-  const HandleAddDocument = async (e) => {
-    if (fileList.length == 0) {
-      handleDocClose();
-      return;
-    }
-    e.preventDefault();
-    try {
-      const convertToBase64 = (file) => {
-        return new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onload = () => resolve(reader.result.split(",")[1]);
-          reader.onerror = (error) => reject(error);
-          reader.readAsDataURL(file);
-        });
-      };
+const HandleAddDocument = async (e) => {
+  e.preventDefault();
 
-      const filterDocTypeBroker = documentTypeList?.find((doctype) => doctype.name === "Questionnaire");
+  if (fileList.length === 0) {
+    handleDocClose();
+    return;
+  }
 
-      const base64Files = await Promise.all(
-        fileList.map(async (file) => ({
-          filename: file.name,
-          file: await convertToBase64(file),
-          doc_type_id: filterDocTypeBroker?.id,
-        }))
-      );
+  try {
+    const formData = new FormData();
+    const filterDocTypeBroker = documentTypeList?.find(
+      (doctype) => doctype.name === "Questionnaire"
+    );
 
-      var useData = {
-        documents: base64Files,
-      };
-      const response = await FilePageService.add_document_files(id, useData);
-      if (response.data.status) {
-        setFileList([]);
-        setFlashMessageStoreDoc({
-          type: "success",
-          message: response.data.message || t("somethingWentWrong"),
-        });
+    fileList.forEach((file, index) => {
+      formData.append(`documents[${index}][file]`, file);
+      formData.append(`documents[${index}][filename]`, file.name);
+      formData.append(`documents[${index}][doc_type_id]`, filterDocTypeBroker?.id || "");
+    });
 
-        if (activeTab === "otherdocument") {
-          ShowOtherDocument(id, sort, currentPage, editUserStatus, selectDocumentType);
-          SpeakerDropDownList("", 1);
-          DocumentTypeList();
-        }
-        if (activeTab === "missingdocument") {
-          GetMissingDocumentList(id, sort, currentPage);
-        }
-      } else {
-        setFlashMessageStoreDoc({
-          type: "error",
-          message: response.data.message || t("somethingWentWrong"),
-        });
+    const response = await FilePageService.add_document_files(id, formData);
+
+    if (response?.data?.status) {
+      setFileList([]);
+      setFlashMessageStoreDoc({
+        type: "success",
+        message: response.data.message || t("somethingWentWrong"),
+      });
+
+      if (activeTab === "otherdocument") {
+        ShowOtherDocument(id, sort, currentPage, editUserStatus, selectDocumentType);
+        SpeakerDropDownList("", 1);
+        DocumentTypeList();
       }
-    } catch (error) {
+      if (activeTab === "missingdocument") {
+        GetMissingDocumentList(id, sort, currentPage);
+      }
+    } else {
       setFlashMessageStoreDoc({
         type: "error",
-        message: t("somethingWentWrong"),
+        message: response?.data?.message || t("somethingWentWrong"),
       });
     }
-  };
+  } catch (error) {
+    setFlashMessageStoreDoc({
+      type: "error",
+      message: t("somethingWentWrong"),
+    });
+  }
+};
 
   const HandleUpdateDocument = async (e) => {
     e.preventDefault();
