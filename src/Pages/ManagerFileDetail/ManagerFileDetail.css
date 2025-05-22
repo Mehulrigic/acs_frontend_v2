@@ -197,3 +197,13 @@ button.btn.btn-primary.add-intervenant{
     padding: 0px 12px;
     font-size: 14px;
 }
+
+.filter-btn {
+    border: 2px solid fuchsia;
+    background-color: white;
+    color: #c700ff;
+    padding: 5px 15px;
+    font-weight: 600;
+    border-radius: 4px;
+    cursor: pointer;
+}

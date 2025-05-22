@@ -79,7 +79,7 @@ const ManagerFileDetail = () => {
   const [speakerDropDownList, setSpeakerDropDownList] = useState([]);
   const [folderDetail, setFolderDetail] = useState([]);
   const [fileDetail, setFileDetail] = useState();
-  const [speakerDetail, setSpeakerDetail] = useState();
+  const [speakerDetail, setSpeakerDetail] = useState({});
   const [speakerDocumentTypeList, setSpeakerDocumentTypeList] = useState([]);
   const [markIsReadCount, setMarkIsReadCount] = useState(0);
   const [missingDocumentList, setMissingDocumentList] = useState([]);
@@ -96,6 +96,7 @@ const ManagerFileDetail = () => {
   const [showUserDocumentData, setShowUserDocumentData] = useState([]);
   const [showUserFolderName, setShowUserFolderName] = useState("");
   const [showUserCompanyName, setShowUserCompanyName] = useState("");
+  const [validateDocumnetFilter, setValidateDocumnetFilter] = useState("");
   const [showUserDocumentFileData, setShowUserDocumentFileData] = useState([]);
   const [userDocumentFileDataChanges, setUserDocumentFileDataChanges] =
     useState({
@@ -182,6 +183,7 @@ const ManagerFileDetail = () => {
   };
 
   const [rightPanelThemeColor, setRightPanelThemeColor] = useState("");
+  const [buttonColor, setButtonColor] = useState("");
   const [logoImageShow, setLogoImageShow] = useState("");
   const [sendToFileStatus, setSendToFileStatus] = useState("");
   const [showSendFileChange, setShowSendFileChange] = useState(false);
@@ -223,10 +225,10 @@ const ManagerFileDetail = () => {
 
   useEffect(() => {
     const logo_image = JSON.parse(localStorage.getItem("logo_image"));
-    const right_panel_color = JSON.parse(
-      localStorage.getItem("right_panel_color")
-    );
+    const button_color = JSON.parse(localStorage.getItem('button_color'));
+    const right_panel_color = JSON.parse(localStorage.getItem("right_panel_color"));
     setRightPanelThemeColor(right_panel_color);
+    setButtonColor(button_color);
     setLogoImageShow(logo_image);
   }, []);
 
@@ -239,7 +241,7 @@ const ManagerFileDetail = () => {
     } else {
       navigate("/");
     }
-  }, []);
+  }, [validateDocumnetFilter]);
 
   useEffect(() => {
     if (activeTab === "information") {
@@ -391,7 +393,52 @@ const ManagerFileDetail = () => {
     }
   };
 
-const handleUpdateFileChange = (event) => {
+  // const handleUpdateFileChange = async (event) => {
+  //   const files = Array.from(event.target.files); // Only get the first selected file
+
+  //   const newFiles = [];
+
+  //   const convertToBase64 = (file) => {
+  //     return new Promise((resolve, reject) => {
+  //       const reader = new FileReader();
+  //       reader.onload = () => resolve(reader.result.split(",")[1]); // Extract only Base64 content
+  //       reader.onerror = (error) => reject(error);
+  //       reader.readAsDataURL(file);
+  //     });
+  //   };
+
+  //   for (const file of files) {
+  //     if (!allowedFileTypes.includes(file.type)) {
+  //       setFlashMessage({
+  //         type: "error",
+  //         message: `Ce type de document n'est pas pris en charge: ${file.name}`,
+  //       });
+  //       return; // Exit if invalid file type
+  //     }
+  //     console.log(file);
+  //     if (file.size > maxFileSize) {
+  //       setFlashMessage({
+  //         type: "error",
+  //         message: `Limite de taille atteinte. Vos fichiers ne doivent pas dépasser 50 Mo: ${file.name}`,
+  //       });
+  //       return; // Exit if file size is too large
+  //     }
+
+  //     const base64File = await convertToBase64(file);
+
+  //     newFiles.push({
+  //       file: base64File,
+  //       name: file.name,
+  //     });
+  //   }
+  //   if (newFiles.length > 0) {
+  //     setFileList((prevFiles) => [...prevFiles, ...newFiles]);
+  //   }
+
+  //   event.target.value = ""; // Reset the file input
+  // };
+
+  const handleUpdateFileChange = (event) => {
   const files = Array.from(event.target.files);
   const newFiles = [];
 
@@ -434,6 +481,53 @@ const handleUpdateFileChange = (event) => {
   ];
 
   const maxFileSize = 50 * 1024 * 1024;
+
+  // const AddMissingDocument = async (e) => {
+  //   e.preventDefault();
+  //   try {
+  //     const documents = [];
+
+  //     if (fileList?.length) {
+  //       documents.push(...fileList);
+  //     }
+
+  //     var userData = {
+  //       speaker_id: showSpeakerId,
+  //       missing_document_id: missingDocumentId,
+  //       documents: documents
+  //     }
+
+  //     const response = await FilePageService.add_missing_document(id, userData);
+      
+  //     if (response.data.status) {
+  //       setFileList([]);
+  //       setFlashMessageStoreDoc({
+  //         type: "success",
+  //         message: response.data.message || t("somethingWentWrong"),
+  //       });
+
+  //       if (activeTab === "speakerdocument") {
+  //         if (activeSubTab === "documentType") {
+  //           SpeakerDocumentTypeList(id, showSpeakerId);
+  //         }
+  //       }
+  //       if (activeTab === "missingdocument") {
+  //         GetMissingDocumentList(id, sort, 1, selectIsRequired);
+  //       }
+  //       ShowUserDocumentData(id);
+  //     } else {
+  //       setFlashMessageStoreDoc({
+  //         type: "error",
+  //         message: response.data.message || t("somethingWentWrong"),
+  //       });
+  //     }
+  //   } catch (error) {
+  //     setFlashMessageStoreDoc({
+  //       type: "error",
+  //       message: t("somethingWentWrong"),
+  //     });
+  //   }
+  // };
 
 const AddMissingDocument = async (e) => {
   e.preventDefault();
@@ -486,7 +580,11 @@ const AddMissingDocument = async (e) => {
 
   const ShowUserDocumentData = async (id) => {
     try {
-      const response = await FilePageService.show_user_document(id);
+      var userData = {
+        status: validateDocumnetFilter
+      }
+
+      const response = await FilePageService.show_user_document(id, userData);
 
       if (response.data.status) {
         const fileDataChanges = response.data.documents.user_document_files.map(
@@ -520,9 +618,7 @@ const AddMissingDocument = async (e) => {
         } else {
           setSendToFileStatus("");
         }
-        setShowUserDocumentFileData(
-          response.data.documents.user_document_files
-        );
+        setShowUserDocumentFileData(response.data.documents.user_document_files);
         setUserDocumentFileDataChanges(fileDataChanges);
         if (showCheck && showDeleteModal) {
           setShowUserDocumentAfterDeleteFile(true);
@@ -947,6 +1043,11 @@ const AddMissingDocument = async (e) => {
         setEditUserStatus(selectedDoc?.status);
         setSelectDocumentType(selectedDoc?.docType?.id);
         setSelectSpeakerId(selectedDoc?.speaker?.id);
+        if(selectedDoc?.speaker?.id){
+          SpeakerDetail(selectedDoc?.speaker?.id);
+        } else {
+          setSpeakerDetail({});
+        }
 
         setUserDocumentFileDataChanges((prevData) => {
           return prevData?.map((file) => {
@@ -969,6 +1070,11 @@ const AddMissingDocument = async (e) => {
         setEditUserStatus(userDocumentFileDataChanges[0]?.status);
         setSelectDocumentType(userDocumentFileDataChanges[0]?.doc_type_id);
         setSelectSpeakerId(userDocumentFileDataChanges[0]?.speaker_id);
+        if(userDocumentFileDataChanges[0]?.speaker_id){
+          SpeakerDetail(userDocumentFileDataChanges[0]?.speaker_id);
+        } else {
+          setSpeakerDetail({});
+        }
 
         setUserDocumentFileDataChanges((prevData) => {
           return prevData?.map((file) => {
@@ -999,6 +1105,11 @@ const AddMissingDocument = async (e) => {
       setEditUserStatus(selectedDoc?.status);
       setSelectDocumentType(selectedDoc?.doc_type_id);
       setSelectSpeakerId(selectedDoc?.speaker_id);
+      if(selectedDoc?.speaker_id){
+        SpeakerDetail(selectedDoc?.speaker_id);
+      } else {
+        setSpeakerDetail({});
+      }
 
       setUserDocumentFileDataChanges((prevData) => {
         return prevData?.map((file) => {
@@ -1016,6 +1127,7 @@ const AddMissingDocument = async (e) => {
       });
     }
   };
+
   const handleSaveNext = async (e) => {
     setCurrentFileIndex(currentFileIndex + 1);
     saveSingle();
@@ -1810,18 +1922,72 @@ const AddMissingDocument = async (e) => {
                     </Offcanvas.Header>
                     <Offcanvas.Body>
                       <div className="top-header d-md-flex justify-content-between align-items-center">
-                        <Form.Select
-                          className="mb-3 mb-lg-0"
-                          aria-label="statusSelectAria"
-                          value={selectDocumentId}
-                          onChange={(e) => handleDocChange(e)}
-                        >
-                          {showUserDocumentFileData?.map((doc) => (
-                            <option key={doc.id} value={doc.id}>
-                              {doc.filename}
-                            </option>
-                          ))}
-                        </Form.Select>
+                        <div className="d-flex align-items-start">
+                          <div>
+                            <Form.Select
+                              className="mb-3 mb-lg-0"
+                              aria-label="statusSelectAria"
+                              value={selectDocumentId}
+                              onChange={(e) => handleDocChange(e)}
+                              style={{
+                                width: "320px",
+                                whiteSpace: "nowrap",
+                                overflow: "hidden",
+                                textOverflow: "ellipsis",
+                              }}
+                            >
+                              {showUserDocumentFileData && showUserDocumentFileData.length > 0 ? (
+                                showUserDocumentFileData.map((doc) => (
+                                  <option key={doc.id} value={doc.id}>
+                                    {doc.filename}
+                                  </option>
+                                ))
+                              ) : (
+                                <option value="">{t("NorecordsfoundLabel")}</option>
+                              )}
+                            </Form.Select>
+                          </div>
+
+                          <div
+                            className="d-flex gap-2 ms-3"
+                            style={{ marginTop: '4px' }}
+                          >
+                            <button
+                              className={`filter-btn ${validateDocumnetFilter === '' ? 'active' : ''}`}
+                              onClick={() => setValidateDocumnetFilter('')}
+                              style={{
+                                border: `2px solid ${buttonColor}`,
+                                backgroundColor: validateDocumnetFilter === '' ? buttonColor : '',
+                                color: validateDocumnetFilter === '' ? 'white' : '#000',
+                              }}
+                            >
+                              Tous
+                            </button>
+                            <button
+                              className={`filter-btn ${validateDocumnetFilter === 'to_be_checked' ? 'active' : ''}`}
+                              onClick={() => setValidateDocumnetFilter('to_be_checked')}
+                              style={{
+                                border: `2px solid ${buttonColor}`,
+                                backgroundColor: validateDocumnetFilter === 'to_be_checked' ? buttonColor : '',
+                                color: validateDocumnetFilter === 'to_be_checked' ? 'white' : '#000',
+                              }}
+                            >
+                              {t("toBeCheckedLabel")}
+                            </button>
+                            <button
+                              className={`filter-btn ${validateDocumnetFilter === 'invalid' ? 'active' : ''}`}
+                              onClick={() => setValidateDocumnetFilter('invalid')}
+                              style={{
+                                border: `2px solid ${buttonColor}`,
+                                backgroundColor: validateDocumnetFilter === 'invalid' ? buttonColor : '',
+                                color: validateDocumnetFilter === 'invalid' ? 'white' : '#000',
+                              }}
+                            >
+                              {t("invalidLabel")}
+                            </button>
+                          </div>
+                        </div>
+
                         <MissingDocument
                           selectDocumentId={selectDocumentId}
                           selectDocumentFileName={selectDocumentFileName}
@@ -2141,6 +2307,77 @@ const AddMissingDocument = async (e) => {
                                       </Form.Group>
                                     </div>
                                   </div>
+                                </Tab>
+                                <Tab
+                                  eventKey="speaker"
+                                  title="Intervenant"
+                                >
+                                  <Form>
+                                    <Form.Label>
+                                      N° de SIRET <span>*</span>
+                                    </Form.Label>
+                                    <Form.Control
+                                      className="mb-3"
+                                      type="text"
+                                      placeholder="SIRET"
+                                      name="siren_number"
+                                      disabled
+                                      value={speakerDetail?.siren_number ? speakerDetail?.siren_number : "-"}
+                                    />
+                                    <Form.Label>
+                                      Nom société <span>*</span>
+                                    </Form.Label>
+                                    <Form.Control
+                                      className="mb-3"
+                                      type="text"
+                                      placeholder="Nom société"
+                                      defaultValue="Mark"
+                                      name="company_name"
+                                      disabled
+                                      value={speakerDetail?.company_name ? speakerDetail?.company_name : "-"}
+                                    />
+                                    <Form.Label>
+                                      Adresse <span>*</span>
+                                    </Form.Label>
+                                    <Form.Control
+                                      className="mb-3"
+                                      type="text"
+                                      placeholder="Adresse"
+                                      name="address"
+                                      disabled
+                                      value={speakerDetail?.address ? speakerDetail?.address : "-"}
+                                    />
+
+                                    <div className="d-md-flex align-items-center side-col">
+                                      <Form.Group className="post-code" controlId="postcode">
+                                        <Form.Label>
+                                          Code postal <span>*</span>
+                                        </Form.Label>
+                                        <Form.Control
+                                          className="mb-3"
+                                          type="text"
+                                          placeholder="Code postal"
+                                          name="postcode"
+                                          disabled
+                                          value={speakerDetail?.postcode ? speakerDetail?.postcode : "-"}
+                                        />
+                                      </Form.Group>
+
+                                      <Form.Group className="" controlId="city">
+                                        <Form.Label>
+                                          Ville <span>*</span>
+                                        </Form.Label>
+                                        <Form.Control
+                                          className="mb-3"
+                                          type="text"
+                                          placeholder="Ville"
+                                          name="city"
+                                          disabled
+                                          value={speakerDetail?.city ? speakerDetail?.city : "-"}
+                                        />
+                                      </Form.Group>
+                                    </div>
+                                  </Form>
                                 </Tab>
                               </Tabs>
                             </div>
@@ -2595,7 +2832,7 @@ const AddMissingDocument = async (e) => {
                         ))
                       ) : (
                         <tr style={{ textAlign: "center" }}>
-                          <td colSpan="5">{t("NorecordsfoundLabel")}</td>
+                          <td colSpan="6">{t("NorecordsfoundLabel")}</td>
                         </tr>
                       )}
                     </tbody>
