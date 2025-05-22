@@ -409,7 +409,7 @@ const UserManagement = () => {
                           </Link>
                         </div>
                       </th>
-                      <th width={165} className="select-drop">
+                      <th width={165} className="select-drop elips-dropdown">
                         <div className="d-flex align-items-center">
                           <div>
                             <Form.Select aria-label="statusSelectAria" value={editUserStatus} onChange={(e) => HandleFilterStatus(e.target.value)}>
@@ -610,7 +610,7 @@ const UserManagement = () => {
                           </Link>
                         </div>
                       </th>
-                      <th width={165} className="select-drop">
+                      <th width={165} className="select-drop elips-dropdown">
                         <div className="d-flex align-items-center">
                           <div>
                             <Form.Select aria-label="statusSelectAria" value={editUserStatus} onChange={(e) => HandleFilterStatus(e.target.value)}>
@@ -789,7 +789,7 @@ const UserManagement = () => {
                           </Link>
                         </div>
                       </th>
-                      <th width={165} className="select-drop">
+                      <th width={165} className="select-drop elips-dropdown">
                         <div className="d-flex align-items-center">
                           <div>
                             <Form.Select aria-label="statusSelectAria" value={editUserStatus} onChange={(e) => HandleFilterStatus(e.target.value)}>

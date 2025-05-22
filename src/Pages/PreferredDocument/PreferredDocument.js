@@ -212,7 +212,7 @@ const PreferredDocument = () => {
                   <th>{t("nameLabel")}</th>
                   <th>{t("requiredforLabel")}</th>
                   <th>{t("documentTypeLabel")}</th>
-                  <th width={165} className="select-drop">
+                  <th width={165} className="select-drop elips-dropdown">
                     <Form.Select aria-label="statusSelectAria" value={editPreferredDocumentStatus} onChange={(e) => HandleFilterStatus(e.target.value)}>
                       <option value="">{t("status")}</option>
                       <option value="0">{t("inActiveLabel")}</option>

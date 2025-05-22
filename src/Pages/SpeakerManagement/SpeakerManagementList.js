@@ -325,7 +325,7 @@ const SpeakerManagementList = () => {
                                                 </Link>
                                             </div>
                                         </th>
-                                        <th className="select-drop">
+                                        <th className="select-drop elips-dropdown">
                                             <div className="d-flex align-items-center">
                                                 <div>
                                                     <Form.Select aria-label="statusSelectAria" value={editSpeakerStatus} onChange={(e) => HandleFilterStatus(e.target.value)}>
