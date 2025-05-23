@@ -242,7 +242,7 @@ const BrokerFileDetail = () => {
       if (response.data.status) {
         setIsLoading(false);
         setShowUserDocumentData(response.data.documents);
-        if(response.data.documents.status == "transfer_to_manager" || response.data.documents.status == "transfer_to_broker" || response.data.documents.status == "formal_notice"){
+        if(response.data.documents.status == "transfer_to_manager" || response.data.documents.status == "transfer_to_insurer"){
           setSendToFileStatus(response.data.documents.status);
         } else {
           setSendToFileStatus("");
@@ -1069,8 +1069,10 @@ const handleUpdateFileChange = (event) => {
                 {
                   showUserDocumentData?.status === "to_be_checked" ? t("toBeCheckedLabel") :
                   showUserDocumentData?.status === "validated" ? t("toBeCheckedLabel") :
-                  showUserDocumentData?.status === "transfer_to_manager" ? "Transfert au Gestionnaire" :
+                  showUserDocumentData?.status === "transfer_to_insurer" ? "Transfert à l'assureur" :
                   showUserDocumentData?.status === "transfer_to_broker" ? "Transfert au Courtier" :
+                  showUserDocumentData?.status === "transfer_to_manager" ? "Transfert au Gestionnaire" :
+                  showUserDocumentData?.status === "to_be_decided" ? "A décider" :
                   showUserDocumentData?.status === "formal_notice" ? "Mise en demeure" : t("invalidLabel")
                 }
               </div>

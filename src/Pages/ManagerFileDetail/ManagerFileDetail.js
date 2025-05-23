@@ -613,7 +613,7 @@ const AddMissingDocument = async (e) => {
         setFinaldSiteCost(response.data.documents.final_site_cost);
         setFinalStartDate(response.data.documents.final_start_date);
         setFinalCompletionDate(response.data.documents.final_completion_date);
-        if(response.data.documents.status == "transfer_to_manager" || response.data.documents.status == "transfer_to_broker" || response.data.documents.status == "formal_notice"){
+        if(response.data.documents.status == "transfer_to_insurer" || response.data.documents.status == "transfer_to_broker" || response.data.documents.status == "to_be_decided"){
           setSendToFileStatus(response.data.documents.status);
         } else {
           setSendToFileStatus("");
@@ -1621,9 +1621,11 @@ const AddMissingDocument = async (e) => {
               <div className="status">
                 {
                   showUserDocumentData?.status === "to_be_checked" ? t("toBeCheckedLabel") :
-                  showUserDocumentData?.status === "validated" ? t("validatedLabel") : 
-                  showUserDocumentData?.status === "transfer_to_manager" ? "Transfert au Gestionnaire" : 
-                  showUserDocumentData?.status === "transfer_to_broker" ? "Transfert au Courtier" : 
+                  showUserDocumentData?.status === "validated" ? t("toBeCheckedLabel") :
+                  showUserDocumentData?.status === "transfer_to_insurer" ? "Transfert à l'assureur" :
+                  showUserDocumentData?.status === "transfer_to_broker" ? "Transfert au Courtier" :
+                  showUserDocumentData?.status === "transfer_to_manager" ? "Transfert au Gestionnaire" :
+                  showUserDocumentData?.status === "to_be_decided" ? "A décider" :
                   showUserDocumentData?.status === "formal_notice" ? "Mise en demeure" : t("invalidLabel")
                 }
               </div>
