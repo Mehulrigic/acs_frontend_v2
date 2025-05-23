@@ -56,6 +56,10 @@ const AdminFileDetail = () => {
   const handleCloseFinalModal = () => setShowFinalModal(false);
   const handleShowFinalModal = () => setShowFinalModal(true);
 
+  const [contractNo, setContractNo] = useState("");
+  const [selectBroker, setSelectBroker] = useState("");
+  const [brokerList, setBrokerList] = useState([]);
+
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
 
@@ -246,6 +250,7 @@ const AdminFileDetail = () => {
   useEffect(() => {
     if (activeTab === "information") {
       FolderDetail(id);
+      BrokerList();
       SpeakerDropDownList("", 1);
     }
     if (activeTab === "document") {
@@ -1528,16 +1533,27 @@ const AddMissingDocument = async (e) => {
 
   const UpdateFolderInfo = async (e) => {
     e.preventDefault();
+    let isValid = (contractNo != "" || contractNo != null || contractNo != undefined) && contractNo?.includes('.');
+    if (!isValid && contractNo != "") {
+      setContractNo(contractNo);
+      setFlashMessage({
+        type: "error",
+        message: "Le num du contrat doit contenir au moins un point (.)",
+      });
+      return false;
+    }
 
     const folderData = {
       folder_name: folderDetail.folder_name,
-      final_site_cost: finalSiteCost || "",
       final_start_date: finalStartDate ? finalStartDate : "",
       final_completion_date: finalCompletionDate ? finalCompletionDate : "",
+      contract_no: contractNo ? contractNo : "",
       insurance_policyholder_name: policyholderName || "",
-      estimated_site_cost: estimatedSiteCost || "",
       estimated_start_date: estimatedStartDate ? estimatedStartDate : "",
       estimated_completion_date: estimatedCompletionDate ? estimatedCompletionDate : "",
+      estimated_site_cost: estimatedSiteCost || "",
+      final_site_cost: finalSiteCost || "",
+      broker_id: selectBroker ? selectBroker : ""
     };
 
     try {
@@ -1559,6 +1575,36 @@ const AddMissingDocument = async (e) => {
         message: t("somethingWentWrong"),
       });
     }
+  };
+
+  const handleChange = (e) => {
+    const value = e.target.value;
+    let isValid = value.includes('.');
+    if (isValid) {
+      setContractNo(value);
+    } else {
+      setContractNo(value);
+    }
+  };
+
+  const BrokerList = async () => {
+    try {
+      const response = await AddFolderPanelService.broker_list();
+      if (response.data.status) {
+        setBrokerList(response.data.brokerList);
+      } else {
+        setFlashMessage({
+          type: "error",
+          message: response.data.message || t("somethingWentWrong"),
+        });
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleBrokerChange = (e) => {
+    setSelectBroker(e.target.value);
   };
 
   return (
@@ -1712,6 +1758,38 @@ const AddMissingDocument = async (e) => {
                     locale={fr}
                   />
                 </Form.Group>
+
+                <Form.Group className="mb-4" controlId="exampleForm.ControlInput1">
+                    <Form.Label>Numéro de contrat</Form.Label>
+                    <Form.Control
+                      type="text"
+                      placeholder="Numéro de contrat"
+                      name="contract_no"
+                      value={contractNo}
+                      onChange={handleChange}
+                    />
+                  </Form.Group>
+                  
+                  <Form.Group className="mb-4" controlId="formBasicEmail">
+                    <Form.Label>Nom du courtier</Form.Label>
+                    <Form.Control
+                      disabled
+                      type="text"
+                      placeholder="Nom du courtier"
+                      value={showUserDocumentData?.broker?.first_name ? showUserDocumentData?.broker?.first_name : "" + "" + showUserDocumentData?.broker?.last_name ? showUserDocumentData?.broker?.last_name : "" }
+                    />
+                    {/* <Form.Select
+                      className="full-width mb-3"
+                      aria-label={"statusSelectAria"}
+                      value={selectBroker}
+                      onChange={handleBrokerChange}
+                    >
+                      <option value="" disabled>Choisir un Courtier</option>
+                      {brokerList?.map((broker) => (
+                        <option value={broker.id}>{broker.first_name}</option>
+                      ))}
+                    </Form.Select> */}
+                  </Form.Group>
               </div>
 
               <h2 class="mb-3">Police</h2>
