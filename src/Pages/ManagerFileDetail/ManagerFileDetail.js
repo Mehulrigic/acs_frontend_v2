@@ -1776,7 +1776,7 @@ const AddMissingDocument = async (e) => {
                       disabled
                       type="text"
                       placeholder="Nom du courtier"
-                      value={folderDetail?.broker?.first_name}
+                      value={showUserDocumentData?.broker?.first_name ? showUserDocumentData?.broker?.first_name : "" + "" + showUserDocumentData?.broker?.last_name ? showUserDocumentData?.broker?.last_name : "" }
                     />
                     {/* <Form.Select
                       className="full-width mb-3"
