@@ -218,4 +218,25 @@ margin-left: 10px;
     transition: all 0.4s ease;
   }
   }
+
+
+  @media(min-width:1400px){
+    .admin-dashboard .tab-content .table-wrap{
+        max-width: 1490px;
+    overflow-x: auto;
+    scrollbar-width: thin;
+    }
+    .sidebar-toggle .admin-dashboard .tab-content .table-wrap{
+      max-width: 100%;
+    }
+        .side-panel-container {
+        max-width: 300px;
+        width: 300px;
+        
+    }
+    .dashboard-main-content {
+    padding-left: 330px;
+    transition: all 0.4s ease;
+}
+  }
   
