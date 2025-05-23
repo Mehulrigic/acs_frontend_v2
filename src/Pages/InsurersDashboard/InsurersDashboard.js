@@ -133,7 +133,7 @@ const InsurersDashboard = () => {
         },
         page,
         status: status ?? "",
-        filter_type:key,
+        filter_type: key,
         site_status: siteStatus,
         tab_type: "dashboard"
       };
