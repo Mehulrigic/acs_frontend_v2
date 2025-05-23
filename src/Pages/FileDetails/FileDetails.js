@@ -724,7 +724,15 @@ const FileDetails = () => {
 
   const UpdateFolderInfo = async (e) => {
     e.preventDefault();
-
+    let isValid = (contractNo != "" || contractNo != null || contractNo != undefined) && contractNo?.includes('.');
+    if (!isValid) {
+      setContractNo(contractNo);
+      setFlashMessage({
+        type: "error",
+        message: "Le num du contrat doit contenir au moins un point (.)",
+      });
+      return false;
+    }
     var folderData = {
       folder_name: e.target.elements.folderName.value ? e.target.elements.folderName.value : "",
       final_start_date: startDate ? startDate : "",
@@ -1401,10 +1409,6 @@ const handleUpdateFileChange = (event) => {
       setContractNo(value);
     } else {
       setContractNo(value);
-      setFlashMessage({
-        type: "error",
-        message: "Le num du contrat doit contenir au moins un point (.)",
-      });
     }
   };
 

@@ -56,6 +56,8 @@ const ManagerFileDetail = () => {
   const handleCloseFinalModal = () => setShowFinalModal(false);
   const handleShowFinalModal = () => setShowFinalModal(true);
 
+  const [contractNo, setContractNo] = useState("");
+
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
 
@@ -1528,6 +1530,15 @@ const AddMissingDocument = async (e) => {
 
   const UpdateFolderInfo = async (e) => {
     e.preventDefault();
+    let isValid = (contractNo != "" || contractNo != null || contractNo != undefined) && contractNo?.includes('.');
+    if (!isValid) {
+      setContractNo(contractNo);
+      setFlashMessage({
+        type: "error",
+        message: "Le num du contrat doit contenir au moins un point (.)",
+      });
+      return false;
+    }
 
     const folderData = {
       folder_name: folderDetail.folder_name,
@@ -1558,6 +1569,16 @@ const AddMissingDocument = async (e) => {
         type: "error",
         message: t("somethingWentWrong"),
       });
+    }
+  };
+
+  const handleChange = (e) => {
+    const value = e.target.value;
+    let isValid = value.includes('.');
+    if (isValid) {
+      setContractNo(value);
+    } else {
+      setContractNo(value);
     }
   };
 
@@ -1712,6 +1733,17 @@ const AddMissingDocument = async (e) => {
                     locale={fr}
                   />
                 </Form.Group>
+
+                <Form.Group className="mb-4" controlId="exampleForm.ControlInput1">
+                    <Form.Label>Numéro de contrat</Form.Label>
+                    <Form.Control
+                      type="text"
+                      placeholder="Numéro de contrat"
+                      name="contract_no"
+                      value={contractNo}
+                      onChange={handleChange}
+                    />
+                  </Form.Group>
               </div>
 
               <h2 class="mb-3">Police</h2>
