@@ -52,6 +52,8 @@ const FilePage = () => {
     brokerlabel: true,
     "Date de création": true,
     lastModifiedDateLabel: true,
+    "Date de début de chantier": true,
+    "Date de fin de chantier": true,
     status: true,
     "Etat du chantier": true,
   });
@@ -421,6 +423,56 @@ const FilePage = () => {
                         </div>
                       </th>
                     }
+                    {selectedColumns.includes("Date de début de chantier") &&
+                      <th>
+                        <div className="d-flex align-items-center">
+                          <span>Date de début de chantier</span>
+                          <Link
+                            className={`sorting-icon ms-2`}
+                            onClick={() => handleClickRotate("start_date")}
+                          >
+                            {sort.value === "asc" &&
+                              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z" fill="black" />
+                                <path d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z" fill="black" fill-opacity="0.5" />
+                              </svg>
+                            }
+
+                            {sort.value === "desc" &&
+                              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z" fill="black" fill-opacity="0.5" />
+                                <path d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z" fill="black" />
+                              </svg>
+                            }
+                          </Link>
+                        </div>
+                      </th>
+                    }
+                    {selectedColumns.includes("Date de fin de chantier") &&
+                      <th>
+                        <div className="d-flex align-items-center">
+                          <span>Date de fin de chantier</span>
+                          <Link
+                            className={`sorting-icon ms-2`}
+                            onClick={() => handleClickRotate("complete_date")}
+                          >
+                            {sort.value === "asc" &&
+                              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z" fill="black" />
+                                <path d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z" fill="black" fill-opacity="0.5" />
+                              </svg>
+                            }
+
+                            {sort.value === "desc" &&
+                              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z" fill="black" fill-opacity="0.5" />
+                                <path d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z" fill="black" />
+                              </svg>
+                            }
+                          </Link>
+                        </div>
+                      </th>
+                    }
                     {selectedColumns.includes("status") && (
                       <th className="select-drop">
                         <div className="d-flex align-items-center">
@@ -530,9 +582,9 @@ const FilePage = () => {
                           </td>
                         )}
                         {selectedColumns.includes("Date de création") && <td>{data.created_at}</td>}
-                        {selectedColumns.includes("lastModifiedDateLabel") && (
-                          <td>{data.updated_at}</td>
-                        )}
+                        {selectedColumns.includes("lastModifiedDateLabel") && <td>{data.updated_at}</td>}
+                        {selectedColumns.includes("Date de début de chantier") && <td className="bold-font">{data?.estimated_start_date}</td>}
+                        {selectedColumns.includes("Date de fin de chantier") && <td className="bold-font">{data?.estimated_completion_date}</td>}
                         {selectedColumns.includes("status") && (
                           <td>
                             {
@@ -579,7 +631,7 @@ const FilePage = () => {
                     ))
                   ) : (
                     <tr style={{ textAlign: "center" }}>
-                      <td colSpan={selectedColumns.length}>{t("NorecordsfoundLabel")}</td>
+                      <td colSpan="10">{t("NorecordsfoundLabel")}</td>
                     </tr>
                   )}
                 </tbody>
