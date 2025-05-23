@@ -1527,7 +1527,7 @@ const handleUpdateFileChange = (event) => {
                         :
                         (
                           <tr style={{ textAlign: "center" }}>
-                            <td colSpan="5">
+                            <td colSpan="6">
                               {t("NorecordsfoundLabel")}
                             </td>
                           </tr>

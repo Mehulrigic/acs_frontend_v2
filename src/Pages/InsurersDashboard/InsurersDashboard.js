@@ -294,7 +294,7 @@ const InsurersDashboard = () => {
                 title="À traiter"
                 eventKey="toProcess"
               >
-                <div className="table-wrapper mt-16">
+                <div className="table-wrapper mt-16 p-0">
                   <div className="d-md-flex align-items-center gap-2 justify-content-between">
                     <h2 className="mb-3 mb-md-0">
                       {t("toProcess", { count: totalRecords })}
@@ -629,7 +629,7 @@ const InsurersDashboard = () => {
                 title="Reçus à venir"
                 eventKey="receipts_to_come"
               >
-                <div className="table-wrapper mt-16">
+                <div className="table-wrapper mt-16 p-0">
                   <div className="d-md-flex align-items-center gap-2 justify-content-between">
                     <h2 className="mb-3 mb-md-0">
                       <h2> Reçus à venir  {`(` + totalRecords + `)`}</h2>
@@ -964,7 +964,7 @@ const InsurersDashboard = () => {
                 eventKey="receipts_past"
                 title="Recettes passées"
               >
-                <div className="table-wrapper mt-16">
+                <div className="table-wrapper mt-16 p-0">
                   <div className="d-md-flex align-items-center gap-2 justify-content-between">
                     <h2 className="mb-3 mb-md-0">
                       <h2> Recettes passées  {`(` + totalRecords + `)`}</h2>

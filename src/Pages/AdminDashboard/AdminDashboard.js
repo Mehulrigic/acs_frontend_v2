@@ -252,7 +252,7 @@ const AdminDashboard = () => {
                                   title="À traiter"
                                   eventKey="toProcess"
                                 >
-    <div className="table-wrapper mt-16">
+    <div className="table-wrapper mt-16 p-0">
               <h2>{t("toProcess", { count: totalRecords })}</h2>
 
               <div className="table-wrap mt-24">
@@ -613,7 +613,7 @@ const AdminDashboard = () => {
                                   title="Reçus à venir"
                                   eventKey="receipts_to_come"
                                 >
-                                  <div className="table-wrapper mt-16">
+                                  <div className="table-wrapper mt-16 p-0">
               <h2> Reçus à venir  { `(`+totalRecords + `)` }</h2>
 
               <div className="table-wrap mt-24">
@@ -974,7 +974,7 @@ const AdminDashboard = () => {
                                   eventKey="receipts_past"
                                   title="Recettes passées"
                                 >
-                                  <div className="table-wrapper mt-16">
+                                  <div className="table-wrapper mt-16 p-0">
               <h2> Recettes passées  { `(`+totalRecords + `)` }</h2>
 
 

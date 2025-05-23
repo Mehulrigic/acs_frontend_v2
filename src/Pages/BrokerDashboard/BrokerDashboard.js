@@ -291,7 +291,7 @@ const BrokerDashboard = () => {
                 title="À traiter"
                 eventKey="toProcess"
               >
-                <div className="table-wrapper mt-16">
+                <div className="table-wrapper mt-16 p-0">
                   <div className="d-md-flex align-items-center gap-2 justify-content-between">
                     <h2 className="mb-3 mb-md-0">{t("toProcess", { count: totalRecords })}</h2>
                     <Form.Group className="relative" controlId="exampleForm.ControlInput1">
@@ -580,7 +580,7 @@ const BrokerDashboard = () => {
                 title="Reçus à venir"
                 eventKey="receipts_to_come"
               >
-                <div className="table-wrapper mt-16">
+                <div className="table-wrapper mt-16 p-0">
                   <div className="d-md-flex align-items-center gap-2 justify-content-between">
                     <h2 className="mb-3 mb-md-0">Reçus à venir  {`(` + totalRecords + `)`}</h2>
                     <Form.Group className="relative" controlId="exampleForm.ControlInput1">
@@ -869,7 +869,7 @@ const BrokerDashboard = () => {
                 eventKey="receipts_past"
                 title="Recettes passées"
               >
-                <div className="table-wrapper mt-16">
+                <div className="table-wrapper mt-16 p-0">
                   <div className="d-md-flex align-items-center gap-2 justify-content-between">
                     <h2 className="mb-3 mb-md-0">Recettes passées  {`(` + totalRecords + `)`}</h2>
                     <Form.Group className="relative" controlId="exampleForm.ControlInput1">

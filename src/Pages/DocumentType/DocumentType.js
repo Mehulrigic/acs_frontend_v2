@@ -247,7 +247,7 @@ const DocumentType = () => {
       <div className="dashboard-main-content user-management" style={{ backgroundColor: rightPanelThemeColor }}>
         <h1 className="mb-5">{t("documentTypeLabel")}</h1>
 
-        <div className="table-wrapper mt-16">
+        <div className="table-wrapper mt-16 p-0">
           <div className="text-end mb-3">
             <Button onClick={() => { setShowDocumentTypeList([]); handleFormShow(); setEditDocumentType(false); }} variant="primary">
               {t("AddDocumentType")}

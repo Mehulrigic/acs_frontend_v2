@@ -552,15 +552,18 @@ a.sorting-icon.rotate svg {
 
 
   .table-wrap {
-    max-width: 1300px;
+    max-width: 950px;
     overflow-x: auto;
     scrollbar-width: thin;
 }
+.sidebar-toggle .table-wrap {
+    max-width: 1200px;
+}
 .tab-content .table-wrap {
-  max-width: 980px;
+  max-width: 950px;
 }
 .sidebar-toggle .tab-content .table-wrap {
-  max-width: 1200px;
+  max-width: 1190px;
 }
 }
 @media(min-width:1200px){
