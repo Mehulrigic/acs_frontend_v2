@@ -298,7 +298,7 @@ const ManagerFileDetail = () => {
     if (showCheck) {
       SpeakerDropDownList("", 1);
     }
-  }, [showCheck, showUserDocumentAfterDeleteFile]);
+  }, [showCheck, showUserDocumentAfterDeleteFile, validateDocumnetFilter, showUserDocumentFileData]);
 
   const MarkHistoryAsReadAllDocument = async (id) => {
     try {
@@ -821,6 +821,7 @@ const AddMissingDocument = async (e) => {
     if (!showCheck) {
       PaperList(id, sort, currentPage, editUserStatus, selectDocumentType, selectedValue);
     }
+    SpeakerDetail(selectedValue);
 
     setUserDocumentFileDataChanges((prevData) => {
       return prevData.map((file) => {
@@ -901,7 +902,7 @@ const AddMissingDocument = async (e) => {
       setIsLoading(false);
       setFlashMessage({
         type: "error",
-        message: error.response.data.message || t("somethingWentWrong"),
+        message: t("somethingWentWrong"),
       });
     }
   };
