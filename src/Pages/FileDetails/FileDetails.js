@@ -406,15 +406,6 @@ const FileDetails = () => {
           doc_type_id: file.docType?.id
         }));
 
-        let ContractNo = response.data.documents.contract_no.includes('.');
-
-        setContractNo(response.data.documents.contract_no);
-        if(!ContractNo){
-         setFlashMessage({
-          type: "error",
-          message: "Le num du contrat doit contenir au moins un point (.)",
-        });
-        }
         setShowUserDocumentData(response.data.documents);
         setStartDate(response.data.documents.final_start_date);
         setEndDate(response.data.documents.final_completion_date);
@@ -1485,7 +1476,7 @@ const handleUpdateFileChange = (event) => {
             </div>
             <div className="d-sm-flex align-items-center gap-3">
               <div>
-                <Form.Select aria-label="Etat du chantier" style={{ minHeight: "30px" }} value={sendToFileStatus} onChange={(e) => handleSendFileShow(e.target.value)}>
+                <Form.Select aria-label="Etat du chantier" style={{ minHeight: "30px", fontFamily: "Manrope" }} value={sendToFileStatus} onChange={(e) => handleSendFileShow(e.target.value)}>
                   <option value="" disabled selected>Envoyer à</option>
                   <option value="transfer_to_manager">Transfert au Gestionnaire</option>
                   <option value="transfer_to_broker">Transfert au Courtier</option>
@@ -1811,7 +1802,7 @@ const handleUpdateFileChange = (event) => {
                 )}
                 <div className="d-flex gap-4 flex-wrap">
                   <div className="flex-fill" style={{ minWidth: "300px" }}>
-                    <Form.Group className="mb-4 mx-w-320" controlId="exampleForm.ControlInput1">
+                    <Form.Group className="mb-4" controlId="exampleForm.ControlInput1">
                       <Form.Label>N° de dossier <span>*</span></Form.Label>
                       <Form.Control
                         type="text"
@@ -1821,7 +1812,7 @@ const handleUpdateFileChange = (event) => {
                       />
                     </Form.Group>
 
-                    <Form.Group className="mb-4 mx-w-320" controlId="exampleForm.ControlInput1">
+                    <Form.Group className="mb-4" controlId="exampleForm.ControlInput1">
                       <Form.Label>Numéro de contrat</Form.Label>
                       <Form.Control
                         type="text"
@@ -1832,53 +1823,8 @@ const handleUpdateFileChange = (event) => {
                       />
                     </Form.Group>
 
-                    <Form.Group className="mb-4 mx-w-320" controlId="names">
-                      <Form.Label className="d-block">Date de début du site</Form.Label>
-                      <DatePicker
-                        placeholderText="Selectionner une date de début du site"
-                        selected={startDate ? getFormattedDate(startDate) : ""}
-                        onChange={(date) => setStartDate(formatDate(date))}
-                        dateFormat="dd/MM/yyyy"
-                        locale={fr}
-                      />
-                    </Form.Group>
-
-                    <Form.Group className="mb-4 mx-w-320" controlId="names">
-                      <Form.Label className="d-block">Date de début estimée</Form.Label>
-                      <DatePicker
-                        placeholderText="Selectionner une date de début estimée"
-                        selected={estimatedStartDate ? getFormattedDate(estimatedStartDate) : ""}
-                        onChange={(date) => setEstimatedStartDate(formatDate(date))}
-                        dateFormat="dd/MM/yyyy"
-                        locale={fr}
-                      />
-                    </Form.Group>
-
-                    <Form.Group className="mb-4 mx-w-320" controlId="names">
-                      <Form.Label className="d-block">Date d'achèvement estimée</Form.Label>
-                      <DatePicker
-                        placeholderText="Selectionner une date d'achèvement estimée"
-                        selected={estimatedCompletionDate ? getFormattedDate(estimatedCompletionDate) : ""}
-                        onChange={(date) => setEstimatedCompletionDate(formatDate(date))}
-                        dateFormat="dd/MM/yyyy"
-                        locale={fr}
-                      />
-                    </Form.Group>
-                    
-                  </div>
-                  <div className="flex-fill" style={{ minWidth: "300px" }}>
-                    <Form.Group className="mb-4 mx-w-320" controlId="formBasicEmail">
-                      <Form.Label>Nom du preneur d'assurance</Form.Label>
-                      <Form.Control
-                        type="text"
-                        placeholder="Nom du preneur d'assurance"
-                        value={policyholderName}
-                        onChange={(e) => setPolicyholderName(e.target.value)}
-                      />
-                    </Form.Group>
-
-                    <Form.Group className="mb-4 mx-w-320" controlId="exampleForm.ControlInput1">
-                      <Form.Label>coût estimé du chantier</Form.Label>
+                    <Form.Group className="mb-4" controlId="exampleForm.ControlInput1">
+                      <Form.Label>Coût estimé du chantier</Form.Label>
                       <Form.Control
                         type="text"
                         placeholder="Entrez le coût estimé du site"
@@ -1892,7 +1838,56 @@ const handleUpdateFileChange = (event) => {
                       />
                     </Form.Group>
 
-                    <Form.Group className="mb-4 mx-w-320" controlId="exampleForm.ControlInput1">
+                    <Form.Group className="mb-4" controlId="names">
+                      <Form.Label className="d-block">Date de début estimée</Form.Label>
+                      <DatePicker
+                        placeholderText="Selectionner une date de début estimée"
+                        selected={estimatedStartDate ? getFormattedDate(estimatedStartDate) : ""}
+                        onChange={(date) => setEstimatedStartDate(formatDate(date))}
+                        dateFormat="dd/MM/yyyy"
+                        locale={fr}
+                      />
+                    </Form.Group>
+
+                    <Form.Group className="mb-4" controlId="names">
+                      <Form.Label className="d-block">Date d'achèvement estimée</Form.Label>
+                      <DatePicker
+                        placeholderText="Selectionner une date d'achèvement estimée"
+                        selected={estimatedCompletionDate ? getFormattedDate(estimatedCompletionDate) : ""}
+                        onChange={(date) => setEstimatedCompletionDate(formatDate(date))}
+                        dateFormat="dd/MM/yyyy"
+                        locale={fr}
+                      />
+                    </Form.Group>
+                  </div>
+                  
+                  <div className="flex-fill" style={{ minWidth: "300px" }}>
+                    <Form.Group className="mb-4" controlId="formBasicEmail">
+                      <Form.Label>Nom du preneur d'assurance</Form.Label>
+                      <Form.Control
+                        type="text"
+                        placeholder="Nom du preneur d'assurance"
+                        value={policyholderName}
+                        onChange={(e) => setPolicyholderName(e.target.value)}
+                      />
+                    </Form.Group>
+
+                    <Form.Group className="mb-4" controlId="formBasicEmail">
+                      <Form.Label>Choisir un Courtier</Form.Label>
+                      <Form.Select
+                        className="full-width mb-3"
+                        aria-label={"statusSelectAria"}
+                        value={selectBroker}
+                        onChange={handleBrokerChange}
+                      >
+                        <option value="" disabled>Choisir un Courtier</option>
+                        {brokerList?.map((broker) => (
+                          <option value={broker.id}>{broker.first_name}</option>
+                        ))}
+                      </Form.Select>
+                    </Form.Group>
+
+                    <Form.Group className="mb-4" controlId="exampleForm.ControlInput1">
                       <Form.Label>Coût final du chantier</Form.Label>
                       <Form.Control
                         type="text"
@@ -1907,7 +1902,18 @@ const handleUpdateFileChange = (event) => {
                       />
                     </Form.Group>
 
-                    <Form.Group className="mb-4 mx-w-320" controlId="names">
+                    <Form.Group className="mb-4" controlId="names">
+                      <Form.Label className="d-block">Date de début définitive</Form.Label>
+                      <DatePicker
+                        placeholderText="Selectionner une date de début du site"
+                        selected={startDate ? getFormattedDate(startDate) : ""}
+                        onChange={(date) => setStartDate(formatDate(date))}
+                        dateFormat="dd/MM/yyyy"
+                        locale={fr}
+                      />
+                    </Form.Group>
+
+                    <Form.Group className="mb-4" controlId="names">
                       <Form.Label className="d-block">Date d'achèvement définitive</Form.Label>
                       <DatePicker
                         placeholderText="Selectionner une date d'achèvement définitive"
@@ -1916,21 +1922,6 @@ const handleUpdateFileChange = (event) => {
                         dateFormat="dd/MM/yyyy"
                         locale={fr}
                       />
-                    </Form.Group>
-                    
-                    <Form.Group className="mb-4 mx-w-320" controlId="formBasicEmail">
-                      <Form.Label>Choisir un Courtier</Form.Label>
-                      <Form.Select
-                        className="full-width mb-3"
-                        aria-label={"statusSelectAria"}
-                        value={selectBroker}
-                        onChange={handleBrokerChange}
-                      >
-                        <option value="" disabled>Choisir un Courtier</option>
-                        {brokerList?.map((broker) => (
-                          <option value={broker.id}>{broker.first_name}</option>
-                        ))}
-                      </Form.Select>
                     </Form.Group>
                   </div>
                 </div>

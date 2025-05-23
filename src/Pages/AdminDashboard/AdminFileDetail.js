@@ -1631,7 +1631,7 @@ const AddMissingDocument = async (e) => {
           </div>
             <div className="detail-header" style={{display: "flex", justifyContent: "right"}}>
               <p className="m-0" style={{paddingRight: "10px"}}>Envoyer à : </p>
-              <Form.Select aria-label="Etat du chantier" class="form-select" style={{  minHeight: "30px", width: "25%"}} value={sendToFileStatus} onChange={(e) => handleSendFileShow(e.target.value)}>
+              <Form.Select aria-label="Etat du chantier" class="form-select" style={{  minHeight: "30px", width: "25%", fontFamily: "Manrope"}} value={sendToFileStatus} onChange={(e) => handleSendFileShow(e.target.value)}>
                   <option value="" disabled selected>Envoyer à</option>
                   <option value="transfer_to_insurer">Transfert à l'assureur</option>
                   <option value="transfer_to_broker">Transfert au Courtier</option>
