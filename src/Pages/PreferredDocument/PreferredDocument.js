@@ -198,7 +198,7 @@ const PreferredDocument = () => {
       <SidePanel sidebarLogo={(logoImageShow == "" || logoImageShow == null || logoImageShow == undefined) ? logo : `${process.env.REACT_APP_IMAGE_URL}/${logoImageShow}`} />
       <div className="dashboard-main-content user-management" style={{backgroundColor: rightPanelThemeColor}}>
         <h1 className="mb-5">{t("documentTypeLabel")}</h1>
-        <div className="table-wrapper mt-16 p-0">
+        <div className="table-wrapper mt-16">
           <div className="text-end mb-3">
             <Button onClick={() => { setShowPreferredDocumentList([]); handleFormShow(); setEditPreferredDocument(false); }} variant="primary">
               Add

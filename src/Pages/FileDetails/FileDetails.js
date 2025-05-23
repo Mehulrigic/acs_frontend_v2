@@ -725,7 +725,7 @@ const FileDetails = () => {
   const UpdateFolderInfo = async (e) => {
     e.preventDefault();
     let isValid = (contractNo != "" || contractNo != null || contractNo != undefined) && contractNo?.includes('.');
-    if (!isValid) {
+    if (!isValid && contractNo != "") {
       setContractNo(contractNo);
       setFlashMessage({
         type: "error",
@@ -737,7 +737,7 @@ const FileDetails = () => {
       folder_name: e.target.elements.folderName.value ? e.target.elements.folderName.value : "",
       final_start_date: startDate ? startDate : "",
       final_completion_date: endDate ? endDate : "",
-      contract_no: e.target.elements.contract_no.value ? e.target.elements.contract_no.value : "",
+      contract_no: contractNo ? contractNo : "",
       insurance_policyholder_name: policyholderName ? policyholderName : "",
       estimated_start_date: estimatedStartDate ? estimatedStartDate : "",
       estimated_completion_date: estimatedCompletionDate ? estimatedCompletionDate : "",

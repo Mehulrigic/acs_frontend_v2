@@ -315,7 +315,7 @@ const MyAccount = () => {
         }}
       >
         <h1>{t("myAccountLabel")}</h1>
-        <div className="table-wrapper mt-32 p-0">
+        <div className="table-wrapper mt-32">
           <Tabs
             defaultActiveKey="home"
             id="uncontrolled-tab-example"

@@ -102,7 +102,7 @@ const SettingList = () => {
       <SidePanel sidebarLogo={`${process.env.REACT_APP_IMAGE_URL}/${logoImageShow}`} />
       <div className="dashboard-main-content user-management" style={{backgroundColor: rightPanelThemeColor}}>
         <h1 className="mb-4">{t("Settings")}</h1>
-        <div className="table-wrapper mt-16 p-0">
+        <div className="table-wrapper mt-16">
           <div className="text-start mb-3">
             {/* loader */}
 
