@@ -602,6 +602,7 @@ const AddMissingDocument = async (e) => {
           })
         );
 
+        setContractNo(response.data.documents.contract_no);
         setShowUserDocumentData(response.data.documents);
         setShowUserFolderName(response.data.documents.folder_name);
         setShowUserCompanyName(response.data.documents.company_name);

@@ -406,6 +406,7 @@ const FileDetails = () => {
           doc_type_id: file.docType?.id
         }));
 
+        setContractNo(response.data.documents.contract_no);
         setShowUserDocumentData(response.data.documents);
         setStartDate(response.data.documents.final_start_date);
         setEndDate(response.data.documents.final_completion_date);
