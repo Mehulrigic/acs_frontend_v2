@@ -1072,7 +1072,7 @@ const handleUpdateFileChange = (event) => {
                   showUserDocumentData?.status === "transfer_to_insurer" ? "Transfert à l'assureur" :
                   showUserDocumentData?.status === "transfer_to_broker" ? "Transfert au Courtier" :
                   showUserDocumentData?.status === "transfer_to_manager" ? "Transfert au Gestionnaire" :
-                  showUserDocumentData?.status === "to_be_decided" ? "A décider" :
+                  showUserDocumentData?.status === "to_be_decided" ? "A statuer" :
                   showUserDocumentData?.status === "formal_notice" ? "Mise en demeure" : t("invalidLabel")
                 }
               </div>
@@ -1096,14 +1096,7 @@ const handleUpdateFileChange = (event) => {
               <span>Dossier à vérifier</span>
             </div>
             <div className="d-sm-flex align-items-center gap-3">
-                <p className="m-0">Envoyer à : </p>
-                <div>
-                    <Form.Select aria-label="Etat du chantier" style={{ minHeight: "30px", fontFamily: "Manrope" }} value={sendToFileStatus} onChange={(e) => handleSendFileShow(e.target.value)}>
-                      <option value="" disabled selected>Envoyer à</option>
-                      <option value="transfer_to_insurer">Transfert à l'assureur</option>
-                      <option value="transfer_to_manager">Transfert au Gestionnaire</option>
-                    </Form.Select>
-                </div>
+                {/* See the Reason */}
                 <div className="add-document mb-sm-0 mb-2 mt-sm-0 mt-2">
                   <Link className="link-wrap" onClick={handleNoteShow}>
                     Voir les raisons
@@ -1184,6 +1177,15 @@ const handleUpdateFileChange = (event) => {
 
                     </Offcanvas.Body>
                   </Offcanvas>
+                </div>
+
+                <p className="m-0">Envoyer à : </p>
+                <div>
+                    <Form.Select aria-label="Etat du chantier" style={{ minHeight: "30px", fontFamily: "Manrope" }} value={sendToFileStatus} onChange={(e) => handleSendFileShow(e.target.value)}>
+                      <option value="" disabled selected>Envoyer à</option>
+                      <option value="transfer_to_insurer">Transfert à l'assureur</option>
+                      <option value="transfer_to_manager">Transfert au Gestionnaire</option>
+                    </Form.Select>
                 </div>
             </div>
           </div>

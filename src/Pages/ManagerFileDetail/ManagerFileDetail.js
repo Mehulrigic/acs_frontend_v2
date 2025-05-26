@@ -602,6 +602,7 @@ const AddMissingDocument = async (e) => {
           })
         );
 
+        setContractNo(response.data.documents.contract_no);
         setShowUserDocumentData(response.data.documents);
         setShowUserFolderName(response.data.documents.folder_name);
         setShowUserCompanyName(response.data.documents.company_name);
@@ -625,6 +626,7 @@ const AddMissingDocument = async (e) => {
         }
         setShowUserDocumentFileData(response.data.documents.user_document_files);
         setUserDocumentFileDataChanges(fileDataChanges);
+        setShowDocumentId(fileDataChanges[0].id);
         if (showCheck && showDeleteModal) {
           setShowUserDocumentAfterDeleteFile(true);
         }
@@ -1671,22 +1673,29 @@ const AddMissingDocument = async (e) => {
                   showUserDocumentData?.status === "transfer_to_insurer" ? "Transfert à l'assureur" :
                   showUserDocumentData?.status === "transfer_to_broker" ? "Transfert au Courtier" :
                   showUserDocumentData?.status === "transfer_to_manager" ? "Transfert au Gestionnaire" :
-                  showUserDocumentData?.status === "to_be_decided" ? "A décider" :
+                  showUserDocumentData?.status === "to_be_decided" ? "A statuer" :
                   showUserDocumentData?.status === "formal_notice" ? "Mise en demeure" : t("invalidLabel")
                 }
               </div>
             </div>
           </div>
-            <div className="detail-header" style={{display: "flex", justifyContent: "right"}}>
-              <p className="m-0" style={{paddingRight: "10px"}}>Envoyer à : </p>
-              <Form.Select aria-label="Etat du chantier" class="form-select" style={{  minHeight: "30px", width: "25%", fontFamily: "Manrope"}} value={sendToFileStatus} onChange={(e) => handleSendFileShow(e.target.value)}>
-                  <option value="" disabled selected>Envoyer à</option>
-                  <option value="transfer_to_insurer">Transfert à l'assureur</option>
-                  <option value="transfer_to_broker">Transfert au Courtier</option>
-                  <option value="to_be_decided">A décider</option>
-                </Form.Select>
+          <div className="detail-header" style={{ display: "flex", justifyContent: "right" }}>
+            <div style={{ marginRight: "20px" }}>
+              <MissingDocument
+                selectDocumentId={selectDocumentId}
+                selectDocumentFileName={selectDocumentFileName}
+                link={true}
+              />
             </div>
+            <p className="m-0" style={{ paddingRight: "10px" }}>Envoyer à : </p>
+            <Form.Select aria-label="Etat du chantier" class="form-select" style={{ minHeight: "30px", width: "25%", fontFamily: "Manrope" }} value={sendToFileStatus} onChange={(e) => handleSendFileShow(e.target.value)}>
+              <option value="" disabled selected>Envoyer à</option>
+              <option value="transfer_to_insurer">Transfert à l'assureur</option>
+              <option value="transfer_to_broker">Transfert au Courtier</option>
+              <option value="to_be_decided">A statuer</option>
+            </Form.Select>
           </div>
+        </div>
         <Tabs
           activeKey={activeTab}
           onSelect={handleSelect}
@@ -1816,7 +1825,7 @@ const AddMissingDocument = async (e) => {
                   </Form.Group>
 
                   <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
-                    <Form.Label>Coût estimé du chantier</Form.Label>
+                    <Form.Label>Coût prévisionnel du chantier</Form.Label>
                     <Form.Control
                       type="text"
                       placeholder="Entrez le coût estimé du site"
@@ -1831,7 +1840,7 @@ const AddMissingDocument = async (e) => {
                   </Form.Group>
 
                   <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
-                    <Form.Label>Coût final du chantier</Form.Label>
+                    <Form.Label>Coût définitif du chantier</Form.Label>
                     <Form.Control
                       type="text"
                       placeholder="Entrez le coût final du site"
@@ -1846,9 +1855,9 @@ const AddMissingDocument = async (e) => {
                   </Form.Group>
 
                   <Form.Group className="mb-3" controlId="names">
-                    <Form.Label className="d-block">Date de début estimée</Form.Label>
+                    <Form.Label className="d-block">Date de début prévisionnelle</Form.Label>
                     <DatePicker
-                      placeholderText="Selectionner une date de début estimée"
+                      placeholderText="Selectionner une date de début prévisionnelle"
                       selected={estimatedStartDate ? getFormattedDate(estimatedStartDate) : ""}
                       onChange={(date) => setEstimatedStartDate(formatDate(date))}
                       dateFormat="dd/MM/yyyy"
@@ -1868,9 +1877,9 @@ const AddMissingDocument = async (e) => {
                   </Form.Group>
 
                   <Form.Group className="mb-3" controlId="names">
-                    <Form.Label className="d-block">Date d'achèvement estimée</Form.Label>
+                    <Form.Label className="d-block">Date de fin de chantier prévisionnelle</Form.Label>
                     <DatePicker
-                      placeholderText="Selectionner une date d'achèvement estimée"
+                      placeholderText="Selectionner une date de fin de chantier prévisionnelle"
                       selected={estimatedCompletionDate ? getFormattedDate(estimatedCompletionDate) : ""}
                       onChange={(date) => setEstimatedCompletionDate(formatDate(date))}
                       dateFormat="dd/MM/yyyy"
@@ -1879,9 +1888,9 @@ const AddMissingDocument = async (e) => {
                   </Form.Group>
 
                   <Form.Group className="mb-3" controlId="names">
-                    <Form.Label className="d-block">Date d'achèvement définitive</Form.Label>
+                    <Form.Label className="d-block">Date de fin de chantier définitive</Form.Label>
                     <DatePicker
-                      placeholderText="Selectionner une date d'achèvement définitive"
+                      placeholderText="Selectionner une date de fin de chantier définitive"
                       selected={finalCompletionDate ? getFormattedDate(finalCompletionDate) : ""}
                       onChange={(date) => setFinalCompletionDate(formatDate(date))}
                       dateFormat="dd/MM/yyyy"
@@ -3964,7 +3973,7 @@ const AddMissingDocument = async (e) => {
               Annuler
             </Button>
             <Button variant="primary" onClick={ValidateDocumentFile}>
-              Confirm and finalize
+              Confirmer et finalizer
             </Button>
           </Modal.Footer>
         </Modal>

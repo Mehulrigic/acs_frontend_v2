@@ -561,7 +561,7 @@ const InsurersDashboard = () => {
                                     <option value="transfer_to_broker">Transfert au Courtier</option>
                                     <option value="transfer_to_insurer">Transfert à l'assureur</option>
                                     <option value="formal_notice">Mise en demeure</option>
-                                    <option value="to_be_decided">A décider</option>
+                                    <option value="to_be_decided">A statuer</option>
                                     <option value="validated">{t("validatedLabel")}</option>
                                     <option value="invalid">{t("invalidLabel")}</option>
                                   </Form.Select>
@@ -666,7 +666,7 @@ const InsurersDashboard = () => {
                                     data.status === "transfer_to_broker" ? <span className="transfer badges">Transfert au Courtier</span> :
                                     data.status === "transfer_to_insurer" ? <span className="formal_notice badges">Transfert à l'assureur</span> :
                                     data.status === "formal_notice" ? <span className="formal_notice badges">Mise en demeure</span> :
-                                    data.status === "to_be_decided" ? <span className="to_be_decided badges">A décider</span> :
+                                    data.status === "to_be_decided" ? <span className="to_be_decided badges">A statuer</span> :
                                     data.status === "validated" ? <span className="verified badges">{t("validatedLabel")}</span> :
                                     <span className="incomplete badges">{t("invalidLabel")}</span>
                                   }
@@ -722,13 +722,13 @@ const InsurersDashboard = () => {
                 </div>
               </Tab>
               <Tab
-                title="Reçus à venir"
+                title="Réceptions à venir"
                 eventKey="receipts_to_come"
               >
                 <div className="table-wrapper mt-16 p-0">
                   <div className="d-md-flex align-items-center gap-2 justify-content-between">
                     <h2 className="mb-3 mb-md-0">
-                      <h2> Reçus à venir  {`(` + totalRecords + `)`}</h2>
+                      <h2> Réceptions à venir  {`(` + totalRecords + `)`}</h2>
                     </h2>
                     <Form.Group
                       className="relative"
@@ -980,7 +980,7 @@ const InsurersDashboard = () => {
                                     <option value="transfer_to_broker">Transfert au Courtier</option>
                                     <option value="transfer_to_insurer">Transfert à l'assureur</option>
                                     <option value="formal_notice">Mise en demeure</option>
-                                    <option value="to_be_decided">A décider</option>
+                                    <option value="to_be_decided">A statuer</option>
                                     <option value="validated">{t("validatedLabel")}</option>
                                     <option value="invalid">{t("invalidLabel")}</option>
                                   </Form.Select>
@@ -1085,7 +1085,7 @@ const InsurersDashboard = () => {
                                     data.status === "transfer_to_broker" ? <span className="transfer badges">Transfert au Courtier</span> :
                                     data.status === "transfer_to_insurer" ? <span className="formal_notice badges">Transfert à l'assureur</span> :
                                     data.status === "formal_notice" ? <span className="formal_notice badges">Mise en demeure</span> :
-                                    data.status === "to_be_decided" ? <span className="to_be_decided badges">A décider</span> :
+                                    data.status === "to_be_decided" ? <span className="to_be_decided badges">A statuer</span> :
                                     data.status === "validated" ? <span className="verified badges">{t("validatedLabel")}</span> :
                                     <span className="incomplete badges">{t("invalidLabel")}</span>
                                   }
@@ -1142,12 +1142,12 @@ const InsurersDashboard = () => {
               </Tab>
               <Tab
                 eventKey="receipts_past"
-                title="Recettes passées"
+                title="Réceptions passées"
               >
                 <div className="table-wrapper mt-16 p-0">
                   <div className="d-md-flex align-items-center gap-2 justify-content-between">
                     <h2 className="mb-3 mb-md-0">
-                      <h2> Recettes passées  {`(` + totalRecords + `)`}</h2>
+                      <h2> Réceptions passées  {`(` + totalRecords + `)`}</h2>
                     </h2>
                     <Form.Group
                       className="relative"
@@ -1399,7 +1399,7 @@ const InsurersDashboard = () => {
                                     <option value="transfer_to_broker">Transfert au Courtier</option>
                                     <option value="transfer_to_insurer">Transfert à l'assureur</option>
                                     <option value="formal_notice">Mise en demeure</option>
-                                    <option value="to_be_decided">A décider</option>
+                                    <option value="to_be_decided">A statuer</option>
                                     <option value="validated">{t("validatedLabel")}</option>
                                     <option value="invalid">{t("invalidLabel")}</option>
                                   </Form.Select>
@@ -1504,7 +1504,7 @@ const InsurersDashboard = () => {
                                     data.status === "transfer_to_broker" ? <span className="transfer badges">Transfert au Courtier</span> :
                                     data.status === "transfer_to_insurer" ? <span className="formal_notice badges">Transfert à l'assureur</span> :
                                     data.status === "formal_notice" ? <span className="formal_notice badges">Mise en demeure</span> :
-                                    data.status === "to_be_decided" ? <span className="to_be_decided badges">A décider</span> :
+                                    data.status === "to_be_decided" ? <span className="to_be_decided badges">A statuer</span> :
                                     data.status === "validated" ? <span className="verified badges">{t("validatedLabel")}</span> :
                                     <span className="incomplete badges">{t("invalidLabel")}</span>
                                   }

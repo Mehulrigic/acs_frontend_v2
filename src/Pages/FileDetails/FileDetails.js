@@ -406,6 +406,7 @@ const FileDetails = () => {
           doc_type_id: file.docType?.id
         }));
 
+        setContractNo(response.data.documents.contract_no);
         setShowUserDocumentData(response.data.documents);
         setStartDate(response.data.documents.final_start_date);
         setEndDate(response.data.documents.final_completion_date);
@@ -426,6 +427,7 @@ const FileDetails = () => {
         setShowUserDocumentFileData(response.data.documents.user_document_files);
         setTotalSpeaker(response.data.documents.total_speakers);
         setUserDocumentFileDataChanges(fileDataChanges);
+        setShowDocumentId(fileDataChanges[0].id);
       }
     } catch (error) {
       setIsLoading(false);
@@ -1457,7 +1459,7 @@ const handleUpdateFileChange = (event) => {
                   showUserDocumentData?.status === "transfer_to_insurer" ? "Transfert à l'assureur" :
                   showUserDocumentData?.status === "transfer_to_broker" ? "Transfert au Courtier" :
                   showUserDocumentData?.status === "transfer_to_manager" ? "Transfert au Gestionnaire" :
-                  showUserDocumentData?.status === "to_be_decided" ? "A décider" :
+                  showUserDocumentData?.status === "to_be_decided" ? "A statuer" :
                   showUserDocumentData?.status === "formal_notice" ? "Mise en demeure" : t("invalidLabel")
                 }
               </div>
@@ -1481,15 +1483,7 @@ const handleUpdateFileChange = (event) => {
               <span>Dossier à vérifier</span>
             </div>
             <div className="d-sm-flex align-items-center gap-3">
-                <p className="m-0">Envoyer à : </p>
-                <div>
-                  <Form.Select aria-label="Etat du chantier" style={{ minHeight: "30px", fontFamily: "Manrope" }} value={sendToFileStatus} onChange={(e) => handleSendFileShow(e.target.value)}>
-                    <option value="" disabled selected>Envoyer à</option>
-                    <option value="transfer_to_manager">Transfert au Gestionnaire</option>
-                    <option value="transfer_to_broker">Transfert au Courtier</option>
-                    <option value="formal_notice">Mise en demeure</option>
-                  </Form.Select>
-                </div>
+              {/* Add document */}
               <div className="add-document mb-sm-0 mb-2 mt-sm-0 mt-2">
                 <Link onClick={handleShow}>{t("addDocumentLabel")}</Link>
                 <Offcanvas
@@ -1602,6 +1596,25 @@ const handleUpdateFileChange = (event) => {
                     </button>
                   </div>
                 </Offcanvas>
+              </div>
+
+              {/* Add note  */}
+              <div style={{ marginLeft: "10px" }}>
+                <MissingDocument
+                  selectDocumentId={selectDocumentId}
+                  selectDocumentFileName={selectDocumentFileName}
+                  link={true}
+                />
+              </div>
+
+              <p className="m-0">Envoyer à : </p>
+              <div>
+                <Form.Select aria-label="Etat du chantier" style={{ minHeight: "30px", fontFamily: "Manrope" }} value={sendToFileStatus} onChange={(e) => handleSendFileShow(e.target.value)}>
+                  <option value="" disabled selected>Envoyer à</option>
+                  <option value="transfer_to_manager">Transfert au Gestionnaire</option>
+                  <option value="transfer_to_broker">Transfert au Courtier</option>
+                  <option value="formal_notice">Mise en demeure</option>
+                </Form.Select>
               </div>
 
               {/* Check Document */}
@@ -1831,7 +1844,7 @@ const handleUpdateFileChange = (event) => {
                     </Form.Group>
 
                     <Form.Group className="mb-4" controlId="exampleForm.ControlInput1">
-                      <Form.Label>Coût estimé du chantier</Form.Label>
+                      <Form.Label>Coût prévisionnel du chantier</Form.Label>
                       <Form.Control
                         type="text"
                         placeholder="Entrez le coût estimé du site"
@@ -1846,9 +1859,9 @@ const handleUpdateFileChange = (event) => {
                     </Form.Group>
 
                     <Form.Group className="mb-4" controlId="names">
-                      <Form.Label className="d-block">Date de début estimée</Form.Label>
+                      <Form.Label className="d-block">Date de début prévisionnelle</Form.Label>
                       <DatePicker
-                        placeholderText="Selectionner une date de début estimée"
+                        placeholderText="Selectionner une date de début prévisionnelle"
                         selected={estimatedStartDate ? getFormattedDate(estimatedStartDate) : ""}
                         onChange={(date) => setEstimatedStartDate(formatDate(date))}
                         dateFormat="dd/MM/yyyy"
@@ -1857,9 +1870,9 @@ const handleUpdateFileChange = (event) => {
                     </Form.Group>
 
                     <Form.Group className="mb-4" controlId="names">
-                      <Form.Label className="d-block">Date d'achèvement estimée</Form.Label>
+                      <Form.Label className="d-block">Date de fin de chantier prévisionnelle</Form.Label>
                       <DatePicker
-                        placeholderText="Selectionner une date d'achèvement estimée"
+                        placeholderText="Selectionner une date de fin de chantier prévisionnelle"
                         selected={estimatedCompletionDate ? getFormattedDate(estimatedCompletionDate) : ""}
                         onChange={(date) => setEstimatedCompletionDate(formatDate(date))}
                         dateFormat="dd/MM/yyyy"
@@ -1895,7 +1908,7 @@ const handleUpdateFileChange = (event) => {
                     </Form.Group>
 
                     <Form.Group className="mb-4" controlId="exampleForm.ControlInput1">
-                      <Form.Label>Coût final du chantier</Form.Label>
+                      <Form.Label>Coût définitif du chantier</Form.Label>
                       <Form.Control
                         type="text"
                         placeholder="Entrez le coût final du site"
@@ -1921,9 +1934,9 @@ const handleUpdateFileChange = (event) => {
                     </Form.Group>
 
                     <Form.Group className="mb-4" controlId="names">
-                      <Form.Label className="d-block">Date d'achèvement définitive</Form.Label>
+                      <Form.Label className="d-block">Date de fin de chantier définitive</Form.Label>
                       <DatePicker
-                        placeholderText="Selectionner une date d'achèvement définitive"
+                        placeholderText="Selectionner une date de fin de chantier définitive"
                         selected={endDate ? getFormattedDate(endDate) : ""}
                         onChange={(date) => setEndDate(formatDate(date))}
                         dateFormat="dd/MM/yyyy"
@@ -3316,7 +3329,7 @@ const handleUpdateFileChange = (event) => {
             Annuler
           </Button>
           <Button variant="primary" onClick={ValidateDocumentFile}>
-            Confirm and finalize
+            Confirmer et finalizer
           </Button>
         </Modal.Footer>
       </Modal>

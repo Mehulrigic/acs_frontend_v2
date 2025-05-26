@@ -30,7 +30,7 @@ const StatisticsData = (props) => {
             <p className="m-0"> Sur la période :</p>
             <Form.Select aria-label="Date range selector" value={selectedMonth} onChange={handleSelectChange}>
               <option value="all">Toutes</option>
-              <option value="last_month">derniers mois</option>
+              <option value="last_month">dernier mois</option>
               <option value="last_three_month">3 derniers mois</option>
               {/* <option value="custom">Coutume</option> */}
             </Form.Select>

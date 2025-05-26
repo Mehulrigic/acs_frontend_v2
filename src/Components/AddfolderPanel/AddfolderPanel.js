@@ -470,9 +470,9 @@ const handleFileChangeStep2 = (e) => {
                 </Form.Group>
 
                 <Form.Group className="mt-32" controlId="names">
-                  <Form.Label className="d-block">Date de début estimée</Form.Label>
+                  <Form.Label className="d-block">Date de début prévisionnelle</Form.Label>
                   <DatePicker
-                    placeholderText="Selectionner une date de début estimée"
+                    placeholderText="Selectionner une date de début prévisionnelle"
                     selected={estimatedStartDate ? getFormattedDate(estimatedStartDate) : null}
                     onChange={(date) => setEstimatedStartDate(formatDate(date))}
                     dateFormat="dd/MM/yyyy"
@@ -481,9 +481,9 @@ const handleFileChangeStep2 = (e) => {
                 </Form.Group>
 
                 <Form.Group className="mt-32" controlId="names">
-                  <Form.Label className="d-block">Date d'achèvement estimée</Form.Label>
+                  <Form.Label className="d-block">Date de fin de chantier prévisionnelle</Form.Label>
                   <DatePicker
-                    placeholderText="Selectionner une date d'achèvement estimée"
+                    placeholderText="Selectionner une date de fin de chantier prévisionnelle"
                     selected={estimatedCompletionDate ? getFormattedDate(estimatedCompletionDate) : null}
                     onChange={(date) => setEstimatedCompletionDate(formatDate(date))}
                     dateFormat="dd/MM/yyyy"
@@ -492,7 +492,7 @@ const handleFileChangeStep2 = (e) => {
                 </Form.Group>
 
                 <Form.Group className="mt-32" controlId="formBasicEmail">
-                    <Form.Label>Coût estimé du chantier</Form.Label>
+                    <Form.Label>Coût prévisionnel du chantier</Form.Label>
                     <Form.Control
                       type="text"
                       placeholder="Entrez le coût estimé du site"
