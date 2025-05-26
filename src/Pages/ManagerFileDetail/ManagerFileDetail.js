@@ -626,6 +626,7 @@ const AddMissingDocument = async (e) => {
         }
         setShowUserDocumentFileData(response.data.documents.user_document_files);
         setUserDocumentFileDataChanges(fileDataChanges);
+        setShowDocumentId(fileDataChanges[0].id);
         if (showCheck && showDeleteModal) {
           setShowUserDocumentAfterDeleteFile(true);
         }

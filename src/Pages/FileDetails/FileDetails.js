@@ -427,6 +427,7 @@ const FileDetails = () => {
         setShowUserDocumentFileData(response.data.documents.user_document_files);
         setTotalSpeaker(response.data.documents.total_speakers);
         setUserDocumentFileDataChanges(fileDataChanges);
+        setShowDocumentId(fileDataChanges[0].id);
       }
     } catch (error) {
       setIsLoading(false);
