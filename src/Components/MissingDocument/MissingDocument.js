@@ -49,13 +49,13 @@ const MissingDocument = (props) => {
       } else {
         setFlashMessage({
           type: "error",
-          message: response.data.message || t("somethingWentWrong"),
+          message: t("somethingWentWrong"),
         });
       }
     } catch (error) {
       setFlashMessage({
         type: "error",
-        message: error.response.data.message || t("somethingWentWrong"),
+        message: t("somethingWentWrong"),
       });
     }
   };
