@@ -3964,7 +3964,7 @@ const AddMissingDocument = async (e) => {
               Annuler
             </Button>
             <Button variant="primary" onClick={ValidateDocumentFile}>
-              Confirm and finalize
+              Confirmer et finalizer
             </Button>
           </Modal.Footer>
         </Modal>
