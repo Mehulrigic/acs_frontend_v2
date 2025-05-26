@@ -198,18 +198,18 @@ const HandleStoreDocument = async (e) => {
   const handleNextPage = () => {
     if (showstep1) {
       if (folderName != "") {
-        let isValid = (contractNo != "" || contractNo != null || contractNo != undefined) && contractNo?.includes('.');
-          if (!isValid && contractNo != "") {
-            setContractNo(contractNo);
-            setFlashMessage({
-              type: "error",
-              message: "Le num du contrat doit contenir au moins un point (.)",
-            });
-            return false;
-        } else {
+        // let isValid = (contractNo != "" || contractNo != null || contractNo != undefined) && contractNo?.includes('.');
+        //   if (!isValid && contractNo != "") {
+        //     setContractNo(contractNo);
+        //     setFlashMessage({
+        //       type: "error",
+        //       message: "Le num du contrat doit contenir au moins un point (.)",
+        //     });
+        //     return false;
+        // } else {
           setShowStep2(true);
           setShowStep1(false);
-        }
+        // }
       } else {
         setFlashMessage({ type: "error", message: t("requriedErrorMessage") });
       }

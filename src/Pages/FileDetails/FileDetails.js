@@ -202,10 +202,13 @@ const FileDetails = () => {
   const handleModalShow = () => setShowmodal(true);
   const handleModalClose = () => setShowmodal(false);
 
+  const [documentUploading, setDocumentUploading] = useState(false);
+
   const [show, setShow] = useState(false);
   const handleShow = () => setShow(true);
   const handleClose = () => {
     setShow(false);
+    setDocumentUploading(false);
     setFileList([]);
     if (activeTab === "contactinfo") {
       ShowUserDocumentData(id);
@@ -801,6 +804,7 @@ const FileDetails = () => {
   const HandleAddDocument = async (e) => {
   e.preventDefault();
 
+  setDocumentUploading(true);
   if (fileList.length === 0) {
     handleClose();
     return;
@@ -828,12 +832,14 @@ const FileDetails = () => {
         message: response.data.message || t("somethingWentWrong"),
       });
     } else {
+      setDocumentUploading(false);
       setFlashMessage({
         type: "error",
         message: response.data.message || t("somethingWentWrong"),
       });
     }
   } catch (error) {
+    setDocumentUploading(false);
     console.error(error);
     setFlashMessage({
       type: "error",
@@ -890,6 +896,7 @@ const FileDetails = () => {
 
 const AddMissingDocument = async (e) => {
   e.preventDefault();
+  setDocumentUploading(true);
 
   try {
     const formData = new FormData();
@@ -904,22 +911,22 @@ const AddMissingDocument = async (e) => {
 
     if (response.data.status) {
       setFileList([]);
+      setDocumentUploading(false);
       setFlashMessageStoreDoc({ type: "success", message: response.data.message });
     } else {
+      setDocumentUploading(false);
       setFlashMessageStoreDoc({ type: "error", message: response.data.message });
     }
 
   } catch (error) {
+    setDocumentUploading(false);
     setFlashMessageStoreDoc({ type: "error", message: "Something went wrong." });
   }
 };
 
-
-
-
-
 const HandleUpdateDocument = async (e) => {
   e.preventDefault();
+  setDocumentUploading(true);
 
   try {
     if (fileList.length === 0) return;
@@ -933,6 +940,7 @@ const HandleUpdateDocument = async (e) => {
     const response = await FilePageService.update_document_files(showDocumentId, formData);
 
     if (response.data.status) {
+      setDocumentUploading(false);
       setFileList([]);
       setShowDocumentName(fileList[0].name);
       setFlashMessageStoreDoc({
@@ -946,12 +954,14 @@ const HandleUpdateDocument = async (e) => {
         DocumentTypeList();
       }
     } else {
+      setDocumentUploading(false);
       setFlashMessageStoreDoc({
         type: "error",
         message: response.data.message || t("somethingWentWrong"),
       });
     }
   } catch (error) {
+    setDocumentUploading(false);
     setFlashMessageStoreDoc({
       type: "error",
       message: t("somethingWentWrong"),
@@ -1406,12 +1416,12 @@ const handleUpdateFileChange = (event) => {
 
   const handleChange = (e) => {
     const value = e.target.value;
-    let isValid = value.includes('.');
-    if (isValid) {
+    // let isValid = value.includes('.');
+    // if (isValid) {
       setContractNo(value);
-    } else {
-      setContractNo(value);
-    }
+    // } else {
+    //   setContractNo(value);
+    // }
   };
 
   return (
@@ -1589,10 +1599,10 @@ const handleUpdateFileChange = (event) => {
                     <button
                       type="submit"
                       className="btn btn-primary"
-                      disabled={!fileList.length > 0}
+                      disabled={documentUploading && !fileList.length > 0}
                       onClick={HandleAddDocument}
                     >
-                      Suivant
+                      {documentUploading ? "Suivant..." : "Suivant"}
                     </button>
                   </div>
                 </Offcanvas>
@@ -2860,7 +2870,7 @@ const handleUpdateFileChange = (event) => {
                         disabled={!fileList?.length > 0}
                         onClick={(e) => AddMissingDocument(e)}
                       >
-                        Suivant
+                        {documentUploading ? "Suivant..." : "Suivant"}
                       </button>
                     </div>
                   </Offcanvas>
@@ -3203,7 +3213,7 @@ const handleUpdateFileChange = (event) => {
             disabled={!fileList.length > 0}
             onClick={(e) => HandleUpdateDocument(e)}
           >
-            Suivant
+            {documentUploading ? "Suivant..." : "Suivant"}
           </button>
         </div>
       </Offcanvas>

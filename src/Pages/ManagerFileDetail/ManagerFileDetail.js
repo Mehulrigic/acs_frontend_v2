@@ -1581,12 +1581,12 @@ const AddMissingDocument = async (e) => {
 
   const handleChange = (e) => {
     const value = e.target.value;
-    let isValid = value.includes('.');
-    if (isValid) {
+    // let isValid = value.includes('.');
+    // if (isValid) {
       setContractNo(value);
-    } else {
-      setContractNo(value);
-    }
+    // } else {
+    //   setContractNo(value);
+    // }
   };
 
   const BrokerList = async () => {

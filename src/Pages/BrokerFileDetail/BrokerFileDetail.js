@@ -115,6 +115,7 @@ const BrokerFileDetail = () => {
   const handleDocShow = () => setShowDoc(true);
   const handleDocClose = () => {
     setShowDoc(false);
+    setDocumentUploading(false);
     setFileList([]);
   }
 
@@ -145,6 +146,7 @@ const BrokerFileDetail = () => {
     };
     const handleSendFileClose = () => setShowSendFileChange(false);
 
+  const [documentUploading, setDocumentUploading] = useState(false);
   const [showViewSpeaker, setShowViewSpeaker] = useState(false);
   const handleViewShowSpeaker = () => setShowViewSpeaker(true);
   const handleViewCloseSpeaker = () => {
@@ -542,6 +544,7 @@ const BrokerFileDetail = () => {
 
 const HandleAddDocument = async (e) => {
   e.preventDefault();
+  setDocumentUploading(true);
 
   if (fileList.length === 0) {
     handleDocClose();
@@ -564,6 +567,7 @@ const HandleAddDocument = async (e) => {
 
     if (response?.data?.status) {
       setFileList([]);
+      setDocumentUploading(false);
       setFlashMessageStoreDoc({
         type: "success",
         message: response.data.message || t("somethingWentWrong"),
@@ -584,6 +588,7 @@ const HandleAddDocument = async (e) => {
       });
     }
   } catch (error) {
+    setDocumentUploading(false);
     setFlashMessageStoreDoc({
       type: "error",
       message: t("somethingWentWrong"),
@@ -593,6 +598,7 @@ const HandleAddDocument = async (e) => {
 
 const HandleUpdateDocument = async (e) => {
   e.preventDefault();
+  setDocumentUploading(true);
 
   try {
     if (fileList.length === 0) return;
@@ -606,6 +612,7 @@ const HandleUpdateDocument = async (e) => {
     const response = await FilePageService.update_document_files(showDocumentId, formData);
 
     if (response.data.status) {
+      setDocumentUploading(false);
       setFileList([]);
       setShowDocumentName(fileList[0].name);
       setFlashMessageStoreDoc({
@@ -619,12 +626,14 @@ const HandleUpdateDocument = async (e) => {
         DocumentTypeList();
       }
     } else {
+      setDocumentUploading(false);
       setFlashMessageStoreDoc({
         type: "error",
         message: response.data.message || t("somethingWentWrong"),
       });
     }
   } catch (error) {
+    setDocumentUploading(false);
     setFlashMessageStoreDoc({
       type: "error",
       message: t("somethingWentWrong"),
@@ -684,6 +693,8 @@ const HandleUpdateDocument = async (e) => {
 
   const AddMissingDocument = async (e) => {
   e.preventDefault();
+  setDocumentUploading(true);
+
   try {
     const formData = new FormData();
 
@@ -701,6 +712,7 @@ const HandleUpdateDocument = async (e) => {
     });
 
     if (response.data.status) {
+      setDocumentUploading(false);
       setFileList([]);
       setFlashMessageStoreDoc({
         type: "success",
@@ -720,12 +732,14 @@ const HandleUpdateDocument = async (e) => {
 
       ShowUserDocumentData(id);
     } else {
+      setDocumentUploading(false);
       setFlashMessageStoreDoc({
         type: "error",
         message: response.data.message || t("somethingWentWrong"),
       });
     }
   } catch (error) {
+    setDocumentUploading(false);
     setFlashMessageStoreDoc({
       type: "error",
       message: t("somethingWentWrong"),
