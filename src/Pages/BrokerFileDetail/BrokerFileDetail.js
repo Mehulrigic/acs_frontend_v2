@@ -1072,7 +1072,7 @@ const handleUpdateFileChange = (event) => {
                   showUserDocumentData?.status === "transfer_to_insurer" ? "Transfert à l'assureur" :
                   showUserDocumentData?.status === "transfer_to_broker" ? "Transfert au Courtier" :
                   showUserDocumentData?.status === "transfer_to_manager" ? "Transfert au Gestionnaire" :
-                  showUserDocumentData?.status === "to_be_decided" ? "A décider" :
+                  showUserDocumentData?.status === "to_be_decided" ? "A statuer" :
                   showUserDocumentData?.status === "formal_notice" ? "Mise en demeure" : t("invalidLabel")
                 }
               </div>

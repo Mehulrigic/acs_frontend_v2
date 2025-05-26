@@ -498,7 +498,7 @@ const ManagerFile = () => {
                               <option value="transfer_to_broker">Transfert au Courtier</option>
                               <option value="transfer_to_insurer">Transfert à l'assureur</option>
                               <option value="formal_notice">Mise en demeure</option>
-                              <option value="to_be_decided">A décider</option>
+                              <option value="to_be_decided">A statuer</option>
                               <option value="validated">{t("validatedLabel")}</option>
                               <option value="invalid">{t("invalidLabel")}</option>
                             </Form.Select>
@@ -601,7 +601,7 @@ const ManagerFile = () => {
                               data.status === "transfer_to_broker" ? <span className="transfer badges">Transfert au Courtier</span> :
                               data.status === "transfer_to_insurer" ? <span className="formal_notice badges">Transfert à l'assureur</span> :
                               data.status === "formal_notice" ? <span className="formal_notice badges">Mise en demeure</span> :
-                              data.status === "to_be_decided" ? <span className="to_be_decided badges">A décider</span> :
+                              data.status === "to_be_decided" ? <span className="to_be_decided badges">A statuer</span> :
                               data.status === "validated" ? <span className="verified badges">{t("validatedLabel")}</span> :
                               <span className="incomplete badges">{t("invalidLabel")}</span>
                             }
