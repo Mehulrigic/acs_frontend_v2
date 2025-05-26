@@ -219,7 +219,7 @@ text-align: left;
   vertical-align: middle;
   border-bottom: 1px solid #00366B80;
   background-color: #00366B1A;
-font-size: 15px;
+font-size: 14px;
 font-weight: 700;
 line-height: 21.86px;
 color: var(--table-th-color);
@@ -228,7 +228,7 @@ padding: 17px 16px;
 .table-wrap td{
   padding: 17px 16px;
   color: var(--table-th-color);
-  font-size: 15px;
+  font-size: 14px;
 }
 .table-wrap td.bold-font{
   color: var(--black-color);
