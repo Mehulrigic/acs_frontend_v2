@@ -251,6 +251,10 @@ background-size: 7px;
 padding-right: 25px;
 border: none;
 cursor: pointer;
+    width: 150px !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 
 }
 .table-wrap .form-select:focus{
