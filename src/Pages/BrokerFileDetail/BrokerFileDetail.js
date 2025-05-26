@@ -110,7 +110,8 @@ const BrokerFileDetail = () => {
   const [showAddOtherCol, setShowAddOtherCol] = useState(false);
   const handleAddOtherColClose = () => setShowAddOtherCol(false);
   const handleAddOtherColShow = () => setShowAddOtherCol(true);
-
+  
+  const [documentUploading, setDocumentUploading] = useState(false);
   const [showDoc, setShowDoc] = useState(false);
   const handleDocShow = () => setShowDoc(true);
   const handleDocClose = () => {
@@ -146,7 +147,6 @@ const BrokerFileDetail = () => {
     };
     const handleSendFileClose = () => setShowSendFileChange(false);
 
-  const [documentUploading, setDocumentUploading] = useState(false);
   const [showViewSpeaker, setShowViewSpeaker] = useState(false);
   const handleViewShowSpeaker = () => setShowViewSpeaker(true);
   const handleViewCloseSpeaker = () => {
@@ -2089,10 +2089,10 @@ const handleUpdateFileChange = (event) => {
                     <div className="offcanvas-footer text-end">
                       <button
                         className="btn btn-primary"
-                        disabled={!fileList?.length > 0}
+                        disabled={documentUploading || !fileList?.length > 0}
                         onClick={(e) => AddMissingDocument(e)}
                       >
-                        Suivant
+                        {documentUploading ? "Suivant..." : "Suivant"}
                       </button>
                     </div>
                   </Offcanvas>
@@ -2436,9 +2436,9 @@ const handleUpdateFileChange = (event) => {
             <button
               className="btn btn-primary"
               onClick={(e) => HandleUpdateDocument(e)}
-              disabled={!fileList.length > 0}
+              disabled={documentUploading || !fileList.length > 0}
             >
-              Suivant
+              {documentUploading ? "Suivant..." : "Suivant"}
             </button>
           </div>
         </Offcanvas>
