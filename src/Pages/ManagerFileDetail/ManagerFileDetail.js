@@ -1677,16 +1677,23 @@ const AddMissingDocument = async (e) => {
               </div>
             </div>
           </div>
-            <div className="detail-header" style={{display: "flex", justifyContent: "right"}}>
-              <p className="m-0" style={{paddingRight: "10px"}}>Envoyer à : </p>
-              <Form.Select aria-label="Etat du chantier" class="form-select" style={{  minHeight: "30px", width: "25%", fontFamily: "Manrope"}} value={sendToFileStatus} onChange={(e) => handleSendFileShow(e.target.value)}>
-                  <option value="" disabled selected>Envoyer à</option>
-                  <option value="transfer_to_insurer">Transfert à l'assureur</option>
-                  <option value="transfer_to_broker">Transfert au Courtier</option>
-                  <option value="to_be_decided">A statuer</option>
-                </Form.Select>
+          <div className="detail-header" style={{ display: "flex", justifyContent: "right" }}>
+            <div style={{ marginRight: "20px" }}>
+              <MissingDocument
+                selectDocumentId={selectDocumentId}
+                selectDocumentFileName={selectDocumentFileName}
+                link={true}
+              />
             </div>
+            <p className="m-0" style={{ paddingRight: "10px" }}>Envoyer à : </p>
+            <Form.Select aria-label="Etat du chantier" class="form-select" style={{ minHeight: "30px", width: "25%", fontFamily: "Manrope" }} value={sendToFileStatus} onChange={(e) => handleSendFileShow(e.target.value)}>
+              <option value="" disabled selected>Envoyer à</option>
+              <option value="transfer_to_insurer">Transfert à l'assureur</option>
+              <option value="transfer_to_broker">Transfert au Courtier</option>
+              <option value="to_be_decided">A statuer</option>
+            </Form.Select>
           </div>
+        </div>
         <Tabs
           activeKey={activeTab}
           onSelect={handleSelect}
