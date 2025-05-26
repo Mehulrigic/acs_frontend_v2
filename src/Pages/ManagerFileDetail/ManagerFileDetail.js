@@ -204,6 +204,7 @@ const ManagerFileDetail = () => {
   const [finalSiteCost, setFinaldSiteCost] = useState("");
   const [finalStartDate, setFinalStartDate] = useState(null);
   const [finalCompletionDate, setFinalCompletionDate] = useState(null);
+  const [documentUploading, setDocumentUploading] = useState(false);
 
   useEffect(() => {
     if (flashMessage.message) {
@@ -536,6 +537,8 @@ const ManagerFileDetail = () => {
 
 const AddMissingDocument = async (e) => {
   e.preventDefault();
+  setDocumentUploading(true);
+  
   try {
     const formData = new FormData();
     formData.append("speaker_id", showSpeakerId);
@@ -552,6 +555,7 @@ const AddMissingDocument = async (e) => {
     });
 
     if (response.data.status) {
+      setDocumentUploading(false);
       setFileList([]);
       setFlashMessageStoreDoc({
         type: "success",
@@ -569,12 +573,14 @@ const AddMissingDocument = async (e) => {
 
       ShowUserDocumentData(id);
     } else {
+      setDocumentUploading(false);
       setFlashMessageStoreDoc({
         type: "error",
         message: response.data.message || t("somethingWentWrong"),
       });
     }
   } catch (error) {
+    setDocumentUploading(false);
     setFlashMessageStoreDoc({
       type: "error",
       message: t("somethingWentWrong"),
@@ -3515,10 +3521,10 @@ const AddMissingDocument = async (e) => {
                     <div className="offcanvas-footer text-end">
                       <button
                         className="btn btn-primary"
-                        disabled={!fileList?.length > 0}
+                        disabled={documentUploading || !fileList?.length > 0}
                         onClick={(e) => AddMissingDocument(e)}
                       >
-                        Suivant
+                        {documentUploading ? "Suivant..." : "Suivant"}
                       </button>
                     </div>
                   </Offcanvas>

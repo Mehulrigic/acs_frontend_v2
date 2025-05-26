@@ -1599,7 +1599,7 @@ const handleUpdateFileChange = (event) => {
                     <button
                       type="submit"
                       className="btn btn-primary"
-                      disabled={documentUploading && !fileList.length > 0}
+                      disabled={documentUploading || !fileList.length > 0}
                       onClick={HandleAddDocument}
                     >
                       {documentUploading ? "Suivant..." : "Suivant"}
@@ -2867,7 +2867,7 @@ const handleUpdateFileChange = (event) => {
                     <div className="offcanvas-footer text-end">
                       <button
                         className="btn btn-primary"
-                        disabled={!fileList?.length > 0}
+                        disabled={documentUploading || !fileList?.length > 0}
                         onClick={(e) => AddMissingDocument(e)}
                       >
                         {documentUploading ? "Suivant..." : "Suivant"}
@@ -3210,7 +3210,7 @@ const handleUpdateFileChange = (event) => {
         <div className="offcanvas-footer text-end">
           <button
             className="btn btn-primary"
-            disabled={!fileList.length > 0}
+            disabled={documentUploading || !fileList.length > 0}
             onClick={(e) => HandleUpdateDocument(e)}
           >
             {documentUploading ? "Suivant..." : "Suivant"}
