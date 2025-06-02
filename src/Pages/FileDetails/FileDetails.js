@@ -729,15 +729,7 @@ const FileDetails = () => {
 
   const UpdateFolderInfo = async (e) => {
     e.preventDefault();
-    let isValid = (contractNo != "" || contractNo != null || contractNo != undefined) && contractNo?.includes('.');
-    if (!isValid && contractNo != "") {
-      setContractNo(contractNo);
-      setFlashMessage({
-        type: "error",
-        message: "Le num du contrat doit contenir au moins un point (.)",
-      });
-      return false;
-    }
+    
     var folderData = {
       folder_name: e.target.elements.folderName.value ? e.target.elements.folderName.value : "",
       final_start_date: startDate ? startDate : "",
@@ -911,6 +903,7 @@ const AddMissingDocument = async (e) => {
 
     if (response.data.status) {
       setFileList([]);
+      ShowUserDocumentData(id);
       setDocumentUploading(false);
       setFlashMessageStoreDoc({ type: "success", message: response.data.message });
     } else {
@@ -1416,12 +1409,7 @@ const handleUpdateFileChange = (event) => {
 
   const handleChange = (e) => {
     const value = e.target.value;
-    // let isValid = value.includes('.');
-    // if (isValid) {
-      setContractNo(value);
-    // } else {
-    //   setContractNo(value);
-    // }
+    setContractNo(value);
   };
 
   return (
@@ -1614,6 +1602,7 @@ const handleUpdateFileChange = (event) => {
                   selectDocumentId={selectDocumentId}
                   selectDocumentFileName={selectDocumentFileName}
                   link={true}
+                  GetHistoryListDocument={GetHistoryListDocument}
                 />
               </div>
 
@@ -1959,7 +1948,7 @@ const handleUpdateFileChange = (event) => {
                   Valider
                 </Button>
                 <Button
-                  className="btn-transperant ms-2"
+                  className="btn-secondary ms-2"
                   onClick={() => navigate("/insurers-file")}
                 >
                   Annuler

@@ -28,7 +28,7 @@ const Paginations = ({ currentPage, totalPages, onPageChange }) => {
       <Pagination.Item
         key={index}
         active={page === currentPage}
-        disabled={page === "..."}
+        disabled={ page === currentPage || page === "..."}
         onClick={() => handlePageClick(page)}
       >
         {page}

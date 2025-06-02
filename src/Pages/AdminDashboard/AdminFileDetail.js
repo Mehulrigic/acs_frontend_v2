@@ -557,6 +557,7 @@ const AddMissingDocument = async (e) => {
     if (response.data.status) {
       setDocumentUploading(false);
       setFileList([]);
+      ShowUserDocumentData(id);
       setFlashMessageStoreDoc({
         type: "success",
         message: response.data.message || t("somethingWentWrong"),
@@ -1541,15 +1542,6 @@ const AddMissingDocument = async (e) => {
 
   const UpdateFolderInfo = async (e) => {
     e.preventDefault();
-    let isValid = (contractNo != "" || contractNo != null || contractNo != undefined) && contractNo?.includes('.');
-    if (!isValid && contractNo != "") {
-      setContractNo(contractNo);
-      setFlashMessage({
-        type: "error",
-        message: "Le num du contrat doit contenir au moins un point (.)",
-      });
-      return false;
-    }
 
     const folderData = {
       folder_name: folderDetail.folder_name,
@@ -1587,12 +1579,7 @@ const AddMissingDocument = async (e) => {
 
   const handleChange = (e) => {
     const value = e.target.value;
-    // let isValid = value.includes('.');
-    // if (isValid) {
-      setContractNo(value);
-    // } else {
-    //   setContractNo(value);
-    // }
+    setContractNo(value);
   };
 
   const BrokerList = async () => {
@@ -1691,6 +1678,7 @@ const AddMissingDocument = async (e) => {
                 selectDocumentId={selectDocumentId}
                 selectDocumentFileName={selectDocumentFileName}
                 link={true}
+                GetHistoryListDocument={GetHistoryListDocument}
               />
             </div>
             <p className="m-0" style={{ paddingRight: "10px" }}>Envoyer à : </p>
@@ -1908,7 +1896,7 @@ const AddMissingDocument = async (e) => {
                   Valider
                 </Button>
                 <Button
-                  className="btn-transperant ms-2"
+                  className="btn-secondary ms-2"
                   onClick={() => navigate("/manager-files")}
                 >
                   Annuler

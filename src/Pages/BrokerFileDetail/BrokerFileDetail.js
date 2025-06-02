@@ -714,6 +714,7 @@ const HandleUpdateDocument = async (e) => {
     if (response.data.status) {
       setDocumentUploading(false);
       setFileList([]);
+      ShowUserDocumentData(id);
       setFlashMessageStoreDoc({
         type: "success",
         message: response.data.message || t("somethingWentWrong"),
