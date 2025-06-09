@@ -957,9 +957,13 @@ const UserManagement = () => {
                 <option value="" disabled>
                   {t("selectRoleLabel")}
                 </option>
-                {roleList?.map((role) => (
-                  <option value={role}>{role}</option>
-                ))}
+                {roleList?.length > 0 ?
+                  roleList?.map((role) => (
+                    <option value={role}>{role}</option>
+                  )) : (
+                    <option value="">{t("NorecordsfoundLabel")}</option>
+                  )
+                }
               </Form.Select>
             </Form.Group>
 
@@ -974,9 +978,13 @@ const UserManagement = () => {
                   <option value="" disabled>
                     {t("selectInsurer")}
                   </option>
-                  {InsurerList?.map((insurer) => (
-                    <option value={insurer.id}>{insurer.first_name}</option>
-                  ))}
+                  {InsurerList?.length > 0 ?
+                    InsurerList?.map((insurer) => (
+                      <option value={insurer.id}>{insurer.first_name}</option>
+                    )) : (
+                      <option value="">{t("NorecordsfoundLabel")}</option>
+                    )
+                  }
                 </Form.Select>
               </Form.Group>
             }

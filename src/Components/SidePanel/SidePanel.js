@@ -136,6 +136,15 @@ const SidePanel = ({ sidebarLogo, backgroundColor, leftPanelChange, logoChange ,
                       <span className="menu-title">{t("userManagementLabel")}</span></Link>
                   </li>
 
+                  <li title="Bloc logique" className={location.pathname === "/logical-block" ? "active" : ""}>
+                    <Link to="/logical-block">
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <polygon points="12,2 22,12 12,22 2,12" stroke="#fff" stroke-width="2" fill="none" />
+                        <text x="12" y="16" text-anchor="middle" fill="#fff" font-size="10" font-family="Arial" font-weight="bold">IF</text>
+                      </svg>
+                      <span className="menu-title">Bloc logique</span></Link>
+                  </li>
+
                   <li title={t("documentTypeLabel")} className={location.pathname === "/document-type" ? "active" : ""}>
                     <Link to="/document-type">
                       <svg width="24px" height="24px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

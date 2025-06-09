@@ -271,9 +271,13 @@ const Login = () => {
                           <option value="" disabled>
                             {t("selectRoleLabel")}
                           </option>
-                          {roleList?.map((role) => (
-                            <option value={role}>{role}</option>
-                          ))}
+                          {roleList?.length > 0 ?
+                            roleList?.map((role) => (
+                              <option value={role}>{role}</option>
+                            )) : (
+                              <option value="">{t("NorecordsfoundLabel")}</option>
+                            )
+                          }
                         </Form.Select>
                       </Form.Group>
 

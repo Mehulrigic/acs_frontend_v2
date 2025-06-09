@@ -1,56 +1,43 @@
 import React, { Fragment, useEffect, useState } from "react";
-import SidePanel from "../../Components/SidePanel/SidePanel";
 import Table from "react-bootstrap/Table";
 import { Link, useNavigate } from "react-router";
 import { Button, Form, Modal, Offcanvas } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
-import Paginations from "../../Components/Paginations/Paginations";
-import logo from "../../acs-logo.png"
-import DocumentTypeService from "../../API/DocumentType/DocumentTypeService";
 import Loading from "../../Common/Loading";
+import SidePanel from "../../Components/SidePanel/SidePanel";
+import Paginations from "../../Components/Paginations/Paginations";
 import LogicalBlockService from "../../API/LogicalBlock/LogicalBlockService";
 
-const DocumentType = () => {
+const LogicalBlock = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
 
   const [isLoading, setIsLoading] = useState(false);
-  const [editDocumentType, setEditDocumentType] = useState(false);
-  const [documentTypeList, setDocumentTypeList] = useState([]);
-  const [showDocumentTypeList, setShowDocumentTypeList] = useState([]);
-  const [logicalBlockList, setLogicalBlockList] = useState([]);
-  const [editDocumentTypeId, setEditDocumentTypeId] = useState("");
-  const [updateDocumentTypeId, setUpdateDocumentTypeId] = useState("");
-  const [editDocumentTypeStatus, setEditDocumentTypeStatus] = useState("");
-  const [editDocumentTypeQualification, setEditDocumentTypeQualification] = useState('');
-  const [updateDocumentTypeStatus, setUpdateDocumentTypeStatus] = useState("");
-  const [flashMessage, setFlashMessage] = useState({ type: "", message: "" });
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalRecord, setTotalRecord] = useState(0);
-  const [siteStatus, setSiteStatus] = useState(false);
-  const [rightPanelThemeColor, setRightPanelThemeColor] = useState("#d9ebff");
+  const [logicalBlockList, setLogicalBlockList] = useState([]);
+  const [showLogicalBlockList, setShowLogicalBlockList] = useState([]);
   const [logoImageShow, setLogoImageShow] = useState("");
-  const [deleteDocumentTypeId, setDeleteDocumentTypeId] = useState("");
-  const [isRotated, setIsRotated] = useState(false);
-  const [qualification, setQualification] = useState([]);
-  const [logicalBlock, setLogicalBlock] = useState([]);
+  const [rightPanelThemeColor, setRightPanelThemeColor] = useState("#d9ebff");
+  const [editLogicalBlockId, setEditLogicalBlockId] = useState("");
+  const [editLogicalBlock, setEditLogicalBlock] = useState(false);
+  const [editLogicalBlockStatus, setEditLogicalBlockStatus] = useState("");
+  const [updateLogicalBlockId, setUpdateLogicalBlockId] = useState("");
+  const [updateLogicalBlockStatus, setUpdateLogicalBlockStatus] = useState("");
+  const [deleteLogicalBlockId, setDeleteLogicalBlockId] = useState("");
+  const [flashMessage, setFlashMessage] = useState({ type: "", message: "" });
   const [sort, setSort] = useState({ key: "created_at", value: "desc" });
+  const [isRotated, setIsRotated] = useState(false);
 
   const [formShow, setFormShow] = useState(false);
   const handleFormShow = () => setFormShow(true);
-  const handleFormClose = () => {
-    setShowDocumentTypeList([]);
-    setSiteStatus(false);
-    setQualification("");
-    setFormShow(false);
-  };
+  const handleFormClose = () => setFormShow(false);
 
   const [showmodal, setShowmodal] = useState(false);
   const handleModalShow = () => setShowmodal(true);
   const handleModalClose = () => {
     setShowmodal(false);
-    setSiteStatus(false);
   };
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -74,27 +61,12 @@ const DocumentType = () => {
       const right_panel_color = JSON.parse(localStorage.getItem("right_panel_color"));
       setRightPanelThemeColor(right_panel_color);
       setLogoImageShow(logo_image);
-      DocumentTypeList(sort, currentPage, editDocumentTypeStatus, editDocumentTypeQualification);
-      setEditDocumentTypeStatus("");
+      LogicalBlockList(sort, currentPage, editLogicalBlockStatus);
+      setEditLogicalBlockStatus("");
     } else {
       navigate("/");
     }
   }, [sort]);
-
-  useEffect(() => {
-    if (formShow) {
-      let sort = {
-        key: "created_at",
-        value: "desc"
-      }
-      LogicalBlockList(sort, 1, "")
-    }
-  }, [formShow]);
-
-  const handlePageChange = (page) => {
-    setCurrentPage(page);
-    DocumentTypeList(sort, page, editDocumentTypeStatus, editDocumentTypeQualification); // Fetch data for the selected page
-  };
 
   const LogicalBlockList = async (sort, page = 1, status) => {
     setIsLoading(true);
@@ -113,6 +85,9 @@ const DocumentType = () => {
       if (response.data.status) {
         setIsLoading(false);
         setLogicalBlockList(response.data.LogicalBlocks.data);
+        setCurrentPage(response.data.LogicalBlocks.meta.current_page);
+        setTotalPages(response.data.LogicalBlocks.meta.last_page);
+        setTotalRecord(response.data.LogicalBlocks.meta.total);
       }
     } catch (error) {
       setIsLoading(false);
@@ -120,33 +95,7 @@ const DocumentType = () => {
     }
   };
 
-  const DocumentTypeList = async (sort, page = 1, status, editDocumentTypeQualification) => {
-    setIsLoading(true);
-    try {
-      const useData = {
-        sort: {
-          key: sort.key,
-          value: sort.value
-        },
-        page,
-        status: status,
-        type_for: editDocumentTypeQualification
-      };
-      const response = await DocumentTypeService.document_type_list(useData);
-      if (response.data.status) {
-        setIsLoading(false);
-        setDocumentTypeList(response.data.DocumentType.data);
-        setCurrentPage(response.data.DocumentType.meta.current_page);
-        setTotalPages(response.data.DocumentType.meta.last_page);
-        setTotalRecord(response.data.DocumentType.meta.total);
-      }
-    } catch (error) {
-      setIsLoading(false);
-      console.log(error);
-    }
-  };
-
-  const NewDocumentTypeCreate = async (e) => {
+  const NewLogicalBlockCreate = async (e) => {
     e.preventDefault();
     if (e.target.elements.nameLabel.value == "") {
       setFlashMessage({ type: "error", message: t("requriedErrorMessageLabel") });
@@ -155,17 +104,14 @@ const DocumentType = () => {
     try {
       var useData = {
         name: e.target.elements.nameLabel.value ?? "",
-        type_for: e.target.elements.qualificationLabel.value ?? "",
-        site_status: siteStatus == true ? 'end_of_site' : 'on_site',
-        logical_block_id: e.target.elements.logicalBlockLabel.value ?? ""
+        // status: siteStatus == true ? 'end_of_site' : 'on_site'
       };
 
-      const response = await DocumentTypeService.create_document_type(useData);
+      const response = await LogicalBlockService.create_logical_block(useData);
 
       if (response.data.status) {
         setFormShow(false);
-        setSiteStatus(false);
-        DocumentTypeList(sort, 1, "", "");
+        LogicalBlockList(sort, 1, "", "");
       } else {
         setFlashMessage({ type: "error", message: response.data.message || t("somethingWentWrong") });
       }
@@ -174,27 +120,22 @@ const DocumentType = () => {
     }
   };
 
-  const ShowDocumentType = async (e, id) => {
+  const ShowLogicalBlock = async (e, id) => {
     e.preventDefault();
-    setEditDocumentTypeId(id);
+    setEditLogicalBlockId(id);
     try {
-      const response = await DocumentTypeService.show_document_type(id);
+
+      const response = await LogicalBlockService.show_logical_block(id);
+
       if (response.data.status) {
-        setShowDocumentTypeList(response.data.DocumentType);
-        setLogicalBlock(response.data.DocumentType?.logical_block?.id || "");
-        setQualification(response.data.DocumentType?.type_for);
-        if (response.data.DocumentType.site_status === "end_of_site") {
-          setSiteStatus(true);
-        } else {
-          setSiteStatus(false);
-        }
+        setShowLogicalBlockList(response.data.LogicalBlock);
       }
     } catch (error) {
       console.log(error);
     }
   };
 
-  const EditDocumentType = async (e) => {
+  const EditLogicalBlock = async (e) => {
     e.preventDefault();
     if (e.target.elements.nameLabel.value == "") {
       setFlashMessage({ type: "error", message: t("requriedErrorMessageLabel") });
@@ -203,16 +144,13 @@ const DocumentType = () => {
     try {
       var useData = {
         name: e.target.elements.nameLabel.value ?? "",
-        type_for: e.target.elements.qualificationLabel.value ?? "",
-        site_status: siteStatus == true ? 'end_of_site' : 'on_site',
-        logical_block_id: e.target.elements.logicalBlockLabel.value ?? ""
       };
 
-      const response = await DocumentTypeService.edit_document_type(editDocumentTypeId, useData);
+      const response = await LogicalBlockService.edit_logical_block(editLogicalBlockId, useData);
+
       if (response.data.status) {
         setFormShow(false);
-        setSiteStatus(false);
-        DocumentTypeList(sort, currentPage, "", "");
+        LogicalBlockList(sort, currentPage, "", "");
       } else {
         setFlashMessage({ type: "error", message: response.data.message || t("somethingWentWrong") });
       }
@@ -221,11 +159,13 @@ const DocumentType = () => {
     }
   };
 
-  const DeleteDocumentType = async () => {
+  const DeleteLogicalBlock = async () => {
     try {
-      const response = await DocumentTypeService.delete_document_type(deleteDocumentTypeId);
+
+      const response = await LogicalBlockService.delete_logical_block(deleteLogicalBlockId);
+
       if (response.data.status) {
-        DocumentTypeList(sort, 1, "", "");
+        LogicalBlockList(sort, 1, "", "");
         handleCloseDeleteModal();
       }
     } catch (error) {
@@ -236,12 +176,14 @@ const DocumentType = () => {
   const HandleUpdateStatus = async () => {
     try {
       var useData = {
-        status: updateDocumentTypeStatus == 1 ? "0" : "1",
+        status: updateLogicalBlockStatus == 1 ? "0" : "1",
       };
-      const response = await DocumentTypeService.document_type_status_update(updateDocumentTypeId, useData);
+
+      const response = await LogicalBlockService.logical_block_status_update(updateLogicalBlockId, useData);
+
       if (response.data.status) {
-        setEditDocumentTypeStatus("");
-        DocumentTypeList(sort, currentPage, "", "");
+        setEditLogicalBlockStatus("");
+        LogicalBlockList(sort, currentPage, "", "");
         handleModalClose();
       }
     } catch (error) {
@@ -249,38 +191,26 @@ const DocumentType = () => {
     }
   };
 
+  const HandleFilterStatus = (status) => {
+    setEditLogicalBlockStatus(status);
+    LogicalBlockList(sort, 1, status)
+  };
+
   const handleStatusChange = (id, status) => {
-    setUpdateDocumentTypeId(id);
-    setUpdateDocumentTypeStatus(status);
+    setUpdateLogicalBlockId(id);
+    setUpdateLogicalBlockStatus(status);
     handleModalShow();
   };
 
-  const HandleFilterStatus = (status) => {
-    setEditDocumentTypeStatus(status);
-    DocumentTypeList(sort, 1, status, editDocumentTypeQualification)
-  };
-
-  const HandleFilterQualification = (qualification) => {
-    setEditDocumentTypeQualification(qualification);
-    DocumentTypeList(sort, 1, editDocumentTypeStatus, qualification)
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+    LogicalBlockList(sort, page, editLogicalBlockStatus); // Fetch data for the selected page
   };
 
   const handleClickRotate = (column) => {
     const direction = sort.key === column ? (sort.value === "desc" ? "asc" : "desc") : "asc";
     setSort({ key: column, value: direction });
     setIsRotated(!isRotated); // Toggle the class on click
-  };
-
-  const handleQualificationChange = (e) => {
-    setQualification(e.target.value);
-  }
-
-  const handleLogicalBlockChange = (e) => {
-    setLogicalBlock(e.target.value);
-  }
-
-  const handleCheckboxChange = (e) => {
-    setSiteStatus(e.target.checked)
   };
 
   return (
@@ -290,12 +220,12 @@ const DocumentType = () => {
       <SidePanel sidebarLogo={`${process.env.REACT_APP_IMAGE_URL}/${logoImageShow}`} />
 
       <div className="dashboard-main-content user-management" style={{ backgroundColor: rightPanelThemeColor }}>
-        <h1 className="mb-5">{t("documentTypeLabel")}</h1>
+        <h1 className="mb-5">Bloc logique</h1>
 
         <div className="table-wrapper mt-16">
           <div className="text-end mb-3">
-            <Button onClick={() => { setShowDocumentTypeList([]); handleFormShow(); setEditDocumentType(false); }} variant="primary">
-              {t("AddDocumentType")}
+            <Button onClick={() => { setShowLogicalBlockList([]); handleFormShow(); setEditLogicalBlock(false); }} variant="primary">
+              Ajouter un bloc logique
             </Button>
           </div>
           {isLoading ? <Loading /> :
@@ -327,63 +257,10 @@ const DocumentType = () => {
                         </Link>
                       </div>
                     </th>
-                    <th>
-                      <div className="d-flex align-items-center">
-                        <div>
-                          <Form.Select aria-label="statusSelectAria" value={editDocumentTypeQualification} onChange={(e) => HandleFilterQualification(e.target.value)}>
-                            <option value="">{t("Rattachement")}</option>
-                            <option value="general">{t("Dossier")}</option>
-                            <option value="speaker">{t("Intervenant")}</option>
-                          </Form.Select>
-                        </div>
-                        <Link
-                          className={`sorting-icon ms-2`}
-                          onClick={() => handleClickRotate("type_for")}
-                        >
-                          {sort.value === "asc" &&
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                              <path d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z" fill="black" />
-                              <path d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z" fill="black" fill-opacity="0.5" />
-                            </svg>
-                          }
-
-                          {sort.value === "desc" &&
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                              <path d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z" fill="black" fill-opacity="0.5" />
-                              <path d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z" fill="black" />
-                            </svg>
-                          }
-                        </Link>
-                      </div>
-                    </th>
-                    <th>
-                      <div className="d-flex align-items-center">
-                        <span>Nom du bloc logique</span>
-                        <Link
-                          className={`sorting-icon ms-2`}
-                          onClick={() => handleClickRotate("logical_block.name")}
-                        >
-                          {sort.value === "asc" &&
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                              <path d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z" fill="black" />
-                              <path d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z" fill="black" fill-opacity="0.5" />
-                            </svg>
-                          }
-
-                          {sort.value === "desc" &&
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                              <path d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z" fill="black" fill-opacity="0.5" />
-                              <path d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z" fill="black" />
-                            </svg>
-                          }
-                        </Link>
-                      </div>
-                    </th>
-                    <th> Fin de chantier</th>
                     <th width={165} className="select-drop elips-dropdown">
                       <div className="d-flex align-items-center">
                         <div>
-                          <Form.Select aria-label="statusSelectAria" value={editDocumentTypeStatus} onChange={(e) => HandleFilterStatus(e.target.value)}>
+                          <Form.Select aria-label="statusSelectAria" value={editLogicalBlockStatus} onChange={(e) => HandleFilterStatus(e.target.value)}>
                             <option value="">{t("status")}</option>
                             <option value="0">{t("inActiveLabel")}</option>
                             <option value="1">{t("activeLabel")}</option>
@@ -415,25 +292,15 @@ const DocumentType = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {documentTypeList?.length > 0 ?
-                    documentTypeList?.map((data, index) => (
+                  {logicalBlockList?.length > 0 ?
+                    logicalBlockList?.map((data, index) => (
                       <tr>
                         <td>{(currentPage - 1) * 10 + (index + 1)}</td>
                         <td className="bold-font">{data.name}</td>
-                        <td className="bold-font">{data.type_for == 'general' ? 'Dossier' : data.type_for == 'speaker' ? 'Intervenant' : ''}</td>
-                        <td className="bold-font">{data.logical_block?.name}</td>
-                        <td>
-                          <div>
-                            <Form.Check
-                              id="select-all-checkbox"
-                              checked={data.site_status === "end_of_site"}
-                            />
-                          </div>
-                        </td>
                         <td>{data.status == 1 ? <span className="verified badges" onClick={() => handleStatusChange(data.id, data.status)} style={{ cursor: "pointer" }}>{t("activeLabel")}</span> : <span className="incomplete badges" onClick={() => handleStatusChange(data.id, data.status)} style={{ cursor: "pointer" }}>{t("inActiveLabel")}</span>}</td>
                         <td>
                           <div className="action-btn">
-                            <Link className="edit" onClick={(e) => { ShowDocumentType(e, data.id); handleFormShow(); setEditDocumentType(true); }}>
+                            <Link className="edit" onClick={(e) => { ShowLogicalBlock(e, data.id); handleFormShow(); setEditLogicalBlock(true); }}>
                               <svg
                                 width="24"
                                 height="24"
@@ -447,7 +314,7 @@ const DocumentType = () => {
                                 />
                               </svg>
                             </Link>
-                            <Link className="delete" onClick={() => {handleShowDeleteModal(); setDeleteDocumentTypeId(data.id)}}>
+                            {/* <Link className="delete" onClick={() => { handleShowDeleteModal(); setDeleteLogicalBlockId(data.id) }}>
                               <svg
                                 width="24"
                                 height="24"
@@ -460,7 +327,7 @@ const DocumentType = () => {
                                   fill="#e84455"
                                 />
                               </svg>
-                            </Link>
+                            </Link> */}
                           </div>
                         </td>
                       </tr>
@@ -476,7 +343,8 @@ const DocumentType = () => {
                   }
                 </tbody>
               </Table>
-            </div>}
+            </div>
+          }
           {totalRecord > 10 &&
             <Paginations
               currentPage={currentPage}
@@ -487,7 +355,7 @@ const DocumentType = () => {
         </div>
       </div>
 
-      {/* Add User Canvas */}
+      {/* Add & Edit User Canvas */}
       <Offcanvas
         className="account-request-pannel"
         placement="end"
@@ -495,10 +363,10 @@ const DocumentType = () => {
         onHide={handleFormClose}
       >
         <Offcanvas.Header closeButton>
-          <Offcanvas.Title>{editDocumentType ? t("EditDocumentType") : t("AddDocumentType")}</Offcanvas.Title>
+          <Offcanvas.Title>{editLogicalBlock ? "Changer le bloc logique" : "Ajouter un bloc logique"}</Offcanvas.Title>
         </Offcanvas.Header>
         <Offcanvas.Body>
-          <Form onSubmit={editDocumentType ? EditDocumentType : NewDocumentTypeCreate}>
+          <Form onSubmit={editLogicalBlock ? EditLogicalBlock : NewLogicalBlockCreate}>
             {flashMessage.message && (
               <div
                 className={`alert ${flashMessage.type === "success" ? "alert-success" : "alert-danger"
@@ -510,50 +378,8 @@ const DocumentType = () => {
             )}
             <Form.Group controlId="nameLabel">
               <Form.Label>{t("nameLabel")} <span>*</span></Form.Label>
-              <Form.Control type="text" placeholder={t("nameLabel")} defaultValue={showDocumentTypeList?.name} name="nameLabel" />
+              <Form.Control type="text" placeholder={t("nameLabel")} defaultValue={showLogicalBlockList?.name} name="nameLabel" />
             </Form.Group>
-
-            <Form.Group controlId="qualificationLabel">
-              <Form.Label>Rattachement <span>*</span></Form.Label>
-              <Form.Select
-                value={qualification}
-                onChange={handleQualificationChange}
-                aria-label="statusSelectAria"
-              >
-                <option value="">Sélectionner une qualification</option>
-                <option value="general">Dossier</option>
-                <option value="speaker">Intervenant</option>
-              </Form.Select>
-            </Form.Group>
-
-            <Form.Group controlId="logicalBlockLabel">
-              <Form.Label className="mt-3">Sélectionnez un bloc logique <span>*</span></Form.Label>
-              <Form.Select
-                value={logicalBlock}
-                onChange={handleLogicalBlockChange}
-                aria-label="statusSelectAria"
-              >
-                <option value="">Sélectionnez un bloc logique</option>
-                {logicalBlockList?.length > 0 ?
-                  logicalBlockList?.map((data) => (
-                    <option key={data.id} value={data.id}>{data.name}</option>
-                  )) : (
-                    <option value="">{t("NorecordsfoundLabel")}</option>
-                  )
-                }
-              </Form.Select>
-            </Form.Group>
-
-            <div className="mt-3">
-              <Form.Label className="d-flex">
-                <Form.Check
-                  id="select-all-checkbox"
-                  checked={siteStatus}
-                  onChange={handleCheckboxChange}
-                />
-                <span style={{ paddingLeft: "5px", cursor: "pointer" }}>Fin de chantier</span>
-              </Form.Label>
-            </div>
             <div className="canvas-footer text-end">
               <Button variant="primary" type="submit">
                 {t("submitButton")}
@@ -590,13 +416,13 @@ const DocumentType = () => {
           <Modal.Title><h2>Confirmation</h2></Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <p>Etes-vous sûr de vouloir supprimer le type de document?</p>
+          <p>Êtes-vous sûr de vouloir supprimer le bloc logique ?</p>
         </Modal.Body>
         <Modal.Footer>
           <Button className="cancel-btn" variant="primary" onClick={handleCloseDeleteModal}>
             Annuler
           </Button>
-          <Button variant="primary" onClick={DeleteDocumentType}>
+          <Button variant="primary" onClick={DeleteLogicalBlock}>
             {t("confirmbtnLabel")}
           </Button>
         </Modal.Footer>
@@ -605,4 +431,4 @@ const DocumentType = () => {
   );
 };
 
-export default DocumentType;
+export default LogicalBlock;

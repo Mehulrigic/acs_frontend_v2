@@ -27,7 +27,10 @@ apiClient.interceptors.response.use((response) => response,
 
 const AddFolderPanelService = {
   broker_list: () => apiClient.get(`/user/user_document/broker-list`),
-  document_type_list: () => apiClient.get(`/user/user_document/doc-types`),
+  document_type_list: (slug) => {
+    const endpoint = slug ? `/user/user_document/doc-types/${slug}` : `/user/user_document/doc-types`;
+    return apiClient.get(endpoint);
+  },
   add_broker: (userData) => apiClient.post("/user/user_document/create-broker", userData),
   store_document: (userData) => apiClient.post("/user/user_document/store-documents", userData),
 };

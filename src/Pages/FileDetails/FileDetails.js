@@ -44,6 +44,7 @@ const FileDetails = () => {
   const [speakerDocumentTypeList, setSpeakerDocumentTypeList] = useState([]);
   const [speakerDetail, setSpeakerDetail] = useState();
   const [historyDocumentList, setHistoryDocumentList] = useState([]);
+  const [totalHistoryRecords, setTotalHistoryRecords] = useState(0);
   const [markIsReadCount, setMarkIsReadCount] = useState(0);
   const [totalMissingRecords, setTotalMissingRecords] = useState(0);
   const [missingDocumentList, setMissingDocumentList] = useState([]);
@@ -69,6 +70,7 @@ const FileDetails = () => {
   const [documentTypeList, setDocumentTypeList] = useState([]);
   const [viewRowData, setViewRowData] = useState([]);
   const [selectDocumentType, setSelectDocumentType] = useState("");
+  const [selectActionType, setSelectActionType] = useState("");
   const [selectDocumentId, setSelectDocumentId] = useState("");
   const [selectDocumentFileName, setSelectDocumentFileName] = useState("");
   const [missingDocumentId, setMissingDocumentId] = useState("");
@@ -164,7 +166,7 @@ const FileDetails = () => {
       GetMissingDocumentList(id, sort, currentPage);
     }
     if (activeTab === "history") {
-      GetHistoryListDocument(id);
+      GetHistoryListDocument(id, sort, search, currentPage, selectActionType);
     }
   }
 
@@ -194,7 +196,7 @@ const FileDetails = () => {
       GetMissingDocumentList(id, sort, currentPage);
     }
     if (activeTab === "history") {
-      GetHistoryListDocument(id);
+      GetHistoryListDocument(id, sort, search, currentPage, selectActionType);
     }
   };
 
@@ -227,7 +229,7 @@ const FileDetails = () => {
       GetMissingDocumentList(id, sort, currentPage);
     }
     if (activeTab === "history") {
-      GetHistoryListDocument(id);
+      GetHistoryListDocument(id, sort, search, currentPage, selectActionType);
     }
   };
 
@@ -265,6 +267,7 @@ const FileDetails = () => {
       return () => {
         setShow(false);
         handleMissingDocClose();
+        handleReplaceClose();
         clearTimeout(timer);
       };
     }
@@ -301,7 +304,7 @@ const FileDetails = () => {
       GetMissingDocumentList(id, sort, 1);
     }
     if (activeTab === "history") {
-      GetHistoryListDocument(id);
+      GetHistoryListDocument(id, sort, search, currentPage, selectActionType);
     }
   }, [activeTab, sort]);
 
@@ -350,7 +353,7 @@ const FileDetails = () => {
       GetMissingDocumentList(id, sort, currentPage);
     }
     if (activeTab === "history") {
-      GetHistoryListDocument(id);
+      GetHistoryListDocument(id, sort, search, currentPage, selectActionType);
     }
   };
 
@@ -366,6 +369,9 @@ const FileDetails = () => {
     }
     if (activeTab === "missingdocument") {
       GetMissingDocumentList(id, sort, page);
+    }
+    if (activeTab === "history") {
+      GetHistoryListDocument(id, sort, search, page, selectActionType);
     }
   };
 
@@ -599,9 +605,9 @@ const FileDetails = () => {
     }
   };
 
-  const DocumentTypeList = async () => {
+  const DocumentTypeList = async (slug) => {
     try {
-      const response = await AddFolderPanelService.document_type_list();
+      const response = await AddFolderPanelService.document_type_list(slug);
       if (response.data.status) {
         setDocumentTypeList(response.data.docTypeList);
       } else {
@@ -621,6 +627,7 @@ const FileDetails = () => {
       const response = await FilePageService.delete_document_file(showDocumentId);
       if (response.data.status) {
         handleCloseDeleteModal();
+        ShowUserDocumentData(id);
         if (activeTab === "speakerdocument") {
           if (activeSubTab === "documents") {
             ShowSpeakerDocument(id, sort, search, 1, editUserStatus, selectDocumentType, showSpeakerId);
@@ -651,15 +658,29 @@ const FileDetails = () => {
     }
   };
 
-  const GetHistoryListDocument = async (id) => {
+  const GetHistoryListDocument = async (id, sort, search, page = 1, actionType) => {
     setIsLoading(true);
     try {
-      const response = await FilePageService.history_list(id);
+      var userData = {
+        search,
+        sort: {
+          key: sort.key,
+          value: sort.value,
+        },
+        page,
+        action_type: actionType,
+      };
+
+      const response = await FilePageService.history_list(id, userData);
+
       if (response.data.status) {
         setIsLoading(false);
-        const markIsRead = response.data.data.filter((data) => data.is_read == 0);
-        setMarkIsReadCount(markIsRead.length);
-        setHistoryDocumentList(response.data.data);
+        // const markIsRead = response.data.history.data.filter((data) => data.is_read == 0);
+        // setMarkIsReadCount(markIsRead.length);
+        setHistoryDocumentList(response.data.history.data);
+        setCurrentPage(response.data.history.meta.current_page);
+        setTotalPages(response.data.history.meta.last_page);
+        setTotalHistoryRecords(response.data.history.meta.total);
       }
     } catch (error) {
       setIsLoading(false);
@@ -688,27 +709,27 @@ const FileDetails = () => {
     }
   };
 
-  const MarkHistoryAsReadDocument = async (id) => {
-    try {
-      const response = await FilePageService.mark_history_as_read(id);
-      if (response.data.status) {
-        GetHistoryListDocument(showUserDocumentDataId);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  // const MarkHistoryAsReadDocument = async (id) => {
+  //   try {
+  //     const response = await FilePageService.mark_history_as_read(id);
+  //     if (response.data.status) {
+  //       GetHistoryListDocument(showUserDocumentDataId);
+  //     }
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
 
-  const MarkHistoryAsReadAllDocument = async (id) => {
-    try {
-      const response = await FilePageService.mark_history_all_as_read(id);
-      if (response.data.status) {
-        GetHistoryListDocument(id);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  // const MarkHistoryAsReadAllDocument = async (id) => {
+  //   try {
+  //     const response = await FilePageService.mark_history_all_as_read(id);
+  //     if (response.data.status) {
+  //       GetHistoryListDocument(id);
+  //     }
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
 
   const formatDate = (dateString) => {
     if (dateString) {
@@ -904,6 +925,7 @@ const AddMissingDocument = async (e) => {
     if (response.data.status) {
       setFileList([]);
       ShowUserDocumentData(id);
+      GetMissingDocumentList(id, sort, currentPage);
       setDocumentUploading(false);
       setFlashMessageStoreDoc({ type: "success", message: response.data.message });
     } else {
@@ -936,6 +958,7 @@ const HandleUpdateDocument = async (e) => {
       setDocumentUploading(false);
       setFileList([]);
       setShowDocumentName(fileList[0].name);
+      ShowUserDocumentData(id);
       setFlashMessageStoreDoc({
         type: "success",
         message: response.data.message || t("somethingWentWrong"),
@@ -1128,6 +1151,12 @@ const handleUpdateFileChange = (event) => {
     });
   };
 
+  const handleActionTypeChange = (e) => {
+    const selectedValue = e.target.value;
+    setSelectActionType(selectedValue);
+    GetHistoryListDocument(id, sort, search, currentPage, selectedValue);
+  };
+
   useEffect(() => {
     if (showCheck && !showDeleteModal) {
       handleDocChange();
@@ -1270,7 +1299,13 @@ const handleUpdateFileChange = (event) => {
 
   const handleSearchChange = (search, page) => {
     setSearch(search);
-    SpeakerList(id, sort, search, page);
+    if(activeTab === "speakerdocument") {
+      SpeakerList(id, sort, search, page);
+    } else if (activeTab === "history") {
+      GetHistoryListDocument(id, sort, search, page, selectActionType);
+    } else {
+      return;
+    }
   };
 
   const handleKeyPress = (e) => {
@@ -1328,7 +1363,6 @@ const handleUpdateFileChange = (event) => {
   };
 
   const handleInvalidReason = async (id) => {
-    setIsLoading(true);
     try {
       const response = await FilePageService.invalidreson(id);
       if (response.data.status) {
@@ -1599,9 +1633,11 @@ const handleUpdateFileChange = (event) => {
               {/* Add note  */}
               <div style={{ marginLeft: "10px" }}>
                 <MissingDocument
-                  selectDocumentId={selectDocumentId}
-                  selectDocumentFileName={selectDocumentFileName}
                   link={true}
+                  sort={sort}
+                  search={search}
+                  currentPage={currentPage}
+                  selectActionType={selectActionType}
                   GetHistoryListDocument={GetHistoryListDocument}
                 />
               </div>
@@ -1660,15 +1696,23 @@ const handleUpdateFileChange = (event) => {
                         value={selectDocumentId}
                         onChange={(e) => handleDocChange(e)}
                       >
-                        {showUserDocumentFileData?.map((doc) => (
-                          <option key={doc.id} value={doc.id}>
-                            {doc.filename}
-                          </option>
-                        ))}
+                        {showUserDocumentFileData?.length > 0 ?
+                          showUserDocumentFileData?.map((doc) => (
+                            <option key={doc.id} value={doc.id}>
+                              {doc.filename}
+                            </option>
+                          )) : (
+                            <option value="">{t("NorecordsfoundLabel")}</option>
+                          )
+                        }
                       </Form.Select>
                       <MissingDocument
-                        selectDocumentId={selectDocumentId}
-                        selectDocumentFileName={selectDocumentFileName}
+                        link={false}
+                        sort={sort}
+                        search={search}
+                        currentPage={currentPage}
+                        selectActionType={selectActionType}
+                        GetHistoryListDocument={GetHistoryListDocument}
                       />
                     </div>
 
@@ -1677,7 +1721,8 @@ const handleUpdateFileChange = (event) => {
                         <div className="inner-detail">
                           <div className="header-part">
                             <div className="div">
-                              <span>Attestation</span>Police {selectDocumentFileName}
+                              <span>Attestation</span>Police{" "}
+                              {selectDocumentFileName || t("NorecordsfoundLabel")}
                             </div>
                             <Dropdown>
                               <Dropdown.Toggle
@@ -1760,11 +1805,15 @@ const handleUpdateFileChange = (event) => {
                               onChange={handleDocumentTypeChange}
                             >
                               <option value="" disabled>Choisir un type de document</option>
-                              {documentTypeList?.map((doctype) => (
-                                <option key={doctype.id} value={doctype.id}>
-                                  {doctype.name}
-                                </option>
-                              ))}
+                              {documentTypeList?.length > 0 ?
+                                documentTypeList?.map((doctype) => (
+                                  <option key={doctype.id} value={doctype.id}>
+                                    {doctype.name}
+                                  </option>
+                                )) : (
+                                  <option value="">{t("NorecordsfoundLabel")}</option>
+                                )
+                              }
                             </Form.Select>
                             {currentFileIndex < userDocumentFileDataChanges.length - 1 ? (
                               <>
@@ -1899,10 +1948,14 @@ const handleUpdateFileChange = (event) => {
                         value={selectBroker}
                         onChange={handleBrokerChange}
                       >
-                        <option value="" disabled>Choisir un Courtier</option>
-                        {brokerList?.map((broker) => (
+                        <option value="" disabled selected>Choisir un Courtier</option>
+                        {brokerList?.length > 0 ?
+                          brokerList?.map((broker) => (
                           <option value={broker.id}>{broker.first_name}</option>
-                        ))}
+                        )) : 
+                        (
+                          <option value="">{t("NorecordsfoundLabel")}</option>
+                        )}
                       </Form.Select>
                     </Form.Group>
 
@@ -2002,13 +2055,17 @@ const handleUpdateFileChange = (event) => {
                                   onChange={handleTableSpeakerChange}
                                 >
                                   <option value="">{t("speakerLabel")}</option>
-                                  {speakerDropDownList?.map((speaker) => (
-                                    <option key={speaker.id} value={speaker.id}>
-                                      {speaker.company_name +
-                                        " - " +
-                                        speaker.siren_number}
-                                    </option>
-                                  ))}
+                                  {speakerDropDownList?.length > 0 ?
+                                    speakerDropDownList?.map((speaker) => (
+                                      <option key={speaker.id} value={speaker.id}>
+                                        {speaker.company_name +
+                                          " - " +
+                                          speaker.siren_number}
+                                      </option>
+                                    )) : (
+                                      <option value="">{t("NorecordsfoundLabel")}</option>
+                                    )
+                                  }
                                 </Form.Select>
                               </div>
                               <div>
@@ -2072,11 +2129,15 @@ const handleUpdateFileChange = (event) => {
                                   onChange={handleDocumentTypeChange}
                                 >
                                   <option value="">Type de document</option>
-                                  {documentTypeList?.map((doctype) => (
-                                    <option key={doctype.id} value={doctype.id}>
-                                      {doctype.name}
-                                    </option>
-                                  ))}
+                                  {documentTypeList?.length > 0 ?
+                                    documentTypeList?.map((doctype) => (
+                                      <option key={doctype.id} value={doctype.id}>
+                                        {doctype.name}
+                                      </option>
+                                    )) : (
+                                      <option value="">{t("NorecordsfoundLabel")}</option>
+                                    )
+                                  }
                                 </Form.Select>
                               </div>
                               <div>
@@ -2159,7 +2220,7 @@ const handleUpdateFileChange = (event) => {
                     <tbody>
                       {(showOtherDocument?.length > 0 && selectedOtherDocColumns?.length > 0) ?
                         showOtherDocument?.map((data) => (
-                          <tr onClick={() => data.status === 'invalid' && handleInvalidReason(data.id)}>
+                          <tr style={{cursor: data.status === 'invalid' && "pointer"}} onClick={() => data.status === 'invalid' && handleInvalidReason(data.id)}>
                             {selectedOtherDocColumns.includes("fileNameLabe") &&
                               <td>
                                 <span className="text-elips">{data.filename}</span>
@@ -2313,7 +2374,7 @@ const handleUpdateFileChange = (event) => {
                         :
                         (
                           <tr style={{ textAlign: "center" }}>
-                            <td colSpan='5'>{t("NorecordsfoundLabel")}</td>
+                            <td colSpan='6'>{t("NorecordsfoundLabel")}</td>
                           </tr>
                         )
                       }
@@ -2996,7 +3057,7 @@ const handleUpdateFileChange = (event) => {
                                   className="doc"
                                   href="/user-management"
                                   data-discover="true"
-                                  title="Ajouter un Document"
+                                  title="Ajouter un document manquants"
                                 >
                                   <svg width="16" height="20" viewBox="0 0 16 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M9 9H7V12H4V14H7V17H9V14H12V12H9V9ZM10 0H2C0.9 0 0 0.9 0 2V18C0 19.1 0.89 20 1.99 20H14C15.1 20 16 19.1 16 18V6L10 0ZM14 18H2V2H9V7H14V18Z" fill="black" />
@@ -3008,12 +3069,13 @@ const handleUpdateFileChange = (event) => {
                         ))
                         : (
                           <tr style={{ textAlign: "center" }}>
-                            <td colSpan='4'>{t("NorecordsfoundLabel")}</td>
+                            <td colSpan='3'>{t("NorecordsfoundLabel")}</td>
                           </tr>
                         )}
                     </tbody>
                   </Table>
-                </div>}
+                </div>
+              }
               {totalMissingRecords > 10 &&
                 <Paginations
                   currentPage={currentPage}
@@ -3026,74 +3088,95 @@ const handleUpdateFileChange = (event) => {
 
           {/* History Tab */}
           <Tab eventKey="history" title="Historique">
-            {isLoading ? <Loading /> :
-              <>
-                <div className="mb-3 d-md-flex justify-content-between align-items-center">
-                  {/* <h2 className="m-md-0 mb-3">Historique</h2> */}
-                  {markIsReadCount > 0 &&
-                    <button className="custom-btn" onClick={() => MarkHistoryAsReadAllDocument(id)}>
-                      Marquer comme tout lu
-                    </button>
-                  }
-                </div>
-
-                <div
-                  className="scroll-container" // Set a scrollable container
-                  onScroll={handleScroll}
-                  style={{
-                    maxHeight: "240px", // Set container height
-                    overflowY: "auto",  // Enable scrolling
-                    scrollbarWidth: "thin"
-                  }}
+            <div className="table-wrapper mt-16 p-0">
+              <div className="d-md-flex align-items-center gap-2 justify-content-between">
+                {/* <h2 className="m-md-0 mb-3">Documents manquants ({totalMissingRecords})</h2> */}
+                <div className=""></div>
+                <Form.Group
+                  className="relative"
+                  controlId="exampleForm.ControlInput1"
                 >
-                  {displayedRecords?.length > 0 ?
-                    displayedRecords?.map((data) => (
-                      <Fragment>
-                        <div className="note-box mb-3">
-                          <div className="d-flex justify-content-between align-items-center top-part">
-                            <p className="m-0">{data.type == "note" ? "Note" : "Invalide"}</p>
-                            <p className="m-0 create-date">créé le {data.created_on}</p>
+                  <Form.Control
+                    type="search"
+                    placeholder="Rechercher"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    onKeyDown={handleKeyPress}
+                  />
+                  <div className="search-icon" style={{ cursor: "pointer" }} onClick={() => handleSearchChange(search, 1)}>
+                    <svg
+                      width="18"
+                      height="18"
+                      viewBox="0 0 18 18"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M12.7549 11.2549H11.9649L11.6849 10.9849C12.6649 9.84488 13.2549 8.36488 13.2549 6.75488C13.2549 3.16488 10.3449 0.254883 6.75488 0.254883C3.16488 0.254883 0.254883 3.16488 0.254883 6.75488C0.254883 10.3449 3.16488 13.2549 6.75488 13.2549C8.36488 13.2549 9.84488 12.6649 10.9849 11.6849L11.2549 11.9649V12.7549L16.2549 17.7449L17.7449 16.2549L12.7549 11.2549ZM6.75488 11.2549C4.26488 11.2549 2.25488 9.24488 2.25488 6.75488C2.25488 4.26488 4.26488 2.25488 6.75488 2.25488C9.24488 2.25488 11.2549 4.26488 11.2549 6.75488C11.2549 9.24488 9.24488 11.2549 6.75488 11.2549Z"
+                        fill="#998f90"
+                      />
+                    </svg>
+                  </div>
+                </Form.Group>
+              </div>
+              {isLoading ? <Loading /> :
+                <div className="table-wrap mt-24">
+                  <Table responsive hover>
+                    <thead>
+                      <tr>
+                        <th className="select-drop elips-dropdown">
+                          <div className="d-flex align-items-center">
+                            <Form.Select
+                              aria-label="Choisir un type de document"
+                              value={selectActionType}
+                              onChange={handleActionTypeChange}
+                            >
+                              <option value="">Type d'action</option>
+                              <option value="Message">Message</option>
+                              <option value="Changement de statut">Changement de statut</option>
+                              <option value="Transmission">Transmission</option>
+                            </Form.Select>
                           </div>
-                          <div className="inner-box" style={{ backgroundColor: data.is_read === 0 ? "#b0f0fa" : "#e3f0f2" }}>
-                            <div className="d-md-flex justify-content-between align-items-center mb-2">
-                              <div className="d-flex align-items-center mb-3">
-                                {data.type != "note" &&
-                                  <div className="icon d-flex">
-                                    <svg
-                                      width="16"
-                                      height="16"
-                                      viewBox="0 0 8 14"
-                                      fill="none"
-                                      xmlns="http://www.w3.org/2000/svg"
-                                    >
-                                      <path
-                                        d="M6.42457 3.36368V10.3334C6.42457 11.6728 5.33972 12.7576 4.00033 12.7576C2.66093 12.7576 1.57608 11.6728 1.57608 10.3334V2.75762C1.57608 1.92125 2.25487 1.24246 3.09123 1.24246C3.9276 1.24246 4.60639 1.92125 4.60639 2.75762V9.12125C4.60639 9.45459 4.33366 9.72731 4.00033 9.72731C3.66699 9.72731 3.39426 9.45459 3.39426 9.12125V3.36368H2.48517V9.12125C2.48517 9.95762 3.16396 10.6364 4.00033 10.6364C4.83669 10.6364 5.51548 9.95762 5.51548 9.12125V2.75762C5.51548 1.41822 4.43063 0.333374 3.09123 0.333374C1.75184 0.333374 0.666992 1.41822 0.666992 2.75762V10.3334C0.666992 12.1758 2.1579 13.6667 4.00033 13.6667C5.84275 13.6667 7.33366 12.1758 7.33366 10.3334V3.36368H6.42457Z"
-                                        fill="#683191"
-                                      ></path>
-                                    </svg>
-                                  </div>
-                                }
-                                <div className="file-names">{data.user_document_filename}</div>
-                              </div>
-                              {data.is_read != 1 &&
-                                <button className="custom-btn" onClick={() => MarkHistoryAsReadDocument(data.id)}>
-                                  Marquer Comme lu
-                                </button>
-                              }
-                            </div>
-                            <p className="">
-                              {data.reason}
-                            </p>
-                          </div>
-                        </div>
-                      </Fragment>
-                    ))
-                    : (
-                      <div className="inner-box">
-                        {t("NorecordsfoundLabel")}
-                      </div>
-                    )}
-                </div></>}
+                        </th>
+                        <th>Détails de l'action</th>
+                        <th>Transférer par</th>
+                        <th>Nom du document</th>
+                        <th>Type de document</th>
+                        <th>Note</th>
+                        <th>Créé à</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {historyDocumentList?.length > 0 ?
+                        historyDocumentList?.map((data) => (
+                          <tr>
+                            <td>{data.action_type || "-"}</td>
+                            <td>{data.action_details || "-"}</td>
+                            <td>{data.transfer_by ? data.transfer_by.name : "-"}</td>
+                            <td>{data.user_document_file ? data.user_document_file.filename : "-"}</td>
+                            <td>{data.user_document_file ? data.user_document_file.document_type : "-"}</td>
+                            <td>{data.disability_reason ? data.disability_reason.reason : "-"}</td>
+                            <td>{data.created_at || "-"}</td>
+                          </tr>
+                        ))
+                        : (
+                          <tr style={{ textAlign: "left" }}>
+                            <td colSpan={7}>{t("NorecordsfoundLabel")}</td>
+                          </tr>
+                        )}
+                    </tbody>
+                  </Table>
+                </div>
+              }
+
+              {totalHistoryRecords > 10 &&
+                <Paginations
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={handlePageChange}
+                />
+              }
+            </div>
           </Tab>
         </Tabs>
       </div>
@@ -3117,15 +3200,15 @@ const handleUpdateFileChange = (event) => {
                   Document remplacé :{" "}
                   <span>{showDocumentName}</span>
                 </div>}
-                {flashMessage.message && (
+                {flashMessageStoreDoc.message && (
                   <div
-                    className={`mt-3 alert ${flashMessage.type === "success"
+                    className={`mt-3 alert ${flashMessageStoreDoc.type === "success"
                       ? "alert-success"
                       : "alert-danger"
                       } text-center`}
                     role="alert"
                   >
-                    {flashMessage.message}
+                    {flashMessageStoreDoc.message}
                   </div>
                 )}
                 <Form.Group

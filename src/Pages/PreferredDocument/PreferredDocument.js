@@ -155,9 +155,9 @@ const PreferredDocument = () => {
     }
   };
 
-  const DocumentTypeList = async () => {
+  const DocumentTypeList = async (slug) => {
     try {
-      const response = await AddFolderPanelService.document_type_list();
+      const response = await AddFolderPanelService.document_type_list(slug);
       if (response.data.status) {
         setDocumentTypeList(response.data.docTypeList);
       } else {
@@ -312,11 +312,15 @@ const PreferredDocument = () => {
                 onChange={handleDocumentTypeChange}
               >
                 <option disabled value="">{t("selectDocumentTypeLabel")}</option>
-                {documentTypeList?.map((doctype) => (
-                  <option key={doctype.id} value={doctype.id}>
-                    {doctype.name}
-                  </option>
-                ))}
+                {documentTypeList?.length > 0 ?
+                  documentTypeList?.map((doctype) => (
+                    <option key={doctype.id} value={doctype.id}>
+                      {doctype.name}
+                    </option>
+                  )) : (
+                    <option value="">{t("NorecordsfoundLabel")}</option>
+                  )
+                }
               </Form.Select>
             </Form.Group>
             <div className="canvas-footer text-end">

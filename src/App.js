@@ -25,6 +25,7 @@ import RoleManagementList from "./Pages/RoleManagement/RoleManagementList";
 import AdminFileDetail from "./Pages/AdminDashboard/AdminFileDetail";
 import { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import LogicalBlock from "./Pages/LogicalBlock/LogicalBlock";
 
 const App = () => { 
   return (
@@ -59,6 +60,10 @@ const App = () => {
             <Route
               path="user-management"
               element={<ProtectedRoute element={<UserManagement />} />}
+            />
+            <Route
+              path="logical-block"
+              element={<ProtectedRoute element={<LogicalBlock />} />}
             />
             <Route
               path="document-type"

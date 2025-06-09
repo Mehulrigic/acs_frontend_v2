@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 import MissingDocumentService from '../../API/MissingDocument/MissingDocumentService';
 
 const MissingDocument = (props) => {
-  const { link, selectDocumentId, selectDocumentFileName, GetHistoryListDocument } = props;
+  const { link, sort, search, currentPage, selectActionType, GetHistoryListDocument } = props;
   const { t } = useTranslation();
   const { id } = useParams();
 
@@ -45,7 +45,7 @@ const MissingDocument = (props) => {
       const response = await MissingDocumentService.add_document_disability_reason(disabilityReasonData);
       if (response.data.status) {
         setReasonMessage("");
-        GetHistoryListDocument(id);
+        GetHistoryListDocument(id, sort, search, currentPage, selectActionType);
         handleModalClose();
       } else {
         setFlashMessage({
