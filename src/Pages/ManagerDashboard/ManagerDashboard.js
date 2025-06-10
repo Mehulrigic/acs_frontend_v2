@@ -596,13 +596,13 @@ const ManagerDashboard = () => {
                               <td>
                                 {
                                   data.status === "to_be_checked" ? <span className="checked badges">{t("toBeCheckedLabel")}</span> :
-                                    data.status === "transfer_to_manager" ? <span className="transfer badges">Transfert au Gestionnaire</span> :
-                                      data.status === "transfer_to_broker" ? <span className="transfer badges">Transfert au Courtier</span> :
-                                        data.status === "transfer_to_insurer" ? <span className="formal_notice badges">Transfert à l'assureur</span> :
-                                          data.status === "formal_notice" ? <span className="formal_notice badges">Mise en demeure</span> :
-                                            data.status === "to_be_decided" ? <span className="to_be_decided badges">A statuer</span> :
-                                              data.status === "validated" ? <span className="verified badges">{t("validatedLabel")}</span> :
-                                                <span className="incomplete badges">{t("invalidLabel")}</span>
+                                  data.status === "transfer_to_manager" ? <span className="transfer badges">Transfert au Gestionnaire</span> :
+                                  data.status === "transfer_to_broker" ? <span className="transfer badges">Transfert au Courtier</span> :
+                                  data.status === "transfer_to_insurer" ? <span className="formal_notice badges">Transfert à l'assureur</span> :
+                                  data.status === "formal_notice" ? <span className="formal_notice badges">Mise en demeure</span> :
+                                  data.status === "to_be_decided" ? <span className="to_be_decided badges">A statuer</span> :
+                                  data.status === "validated" ? <span className="verified badges">{t("validatedLabel")}</span> :
+                                  <span className="incomplete badges">{t("invalidLabel")}</span>
                                 }
                               </td>
                             }

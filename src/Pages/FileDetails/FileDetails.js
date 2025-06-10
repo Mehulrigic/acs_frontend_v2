@@ -1487,7 +1487,7 @@ const handleUpdateFileChange = (event) => {
               <div className="status">
                 {
                   showUserDocumentData?.status === "to_be_checked" ? t("toBeCheckedLabel") :
-                  showUserDocumentData?.status === "validated" ? t("toBeCheckedLabel") :
+                  showUserDocumentData?.status === "validated" ? t("validatedLabel") :
                   showUserDocumentData?.status === "transfer_to_insurer" ? "Transfert à l'assureur" :
                   showUserDocumentData?.status === "transfer_to_broker" ? "Transfert au Courtier" :
                   showUserDocumentData?.status === "transfer_to_manager" ? "Transfert au Gestionnaire" :
