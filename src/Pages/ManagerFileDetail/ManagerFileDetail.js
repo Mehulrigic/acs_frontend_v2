@@ -1289,6 +1289,7 @@ const AddMissingDocument = async (e) => {
           key: "created_at",
           value: "asc",
         };
+        ShowUserDocumentData(id);
         SpeakerList(id, sortSpeaker, currentPage);
       }
     } catch (error) {
