@@ -32,6 +32,7 @@ const SpeakerManagementService = {
   edit_speaker_type: (id, userData) => apiClient.post(`/admin/speaker/update/${id}`, userData),
   delete_speaker_type: (id) => apiClient.get(`/admin/speaker/destroy/${id}`),
   speaker_type_status_update: (id, userData) => apiClient.post(`/admin/speaker/update-status/${id}`, userData),
+  get_speaker_details: (number) => apiClient.get(`/user/speaker/insee/${number}`),
 };
 
 export default SpeakerManagementService;

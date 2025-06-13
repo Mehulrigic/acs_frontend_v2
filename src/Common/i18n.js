@@ -135,7 +135,7 @@ const resources = {
             address:"Adresse",
             Add:"Ajouter",
             Edit:"Modifier",
-            city:"ville",
+            city:"Ville",
             postcode:"Code Postal",
             AddSpeaker:"Ajouter un intervenant",
             EditSpeaker: "Modifier un intervenant",

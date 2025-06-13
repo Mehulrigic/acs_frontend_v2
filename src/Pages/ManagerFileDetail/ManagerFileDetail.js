@@ -7,7 +7,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { useState } from "react";
 import Tabs from "react-bootstrap/Tabs";
 import Tab from "react-bootstrap/Tab";
-import { Button, Form, Offcanvas } from "react-bootstrap";
+import { Button, Form, InputGroup, Offcanvas } from "react-bootstrap";
 import Modal from "react-bootstrap/Modal";
 import MissingDocument from "../../Components/MissingDocument/MissingDocument";
 import Dropdown from "react-bootstrap/Dropdown";
@@ -25,6 +25,7 @@ import Loading from "../../Common/Loading";
 import Select from "react-select";
 import DocViewer, { DocViewerRenderers } from "@cyntler/react-doc-viewer";
 import "@cyntler/react-doc-viewer/dist/index.css";
+import SpeakerManagementService from "../../API/SpeakerManagement/SpeakerManagementService";
 
 const ManagerFileDetail = () => {
   const { t } = useTranslation();
@@ -67,8 +68,6 @@ const ManagerFileDetail = () => {
   const [startDate5, setStartDate5] = useState(null);
   const [startDate6, setStartDate6] = useState(null);
 
-
-  const [show, setShow] = useState(false);
   const [paperList, setPaperList] = useState([]);
   const [documentTypeList, setDocumentTypeList] = useState([]);
   const [selectDocumentType, setSelectDocumentType] = useState("");
@@ -171,9 +170,6 @@ const ManagerFileDetail = () => {
     FileDetails(id);
   };
 
-  const handleModalClose = () => setShow(false);
-  const handleModalShow = () => setShow(true);
-
   const [showCheck, setShowCheck] = useState(false);
   const handleCheckShow = () => setShowCheck(true);
   const handleCheckClose = () => {
@@ -213,6 +209,19 @@ const ManagerFileDetail = () => {
   const [search, setSearch] = useState("");
   const [selectActionType, setSelectActionType] = useState("");
   const [totalHistoryRecords, setTotalHistoryRecords] = useState(0);
+
+  const [isFormLoading, setIsFormLoading] = useState(false);
+  const [SIRETNumber, setSIRETNumber] = useState("");
+  const [showSirenNumberDetail, setShowSirenNumberDetail] = useState([]);
+  
+  const [show, setShow] = useState(false);
+  const handleModalShow = () => setShow(true);
+  const handleModalClose = () => {
+    setShow(false);
+    setShowSirenNumberDetail([]);
+    setSIRETNumber("");
+    setIsFormLoading(false);
+  };
 
   useEffect(() => {
     if (flashMessage.message) {
@@ -1405,6 +1414,8 @@ const AddMissingDocument = async (e) => {
     if (
       e.target.elements.siren_number.value == "" ||
       e.target.elements.companyname.value == "" ||
+      e.target.elements.nic_number.value == "" ||
+      e.target.elements.siret_number.value == "" ||
       e.target.elements.address.value == "" ||
       e.target.elements.city.value == "" ||
       e.target.elements.postcode.value == ""
@@ -1419,14 +1430,15 @@ const AddMissingDocument = async (e) => {
       var useData = {
         siren_number: e.target.elements.siren_number.value,
         company_name: e.target.elements.companyname.value,
+        nic_number: e.target.elements.nic_number.value,
+        siret_number: e.target.elements.siret_number.value,
         address: e.target.elements.address.value,
         city: e.target.elements.city.value,
         postcode: e.target.elements.postcode.value,
       };
-      const response = await AcsManagerFileService.create_speaker_type(
-        id,
-        useData
-      );
+      
+      const response = await AcsManagerFileService.create_speaker_type(id, useData);
+
       if (response.data.status) {
         const sort = {
           key: "company_name",
@@ -1435,7 +1447,7 @@ const AddMissingDocument = async (e) => {
         SpeakerList(id, sort, currentPage);
         ShowUserDocumentData(id);
         SpeakerDropDownList("", 1);
-        setShow(false);
+        handleModalClose();
       } else {
         setFlashMessage({
           type: "error",
@@ -1588,15 +1600,6 @@ const AddMissingDocument = async (e) => {
 
   const UpdateFolderInfo = async (e) => {
     e.preventDefault();
-    // let isValid = (contractNo != "" || contractNo != null || contractNo != undefined) && contractNo?.includes('.');
-    // if (!isValid && contractNo != "") {
-    //   setContractNo(contractNo);
-    //   setFlashMessage({
-    //     type: "error",
-    //     message: "Le num du contrat doit contenir au moins un point (.)",
-    //   });
-    //   return false;
-    // }
 
     const folderData = {
       folder_name: folderDetail.folder_name,
@@ -1653,8 +1656,26 @@ const AddMissingDocument = async (e) => {
     }
   };
 
-  const handleBrokerChange = (e) => {
-    setSelectBroker(e.target.value);
+  const HandleGetDetails = async (siretNumber) => {
+    setIsFormLoading(true);
+    if (siretNumber == "" || siretNumber == null || siretNumber == undefined) {
+      setIsFormLoading(false);
+      setFlashMessage({ type: "error", message: "veuillez saisir le numéro de siret" });
+      return;
+    }
+    try {
+      const response = await SpeakerManagementService.get_speaker_details(siretNumber);
+      if (response.data.status) {
+        setIsFormLoading(false);
+        setShowSirenNumberDetail(response.data.data);
+      } else {
+        setIsFormLoading(false);
+        setFlashMessage({ type: "error", message: response.data.message || t("somethingWentWrong") });
+      }
+    } catch (error) {
+      setIsFormLoading(false);
+      setFlashMessage({ type: "error", message: t("somethingWentWrong") });
+    }
   };
 
   return (
@@ -1838,17 +1859,6 @@ const AddMissingDocument = async (e) => {
                       placeholder="Nom du courtier"
                       value={showUserDocumentData?.broker?.first_name ? showUserDocumentData?.broker?.first_name : "" + "" + showUserDocumentData?.broker?.last_name ? showUserDocumentData?.broker?.last_name : "" }
                     />
-                    {/* <Form.Select
-                      className="full-width mb-3"
-                      aria-label={"statusSelectAria"}
-                      value={selectBroker}
-                      onChange={handleBrokerChange}
-                    >
-                      <option value="" disabled>Choisir un Courtier</option>
-                      {brokerList?.map((broker) => (
-                        <option value={broker.id}>{broker.first_name}</option>
-                      ))}
-                    </Form.Select> */}
                   </Form.Group>
               </div>
 
@@ -3048,64 +3058,84 @@ const AddMissingDocument = async (e) => {
                             {flashMessage.message}
                           </div>
                         )}
-                        <Form.Group className="mt-16 mb-4" controlId="snumber">
-                          <Form.Label>
-                            N° de SIRET <span>*</span>
-                          </Form.Label>
-                          <Form.Control
-                            type="text"
-                            placeholder="SIRET"
-                            name="siren_number"
-                          />
-                        </Form.Group>
-                        <Form.Group className="mt-16" controlId="companyname">
-                          <Form.Label>
-                            Nom société <span>*</span>
-                          </Form.Label>
-                          <Form.Control
-                            type="text"
-                            placeholder="Nom société"
-                            name="companyname"
-                          />
-                        </Form.Group>
-
-                        <Form.Group className="mt-16" controlId="address">
-                          <Form.Label>
-                            Adresse <span>*</span>
-                          </Form.Label>
-                          <Form.Control
-                            type="text"
-                            placeholder="Adresse"
-                            name="address"
-                          />
-                        </Form.Group>
-
-                        <div className="d-md-flex align-items-center side-col">
-                          <Form.Group
-                            className="mt-16 post-code"
-                            controlId="postcode"
-                          >
-                            <Form.Label>
-                              Code postal <span>*</span>
-                            </Form.Label>
+                        <Form.Group className="mt-16 mb-4" controlId="siret_number">
+                          <Form.Label>N° de SIRET <span>*</span></Form.Label>
+                          <InputGroup>
                             <Form.Control
                               type="text"
-                              placeholder="Code postal"
-                              name="postcode"
+                              placeholder="SIRET"
+                              defaultValue={showSirenNumberDetail?.siret_number}
+                              name="siret_number"
+                              onChange={(e) => setSIRETNumber(e.target.value)}
                             />
-                          </Form.Group>
+                            <Button
+                              variant="primary"
+                              onClick={() => HandleGetDetails(SIRETNumber)}
+                              style={{
+                                height: '52px',
+                                borderTopLeftRadius: 0,
+                                borderBottomLeftRadius: 0
+                              }}
+                            >
+                              Obtenir des détails
+                            </Button>
+                          </InputGroup>
+                        </Form.Group>
+                        {isFormLoading ? <Loading /> :
+                          <Fragment>
+                            <Form.Group className="mt-16" controlId="companyname">
+                              <Form.Label>{t("companyname")} <span>*</span></Form.Label>
+                              <Form.Control
+                                type="text"
+                                placeholder={t("companyname")}
+                                defaultValue={showSirenNumberDetail?.company_name}
+                                name="companyname"
+                              />
+                            </Form.Group>
 
-                          <Form.Group className="mt-16" controlId="city">
-                            <Form.Label>
-                              Ville <span>*</span>
-                            </Form.Label>
-                            <Form.Control
-                              type="text"
-                              placeholder="Ville"
-                              name="city"
-                            />
-                          </Form.Group>
-                        </div>
+                            <Form.Group className="mt-16" controlId="nic_number">
+                              <Form.Label>N° de NIC <span>*</span></Form.Label>
+                              <Form.Control type="text" placeholder="NIC" defaultValue={showSirenNumberDetail?.nic_number} name="nic_number" />
+                            </Form.Group>
+
+                            <Form.Group className="mt-16" controlId="siren_number">
+                              <Form.Label>N° de SIREN <span>*</span></Form.Label>
+                              <Form.Control type="text" placeholder="SIREN" defaultValue={showSirenNumberDetail?.siren_number} name="siren_number" />
+                            </Form.Group>
+
+                            <Form.Group className="mt-16" controlId="address">
+                              <Form.Label>{t("address")} <span>*</span></Form.Label>
+                              <Form.Control
+                                type="text"
+                                placeholder={t("address")}
+                                name="address"
+                                defaultValue={showSirenNumberDetail?.address}
+                              />
+                            </Form.Group>
+
+                            <div className="d-md-flex align-items-center side-col">
+                              <Form.Group className="mt-16 post-code" controlId="postcode">
+                                <Form.Label>{t("postcode")} <span>*</span></Form.Label>
+                                <Form.Control
+                                  type="text"
+                                  placeholder={t("postcode")}
+                                  name="postcode"
+                                  defaultValue={showSirenNumberDetail?.postcode}
+                                />
+                              </Form.Group>
+
+                              <Form.Group className="mt-16" controlId="city">
+                                <Form.Label>{t("city")} <span>*</span></Form.Label>
+                                <Form.Control
+                                  type="text"
+                                  placeholder={t("city")}
+                                  name="city"
+                                  defaultValue={showSirenNumberDetail?.city}
+                                />
+                              </Form.Group>
+                            </div>
+                          </Fragment>
+                        }
                       </Modal.Body>
                       <Modal.Footer>
                         <div className="text-end">

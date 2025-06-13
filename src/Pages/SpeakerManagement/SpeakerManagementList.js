@@ -2,7 +2,7 @@ import React, { Fragment, useEffect, useState } from "react";
 import SidePanel from "../../Components/SidePanel/SidePanel";
 import Table from "react-bootstrap/Table";
 import { Link, useNavigate } from "react-router";
-import { Button, Form, Modal, Offcanvas } from "react-bootstrap";
+import { Button, Form, InputGroup, Modal, Offcanvas } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 import Paginations from "../../Components/Paginations/Paginations";
 import logo from "../../acs-logo.png"
@@ -14,7 +14,6 @@ const SpeakerManagementList = () => {
     const navigate = useNavigate();
 
     const [isLoading, setIsLoading] = useState(false);
-    const [formShow, setFormShow] = useState(false);
     const [editSpeaker, setEditSpeaker] = useState(false);
     const [speakerManagementList, setSpeakerManagementList] = useState([]);
     const [editSpeakerStatusId, setEditSpeakerStatusId] = useState("");
@@ -32,8 +31,17 @@ const SpeakerManagementList = () => {
     const [sort, setSort] = useState({ key: "created_at", value: "desc" });
 
     const [showSpeakerList, setShowSpeakerList] = useState([]);
-    const handleFormClose = () => setFormShow(false);
+    const [isFormLoading, setIsFormLoading] = useState(false);
+    const [sirenNumber, setSirenNumber] = useState("");
+    const [showSirenNumberDetail, setShowSirenNumberDetail] = useState([]);
+
+    const [formShow, setFormShow] = useState(false);
     const handleFormShow = () => setFormShow(true);
+    const handleFormClose = () => {
+        setFormShow(false);
+        setSirenNumber("");
+        setShowSirenNumberDetail([]);
+    };
 
     const [showmodal, setShowmodal] = useState(false);
     const handleModalClose = () => setShowmodal(false);
@@ -65,6 +73,12 @@ const SpeakerManagementList = () => {
             navigate("/");
         }
     }, [sort]);
+
+    useEffect(() => {
+        if (showSpeakerList?.siren_number) {
+            setShowSirenNumberDetail(showSpeakerList);
+        }
+    }, [showSpeakerList]);
 
     const handlePageChange = (page) => {
         setCurrentPage(page);
@@ -106,16 +120,20 @@ const SpeakerManagementList = () => {
 
         try {
             var useData = {
+                siren_number: e.target.elements.siren_number.value ?? "",
                 company_name: e.target.elements.company_name.value ?? "",
+                nic_number: e.target.elements.nic_number.value ?? "",
+                siret_number: e.target.elements.siret_number.value ?? "",
                 address: e.target.elements.address.value ?? "",
                 city: e.target.elements.city.value ?? "",
                 postcode: e.target.elements.postcode.value ?? "",
-                siren_number: e.target.elements.siren_number.value ?? "",
             };
 
             const response = await SpeakerManagementService.create_speaker_type(useData);
+
             if (response.data.status) {
                 setFormShow(false);
+                setShowSirenNumberDetail([]);
                 SpeakerList(sort, 1, "");
             } else {
                 setFlashMessage({ type: "error", message: response.data.message || t("somethingWentWrong") });
@@ -133,6 +151,7 @@ const SpeakerManagementList = () => {
             const response = await SpeakerManagementService.show_speaker_type(id);
             if (response.data.status) {
                 setShowSpeakerList(response.data.Speaker);
+                HandleGetDetails(response.data.Speaker.siren_number);
             }
         } catch (error) {
             console.log(error);
@@ -149,16 +168,20 @@ const SpeakerManagementList = () => {
 
         try {
             var useData = {
+                siren_number: e.target.elements.siren_number.value ?? "",
                 company_name: e.target.elements.company_name.value ?? "",
+                nic_number: e.target.elements.nic_number.value ?? "",
+                siret_number: e.target.elements.siret_number.value ?? "",
                 address: e.target.elements.address.value ?? "",
                 city: e.target.elements.city.value ?? "",
                 postcode: e.target.elements.postcode.value ?? "",
-                siren_number: e.target.elements.siren_number.value ?? "",
             };
 
             const response = await SpeakerManagementService.edit_speaker_type(editSpeakerStatusId, useData);
+
             if (response.data.status) {
                 setFormShow(false);
+                setShowSirenNumberDetail([]);
                 SpeakerList(sort, currentPage, editSpeakerStatus);
             } else {
                 setFlashMessage({ type: "error", message: response.data.message || t("somethingWentWrong") });
@@ -195,6 +218,28 @@ const SpeakerManagementList = () => {
         }
     };
 
+    const HandleGetDetails = async (sirenNumber) => {
+        setIsFormLoading(true);
+        if (sirenNumber == "" || sirenNumber == null || sirenNumber == undefined) {
+            setIsFormLoading(false);
+            setFlashMessage({ type: "error", message: t("requriedErrorMessageLabel") });
+            return;
+        }
+        try {
+            const response = await SpeakerManagementService.get_speaker_details(sirenNumber);
+            if (response.data.status) {
+                setIsFormLoading(false);
+                setShowSirenNumberDetail(response.data.data);
+            } else {
+                setIsFormLoading(false);
+                setFlashMessage({ type: "error", message: response.data.message || t("somethingWentWrong") });
+            }
+        } catch (error) {
+            setIsFormLoading(false);
+            setFlashMessage({ type: "error", message: t("somethingWentWrong") });
+        }
+    };
+
     const handleStatusChange = (id, status) => {
         setUpdateSpeakerStatusId(id);
         setUpdateSpeakerStatus(status);
@@ -222,7 +267,7 @@ const SpeakerManagementList = () => {
                 <h1 className="mb-5">{t("SpeakerManagement")}</h1>
                 <div className="table-wrapper mt-16">
                     <div className="text-end mb-3">
-                        <Button onClick={() => { setShowSpeakerList([]); handleFormShow(); setEditSpeaker(false); }} variant="primary">
+                        <Button onClick={() => { handleFormShow(); setEditSpeaker(false); }} variant="primary">
                             {t("AddSpeaker")}
                         </Button>
                     </div>
@@ -446,31 +491,69 @@ const SpeakerManagementList = () => {
                                 {flashMessage.message}
                             </div>
                         )}
-                        <Form.Group controlId="companyname">
-                            <Form.Label>{t("companyname")} <span>*</span></Form.Label>
-                            <Form.Control type="text" placeholder={t("companyname")} defaultValue={showSpeakerList?.company_name} name="company_name" />
+                        <Form.Group controlId="siret_number">
+                            <Form.Label>N° de SIRET <span>*</span></Form.Label>
+                            <InputGroup>
+                                <Form.Control
+                                    type="text"
+                                    placeholder="SIRET"
+                                    defaultValue={showSirenNumberDetail?.siret_number}
+                                    name="siret_number"
+                                    onChange={(e) => setSirenNumber(e.target.value)}
+                                />
+                                <Button
+                                    variant="primary"
+                                    onClick={() => HandleGetDetails(sirenNumber)}
+                                    style={{
+                                        height: '52px',
+                                        borderTopLeftRadius: 0,
+                                        borderBottomLeftRadius: 0
+                                    }}
+                                >
+                                    Obtenir des détails
+                                </Button>
+                            </InputGroup>
                         </Form.Group>
-                        <Form.Group controlId="siren_number">
-                            <Form.Label>{t("siren_number")} <span>*</span></Form.Label>
-                            <Form.Control type="text" placeholder={t("siren_number")} defaultValue={showSpeakerList?.siren_number} name="siren_number" />
-                        </Form.Group>
-                        <Form.Group controlId="address">
-                            <Form.Label>{t("address")}</Form.Label>
-                            <Form.Control type="text" placeholder={t("address")} defaultValue={showSpeakerList?.address} name="address" />
-                        </Form.Group>
-                        <Form.Group controlId="city">
-                            <Form.Label>{t("city")}</Form.Label>
-                            <Form.Control type="text" placeholder={t("city")} defaultValue={showSpeakerList?.city} name="city" />
-                        </Form.Group>
-                        <Form.Group controlId="postcode">
-                            <Form.Label>{t("postcode")}</Form.Label>
-                            <Form.Control type="text" placeholder={t("postcode")} defaultValue={showSpeakerList?.postcode} name="postcode" />
-                        </Form.Group>
-                        <div className="canvas-footer text-end">
-                            <Button variant="primary" type="submit">
-                                {t("submitButton")}
-                            </Button>
-                        </div>
+
+                        {isFormLoading ? <Loading /> :
+                            <Fragment>
+                                <Form.Group controlId="companyname">
+                                    <Form.Label>{t("companyname")} <span>*</span></Form.Label>
+                                    <Form.Control type="text" placeholder={t("companyname")} defaultValue={showSirenNumberDetail?.company_name} name="company_name" />
+                                </Form.Group>
+
+                                <Form.Group controlId="nic_number">
+                                    <Form.Label>N° de NIC</Form.Label>
+                                    <Form.Control type="text" placeholder="NIC" defaultValue={showSirenNumberDetail?.nic_number} name="nic_number" />
+                                </Form.Group>
+
+                                <Form.Group controlId="siren_number">
+                                    <Form.Label>N° de SIREN</Form.Label>
+                                    <Form.Control type="text" placeholder="SIREN" defaultValue={showSirenNumberDetail?.siren_number} name="siren_number" />
+                                </Form.Group>
+
+                                <Form.Group controlId="address">
+                                    <Form.Label>{t("address")}</Form.Label>
+                                    <Form.Control type="text" placeholder={t("address")} defaultValue={showSirenNumberDetail?.address} name="address" />
+                                </Form.Group>
+
+                                <Form.Group controlId="city">
+                                    <Form.Label>{t("city")}</Form.Label>
+                                    <Form.Control type="text" placeholder={t("city")} defaultValue={showSirenNumberDetail?.city} name="city" />
+                                </Form.Group>
+
+                                <Form.Group controlId="postcode">
+                                    <Form.Label>{t("postcode")}</Form.Label>
+                                    <Form.Control type="text" placeholder={t("postcode")} defaultValue={showSirenNumberDetail?.postcode} name="postcode" />
+                                </Form.Group>
+
+                                <div className="canvas-footer text-end">
+                                    <Button variant="primary" type="submit">
+                                        {t("submitButton")}
+                                    </Button>
+                                </div>
+                            </Fragment>
+                        }
                     </Form>
                 </Offcanvas.Body>
             </Offcanvas>
