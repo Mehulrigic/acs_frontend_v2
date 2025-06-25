@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@cyntler/react-doc-viewer": "^1.17.0",
+    "@sentry/react": "^9.31.0",
     "axios": "^1.7.9",
     "bootstrap": "^5.3.3",
     "cors": "^2.8.5",

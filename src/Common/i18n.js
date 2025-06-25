@@ -109,6 +109,17 @@ const resources = {
             lastModifiedDateLabel: "Last Modified At",
             somethingWentWrong: "Something Went Wrong",
             SpeakerManagement:"Speaker Management List",
+            reportBugLabel: "Report a Bug",
+            reportBugTitle: "Report a Bug",
+            namePlaceholder: "Your Name",
+            emailPlaceholder: "your.email@example.org",
+            messageLabel: "Description",
+            messagePlaceholder: "What's the bug? What did you expect?",
+            isRequiredLabel: "(required)",
+            addScreenshotLabel: "Add a screenshot",
+            removeScreenshotLabel: "Remove screenshot",
+            submitBugReportLabel: "Send Bug Report",
+            cancelLabel: "Cancel",
         }
     },
     fr: {
@@ -217,7 +228,18 @@ const resources = {
             saveChangesLabel: "Enregistrer les Modifications",
             tobetreat: "A Traiter",
             lastModifiedDateLabel: "Dernière Modification",
-            somethingWentWrong: "Quelque chose s'est mal passé"
+            somethingWentWrong: "Quelque chose s'est mal passé",
+            reportBugLabel: "Signaler un Bug",
+            reportBugTitle: "Signaler un Bug",
+            namePlaceholder: "Votre Nom",
+            emailPlaceholder: "votre.email@example.org",
+            messageLabel: "Description",
+            messagePlaceholder: "Quel est le bug ? À quoi vous attendiez-vous ?",
+            isRequiredLabel: "(requis)",
+            addScreenshotLabel: "Ajouter une capture d'écran",
+            removeScreenshotLabel: "Supprimer la capture d'écran",
+            submitBugReportLabel: "Envoyer un rapport de bug",
+            cancelLabel: "Annuler",
         }
     }
 };

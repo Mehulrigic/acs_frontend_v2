@@ -5,6 +5,9 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import "./Common/i18n";
+import { initSentry } from "./sentry";
+
+initSentry();
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
