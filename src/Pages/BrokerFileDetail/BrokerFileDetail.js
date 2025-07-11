@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect } from "react";
+import React, { Fragment, useEffect, useRef } from "react";
 import "./BrokerFileDetail.css";
 import SidePanel from "../../Components/SidePanel/SidePanel";
 import Table from "react-bootstrap/Table";
@@ -15,11 +15,15 @@ import Modal from 'react-bootstrap/Modal';
 import Paginations from "../../Components/Paginations/Paginations";
 import Loading from "../../Common/Loading";
 import AcsManagerFileService from "../../API/AcsManager/AcsManagerFileService";
+import AddNote from "../../Components/AddNote/AddNote";
+import Select from "react-select";
+import MissingDocument from "../../Components/MissingDocument/MissingDocument";
 
 const BrokerFileDetail = () => {
   const { t } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
+  const scrollRef = useRef(null);
 
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('otherdocument');
@@ -38,7 +42,7 @@ const BrokerFileDetail = () => {
   const [missingDocumentList, setMissingDocumentList] = useState([]);
   // const [recordsToShow, setRecordsToShow] = useState(2);
   const [missingDocumentId, setMissingDocumentId] = useState("");
-  const [recordsToShowNOte, setRecordsToShowNote] = useState(3);
+  const [recordsToShowNote, setRecordsToShowNote] = useState(3);
   const [invalidRecordsToShowNOte, setInvalidRecordsToShowNote] = useState(3);
   const [showOtherDocument, setShowOtherDocument] = useState([]);
   const [flashMessage, setFlashMessage] = useState({ type: "", message: "" });
@@ -144,11 +148,11 @@ const BrokerFileDetail = () => {
 
   const [sendToFileStatus, setSendToFileStatus] = useState("");
   const [showSendFileChange, setShowSendFileChange] = useState(false);
-    const handleSendFileShow = (status) => {
-      setSendToFileStatus(status);
-      setShowSendFileChange(true);
-    };
-    const handleSendFileClose = () => setShowSendFileChange(false);
+  const handleSendFileShow = (status) => {
+    setSendToFileStatus(status);
+    setShowSendFileChange(true);
+  };
+  const handleSendFileClose = () => setShowSendFileChange(false);
 
   const [showViewSpeaker, setShowViewSpeaker] = useState(false);
   const handleViewShowSpeaker = () => setShowViewSpeaker(true);
@@ -171,6 +175,10 @@ const BrokerFileDetail = () => {
       GetHistoryListDocument(id, sort, search, currentPage, selectActionType);
     }
   };
+
+  const [showAddNoteModal, setShowAddNoteModal] = useState(false);
+  const [selectedAddNoteDocId, setSelectedAddNoteDocId] = useState(null);
+  const [selectedAddNoteDocName, setSelectedAddNoteDocName] = useState("");
 
   useEffect(() => {
     if (flashMessage.message) {
@@ -241,8 +249,8 @@ const BrokerFileDetail = () => {
   }, [showViewSpeaker, activeSubTab]);
 
   useEffect(() => {
-    if(showNote) {
-      GetInvalidReasonNoteList(id);
+    if (showNote) {
+      GetDocumentFileNotesList(id);
     }
   }, [showNote]);
 
@@ -259,7 +267,7 @@ const BrokerFileDetail = () => {
       if (response.data.status) {
         setIsLoading(false);
         setShowUserDocumentData(response.data.documents);
-        if(response.data.documents.status == "transfer_to_manager" || response.data.documents.status == "transfer_to_insurer"){
+        if (response.data.documents.status == "transfer_to_manager" || response.data.documents.status == "transfer_to_insurer") {
           setSendToFileStatus(response.data.documents.status);
         } else {
           setSendToFileStatus("");
@@ -414,15 +422,22 @@ const BrokerFileDetail = () => {
     }
   };
 
-  const GetInvalidReasonNoteList = async (id) => {
+  const GetDocumentFileNotesList = async (id, filter) => {
     setIsLoading(true);
     try {
+      var userData = {
+        is_important: filter ? filter : 1
+      }
 
-      const response = await FilePageService.invalid_reason_note_list(id);
+      const response = await FilePageService.document_file_notes(id, userData);
 
       if (response.data.status) {
         setIsLoading(false);
-        setInvalidReasonNoteList(response.data.data);
+        setInvalidReasonNoteList(response.data.data || []);
+        setRecordsToShowNote(3);
+        if (scrollRef.current) {
+          scrollRef.current.scrollTop = 0;
+        }
       }
     } catch (error) {
       setIsLoading(false);
@@ -587,105 +602,105 @@ const BrokerFileDetail = () => {
     });
   };
 
-const HandleAddDocument = async (e) => {
-  e.preventDefault();
-  setDocumentUploading(true);
+  const HandleAddDocument = async (e) => {
+    e.preventDefault();
+    setDocumentUploading(true);
 
-  if (fileList.length === 0) {
-    handleDocClose();
-    return;
-  }
-
-  try {
-    const formData = new FormData();
-    const filterDocTypeBroker = documentTypeList?.find(
-      (doctype) => doctype.name === "Questionnaire"
-    );
-
-    fileList.forEach((file, index) => {
-      formData.append(`documents[${index}][file]`, file);
-      formData.append(`documents[${index}][filename]`, file.name);
-      formData.append(`documents[${index}][doc_type_id]`, filterDocTypeBroker?.id || "");
-    });
-
-    const response = await FilePageService.add_document_files(id, formData);
-
-    if (response?.data?.status) {
-      setFileList([]);
-      setDocumentUploading(false);
-      setFlashMessageStoreDoc({
-        type: "success",
-        message: response.data.message || t("somethingWentWrong"),
-      });
-
-      if (activeTab === "otherdocument") {
-        ShowOtherDocument(id, sort, currentPage, editUserStatus, selectDocumentType);
-        SpeakerDropDownList("", 1);
-        DocumentTypeList();
-      }
-      if (activeTab === "missingdocument") {
-        GetMissingDocumentList(id, sort, currentPage);
-      }
-    } else {
-      setFlashMessageStoreDoc({
-        type: "error",
-        message: response?.data?.message || t("somethingWentWrong"),
-      });
+    if (fileList.length === 0) {
+      handleDocClose();
+      return;
     }
-  } catch (error) {
-    setDocumentUploading(false);
-    setFlashMessageStoreDoc({
-      type: "error",
-      message: t("somethingWentWrong"),
-    });
-  }
-};
 
-const HandleUpdateDocument = async (e) => {
-  e.preventDefault();
-  setDocumentUploading(true);
+    try {
+      const formData = new FormData();
+      const filterDocTypeBroker = documentTypeList?.find(
+        (doctype) => doctype.name === "Questionnaire"
+      );
 
-  try {
-    if (fileList.length === 0) return;
-
-    const formData = new FormData();
-
-    // Use same key names: `filename` and `file`
-    formData.append("filename", fileList[0].name); // plain text name
-    formData.append("file", fileList[0]); // actual binary file
-
-    const response = await FilePageService.update_document_files(showDocumentId, formData);
-
-    if (response.data.status) {
-      setDocumentUploading(false);
-      setFileList([]);
-      setShowDocumentName(fileList[0].name);
-      ShowUserDocumentData(id);
-      setFlashMessageStoreDoc({
-        type: "success",
-        message: response.data.message || t("somethingWentWrong"),
+      fileList.forEach((file, index) => {
+        formData.append(`documents[${index}][file]`, file);
+        formData.append(`documents[${index}][filename]`, file.name);
+        formData.append(`documents[${index}][doc_type_id]`, filterDocTypeBroker?.id || "");
       });
 
-      if (activeTab === "otherdocument") {
-        ShowOtherDocument(id, sort, currentPage, editUserStatus, selectDocumentType);
-        SpeakerDropDownList("", 1);
-        DocumentTypeList();
+      const response = await FilePageService.add_document_files(id, formData);
+
+      if (response?.data?.status) {
+        setFileList([]);
+        setDocumentUploading(false);
+        setFlashMessageStoreDoc({
+          type: "success",
+          message: response.data.message || t("somethingWentWrong"),
+        });
+
+        if (activeTab === "otherdocument") {
+          ShowOtherDocument(id, sort, currentPage, editUserStatus, selectDocumentType);
+          SpeakerDropDownList("", 1);
+          DocumentTypeList();
+        }
+        if (activeTab === "missingdocument") {
+          GetMissingDocumentList(id, sort, currentPage);
+        }
+      } else {
+        setFlashMessageStoreDoc({
+          type: "error",
+          message: response?.data?.message || t("somethingWentWrong"),
+        });
       }
-    } else {
+    } catch (error) {
       setDocumentUploading(false);
       setFlashMessageStoreDoc({
         type: "error",
-        message: response.data.message || t("somethingWentWrong"),
+        message: t("somethingWentWrong"),
       });
     }
-  } catch (error) {
-    setDocumentUploading(false);
-    setFlashMessageStoreDoc({
-      type: "error",
-      message: t("somethingWentWrong"),
-    });
-  }
-};
+  };
+
+  const HandleUpdateDocument = async (e) => {
+    e.preventDefault();
+    setDocumentUploading(true);
+
+    try {
+      if (fileList.length === 0) return;
+
+      const formData = new FormData();
+
+      // Use same key names: `filename` and `file`
+      formData.append("filename", fileList[0].name); // plain text name
+      formData.append("file", fileList[0]); // actual binary file
+
+      const response = await FilePageService.update_document_files(showDocumentId, formData);
+
+      if (response.data.status) {
+        setDocumentUploading(false);
+        setFileList([]);
+        setShowDocumentName(fileList[0].name);
+        ShowUserDocumentData(id);
+        setFlashMessageStoreDoc({
+          type: "success",
+          message: response.data.message || t("somethingWentWrong"),
+        });
+
+        if (activeTab === "otherdocument") {
+          ShowOtherDocument(id, sort, currentPage, editUserStatus, selectDocumentType);
+          SpeakerDropDownList("", 1);
+          DocumentTypeList();
+        }
+      } else {
+        setDocumentUploading(false);
+        setFlashMessageStoreDoc({
+          type: "error",
+          message: response.data.message || t("somethingWentWrong"),
+        });
+      }
+    } catch (error) {
+      setDocumentUploading(false);
+      setFlashMessageStoreDoc({
+        type: "error",
+        message: t("somethingWentWrong"),
+      });
+    }
+  };
 
 
   // const AddMissingDocument = async (e) => {
@@ -738,61 +753,61 @@ const HandleUpdateDocument = async (e) => {
 
 
   const AddMissingDocument = async (e) => {
-  e.preventDefault();
-  setDocumentUploading(true);
+    e.preventDefault();
+    setDocumentUploading(true);
 
-  try {
-    const formData = new FormData();
+    try {
+      const formData = new FormData();
 
-    formData.append("speaker_id", showSpeakerId);
-    formData.append("missing_document_id", missingDocumentId);
+      formData.append("speaker_id", showSpeakerId);
+      formData.append("missing_document_id", missingDocumentId);
 
-    if (fileList?.length) {
-      fileList.forEach((file) => {
-        formData.append("documents[]", file); // multiple files as documents[]
-      });
-    }
+      if (fileList?.length) {
+        fileList.forEach((file) => {
+          formData.append("documents[]", file); // multiple files as documents[]
+        });
+      }
 
-    const response = await FilePageService.add_missing_document(id, formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
-
-    if (response.data.status) {
-      setDocumentUploading(false);
-      setFileList([]);
-      ShowUserDocumentData(id);
-      setFlashMessageStoreDoc({
-        type: "success",
-        message: response.data.message || t("somethingWentWrong"),
+      const response = await FilePageService.add_missing_document(id, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
       });
 
-      if (activeTab === "speakerdocument") {
-        if (activeSubTab === "documentType") {
-          SpeakerDocumentTypeList(id, showSpeakerId);
-        } else {
-          SpeakerList(id, sort, search, currentPage);
+      if (response.data.status) {
+        setDocumentUploading(false);
+        setFileList([]);
+        ShowUserDocumentData(id);
+        setFlashMessageStoreDoc({
+          type: "success",
+          message: response.data.message || t("somethingWentWrong"),
+        });
+
+        if (activeTab === "speakerdocument") {
+          if (activeSubTab === "documentType") {
+            SpeakerDocumentTypeList(id, showSpeakerId);
+          } else {
+            SpeakerList(id, sort, search, currentPage);
+          }
         }
-      }
-      if (activeTab === "missingdocument") {
-        GetMissingDocumentList(id, sort, currentPage);
-      }
+        if (activeTab === "missingdocument") {
+          GetMissingDocumentList(id, sort, currentPage);
+        }
 
-      ShowUserDocumentData(id);
-    } else {
+        ShowUserDocumentData(id);
+      } else {
+        setDocumentUploading(false);
+        setFlashMessageStoreDoc({
+          type: "error",
+          message: response.data.message || t("somethingWentWrong"),
+        });
+      }
+    } catch (error) {
       setDocumentUploading(false);
       setFlashMessageStoreDoc({
         type: "error",
-        message: response.data.message || t("somethingWentWrong"),
+        message: t("somethingWentWrong"),
       });
     }
-  } catch (error) {
-    setDocumentUploading(false);
-    setFlashMessageStoreDoc({
-      type: "error",
-      message: t("somethingWentWrong"),
-    });
-  }
-};
+  };
 
   const HandleDeleteDocumentFile = async (e) => {
     e.preventDefault();
@@ -873,36 +888,36 @@ const HandleUpdateDocument = async (e) => {
     e.target.value = ""; // Reset the file input
   };
 
-const handleUpdateFileChange = (event) => {
-  const files = Array.from(event.target.files);
-  const validFiles = [];
+  const handleUpdateFileChange = (event) => {
+    const files = Array.from(event.target.files);
+    const validFiles = [];
 
-  for (const file of files) {
-    if (!allowedFileTypes.includes(file.type)) {
-      setFlashMessage({
-        type: "error",
-        message: `Ce type de document n'est pas pris en charge: ${file.name}`,
-      });
-      return;
+    for (const file of files) {
+      if (!allowedFileTypes.includes(file.type)) {
+        setFlashMessage({
+          type: "error",
+          message: `Ce type de document n'est pas pris en charge: ${file.name}`,
+        });
+        return;
+      }
+
+      if (file.size > maxFileSize) {
+        setFlashMessage({
+          type: "error",
+          message: `Limite de taille atteinte. Vos fichiers ne doivent pas dépasser 50 Mo: ${file.name}`,
+        });
+        return;
+      }
+
+      validFiles.push(file); // Add the actual File object
     }
 
-    if (file.size > maxFileSize) {
-      setFlashMessage({
-        type: "error",
-        message: `Limite de taille atteinte. Vos fichiers ne doivent pas dépasser 50 Mo: ${file.name}`,
-      });
-      return;
+    if (validFiles.length > 0) {
+      setFileList((prevFiles) => [...prevFiles, ...validFiles]);
     }
 
-    validFiles.push(file); // Add the actual File object
-  }
-
-  if (validFiles.length > 0) {
-    setFileList((prevFiles) => [...prevFiles, ...validFiles]);
-  }
-
-  event.target.value = ""; // Reset the file input
-};
+    event.target.value = ""; // Reset the file input
+  };
 
 
   const handlePageChange = (page) => {
@@ -940,7 +955,7 @@ const handleUpdateFileChange = (event) => {
   const handleScrollNote = (e) => {
     const { scrollTop, scrollHeight, clientHeight } = e.target;
     if (scrollTop + clientHeight >= scrollHeight - 5) {
-      setRecordsToShowNote((prev) => Math.min(prev + 3, historyDocumentList.length));
+      setRecordsToShowNote((prev) => Math.min(prev + 3, invalidReasonNoteList.length));
     }
   };
 
@@ -952,7 +967,7 @@ const handleUpdateFileChange = (event) => {
   };
 
   // const displayedRecords = historyDocumentList.slice(0, recordsToShow);
-  const displayedRecordsNote = invalidReasonNoteList.slice(0, recordsToShowNOte);
+  const displayedRecordsNote = invalidReasonNoteList.slice(0, recordsToShowNote);
   
   const displayedInvalidResonList = invalidReasonList.slice(0, invalidRecordsToShowNOte);
 
@@ -1006,7 +1021,7 @@ const handleUpdateFileChange = (event) => {
 
   const handleSearchChange = (search, page) => {
     setSearch(search);
-    if(activeTab === "speakerdocument") {
+    if (activeTab === "speakerdocument") {
       SpeakerList(id, sort, search, page);
     } else if (activeTab === "history") {
       GetHistoryListDocument(id, sort, search, page, selectActionType);
@@ -1095,6 +1110,21 @@ const handleUpdateFileChange = (event) => {
     }
   };
 
+  const handleAddNoteModalOpen = (docId, docName) => {
+    setSelectedAddNoteDocId(docId);
+    setSelectedAddNoteDocName(docName);
+    setShowAddNoteModal(true);
+  };
+
+  const handleAddNoteModalClose = () => {
+    setShowAddNoteModal(false);
+  };
+
+  const NotesOptions = [
+    { value: "1", label: "Importante" },
+    { value: "0", label: "Général" },
+  ];
+
   return (
     <Fragment>
       <style> {` button.btn.btn-primary  { background-color: ${localStorage.getItem('button_color') ? JSON.parse(localStorage.getItem('button_color')) : "#e84455"} !Important};`} </style>
@@ -1168,97 +1198,122 @@ const handleUpdateFileChange = (event) => {
               <span>Dossier à vérifier</span>
             </div>
             <div className="d-sm-flex align-items-center gap-3">
-                {/* See the Reason */}
-                <div className="add-document mb-sm-0 mb-2 mt-sm-0 mt-2">
-                  <Link className="link-wrap" onClick={handleNoteShow}>
-                    Voir les raisons
-                  </Link>
-                  <Offcanvas
-                    className="add-folder-panel broker-add-panel"
-                    placement={"end"}
-                    show={showNote}
-                    onHide={handleNoteClose}
-                  >
-                    <Offcanvas.Header closeButton>
-                      <Offcanvas.Title>Dossier incomplet</Offcanvas.Title>
-                    </Offcanvas.Header>
-                    <Offcanvas.Body>
-                      <div className="step-1">
-                        <div className="div">
-                          <div className="step-2">
-                            <h2>Notes du gestionnaire</h2>
-                            {displayedRecordsNote?.length > 0 ? (
-                              <div
-                                className="scroll-container"
-                                onScroll={handleScrollNote}
-                                style={{
-                                  maxHeight: "400px",
-                                  overflowY: "auto",
-                                  scrollbarWidth: "thin"
-                                }}
-                              >
-                                <div style={{ height: "400px" }}>
-                                  {displayedRecordsNote?.map((data) => (
-                                    <Fragment>
-                                      <div className="note-box mb-3">
-                                        <div className="d-flex justify-content-between align-items-center top-part">
-                                          <p className="m-0">{data.type == "note" ? "Note" : "Invalide"}</p>
-                                          <p className="m-0 create-date">créé le {data.created_on}</p>
-                                        </div>
-                                        <div className="inner-box">
-                                          <div className="d-md-flex justify-content-between align-items-center mb-2">
-                                            <div className="d-flex align-items-center mb-3">
-                                              {data.type != "note" &&
-                                                <div className="icon d-flex">
-                                                  <svg
-                                                    width="16"
-                                                    height="16"
-                                                    viewBox="0 0 8 14"
-                                                    fill="none"
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                  >
-                                                    <path
-                                                      d="M6.42457 3.36368V10.3334C6.42457 11.6728 5.33972 12.7576 4.00033 12.7576C2.66093 12.7576 1.57608 11.6728 1.57608 10.3334V2.75762C1.57608 1.92125 2.25487 1.24246 3.09123 1.24246C3.9276 1.24246 4.60639 1.92125 4.60639 2.75762V9.12125C4.60639 9.45459 4.33366 9.72731 4.00033 9.72731C3.66699 9.72731 3.39426 9.45459 3.39426 9.12125V3.36368H2.48517V9.12125C2.48517 9.95762 3.16396 10.6364 4.00033 10.6364C4.83669 10.6364 5.51548 9.95762 5.51548 9.12125V2.75762C5.51548 1.41822 4.43063 0.333374 3.09123 0.333374C1.75184 0.333374 0.666992 1.41822 0.666992 2.75762V10.3334C0.666992 12.1758 2.1579 13.6667 4.00033 13.6667C5.84275 13.6667 7.33366 12.1758 7.33366 10.3334V3.36368H6.42457Z"
-                                                      fill="#683191"
-                                                    ></path>
-                                                  </svg>
-                                                </div>
-                                              }
-                                              <div className="file-names">{data.user_document_filename}</div>
-                                            </div>
-                                          </div>
-                                          <p className="">
-                                            {data.reason}
-                                          </p>
-                                        </div>
+              <div style={{ marginRight: "20px" }}>
+                <MissingDocument
+                  link={true}
+                  sort={sort}
+                  search={search}
+                  currentPage={currentPage}
+                  selectActionType={selectActionType}
+                  GetHistoryListDocument={GetHistoryListDocument}
+                />
+              </div>
+              {/* See the Reason */}
+              <div className="add-document mb-sm-0 mb-2 mt-sm-0 mt-2">
+                <Link className="link-wrap" onClick={handleNoteShow}>
+                  Voir les raisons
+                </Link>
+                <Offcanvas
+                  className="add-folder-panel broker-add-panel"
+                  placement={"end"}
+                  show={showNote}
+                  onHide={handleNoteClose}
+                >
+                  <Offcanvas.Header closeButton>
+                    <Offcanvas.Title>Dossier incomplet</Offcanvas.Title>
+                  </Offcanvas.Header>
+                  <Offcanvas.Body style={{ overflow: "hidden", maxHeight: "80vh" }}>
+                    <div className="step-1">
+                      <div className="div">
+                        <div className="step-2">
+                          <h2>Notes du courtier</h2>
+                          <Select
+                            options={NotesOptions}
+                            onChange={(selectedOption) => GetDocumentFileNotesList(id, selectedOption?.value)}
+                            styles={{
+                              container: (provided) => ({
+                                ...provided,
+                                width: '50%',
+                              }),
+                              menu: (provided) => ({
+                                ...provided,
+                                width: '100%',
+                              }),
+                            }}
+                            placeholder={t("speakerLabel")}
+                            isSearchable={true}
+                          />
+                          {displayedRecordsNote?.length > 0 ? (
+                            <div
+                              ref={scrollRef}
+                              className="scroll-container mt-3"
+                              onScroll={handleScrollNote}
+                              style={{
+                                maxHeight: "300px",
+                                overflowY: "auto",
+                                scrollbarWidth: "thin"
+                              }}
+                            >
+                              <div style={{ height: "400px" }}>
+                                {displayedRecordsNote?.map((data) => (
+                                  <Fragment>
+                                    <div className="note-box mb-3">
+                                      <div className="d-flex justify-content-between align-items-center top-part">
+                                        <p className="m-0">{data.type == "note" ? "Note" : "Invalide"}</p>
+                                        <p className="m-0 create-date">créé le {data.created_on}</p>
                                       </div>
-                                    </Fragment>
-                                  ))}
-                                </div>
+                                      <div className="inner-box">
+                                        {data.type == "note" && data.user_document_filename &&
+                                          <div className="d-flex align-items-center mb-3">
+                                            <div className="icon d-flex">
+                                              <svg
+                                                width="16"
+                                                height="16"
+                                                viewBox="0 0 8 14"
+                                                fill="none"
+                                                xmlns="http://www.w3.org/2000/svg"
+                                              >
+                                                <path
+                                                  d="M6.42457 3.36368V10.3334C6.42457 11.6728 5.33972 12.7576 4.00033 12.7576C2.66093 12.7576 1.57608 11.6728 1.57608 10.3334V2.75762C1.57608 1.92125 2.25487 1.24246 3.09123 1.24246C3.9276 1.24246 4.60639 1.92125 4.60639 2.75762V9.12125C4.60639 9.45459 4.33366 9.72731 4.00033 9.72731C3.66699 9.72731 3.39426 9.45459 3.39426 9.12125V3.36368H2.48517V9.12125C2.48517 9.95762 3.16396 10.6364 4.00033 10.6364C4.83669 10.6364 5.51548 9.95762 5.51548 9.12125V2.75762C5.51548 1.41822 4.43063 0.333374 3.09123 0.333374C1.75184 0.333374 0.666992 1.41822 0.666992 2.75762V10.3334C0.666992 12.1758 2.1579 13.6667 4.00033 13.6667C5.84275 13.6667 7.33366 12.1758 7.33366 10.3334V3.36368H6.42457Z"
+                                                  fill="#683191"
+                                                ></path>
+                                              </svg>
+                                            </div>
+                                            <span className="file-names">{data.user_document_filename}</span>
+                                          </div>
+                                        }
+                                        <p className="">
+                                          {data.reason}
+                                        </p>
+                                      </div>
+                                    </div>
+                                  </Fragment>
+                                ))}
                               </div>
-                            )
-                              :
-                              (
-                                <div>
-                                  {t("NorecordsfoundLabel")}
-                                </div>
-                              )}
-                          </div>
+                            </div>
+                          )
+                            :
+                            (
+                              <div className="mt-3">
+                                {t("NorecordsfoundLabel")}
+                              </div>
+                            )}
                         </div>
                       </div>
+                    </div>
 
-                    </Offcanvas.Body>
-                  </Offcanvas>
-                </div>
+                  </Offcanvas.Body>
+                </Offcanvas>
+              </div>
 
-                <p className="m-0">Envoyer à : </p>
-                <div>
-                    <Form.Select aria-label="Etat du chantier" style={{ minHeight: "30px", fontFamily: "Manrope" }} value={sendToFileStatus} onChange={(e) => handleSendFileShow(e.target.value)}>
-                      <option value="" disabled selected>Envoyer à</option>
-                      <option value="transfer_to_insurer">Transfert à l'assureur</option>
-                      <option value="transfer_to_manager">Transfert au Gestionnaire</option>
-                    </Form.Select>
-                </div>
+              <p className="m-0">Envoyer à : </p>
+              <div>
+                <Form.Select aria-label="Etat du chantier" style={{ minHeight: "30px", fontFamily: "Manrope" }} value={sendToFileStatus} onChange={(e) => handleSendFileShow(e.target.value)}>
+                  <option value="" disabled selected>Envoyer à</option>
+                  <option value="transfer_to_insurer">Transfert à l'assureur</option>
+                  <option value="transfer_to_manager">Transfert au Gestionnaire</option>
+                </Form.Select>
+              </div>
             </div>
           </div>
         </div>
@@ -1271,12 +1326,12 @@ const handleUpdateFileChange = (event) => {
           {/* Other Document Tab */}
           <Tab eventKey="otherdocument" title={`Documents (${totalRecordOther || 0})`}>
             <div className="table-wrapper mt-16 p-0">
-            <div class="d-md-flex align-items-center gap-2 justify-content-between">
-              <h2 class="m-md-0 mb-3">
-                {/* Documents ({totalRecordOther}) */}
-              </h2>
+              <div class="d-md-flex align-items-center gap-2 justify-content-between">
+                <h2 class="m-md-0 mb-3">
+                  {/* Documents ({totalRecordOther}) */}
+                </h2>
                 <Link
-                  style={{ fontWeight: "700",color: "#683191" }}
+                  style={{ fontWeight: "700", color: "#683191" }}
                   onClick={handleDocShow}
                   className="d-flex align-items-center gap-2 justify-content-end"
                   variant="primary"
@@ -1292,7 +1347,7 @@ const handleUpdateFileChange = (event) => {
                   </svg>
                   ajouter un document
                 </Link>
-            </div>
+              </div>
               {isLoading ? <Loading /> :
                 <div className="table-wrap mt-24">
                   <Table responsive hover>
@@ -1554,6 +1609,57 @@ const handleUpdateFileChange = (event) => {
                                       <path
                                         d="M12 6.5C15.79 6.5 19.17 8.63 20.82 12C19.17 15.37 15.8 17.5 12 17.5C8.2 17.5 4.83 15.37 3.18 12C4.83 8.63 8.21 6.5 12 6.5ZM12 4.5C7 4.5 2.73 7.61 1 12C2.73 16.39 7 19.5 12 19.5C17 19.5 21.27 16.39 23 12C21.27 7.61 17 4.5 12 4.5ZM12 9.5C13.38 9.5 14.5 10.62 14.5 12C14.5 13.38 13.38 14.5 12 14.5C10.62 14.5 9.5 13.38 9.5 12C9.5 10.62 10.62 9.5 12 9.5ZM12 7.5C9.52 7.5 7.5 9.52 7.5 12C7.5 14.48 9.52 16.5 12 16.5C14.48 16.5 16.5 14.48 16.5 12C16.5 9.52 14.48 7.5 12 7.5Z"
                                         fill="#00366B"
+                                      />
+                                    </svg>
+                                  </Link>
+                                  <Link
+                                    class="addnote"
+                                    href="/user-management"
+                                    data-discover="true"
+                                    onClick={() => handleAddNoteModalOpen(data.id, data.filename)}
+                                  >
+                                    <svg
+                                      width="24"
+                                      height="24"
+                                      viewBox="0 0 24 24"
+                                      fill="none"
+                                      xmlns="http://www.w3.org/2000/svg"
+                                    >
+                                      <rect
+                                        x="4"
+                                        y="3"
+                                        width="16"
+                                        height="18"
+                                        rx="2"
+                                        stroke="#683191"
+                                        stroke-width="2"
+                                      />
+                                      <line
+                                        x1="8"
+                                        y1="7"
+                                        x2="16"
+                                        y2="7"
+                                        stroke="#683191"
+                                        stroke-width="2"
+                                        stroke-linecap="round"
+                                      />
+                                      <line
+                                        x1="8"
+                                        y1="11"
+                                        x2="16"
+                                        y2="11"
+                                        stroke="#683191"
+                                        stroke-width="2"
+                                        stroke-linecap="round"
+                                      />
+                                      <line
+                                        x1="8"
+                                        y1="15"
+                                        x2="13"
+                                        y2="15"
+                                        stroke="#683191"
+                                        stroke-width="2"
+                                        stroke-linecap="round"
                                       />
                                     </svg>
                                   </Link>
@@ -2085,7 +2191,7 @@ const handleUpdateFileChange = (event) => {
                               controlId="formFile"
                               className="file-upload-container mt-4"
                             >
-                              <div 
+                              <div
                                 className="custom-upload-box"
                                 onDragOver={(e) => e.preventDefault()}
                                 onDrop={(e) => {
@@ -2324,79 +2430,6 @@ const handleUpdateFileChange = (event) => {
           </Tab>
 
           {/* History Tab */}
-          {/* <Tab eventKey="history" title="Historique">
-            {isLoading ? <Loading /> :
-              <>
-                <div className="mb-3 d-md-flex justify-content-between align-items-center">
-                  {markIsReadCount > 0 &&
-                    <button className="custom-btn" style={{ backgroundColor: "#fbd5ea" }} onClick={() => MarkHistoryAsReadAllDocument(id)}>
-                      Marquer comme tout lu
-                    </button>
-                  }
-                </div>
-
-                <div
-                  className="scroll-container"
-                  onScroll={handleScroll}
-                  style={{
-                    maxHeight: "240px",
-                    overflowY: "auto",
-                    scrollbarWidth: "thin"
-                  }}
-                >
-                  {displayedRecords?.length > 0 ?
-                    displayedRecords?.map((data) => (
-                      <Fragment>
-                        <div className="note-box mb-3">
-                          <div className="d-flex justify-content-between align-items-center top-part">
-                            <p className="m-0">{data.type == "note" ? "Note" : "Invalide"}</p>
-                            <p className="m-0 create-date">créé le {data.created_on}</p>
-                          </div>
-                          <div className="inner-box" style={{ backgroundColor: data.is_read === 0 ? "#fbd5ea" : "#fef4fa" }}>
-                            <div className="d-md-flex justify-content-between align-items-center mb-2">
-                              <div className="d-flex align-items-center mb-3">
-                                {data.type != "note" &&
-                                  <div className="icon d-flex">
-                                    <svg
-                                      width="16"
-                                      height="16"
-                                      viewBox="0 0 8 14"
-                                      fill="none"
-                                      xmlns="http://www.w3.org/2000/svg"
-                                    >
-                                      <path
-                                        d="M6.42457 3.36368V10.3334C6.42457 11.6728 5.33972 12.7576 4.00033 12.7576C2.66093 12.7576 1.57608 11.6728 1.57608 10.3334V2.75762C1.57608 1.92125 2.25487 1.24246 3.09123 1.24246C3.9276 1.24246 4.60639 1.92125 4.60639 2.75762V9.12125C4.60639 9.45459 4.33366 9.72731 4.00033 9.72731C3.66699 9.72731 3.39426 9.45459 3.39426 9.12125V3.36368H2.48517V9.12125C2.48517 9.95762 3.16396 10.6364 4.00033 10.6364C4.83669 10.6364 5.51548 9.95762 5.51548 9.12125V2.75762C5.51548 1.41822 4.43063 0.333374 3.09123 0.333374C1.75184 0.333374 0.666992 1.41822 0.666992 2.75762V10.3334C0.666992 12.1758 2.1579 13.6667 4.00033 13.6667C5.84275 13.6667 7.33366 12.1758 7.33366 10.3334V3.36368H6.42457Z"
-                                        fill="#683191"
-                                      ></path>
-                                    </svg>
-                                  </div>
-                                }
-                                <div className="file-names">{data.user_document_filename}</div>
-                              </div>
-                              {data.is_read != 1 &&
-                                <button className="custom-btn" style={{ backgroundColor: "#fbd5ea" }} onClick={() => MarkHistoryAsReadDocument(data.id)}>
-                                  Marquer Comme lu
-                                </button>
-                              }
-                            </div>
-                            <p className="">
-                              {data.reason}
-                            </p>
-                          </div>
-                        </div>
-                      </Fragment>
-                    ))
-                    :
-                    (
-                      <div className="inner-box">
-                        {t("NorecordsfoundLabel")}
-                      </div>
-                    )
-                  }
-                </div>
-              </>
-            }
-          </Tab> */}
           <Tab eventKey="history" title="Historique">
             <div className="table-wrapper mt-16 p-0">
               <div className="d-md-flex align-items-center gap-2 justify-content-between">
@@ -2489,6 +2522,13 @@ const handleUpdateFileChange = (event) => {
           </Tab>
         </Tabs>
 
+        <AddNote
+          showmodal={showAddNoteModal}
+          handleModalClose={handleAddNoteModalClose}
+          selectDocumentId={selectedAddNoteDocId}
+          selectDocumentFileName={selectedAddNoteDocName}
+        />
+
         {/* Replace Doc pannel */}
         <Offcanvas
           className="add-folder-panel broker-add-panel"
@@ -2523,7 +2563,7 @@ const handleUpdateFileChange = (event) => {
                     controlId="formFile"
                     className="file-upload-container mt-4"
                   >
-                    <div 
+                    <div
                       className="custom-upload-box"
                       onDragOver={(e) => e.preventDefault()}
                       onDrop={(e) => {
@@ -2666,7 +2706,7 @@ const handleUpdateFileChange = (event) => {
                     controlId="formFile"
                     className="file-upload-container mt-4"
                   >
-                    <div 
+                    <div
                       className="custom-upload-box"
                       onDragOver={(e) => e.preventDefault()}
                       onDrop={(e) => {
@@ -2910,26 +2950,24 @@ const handleUpdateFileChange = (event) => {
                               <p className="m-0 create-date">créé le {data.created_on}</p>
                             </div>
                             <div className="inner-box">
-                              <div className="d-md-flex justify-content-between align-items-center mb-2">
-                                <div className="d-flex align-items-center mb-3">
-                                  {data.type != "note" &&
-                                    <div className="icon d-flex">
-                                      <svg
-                                        width="16"
-                                        height="16"
-                                        viewBox="0 0 8 14"
-                                        fill="none"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                      >
-                                        <path
-                                          d="M6.42457 3.36368V10.3334C6.42457 11.6728 5.33972 12.7576 4.00033 12.7576C2.66093 12.7576 1.57608 11.6728 1.57608 10.3334V2.75762C1.57608 1.92125 2.25487 1.24246 3.09123 1.24246C3.9276 1.24246 4.60639 1.92125 4.60639 2.75762V9.12125C4.60639 9.45459 4.33366 9.72731 4.00033 9.72731C3.66699 9.72731 3.39426 9.45459 3.39426 9.12125V3.36368H2.48517V9.12125C2.48517 9.95762 3.16396 10.6364 4.00033 10.6364C4.83669 10.6364 5.51548 9.95762 5.51548 9.12125V2.75762C5.51548 1.41822 4.43063 0.333374 3.09123 0.333374C1.75184 0.333374 0.666992 1.41822 0.666992 2.75762V10.3334C0.666992 12.1758 2.1579 13.6667 4.00033 13.6667C5.84275 13.6667 7.33366 12.1758 7.33366 10.3334V3.36368H6.42457Z"
-                                          fill="#683191"
-                                        ></path>
-                                      </svg>
-                                    </div>
-                                  }
-                                  <div className="file-names">{data.user_document_filename}</div>
-                                </div>
+                              <div className="d-flex align-items-center mb-3">
+                                {data.type != "note" &&
+                                  <div className="icon d-flex">
+                                    <svg
+                                      width="16"
+                                      height="16"
+                                      viewBox="0 0 8 14"
+                                      fill="none"
+                                      xmlns="http://www.w3.org/2000/svg"
+                                    >
+                                      <path
+                                        d="M6.42457 3.36368V10.3334C6.42457 11.6728 5.33972 12.7576 4.00033 12.7576C2.66093 12.7576 1.57608 11.6728 1.57608 10.3334V2.75762C1.57608 1.92125 2.25487 1.24246 3.09123 1.24246C3.9276 1.24246 4.60639 1.92125 4.60639 2.75762V9.12125C4.60639 9.45459 4.33366 9.72731 4.00033 9.72731C3.66699 9.72731 3.39426 9.45459 3.39426 9.12125V3.36368H2.48517V9.12125C2.48517 9.95762 3.16396 10.6364 4.00033 10.6364C4.83669 10.6364 5.51548 9.95762 5.51548 9.12125V2.75762C5.51548 1.41822 4.43063 0.333374 3.09123 0.333374C1.75184 0.333374 0.666992 1.41822 0.666992 2.75762V10.3334C0.666992 12.1758 2.1579 13.6667 4.00033 13.6667C5.84275 13.6667 7.33366 12.1758 7.33366 10.3334V3.36368H6.42457Z"
+                                        fill="#683191"
+                                      ></path>
+                                    </svg>
+                                  </div>
+                                }
+                                <div className="file-names">{data.user_document_filename}</div>
                               </div>
                               <p className="">
                                 {data.reason}
@@ -3173,29 +3211,29 @@ const handleUpdateFileChange = (event) => {
                                     </svg>
                                   </Link>
                                   {/* {data.status !== "verified" && */}
-                                    <Link
-                                      className="delete"
-                                      data-discover="true"
-                                      title="Supprimer"
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleShowDeleteModal();
-                                        setShowDocumentId(data.id);
-                                      }}
+                                  <Link
+                                    className="delete"
+                                    data-discover="true"
+                                    title="Supprimer"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleShowDeleteModal();
+                                      setShowDocumentId(data.id);
+                                    }}
+                                  >
+                                    <svg
+                                      width="24"
+                                      height="24"
+                                      viewBox="0 0 24 24"
+                                      fill="none"
+                                      xmlns="http://www.w3.org/2000/svg"
                                     >
-                                      <svg
-                                        width="24"
-                                        height="24"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                      >
-                                        <path
-                                          d="M16 9V19H8V9H16ZM14.5 3H9.5L8.5 4H5V6H19V4H15.5L14.5 3ZM18 7H6V19C6 20.1 6.9 21 8 21H16C17.1 21 18 20.1 18 19V7Z"
-                                          fill="#00366B"
-                                        />
-                                      </svg>
-                                    </Link>
+                                      <path
+                                        d="M16 9V19H8V9H16ZM14.5 3H9.5L8.5 4H5V6H19V4H15.5L14.5 3ZM18 7H6V19C6 20.1 6.9 21 8 21H16C17.1 21 18 20.1 18 19V7Z"
+                                        fill="#00366B"
+                                      />
+                                    </svg>
+                                  </Link>
                                   {/* } */}
                                 </td>
                               </tr>
