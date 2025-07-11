@@ -4833,7 +4833,7 @@ const AdminFileDetail = () => {
                       width: '100%',
                     }),
                   }}
-                  placeholder={t("speakerLabel")}
+                  placeholder={"Sélectionnez le type de note"}
                   isSearchable={true}
                 />
                 {displayedRecordsNote?.length > 0 ? (
