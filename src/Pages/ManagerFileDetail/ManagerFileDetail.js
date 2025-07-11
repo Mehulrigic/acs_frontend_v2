@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect } from "react";
+import React, { Fragment, useEffect, useRef } from "react";
 import "react-datepicker/dist/react-datepicker.css";
 import "./ManagerFileDetail.css";
 import SidePanel from "../../Components/SidePanel/SidePanel";
@@ -26,11 +26,13 @@ import Select from "react-select";
 import DocViewer, { DocViewerRenderers } from "@cyntler/react-doc-viewer";
 import "@cyntler/react-doc-viewer/dist/index.css";
 import SpeakerManagementService from "../../API/SpeakerManagement/SpeakerManagementService";
+import AddNote from "../../Components/AddNote/AddNote";
 
 const ManagerFileDetail = () => {
   const { t } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
+  const scrollRef = useRef(null);
 
   const now = 66;
   const nows = 37;
@@ -222,6 +224,22 @@ const ManagerFileDetail = () => {
     setSIRETNumber("");
     setIsFormLoading(false);
   };
+
+  const [showAddNoteModal, setShowAddNoteModal] = useState(false);
+  const [selectedAddNoteDocId, setSelectedAddNoteDocId] = useState(null);
+  const [selectedAddNoteDocName, setSelectedAddNoteDocName] = useState("");
+  const [invalidReasonNoteList, setInvalidReasonNoteList] = useState([]);
+  const [recordsToShowNOte, setRecordsToShowNote] = useState(3);
+
+  const [showNote, setShowNote] = useState(false);
+  const handleNoteShow = () => setShowNote(true);
+  const handleNoteClose = () => setShowNote(false);
+
+  useEffect(() => {
+    if (showNote) {
+      GetDocumentFileNotesList(id);
+    }
+  }, [showNote]);
 
   useEffect(() => {
     if (flashMessage.message) {
@@ -495,35 +513,35 @@ const ManagerFileDetail = () => {
   // };
 
   const handleUpdateFileChange = (event) => {
-  const files = Array.from(event.target.files);
-  const newFiles = [];
+    const files = Array.from(event.target.files);
+    const newFiles = [];
 
-  for (const file of files) {
-    if (!allowedFileTypes.includes(file.type)) {
-      setFlashMessage({
-        type: "error",
-        message: `Ce type de document n'est pas pris en charge: ${file.name}`,
-      });
-      return;
+    for (const file of files) {
+      if (!allowedFileTypes.includes(file.type)) {
+        setFlashMessage({
+          type: "error",
+          message: `Ce type de document n'est pas pris en charge: ${file.name}`,
+        });
+        return;
+      }
+
+      if (file.size > maxFileSize) {
+        setFlashMessage({
+          type: "error",
+          message: `Limite de taille atteinte. Vos fichiers ne doivent pas dépasser 50 Mo: ${file.name}`,
+        });
+        return;
+      }
+
+      newFiles.push(file); // Keep File object
     }
 
-    if (file.size > maxFileSize) {
-      setFlashMessage({
-        type: "error",
-        message: `Limite de taille atteinte. Vos fichiers ne doivent pas dépasser 50 Mo: ${file.name}`,
-      });
-      return;
+    if (newFiles.length > 0) {
+      setFileList((prevFiles) => [...prevFiles, ...newFiles]);
     }
 
-    newFiles.push(file); // Keep File object
-  }
-
-  if (newFiles.length > 0) {
-    setFileList((prevFiles) => [...prevFiles, ...newFiles]);
-  }
-
-  event.target.value = ""; // Reset file input
-};
+    event.target.value = ""; // Reset file input
+  };
 
 
   const allowedFileTypes = [
@@ -585,59 +603,59 @@ const ManagerFileDetail = () => {
   //   }
   // };
 
-const AddMissingDocument = async (e) => {
-  e.preventDefault();
-  setDocumentUploading(true);
-  
-  try {
-    const formData = new FormData();
-    formData.append("speaker_id", showSpeakerId);
-    formData.append("missing_document_id", missingDocumentId);
+  const AddMissingDocument = async (e) => {
+    e.preventDefault();
+    setDocumentUploading(true);
 
-    if (fileList?.length) {
-      fileList.forEach((file) => {
-        formData.append("documents[]", file); // Use array-style key for multiple files
-      });
-    }
+    try {
+      const formData = new FormData();
+      formData.append("speaker_id", showSpeakerId);
+      formData.append("missing_document_id", missingDocumentId);
 
-    const response = await FilePageService.add_missing_document(id, formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
+      if (fileList?.length) {
+        fileList.forEach((file) => {
+          formData.append("documents[]", file); // Use array-style key for multiple files
+        });
+      }
 
-    if (response.data.status) {
-      setDocumentUploading(false);
-      setFileList([]);
-      ShowUserDocumentData(id);
-      setFlashMessageStoreDoc({
-        type: "success",
-        message: response.data.message || t("somethingWentWrong"),
+      const response = await FilePageService.add_missing_document(id, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
       });
 
-      if (activeTab === "speakerdocument") {
-        if (activeSubTab === "documentType") {
-          SpeakerDocumentTypeList(id, showSpeakerId);
+      if (response.data.status) {
+        setDocumentUploading(false);
+        setFileList([]);
+        ShowUserDocumentData(id);
+        setFlashMessageStoreDoc({
+          type: "success",
+          message: response.data.message || t("somethingWentWrong"),
+        });
+
+        if (activeTab === "speakerdocument") {
+          if (activeSubTab === "documentType") {
+            SpeakerDocumentTypeList(id, showSpeakerId);
+          }
         }
-      }
-      if (activeTab === "missingdocument") {
-        GetMissingDocumentList(id, sort, currentPage, selectIsRequired);
-      }
+        if (activeTab === "missingdocument") {
+          GetMissingDocumentList(id, sort, currentPage, selectIsRequired);
+        }
 
-      ShowUserDocumentData(id);
-    } else {
+        ShowUserDocumentData(id);
+      } else {
+        setDocumentUploading(false);
+        setFlashMessageStoreDoc({
+          type: "error",
+          message: response.data.message || t("somethingWentWrong"),
+        });
+      }
+    } catch (error) {
       setDocumentUploading(false);
       setFlashMessageStoreDoc({
         type: "error",
-        message: response.data.message || t("somethingWentWrong"),
+        message: t("somethingWentWrong"),
       });
     }
-  } catch (error) {
-    setDocumentUploading(false);
-    setFlashMessageStoreDoc({
-      type: "error",
-      message: t("somethingWentWrong"),
-    });
-  }
-};
+  };
 
 
   const ShowUserDocumentData = async (id) => {
@@ -676,7 +694,7 @@ const AddMissingDocument = async (e) => {
         setFinaldSiteCost(response.data.documents.final_site_cost);
         setFinalStartDate(response.data.documents.final_start_date);
         setFinalCompletionDate(response.data.documents.final_completion_date);
-        if(response.data.documents.status == "transfer_to_insurer" || response.data.documents.status == "transfer_to_broker" || response.data.documents.status == "to_be_decided"){
+        if (response.data.documents.status == "transfer_to_insurer" || response.data.documents.status == "transfer_to_broker" || response.data.documents.status == "to_be_decided") {
           setSendToFileStatus(response.data.documents.status);
         } else {
           setSendToFileStatus("");
@@ -1044,7 +1062,7 @@ const AddMissingDocument = async (e) => {
         id: Object.fromEntries(Array(updatedList).map(item => [item.id, item.is_required === 1 ? 0 : 1]))
       }
 
-      if(speakerId){
+      if (speakerId) {
         userDate.speaker_id = speakerId;
       }
 
@@ -1112,7 +1130,7 @@ const AddMissingDocument = async (e) => {
         setEditUserStatus(selectedDoc?.status);
         setSelectDocumentType(selectedDoc?.docType?.id);
         setSelectSpeakerId(selectedDoc?.speaker?.id);
-        if(selectedDoc?.speaker?.id){
+        if (selectedDoc?.speaker?.id) {
           SpeakerDetail(selectedDoc?.speaker?.id);
         } else {
           setSpeakerDetail({});
@@ -1139,7 +1157,7 @@ const AddMissingDocument = async (e) => {
         setEditUserStatus(userDocumentFileDataChanges[0]?.status);
         setSelectDocumentType(userDocumentFileDataChanges[0]?.doc_type_id);
         setSelectSpeakerId(userDocumentFileDataChanges[0]?.speaker_id);
-        if(userDocumentFileDataChanges[0]?.speaker_id){
+        if (userDocumentFileDataChanges[0]?.speaker_id) {
           SpeakerDetail(userDocumentFileDataChanges[0]?.speaker_id);
         } else {
           setSpeakerDetail({});
@@ -1174,7 +1192,7 @@ const AddMissingDocument = async (e) => {
       setEditUserStatus(selectedDoc?.status);
       setSelectDocumentType(selectedDoc?.doc_type_id);
       setSelectSpeakerId(selectedDoc?.speaker_id);
-      if(selectedDoc?.speaker_id){
+      if (selectedDoc?.speaker_id) {
         SpeakerDetail(selectedDoc?.speaker_id);
       } else {
         setSpeakerDetail({});
@@ -1679,6 +1697,53 @@ const AddMissingDocument = async (e) => {
     }
   };
 
+  const GetDocumentFileNotesList = async (id, filter) => {
+    setIsLoading(true);
+    try {
+      var userData = {
+        is_important: filter ? filter : 1
+      }
+
+      const response = await FilePageService.document_file_notes(id, userData);
+
+      if (response.data.status) {
+        setIsLoading(false);
+        setInvalidReasonNoteList(response.data.data || []);
+        setRecordsToShowNote(3);
+        if (scrollRef.current) {
+          scrollRef.current.scrollTop = 0;
+        }
+      }
+    } catch (error) {
+      setIsLoading(false);
+      console.log(error);
+    }
+  };
+
+  const handleAddNoteModalOpen = (docId, docName) => {
+    setSelectedAddNoteDocId(docId);
+    setSelectedAddNoteDocName(docName);
+    setShowAddNoteModal(true);
+  };
+
+  const handleAddNoteModalClose = () => {
+    setShowAddNoteModal(false);
+  };
+
+  const handleScrollNote = (e) => {
+    const { scrollTop, scrollHeight, clientHeight } = e.target;
+    if (scrollTop + clientHeight >= scrollHeight - 5) {
+      setRecordsToShowNote((prev) => Math.min(prev + 3, invalidReasonNoteList?.length));
+    }
+  };
+
+  const displayedRecordsNote = invalidReasonNoteList?.slice(0, recordsToShowNOte);
+
+  const NotesOptions = [
+    { value: "1", label: "Importante" },
+    { value: "0", label: "Général" },
+  ];
+
   return (
     <Fragment>
       <style> {` button.btn.btn-primary  { background-color: ${localStorage.getItem('button_color') ? JSON.parse(localStorage.getItem('button_color')) : "#e84455"} !Important};`} </style>
@@ -1760,6 +1825,9 @@ const AddMissingDocument = async (e) => {
                 GetHistoryListDocument={GetHistoryListDocument}
               />
             </div>
+            <Link className="link-wrap" style={{ marginRight: "20px" }} onClick={handleNoteShow}>
+              Voir les raisons
+            </Link>
             <p className="m-0" style={{ paddingRight: "10px" }}>Envoyer à : </p>
             <Form.Select aria-label="Etat du chantier" class="form-select" style={{ minHeight: "30px", width: "25%", fontFamily: "Manrope" }} value={sendToFileStatus} onChange={(e) => handleSendFileShow(e.target.value)}>
               <option value="" disabled selected>Envoyer à</option>
@@ -1795,53 +1863,53 @@ const AddMissingDocument = async (e) => {
                   {flashMessage.message}
                 </div>
               )}
-            <div className="table-wrapper mt-0 p-0">
-              <h2 class="mb-3">Général</h2>
+              <div className="table-wrapper mt-0 p-0">
+                <h2 class="mb-3">Général</h2>
 
-              <div className="form-grid-2x2">
-                <Form.Group className="mb-3" controlId="insurercode">
-                  <Form.Label>Code assureur</Form.Label>
-                  <Form.Control
-                    disabled
-                    type="text"
-                    placeholder="Code assureur"
-                    value={folderDetail.insurer_code}
-                  />
-                </Form.Group>
+                <div className="form-grid-2x2">
+                  <Form.Group className="mb-3" controlId="insurercode">
+                    <Form.Label>Code assureur</Form.Label>
+                    <Form.Control
+                      disabled
+                      type="text"
+                      placeholder="Code assureur"
+                      value={folderDetail.insurer_code}
+                    />
+                  </Form.Group>
 
-                <Form.Group className="mb-3" controlId="filenumber">
-                  <Form.Label>Numéro de dossier</Form.Label>
-                  <Form.Control
-                    disabled
-                    type="text"
-                    placeholder="Numéro de dossier"
-                    value={folderDetail.folder_name}
-                  />
-                </Form.Group>
+                  <Form.Group className="mb-3" controlId="filenumber">
+                    <Form.Label>Numéro de dossier</Form.Label>
+                    <Form.Control
+                      disabled
+                      type="text"
+                      placeholder="Numéro de dossier"
+                      value={folderDetail.folder_name}
+                    />
+                  </Form.Group>
 
-                <Form.Group className="mb-3" controlId="insurername">
-                  <Form.Label>Nom de l'assureur</Form.Label>
-                  <Form.Control
-                    type="text"
-                    placeholder="Nom de l'assureur"
-                    value={folderDetail.insurer_name}
-                  />
-                </Form.Group>
+                  <Form.Group className="mb-3" controlId="insurername">
+                    <Form.Label>Nom de l'assureur</Form.Label>
+                    <Form.Control
+                      type="text"
+                      placeholder="Nom de l'assureur"
+                      value={folderDetail.insurer_name}
+                    />
+                  </Form.Group>
 
-                <Form.Group className="mb-4" controlId="insurername">
-                  <Form.Label className="d-block">
-                    Date de création du fichier
-                  </Form.Label>
-                  <DatePicker
-                    placeholderText="Selectionner une date"
-                    selected={startDate4 ? getFormattedDate(startDate4) : null}
-                    onChange={(date) => setStartDate4(formatDate(date))}
-                    dateFormat="dd/MM/yyyy"
-                    locale={fr}
-                  />
-                </Form.Group>
+                  <Form.Group className="mb-4" controlId="insurername">
+                    <Form.Label className="d-block">
+                      Date de création du fichier
+                    </Form.Label>
+                    <DatePicker
+                      placeholderText="Selectionner une date"
+                      selected={startDate4 ? getFormattedDate(startDate4) : null}
+                      onChange={(date) => setStartDate4(formatDate(date))}
+                      dateFormat="dd/MM/yyyy"
+                      locale={fr}
+                    />
+                  </Form.Group>
 
-                <Form.Group className="mb-4" controlId="exampleForm.ControlInput1">
+                  <Form.Group className="mb-4" controlId="exampleForm.ControlInput1">
                     <Form.Label>Numéro de contrat</Form.Label>
                     <Form.Control
                       type="text"
@@ -1858,121 +1926,121 @@ const AddMissingDocument = async (e) => {
                       disabled
                       type="text"
                       placeholder="Nom du courtier"
-                      value={showUserDocumentData?.broker?.first_name ? showUserDocumentData?.broker?.first_name : "" + "" + showUserDocumentData?.broker?.last_name ? showUserDocumentData?.broker?.last_name : "" }
-                    />
-                  </Form.Group>
-              </div>
-
-              <h2 class="mb-3">Police</h2>
-
-              <div className="table-wrapper mt-0 p-0">
-                <div className="form-grid-2x2">
-                  <Form.Group className="mb-3" controlId="names">
-                    <Form.Label>Nom et prénom du demandeur</Form.Label>
-                    <Form.Control
-                      type="text"
-                      placeholder="Nom et prénom du demandeur"
-                      value={folderDetail.customer_name || "-"}
-                    />
-                  </Form.Group>
-
-                  <Form.Group className="mb-3" controlId="formBasicEmail">
-                    <Form.Label>Nom du preneur d'assurance</Form.Label>
-                    <Form.Control
-                      type="text"
-                      placeholder="Nom du preneur d'assurance"
-                      value={policyholderName}
-                      onChange={(e) => setPolicyholderName(e.target.value)}
-                    />
-                  </Form.Group>
-
-                  <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
-                    <Form.Label>Coût prévisionnel du chantier</Form.Label>
-                    <Form.Control
-                      type="text"
-                      placeholder="Entrez le coût estimé du site"
-                      name="estimated_site_cost"
-                      value={estimatedSiteCost}
-                      onChange={(e) => {
-                        const value = e.target.value;
-                        const onlyNumbers = value.replace(/[^0-9.]/g, '');
-                        setEstimatedSiteCost(onlyNumbers);
-                      }}
-                    />
-                  </Form.Group>
-
-                  <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
-                    <Form.Label>Coût définitif du chantier</Form.Label>
-                    <Form.Control
-                      type="text"
-                      placeholder="Entrez le coût final du site"
-                      name="final_site_cost"
-                      value={finalSiteCost}
-                      onChange={(e) => {
-                        const value = e.target.value;
-                        const onlyNumbers = value.replace(/[^0-9.]/g, '');
-                        setFinaldSiteCost(onlyNumbers);
-                      }}
-                    />
-                  </Form.Group>
-
-                  <Form.Group className="mb-3" controlId="names">
-                    <Form.Label className="d-block">Date de début prévisionnelle</Form.Label>
-                    <DatePicker
-                      placeholderText="Selectionner une date de début prévisionnelle"
-                      selected={estimatedStartDate ? getFormattedDate(estimatedStartDate) : ""}
-                      onChange={(date) => setEstimatedStartDate(formatDate(date))}
-                      dateFormat="dd/MM/yyyy"
-                      locale={fr}
-                    />
-                  </Form.Group>
-
-                  <Form.Group className="mb-3" controlId="names">
-                    <Form.Label className="d-block">Date de début définitive</Form.Label>
-                    <DatePicker
-                      placeholderText="Selectionner une date de début du site"
-                      selected={finalStartDate ? getFormattedDate(finalStartDate) : ""}
-                      onChange={(date) => setFinalStartDate(formatDate(date))}
-                      dateFormat="dd/MM/yyyy"
-                      locale={fr}
-                    />
-                  </Form.Group>
-
-                  <Form.Group className="mb-3" controlId="names">
-                    <Form.Label className="d-block">Date de fin de chantier prévisionnelle</Form.Label>
-                    <DatePicker
-                      placeholderText="Selectionner une date de fin de chantier prévisionnelle"
-                      selected={estimatedCompletionDate ? getFormattedDate(estimatedCompletionDate) : ""}
-                      onChange={(date) => setEstimatedCompletionDate(formatDate(date))}
-                      dateFormat="dd/MM/yyyy"
-                      locale={fr}
-                    />
-                  </Form.Group>
-
-                  <Form.Group className="mb-3" controlId="names">
-                    <Form.Label className="d-block">Date de fin de chantier définitive</Form.Label>
-                    <DatePicker
-                      placeholderText="Selectionner une date de fin de chantier définitive"
-                      selected={finalCompletionDate ? getFormattedDate(finalCompletionDate) : ""}
-                      onChange={(date) => setFinalCompletionDate(formatDate(date))}
-                      dateFormat="dd/MM/yyyy"
-                      locale={fr}
+                      value={showUserDocumentData?.broker?.first_name ? showUserDocumentData?.broker?.first_name : "" + "" + showUserDocumentData?.broker?.last_name ? showUserDocumentData?.broker?.last_name : ""}
                     />
                   </Form.Group>
                 </div>
-                <Button className="btn-secondary" type="submit" onClick={(e) => UpdateFolderInfo(e)}>
-                  Valider
-                </Button>
-                <Button
-                  className="btn-secondary ms-2"
-                  onClick={() => navigate("/manager-files")}
-                >
-                  Annuler
-                </Button>
-              </div>
-              
 
-              {/* <Form.Group className="mb-3" controlId="names">
+                <h2 class="mb-3">Police</h2>
+
+                <div className="table-wrapper mt-0 p-0">
+                  <div className="form-grid-2x2">
+                    <Form.Group className="mb-3" controlId="names">
+                      <Form.Label>Nom et prénom du demandeur</Form.Label>
+                      <Form.Control
+                        type="text"
+                        placeholder="Nom et prénom du demandeur"
+                        value={folderDetail.customer_name || "-"}
+                      />
+                    </Form.Group>
+
+                    <Form.Group className="mb-3" controlId="formBasicEmail">
+                      <Form.Label>Nom du preneur d'assurance</Form.Label>
+                      <Form.Control
+                        type="text"
+                        placeholder="Nom du preneur d'assurance"
+                        value={policyholderName}
+                        onChange={(e) => setPolicyholderName(e.target.value)}
+                      />
+                    </Form.Group>
+
+                    <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
+                      <Form.Label>Coût prévisionnel du chantier</Form.Label>
+                      <Form.Control
+                        type="text"
+                        placeholder="Entrez le coût estimé du site"
+                        name="estimated_site_cost"
+                        value={estimatedSiteCost}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          const onlyNumbers = value.replace(/[^0-9.]/g, '');
+                          setEstimatedSiteCost(onlyNumbers);
+                        }}
+                      />
+                    </Form.Group>
+
+                    <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
+                      <Form.Label>Coût définitif du chantier</Form.Label>
+                      <Form.Control
+                        type="text"
+                        placeholder="Entrez le coût final du site"
+                        name="final_site_cost"
+                        value={finalSiteCost}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          const onlyNumbers = value.replace(/[^0-9.]/g, '');
+                          setFinaldSiteCost(onlyNumbers);
+                        }}
+                      />
+                    </Form.Group>
+
+                    <Form.Group className="mb-3" controlId="names">
+                      <Form.Label className="d-block">Date de début prévisionnelle</Form.Label>
+                      <DatePicker
+                        placeholderText="Selectionner une date de début prévisionnelle"
+                        selected={estimatedStartDate ? getFormattedDate(estimatedStartDate) : ""}
+                        onChange={(date) => setEstimatedStartDate(formatDate(date))}
+                        dateFormat="dd/MM/yyyy"
+                        locale={fr}
+                      />
+                    </Form.Group>
+
+                    <Form.Group className="mb-3" controlId="names">
+                      <Form.Label className="d-block">Date de début définitive</Form.Label>
+                      <DatePicker
+                        placeholderText="Selectionner une date de début du site"
+                        selected={finalStartDate ? getFormattedDate(finalStartDate) : ""}
+                        onChange={(date) => setFinalStartDate(formatDate(date))}
+                        dateFormat="dd/MM/yyyy"
+                        locale={fr}
+                      />
+                    </Form.Group>
+
+                    <Form.Group className="mb-3" controlId="names">
+                      <Form.Label className="d-block">Date de fin de chantier prévisionnelle</Form.Label>
+                      <DatePicker
+                        placeholderText="Selectionner une date de fin de chantier prévisionnelle"
+                        selected={estimatedCompletionDate ? getFormattedDate(estimatedCompletionDate) : ""}
+                        onChange={(date) => setEstimatedCompletionDate(formatDate(date))}
+                        dateFormat="dd/MM/yyyy"
+                        locale={fr}
+                      />
+                    </Form.Group>
+
+                    <Form.Group className="mb-3" controlId="names">
+                      <Form.Label className="d-block">Date de fin de chantier définitive</Form.Label>
+                      <DatePicker
+                        placeholderText="Selectionner une date de fin de chantier définitive"
+                        selected={finalCompletionDate ? getFormattedDate(finalCompletionDate) : ""}
+                        onChange={(date) => setFinalCompletionDate(formatDate(date))}
+                        dateFormat="dd/MM/yyyy"
+                        locale={fr}
+                      />
+                    </Form.Group>
+                  </div>
+                  <Button className="btn-secondary" type="submit" onClick={(e) => UpdateFolderInfo(e)}>
+                    Valider
+                  </Button>
+                  <Button
+                    className="btn-secondary ms-2"
+                    onClick={() => navigate("/manager-files")}
+                  >
+                    Annuler
+                  </Button>
+                </div>
+
+
+                {/* <Form.Group className="mb-3" controlId="names">
                 <Form.Label>Nom et prénom du demandeur</Form.Label>
                 <Form.Control
                   type="text"
@@ -1981,7 +2049,7 @@ const AddMissingDocument = async (e) => {
                 />
               </Form.Group> */}
 
-              {/* <Form.Group className="mb-3" controlId="start-date">
+                {/* <Form.Group className="mb-3" controlId="start-date">
                 <Form.Label className="d-block">Début du chantier</Form.Label>
                 <DatePicker
                   placeholderText="Selectionner une date"
@@ -1992,7 +2060,7 @@ const AddMissingDocument = async (e) => {
                 />
               </Form.Group> */}
 
-              {/* <Form.Group className="mb-3" controlId="end-date">
+                {/* <Form.Group className="mb-3" controlId="end-date">
                 <Form.Label className="d-block">Fin du chantier</Form.Label>
                 <DatePicker
                   placeholderText="Selectionner une date"
@@ -2002,7 +2070,7 @@ const AddMissingDocument = async (e) => {
                   locale={fr}
                 />
               </Form.Group> */}
-            </div>
+              </div>
             </Form>
           </Tab>
 
@@ -2280,7 +2348,7 @@ const AddMissingDocument = async (e) => {
                                     </Form.Select>
 
                                     <Form.Label>Relation Intervenant</Form.Label>
-                                    <div className="d-flex" style={{gap: "20px"}}>
+                                    <div className="d-flex" style={{ gap: "20px" }}>
                                       <Select
                                         options={options}
                                         value={
@@ -2292,14 +2360,14 @@ const AddMissingDocument = async (e) => {
                                         onChange={handleSpeakerChange}
                                         styles={{
                                           container: (provided) => ({
-                                              ...provided,
-                                              width: '50%',
+                                            ...provided,
+                                            width: '50%',
                                           }),
                                           menu: (provided) => ({
-                                              ...provided,
-                                              width: '100%',
+                                            ...provided,
+                                            width: '100%',
                                           }),
-                                      }}
+                                        }}
                                         placeholder={t("speakerLabel")}
                                         isSearchable={true}
                                       />
@@ -2418,7 +2486,7 @@ const AddMissingDocument = async (e) => {
                                           type="text"
                                           placeholder="Nom et prénom du demandeur"
                                           value={showUserCompanyName}
-                                          onChange={(e) =>setShowUserCompanyName(e.target.value)}
+                                          onChange={(e) => setShowUserCompanyName(e.target.value)}
                                         />
                                       </Form.Group>
 
@@ -2915,6 +2983,57 @@ const AddMissingDocument = async (e) => {
                                     </svg>
                                   </Link>
                                   <Link
+                                    class="addnote"
+                                    href="/user-management"
+                                    data-discover="true"
+                                    onClick={() => handleAddNoteModalOpen(data.id, data.file_name)}
+                                  >
+                                    <svg
+                                      width="24"
+                                      height="24"
+                                      viewBox="0 0 24 24"
+                                      fill="none"
+                                      xmlns="http://www.w3.org/2000/svg"
+                                    >
+                                      <rect
+                                        x="4"
+                                        y="3"
+                                        width="16"
+                                        height="18"
+                                        rx="2"
+                                        stroke="#e84455"
+                                        stroke-width="2"
+                                      />
+                                      <line
+                                        x1="8"
+                                        y1="7"
+                                        x2="16"
+                                        y2="7"
+                                        stroke="#e84455"
+                                        stroke-width="2"
+                                        stroke-linecap="round"
+                                      />
+                                      <line
+                                        x1="8"
+                                        y1="11"
+                                        x2="16"
+                                        y2="11"
+                                        stroke="#e84455"
+                                        stroke-width="2"
+                                        stroke-linecap="round"
+                                      />
+                                      <line
+                                        x1="8"
+                                        y1="15"
+                                        x2="13"
+                                        y2="15"
+                                        stroke="#e84455"
+                                        stroke-width="2"
+                                        stroke-linecap="round"
+                                      />
+                                    </svg>
+                                  </Link>
+                                  <Link
                                     class="download"
                                     href="/user-management"
                                     data-discover="true"
@@ -2947,28 +3066,28 @@ const AddMissingDocument = async (e) => {
                                     </svg>
                                   </Link>
                                   {/* {data.status !== "verified" && */}
-                                    <Link
-                                      class="doc"
-                                      href="/user-management"
-                                      data-discover="true"
-                                      onClick={() => {
-                                        handleCheckShow();
-                                        setShowDocumentId(data.id);
-                                      }}
+                                  <Link
+                                    class="doc"
+                                    href="/user-management"
+                                    data-discover="true"
+                                    onClick={() => {
+                                      handleCheckShow();
+                                      setShowDocumentId(data.id);
+                                    }}
+                                  >
+                                    <svg
+                                      width="24"
+                                      height="24"
+                                      viewBox="0 0 24 24"
+                                      fill="none"
+                                      xmlns="http://www.w3.org/2000/svg"
                                     >
-                                      <svg
-                                        width="24"
-                                        height="24"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                      >
-                                        <path
-                                          d="M14.059 9.02L14.979 9.94L5.91902 19H4.99902V18.08L14.059 9.02ZM17.659 3C17.409 3 17.149 3.1 16.959 3.29L15.129 5.12L18.879 8.87L20.709 7.04C21.099 6.65 21.099 6.02 20.709 5.63L18.369 3.29C18.169 3.09 17.919 3 17.659 3ZM14.059 6.19L2.99902 17.25V21H6.74902L17.809 9.94L14.059 6.19Z"
-                                          fill="#e84455"
-                                        />
-                                      </svg>
-                                    </Link>
+                                      <path
+                                        d="M14.059 9.02L14.979 9.94L5.91902 19H4.99902V18.08L14.059 9.02ZM17.659 3C17.409 3 17.149 3.1 16.959 3.29L15.129 5.12L18.879 8.87L20.709 7.04C21.099 6.65 21.099 6.02 20.709 5.63L18.369 3.29C18.169 3.09 17.919 3 17.659 3ZM14.059 6.19L2.99902 17.25V21H6.74902L17.809 9.94L14.059 6.19Z"
+                                        fill="#e84455"
+                                      />
+                                    </svg>
+                                  </Link>
                                   {/* } */}
                                   <Link
                                     class="delete"
@@ -3749,7 +3868,7 @@ const AddMissingDocument = async (e) => {
                               </Form.Select>
                             </div>
                           </div>
-                          </th>
+                        </th>
                         <th>Action</th>
                       </tr>
                     </thead>
@@ -3992,6 +4111,13 @@ const AddMissingDocument = async (e) => {
             </div>
           </Tab>
         </Tabs>
+
+        <AddNote
+          showmodal={showAddNoteModal}
+          handleModalClose={handleAddNoteModalClose}
+          selectDocumentId={selectedAddNoteDocId}
+          selectDocumentFileName={selectedAddNoteDocName}
+        />
 
         {/* View Show Paper Document */}
         <Offcanvas
@@ -4367,81 +4493,81 @@ const AddMissingDocument = async (e) => {
                 )}
               </Tab>
               <Tab eventKey="documents" title={`Documents (${totalSpeakerDocument})`}>
-              {isLoading ? (
-                <Loading />
-              ) : (
-                <div className="table-wrapper mt-16 p-0">
-                  <div className="table-wrap mt-24">
-                    <Table responsive hover>
-                      <thead>
-                        <tr>
-                          <th>Nom du fichier</th>
-                          <th>Type de document</th>
-                          <th>Statut</th>
-                          <th>Actions</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {showSpeakerDocument?.length > 0 ? (
-                          showSpeakerDocument?.map((data) => (
-                            <tr>
-                              <td>{data.filename}</td>
-                              <td>{data.docType?.name}</td>
-                              <td>
-                                {data.status == "to_be_checked" ? (
-                                  <span className="checked badges">
-                                    {t("toBeCheckedLabel")}
-                                  </span>
-                                ) : data.status == "verified" ? (
-                                  <span className="verified badges">
-                                    {t("verified")}
-                                  </span>
-                                ) : (
-                                  <span className="incomplete badges">
-                                    {t("invalidLabel")}
-                                  </span>
-                                )}
-                              </td>
-                              <td>
-                                <Link
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    e.preventDefault();
-                                    HandleDownloadFile(data);
-                                  }}
-                                  className="download"
-                                  href="/user-management"
-                                  data-discover="true"
-                                  title="Télécharger"
-                                >
-                                  <svg
-                                    width="24"
-                                    height="24"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    xmlns="http://www.w3.org/2000/svg"
+                {isLoading ? (
+                  <Loading />
+                ) : (
+                  <div className="table-wrapper mt-16 p-0">
+                    <div className="table-wrap mt-24">
+                      <Table responsive hover>
+                        <thead>
+                          <tr>
+                            <th>Nom du fichier</th>
+                            <th>Type de document</th>
+                            <th>Statut</th>
+                            <th>Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {showSpeakerDocument?.length > 0 ? (
+                            showSpeakerDocument?.map((data) => (
+                              <tr>
+                                <td>{data.filename}</td>
+                                <td>{data.docType?.name}</td>
+                                <td>
+                                  {data.status == "to_be_checked" ? (
+                                    <span className="checked badges">
+                                      {t("toBeCheckedLabel")}
+                                    </span>
+                                  ) : data.status == "verified" ? (
+                                    <span className="verified badges">
+                                      {t("verified")}
+                                    </span>
+                                  ) : (
+                                    <span className="incomplete badges">
+                                      {t("invalidLabel")}
+                                    </span>
+                                  )}
+                                </td>
+                                <td>
+                                  <Link
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      e.preventDefault();
+                                      HandleDownloadFile(data);
+                                    }}
+                                    className="download"
+                                    href="/user-management"
+                                    data-discover="true"
+                                    title="Télécharger"
                                   >
-                                    <path
-                                      d="M14 2H6C4.9 2 4.01 2.9 4.01 4L4 20C4 21.1 4.89 22 5.99 22H18C19.1 22 20 21.1 20 20V8L14 2ZM18 20H6V4H13V9H18V20Z"
-                                      fill="#e84455"
-                                    />
-                                    <path
-                                      d="M8 14L12 18L16 14"
-                                      stroke="#e84455"
-                                      stroke-width="1.5"
-                                      stroke-linecap="round"
-                                      stroke-linejoin="round"
-                                    />
-                                    <path
-                                      d="M12 11V18"
-                                      stroke="#e84455"
-                                      stroke-width="1.5"
-                                      stroke-linecap="round"
-                                      stroke-linejoin="round"
-                                    />
-                                  </svg>
-                                </Link>
-                                {/* {data.status !== "verified" && */}
+                                    <svg
+                                      width="24"
+                                      height="24"
+                                      viewBox="0 0 24 24"
+                                      fill="none"
+                                      xmlns="http://www.w3.org/2000/svg"
+                                    >
+                                      <path
+                                        d="M14 2H6C4.9 2 4.01 2.9 4.01 4L4 20C4 21.1 4.89 22 5.99 22H18C19.1 22 20 21.1 20 20V8L14 2ZM18 20H6V4H13V9H18V20Z"
+                                        fill="#e84455"
+                                      />
+                                      <path
+                                        d="M8 14L12 18L16 14"
+                                        stroke="#e84455"
+                                        stroke-width="1.5"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                      />
+                                      <path
+                                        d="M12 11V18"
+                                        stroke="#e84455"
+                                        stroke-width="1.5"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                      />
+                                    </svg>
+                                  </Link>
+                                  {/* {data.status !== "verified" && */}
                                   <Link
                                     className="delete"
                                     data-discover="true"
@@ -4465,27 +4591,27 @@ const AddMissingDocument = async (e) => {
                                       />
                                     </svg>
                                   </Link>
-                                {/* } */}
-                              </td>
+                                  {/* } */}
+                                </td>
+                              </tr>
+                            ))
+                          ) : (
+                            <tr style={{ textAlign: "center" }}>
+                              <td colSpan="4">{t("NorecordsfoundLabel")}</td>
                             </tr>
-                          ))
-                        ) : (
-                          <tr style={{ textAlign: "center" }}>
-                            <td colSpan="4">{t("NorecordsfoundLabel")}</td>
-                          </tr>
-                        )}
-                      </tbody>
-                    </Table>
+                          )}
+                        </tbody>
+                      </Table>
+                    </div>
+                    {totalSpeakerDocument > 10 && (
+                      <Paginations
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        onPageChange={handlePageChangeView}
+                      />
+                    )}
                   </div>
-                  {totalSpeakerDocument > 10 && (
-                    <Paginations
-                      currentPage={currentPage}
-                      totalPages={totalPages}
-                      onPageChange={handlePageChangeView}
-                    />
-                  )}
-                </div>
-              )}
+                )}
               </Tab>
               <Tab eventKey="documentType" title={`Documents manquants (${totalMissingDocument})`}>
                 {flashMessage.message && (
@@ -4659,25 +4785,117 @@ const AddMissingDocument = async (e) => {
       </Modal>
 
       {/* Requried & Not Requried Change Confirmation Popup */}
-        <Modal className='missing-doc-modal' show={showNotRequiredStatusChange} onHide={() => setShowNotRequiredStatusChange(true)}>
-          <Modal.Header closeButton onHide={handleNotRequiredChangeClose}>
-            <Modal.Title>
-              <h2>Confirmer</h2>
-            </Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <span className="complete-process">
-              Êtes-vous sûr de vouloir modifier le document requis ?
-            </span>
-          </Modal.Body>
-          <Modal.Footer>
-            <div className="text-end">
-              <Button variant="primary" onClick={() => DocumentTypeUpdateSingle(selectDocumentId, showSpeakerId)}>
-                {t("confirmbtnLabel")}
-              </Button>
+      <Modal className='missing-doc-modal' show={showNotRequiredStatusChange} onHide={() => setShowNotRequiredStatusChange(true)}>
+        <Modal.Header closeButton onHide={handleNotRequiredChangeClose}>
+          <Modal.Title>
+            <h2>Confirmer</h2>
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <span className="complete-process">
+            Êtes-vous sûr de vouloir modifier le document requis ?
+          </span>
+        </Modal.Body>
+        <Modal.Footer>
+          <div className="text-end">
+            <Button variant="primary" onClick={() => DocumentTypeUpdateSingle(selectDocumentId, showSpeakerId)}>
+              {t("confirmbtnLabel")}
+            </Button>
+          </div>
+        </Modal.Footer>
+      </Modal>
+
+      {/* Note List Canvas */}
+      <Offcanvas
+        className="add-folder-panel broker-add-panel"
+        placement={"end"}
+        show={showNote}
+        onHide={handleNoteClose}
+      >
+        <Offcanvas.Header closeButton>
+          <Offcanvas.Title>Dossier incomplet</Offcanvas.Title>
+        </Offcanvas.Header>
+        <Offcanvas.Body>
+          <div className="step-1">
+            <div className="div">
+              <div className="step-2">
+                <h2>Notes du Gestionnaire</h2>
+                <Select
+                  options={NotesOptions}
+                  onChange={(selectedOption) => GetDocumentFileNotesList(id, selectedOption?.value)}
+                  styles={{
+                    container: (provided) => ({
+                      ...provided,
+                      width: '50%',
+                    }),
+                    menu: (provided) => ({
+                      ...provided,
+                      width: '100%',
+                    }),
+                  }}
+                  placeholder={t("speakerLabel")}
+                  isSearchable={true}
+                />
+                {displayedRecordsNote?.length > 0 ? (
+                  <div
+                    ref={scrollRef}
+                    className="scroll-container mt-3"
+                    onScroll={handleScrollNote}
+                    style={{
+                      maxHeight: "300px",
+                      overflowY: "auto",
+                      scrollbarWidth: "thin"
+                    }}
+                  >
+                    <div style={{ height: "300px" }}>
+                      {displayedRecordsNote?.map((data) => (
+                        <Fragment>
+                          <div className="note-box mb-3">
+                            <div className="d-flex justify-content-between align-items-center top-part">
+                              <p className="m-0">{data.type == "note" ? "Note" : "Invalide"}</p>
+                              <p className="m-0 create-date">créé le {data.created_on}</p>
+                            </div>
+                            <div className="inner-box">
+                                {data.type == "note" && data.user_document_filename &&
+                                  <div className="d-flex align-items-center mb-3">
+                                    <div className="icon d-flex">
+                                      <svg
+                                        width="16"
+                                        height="16"
+                                        viewBox="0 0 8 14"
+                                        fill="none"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                      >
+                                        <path
+                                          d="M6.42457 3.36368V10.3334C6.42457 11.6728 5.33972 12.7576 4.00033 12.7576C2.66093 12.7576 1.57608 11.6728 1.57608 10.3334V2.75762C1.57608 1.92125 2.25487 1.24246 3.09123 1.24246C3.9276 1.24246 4.60639 1.92125 4.60639 2.75762V9.12125C4.60639 9.45459 4.33366 9.72731 4.00033 9.72731C3.66699 9.72731 3.39426 9.45459 3.39426 9.12125V3.36368H2.48517V9.12125C2.48517 9.95762 3.16396 10.6364 4.00033 10.6364C4.83669 10.6364 5.51548 9.95762 5.51548 9.12125V2.75762C5.51548 1.41822 4.43063 0.333374 3.09123 0.333374C1.75184 0.333374 0.666992 1.41822 0.666992 2.75762V10.3334C0.666992 12.1758 2.1579 13.6667 4.00033 13.6667C5.84275 13.6667 7.33366 12.1758 7.33366 10.3334V3.36368H6.42457Z"
+                                          fill="#683191"
+                                        ></path>
+                                      </svg>
+                                    </div>
+                                    <span className="file-names">{data.user_document_filename}</span>
+                                  </div>
+                                }
+                              <p className="">
+                                {data.reason}
+                              </p>
+                            </div>
+                          </div>
+                        </Fragment>
+                      ))}
+                    </div>
+                  </div>
+                )
+                  :
+                  (
+                    <div className="mt-3">
+                      {t("NorecordsfoundLabel")}
+                    </div>
+                  )}
+              </div>
             </div>
-          </Modal.Footer>
-        </Modal>
+          </div>
+        </Offcanvas.Body>
+      </Offcanvas>
     </Fragment>
   );
 };
