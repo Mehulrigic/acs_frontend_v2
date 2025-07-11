@@ -13,6 +13,7 @@ import Button from "react-bootstrap/Button";
 import Loading from '../../Common/Loading';
 import DashboardManagementService from "../../API/DashboardManagement/DashboardManagementService";
 import { Tab,Tabs } from 'react-bootstrap';
+import { BsPatchExclamation } from "react-icons/bs";
 
 const ManagerDashboard = () => {
   const { t } = useTranslation();
@@ -578,7 +579,14 @@ const ManagerDashboard = () => {
                       {(tobeProceedList?.length > 0 && selectedColumns?.length > 0) ?
                         tobeProceedList?.map((data, index) => (
                           <tr key={index} onClick={() => navigate(`/manager-file-detail/${data.id}`)}>
-                            {selectedColumns.includes("Police") && <td className="bold-font">{data.folder_name}</td>}
+                            {selectedColumns.includes("Police") && 
+                              <td className="bold-font" style={{ textAlign: "center" }}>
+                                <div style={{ lineHeight: 1 }}>
+                                  {data.is_important == 1 && <BsPatchExclamation style={{ color: "red", fontSize: "1.0rem" }} title='Remarque importante' />}
+                                  <div style={{ marginTop: "4px" }}>{data.folder_name}</div>
+                                </div>
+                              </td>
+                            }
                             {selectedColumns.includes("client") && <td className="bold-font">{data.customer_name}</td>}
                             {selectedColumns.includes("Nom du preneur d'assurance") && <td className="bold-font">{data.insurance_policyholder_name}</td>}
                             {selectedColumns.includes("brokerlabel") &&
@@ -1025,7 +1033,14 @@ const ManagerDashboard = () => {
                       {(tobeProceedList?.length > 0 && selectedColumns?.length > 0) ?
                         tobeProceedList?.map((data, index) => (
                           <tr key={index} onClick={() => navigate(`/manager-file-detail/${data.id}`)}>
-                            {selectedColumns.includes("Police") && <td className="bold-font">{data.folder_name}</td>}
+                            {selectedColumns.includes("Police") && 
+                              <td className="bold-font" style={{ textAlign: "center" }}>
+                                <div style={{ lineHeight: 1 }}>
+                                  {data.is_important == 1 && <BsPatchExclamation style={{ color: "red", fontSize: "1.0rem" }} title='Remarque importante' />}
+                                  <div style={{ marginTop: "4px" }}>{data.folder_name}</div>
+                                </div>
+                              </td>
+                            }
                             {selectedColumns.includes("client") && <td className="bold-font">{data.customer_name}</td>}
                             {selectedColumns.includes("Nom du preneur d'assurance") && <td className="bold-font">{data.insurance_policyholder_name}</td>}
                             {selectedColumns.includes("brokerlabel") &&
@@ -1472,7 +1487,14 @@ const ManagerDashboard = () => {
                       {(tobeProceedList?.length > 0 && selectedColumns?.length > 0) ?
                         tobeProceedList?.map((data, index) => (
                           <tr key={index} onClick={() => navigate(`/manager-file-detail/${data.id}`)}>
-                            {selectedColumns.includes("Police") && <td className="bold-font">{data.folder_name}</td>}
+                            {selectedColumns.includes("Police") && 
+                              <td className="bold-font" style={{ textAlign: "center" }}>
+                                <div style={{ lineHeight: 1 }}>
+                                  {data.is_important == 1 && <BsPatchExclamation style={{ color: "red", fontSize: "1.0rem" }} title='Remarque importante' />}
+                                  <div style={{ marginTop: "4px" }}>{data.folder_name}</div>
+                                </div>
+                              </td>
+                            }
                             {selectedColumns.includes("client") && <td className="bold-font">{data.customer_name}</td>}
                             {selectedColumns.includes("Nom du preneur d'assurance") && <td className="bold-font">{data.insurance_policyholder_name}</td>}
                             {selectedColumns.includes("brokerlabel") &&

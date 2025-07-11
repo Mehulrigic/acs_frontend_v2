@@ -14,6 +14,7 @@ import Button from "react-bootstrap/Button";
 import { Link } from "react-router-dom";
 import Loading from '../../Common/Loading';
 import DashboardManagementService from '../../API/DashboardManagement/DashboardManagementService';
+import { BsPatchExclamation } from 'react-icons/bs';
 
 const FilePage = () => {
   const { t } = useTranslation();
@@ -570,7 +571,12 @@ const FilePage = () => {
                     folderListData.map((data) => (
                       <tr key={data.id} onClick={() => navigate(`/file-details/${data.id}`)}>
                         {selectedColumns.includes("Police") && (
-                          <td className="bold-font">{data.folder_name}</td>
+                          <td className="bold-font" style={{ textAlign: "center" }}>
+                            <div style={{ lineHeight: 1 }}>
+                              {data.is_important == 1 && <BsPatchExclamation style={{ color: "red", fontSize: "1.0rem" }} title='Remarque importante' />}
+                              <div style={{ marginTop: "4px" }}>{data.folder_name}</div>
+                            </div>
+                          </td>
                         )}
                         {selectedColumns.includes("client") && userRole !="Assureur" && <td>{data.customer_name}</td>}
                         {selectedColumns.includes("Nom du preneur d'assurance") &&  <td>{data.insurance_policyholder_name}</td>}

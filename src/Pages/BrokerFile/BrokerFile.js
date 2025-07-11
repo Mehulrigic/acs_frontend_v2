@@ -14,6 +14,7 @@ import Button from "react-bootstrap/Button";
 import { Link } from "react-router-dom";
 import Loading from '../../Common/Loading';
 import DashboardManagementService from '../../API/DashboardManagement/DashboardManagementService';
+import { BsPatchExclamation } from 'react-icons/bs';
 
 const BrokerFile = () => {
   const { t } = useTranslation();
@@ -540,7 +541,14 @@ const BrokerFile = () => {
                   {folderListData?.length > 0 && selectedColumns?.length > 0 ?
                     folderListData?.map((data) => (
                       <tr onClick={() => navigate(`/courtier-file-detail/${data.id}`)}>
-                        {selectedColumns.includes("fileNumber") && <td className="bold-font">{data.folder_name}</td>}
+                        {selectedColumns.includes("fileNumber") && 
+                          <td className="bold-font" style={{ textAlign: "center" }}>
+                            <div style={{ lineHeight: 1 }}>
+                              {data.is_important == 1 && <BsPatchExclamation style={{ color: "red", fontSize: "1.0rem" }} title='Remarque importante' />}
+                              <div style={{ marginTop: "4px" }}>{data.folder_name}</div>
+                            </div>
+                          </td>
+                        }
                         {selectedColumns.includes("client") && <td>{data.customer_name}</td>}
                         {selectedColumns.includes("Nom du preneur d'assurance") && <td>{data.insurance_policyholder_name}</td>}
                         {selectedColumns.includes("Date de création") && <td>{data.created_at}</td>}

@@ -12,6 +12,7 @@ import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 import Loading from '../../Common/Loading';
 import DashboardManagementService from "../../API/DashboardManagement/DashboardManagementService";
+import { BsPatchExclamation } from "react-icons/bs";
 
 const ManagerFile = () => {
   const { t } = useTranslation();
@@ -582,7 +583,15 @@ const ManagerFile = () => {
                   {(fileList?.length > 0 && selectedColumns?.length > 0) ?
                     fileList?.map((data, index) => (
                       <tr key={index} onClick={() => navigate(`/manager-file-detail/${data.id}`)}>
-                        {selectedColumns.includes("Police") && <td className="bold-font">{data.folder_name}</td>}
+                        {selectedColumns.includes("Police") && 
+                          // <td className="bold-font">{data.folder_name}</td>
+                          <td className="bold-font" style={{ textAlign: "center" }}>
+                            <div style={{ lineHeight: 1 }}>
+                              {data.is_important == 1 && <BsPatchExclamation style={{ color: "red", fontSize: "1.0rem" }} title='Remarque importante' />}
+                              <div style={{ marginTop: "4px" }}>{data.folder_name}</div>
+                            </div>
+                          </td>
+                        }
                         {selectedColumns.includes("client") && <td className="bold-font">{data.customer_name}</td>}
                         {selectedColumns.includes("Nom du preneur d'assurance") && <td className="bold-font">{data.insurance_policyholder_name}</td>}
                         {selectedColumns.includes("brokerlabel") && <td className="bold-font">

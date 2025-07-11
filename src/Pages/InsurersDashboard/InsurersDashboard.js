@@ -15,6 +15,7 @@ import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 import Loading from "../../Common/Loading";
 import { Tab,Tabs } from 'react-bootstrap';
+import { BsPatchExclamation } from "react-icons/bs";
 
 
 const InsurersDashboard = () => {
@@ -643,7 +644,12 @@ const InsurersDashboard = () => {
                           userDocumentData?.map((data) => (
                             <tr key={data.id} onClick={() => navigate(`/file-details/${data.id}`)}>
                               {selectedColumns.includes("fileNumber") && (
-                                <td className="bold-font">{data.folder_name}</td>
+                                <td className="bold-font" style={{ textAlign: "center" }}>
+                                  <div style={{ lineHeight: 1 }}>
+                                    {data.is_important == 1 && <BsPatchExclamation style={{ color: "red", fontSize: "1.0rem" }} title='Remarque importante' />}
+                                    <div style={{ marginTop: "4px" }}>{data.folder_name}</div>
+                                  </div>
+                                </td>
                               )}
                               {/* {selectedColumns.includes("client") && <td>{data.customer_name}</td>} */}
                               {selectedColumns.includes("Nom du preneur d'assurance") && <td>{data.insurance_policyholder_name}</td>}
@@ -1062,7 +1068,12 @@ const InsurersDashboard = () => {
                           userDocumentData?.map((data) => (
                             <tr key={data.id} onClick={() => navigate(`/file-details/${data.id}`)}>
                               {selectedColumns.includes("fileNumber") && (
-                                <td className="bold-font">{data.folder_name}</td>
+                                <td className="bold-font" style={{ textAlign: "center" }}>
+                                  <div style={{ lineHeight: 1 }}>
+                                    {data.is_important == 1 && <BsPatchExclamation style={{ color: "red", fontSize: "1.0rem" }} title='Remarque importante' />}
+                                    <div style={{ marginTop: "4px" }}>{data.folder_name}</div>
+                                  </div>
+                                </td>
                               )}
                               {/* {selectedColumns.includes("client") && <td>{data.customer_name}</td>} */}
                               {selectedColumns.includes("Nom du preneur d'assurance") && <td>{data.insurance_policyholder_name}</td>}
@@ -1481,7 +1492,12 @@ const InsurersDashboard = () => {
                           userDocumentData?.map((data) => (
                             <tr key={data.id} onClick={() => navigate(`/file-details/${data.id}`)}>
                               {selectedColumns.includes("fileNumber") && (
-                                <td className="bold-font">{data.folder_name}</td>
+                                <td className="bold-font" style={{ textAlign: "center" }}>
+                                  <div style={{ lineHeight: 1 }}>
+                                    {data.is_important == 1 && <BsPatchExclamation style={{ color: "red", fontSize: "1.0rem" }} title='Remarque importante' />}
+                                    <div style={{ marginTop: "4px" }}>{data.folder_name}</div>
+                                  </div>
+                                </td>
                               )}
                               {/* {selectedColumns.includes("client") && <td>{data.customer_name}</td>} */}
                               {selectedColumns.includes("Nom du preneur d'assurance") && <td>{data.insurance_policyholder_name}</td>}
