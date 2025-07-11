@@ -19,16 +19,15 @@
     border: 1px solid var(--primary-dark);
     background-color: var(--white-color);
     border-radius: 8px;
-    padding: 11px 24px;
+    padding: 12px 12px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     color: var(--primary-dark);
     font-family: "Nunito";
-font-size: 16px;
-font-weight: 700;
-line-height: 21.82px;
-
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 21.82px;
 }
 .add-document,.check-document{
     font-family: "Manrope";

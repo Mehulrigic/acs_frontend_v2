@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect } from "react";
+import React, { Fragment, useEffect, useRef } from "react";
 import "./FileDetails.css";
 import SidePanel from "../../Components/SidePanel/SidePanel";
 import Table from "react-bootstrap/Table";
@@ -22,11 +22,14 @@ import Loading from "../../Common/Loading";
 import DocViewer, { DocViewerRenderers } from '@cyntler/react-doc-viewer';
 import '@cyntler/react-doc-viewer/dist/index.css';
 import AcsManagerFileService from "../../API/AcsManager/AcsManagerFileService";
+import AddNote from "../../Components/AddNote/AddNote";
+import Select from "react-select";
 
 const FileDetails = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { id } = useParams();
+  const scrollRef = useRef(null);
 
   const [isLoading, setIsLoading] = useState(false);
   const [currentFileIndex, setCurrentFileIndex] = useState(0);
@@ -80,10 +83,10 @@ const FileDetails = () => {
   const [brokerList, setBrokerList] = useState([]);
   const [selectBroker, setSelectBroker] = useState("");
   const [recordsToShow, setRecordsToShow] = useState(2);
+  const [invalidReasonNoteList, setInvalidReasonNoteList] = useState([]);
   const [recordsToShowNOte, setRecordsToShowNote] = useState(3);
   const [logoImageShow, setLogoImageShow] = useState("");
   const [rightPanelThemeColor, setRightPanelThemeColor] = useState("");
-  const [userRole, setUserRole] = useState(null);
   const [search, setSearch] = useState("");
   const [isRotated, setIsRotated] = useState(false);
   const [sort, setSort] = useState({ key: "created_at", value: "desc" });
@@ -250,6 +253,20 @@ const FileDetails = () => {
   const handleInvalidReasonModalClose = () => setInvalidReasonModal(false);
 
   const [contractNo, setContractNo] = useState("");
+
+  const [showAddNoteModal, setShowAddNoteModal] = useState(false);
+  const [selectedAddNoteDocId, setSelectedAddNoteDocId] = useState(null);
+  const [selectedAddNoteDocName, setSelectedAddNoteDocName] = useState("");
+
+  const [showNote, setShowNote] = useState(false);
+  const handleNoteShow = () => setShowNote(true);
+  const handleNoteClose = () => setShowNote(false);
+
+  useEffect(() => {
+    if (showNote) {
+      GetDocumentFileNotesList(id);
+    }
+  }, [showNote]);
 
   useEffect(() => {
     if (flashMessage.message) {
@@ -1315,22 +1332,23 @@ const handleUpdateFileChange = (event) => {
     }
   };
 
-  const handleScroll = (e) => {
+  const handleScrollInvalid = (e) => {
     const { scrollTop, scrollHeight, clientHeight } = e.target;
     if (scrollTop + clientHeight >= scrollHeight - 5) {
-      setRecordsToShow((prev) => Math.min(prev + 2, historyDocumentList.length));
+      setRecordsToShow((prev) => Math.min(prev + 2, invalidReasonList.length));
     }
   };
 
   const handleScrollNote = (e) => {
     const { scrollTop, scrollHeight, clientHeight } = e.target;
     if (scrollTop + clientHeight >= scrollHeight - 5) {
-      setRecordsToShowNote((prev) => Math.min(prev + 3, historyDocumentList.length));
+      setRecordsToShowNote((prev) => Math.min(prev + 3, invalidReasonNoteList.length));
     }
   };
 
-  const displayedRecords = historyDocumentList.slice(0, recordsToShow);
-  const displayedRecordsNote = invalidReasonList.slice(0, recordsToShowNOte);
+  // const displayedRecords = historyDocumentList.slice(0, recordsToShow);
+  const displayedRecordsNoteInvalid = invalidReasonList.slice(0, recordsToShow);
+  const displayedRecordsNote = invalidReasonNoteList.slice(0, recordsToShowNOte);
 
   const handleSpeakerCheckboxChange = (key) => {
     setSpeakerModalColumns((prev) => ({ ...prev, [key]: !prev[key] }));
@@ -1441,10 +1459,48 @@ const handleUpdateFileChange = (event) => {
     };
   }, []);
 
+  const GetDocumentFileNotesList = async (id, filter) => {
+    setIsLoading(true);
+    try {
+      var userData = {
+        is_important: filter ? filter : 1
+      }
+
+      const response = await FilePageService.document_file_notes(id, userData);
+
+      if (response.data.status) {
+        setIsLoading(false);
+        setInvalidReasonNoteList(response.data.data || []);
+        setRecordsToShowNote(3);
+        if (scrollRef.current) {
+          scrollRef.current.scrollTop = 0;
+        }
+      }
+    } catch (error) {
+      setIsLoading(false);
+      console.log(error);
+    }
+  };
+
   const handleChange = (e) => {
     const value = e.target.value;
     setContractNo(value);
   };
+
+  const handleAddNoteModalOpen = (docId, docName) => {
+    setSelectedAddNoteDocId(docId);
+    setSelectedAddNoteDocName(docName);
+    setShowAddNoteModal(true);
+  };
+
+  const handleAddNoteModalClose = () => {
+    setShowAddNoteModal(false);
+  };
+
+  const NotesOptions = [
+    { value: "1", label: "Importante" },
+    { value: "0", label: "Général" },
+  ];
 
   return (
     <Fragment>
@@ -1631,7 +1687,7 @@ const handleUpdateFileChange = (event) => {
               </div>
 
               {/* Add note  */}
-              <div style={{ marginLeft: "10px" }}>
+              <div>
                 <MissingDocument
                   link={true}
                   sort={sort}
@@ -1640,6 +1696,10 @@ const handleUpdateFileChange = (event) => {
                   selectActionType={selectActionType}
                   GetHistoryListDocument={GetHistoryListDocument}
                 />
+              </div>
+
+              <div>
+                <Link className="link-wrap" onClick={handleNoteShow}>Voir les raisons</Link>
               </div>
 
               <p className="m-0">Envoyer à : </p>
@@ -2277,6 +2337,57 @@ const handleUpdateFileChange = (event) => {
                                       <path
                                         d="M12 6.5C15.79 6.5 19.17 8.63 20.82 12C19.17 15.37 15.8 17.5 12 17.5C8.2 17.5 4.83 15.37 3.18 12C4.83 8.63 8.21 6.5 12 6.5ZM12 4.5C7 4.5 2.73 7.61 1 12C2.73 16.39 7 19.5 12 19.5C17 19.5 21.27 16.39 23 12C21.27 7.61 17 4.5 12 4.5ZM12 9.5C13.38 9.5 14.5 10.62 14.5 12C14.5 13.38 13.38 14.5 12 14.5C10.62 14.5 9.5 13.38 9.5 12C9.5 10.62 10.62 9.5 12 9.5ZM12 7.5C9.52 7.5 7.5 9.52 7.5 12C7.5 14.48 9.52 16.5 12 16.5C14.48 16.5 16.5 14.48 16.5 12C16.5 9.52 14.48 7.5 12 7.5Z"
                                         fill="#00366B"
+                                      />
+                                    </svg>
+                                  </Link>
+                                  <Link
+                                    class="addnote"
+                                    href="/user-management"
+                                    data-discover="true"
+                                    onClick={() => handleAddNoteModalOpen(data.id, data.filename)}
+                                  >
+                                    <svg
+                                      width="24"
+                                      height="24"
+                                      viewBox="0 0 24 24"
+                                      fill="none"
+                                      xmlns="http://www.w3.org/2000/svg"
+                                    >
+                                      <rect
+                                        x="4"
+                                        y="3"
+                                        width="16"
+                                        height="18"
+                                        rx="2"
+                                        stroke="#00366B"
+                                        stroke-width="2"
+                                      />
+                                      <line
+                                        x1="8"
+                                        y1="7"
+                                        x2="16"
+                                        y2="7"
+                                        stroke="#00366B"
+                                        stroke-width="2"
+                                        stroke-linecap="round"
+                                      />
+                                      <line
+                                        x1="8"
+                                        y1="11"
+                                        x2="16"
+                                        y2="11"
+                                        stroke="#00366B"
+                                        stroke-width="2"
+                                        stroke-linecap="round"
+                                      />
+                                      <line
+                                        x1="8"
+                                        y1="15"
+                                        x2="13"
+                                        y2="15"
+                                        stroke="#00366B"
+                                        stroke-width="2"
+                                        stroke-linecap="round"
                                       />
                                     </svg>
                                   </Link>
@@ -3181,6 +3292,13 @@ const handleUpdateFileChange = (event) => {
         </Tabs>
       </div>
 
+      <AddNote
+        showmodal={showAddNoteModal}
+        handleModalClose={handleAddNoteModalClose}
+        selectDocumentId={selectedAddNoteDocId}
+        selectDocumentFileName={selectedAddNoteDocName}
+      />
+
       {/* Update Speaker Documents */}
       <Offcanvas
         className="add-folder-panel"
@@ -3462,7 +3580,7 @@ const handleUpdateFileChange = (event) => {
             {displayedRecordsNote?.length > 0 ? (
               <div
                 className="scroll-container"
-                onScroll={handleScrollNote}
+                onScroll={handleScrollInvalid}
                 style={{
                   maxHeight: "400px",
                   overflowY: "auto",
@@ -3470,7 +3588,7 @@ const handleUpdateFileChange = (event) => {
                 }}
               >
                 <div style={{ height: "400px" }}>
-                  {displayedRecordsNote?.map((data) => (
+                  {displayedRecordsNoteInvalid?.map((data) => (
                     <Fragment>
                       <div className="note-box mb-3">
                         <div className="d-flex justify-content-between align-items-center top-part">
@@ -3943,6 +4061,99 @@ const handleUpdateFileChange = (event) => {
           </div>
         </Modal.Footer>
       </Modal>
+
+      {/* Note list */}
+      <Offcanvas
+        className="add-folder-panel broker-add-panel"
+        placement={"end"}
+        show={showNote}
+        onHide={handleNoteClose}
+      >
+        <Offcanvas.Header closeButton>
+          <Offcanvas.Title>Dossier incomplet</Offcanvas.Title>
+        </Offcanvas.Header>
+        <Offcanvas.Body style={{ overflow: "hidden", maxHeight: "80vh" }}>
+          <div className="step-1">
+            <div className="div">
+              <div className="step-2">
+                <h2>Notes du Assureur</h2>
+                <Select
+                  options={NotesOptions}
+                  onChange={(selectedOption) => GetDocumentFileNotesList(id, selectedOption?.value)}
+                  styles={{
+                    container: (provided) => ({
+                      ...provided,
+                      width: '50%',
+                    }),
+                    menu: (provided) => ({
+                      ...provided,
+                      width: '100%',
+                    }),
+                  }}
+                  placeholder={t("speakerLabel")}
+                  isSearchable={true}
+                />
+                {displayedRecordsNote?.length > 0 ? (
+                  <div
+                    ref={scrollRef}
+                    className="scroll-container mt-3"
+                    onScroll={handleScrollNote}
+                    style={{
+                      maxHeight: "300px",
+                      overflowY: "auto",
+                      scrollbarWidth: "thin"
+                    }}
+                  >
+                    <div style={{ height: "400px" }}>
+                      {displayedRecordsNote?.map((data) => (
+                        <Fragment>
+                          <div className="note-box mb-3">
+                            <div className="d-flex justify-content-between align-items-center top-part">
+                              <p className="m-0">{data.type == "note" ? "Note" : "Invalide"}</p>
+                              <p className="m-0 create-date">créé le {data.created_on}</p>
+                            </div>
+                            <div className="inner-box">
+                              {data.type == "note" && data.user_document_filename &&
+                                <div className="d-flex align-items-center mb-3">
+                                  <div className="icon d-flex">
+                                    <svg
+                                      width="16"
+                                      height="16"
+                                      viewBox="0 0 8 14"
+                                      fill="none"
+                                      xmlns="http://www.w3.org/2000/svg"
+                                    >
+                                      <path
+                                        d="M6.42457 3.36368V10.3334C6.42457 11.6728 5.33972 12.7576 4.00033 12.7576C2.66093 12.7576 1.57608 11.6728 1.57608 10.3334V2.75762C1.57608 1.92125 2.25487 1.24246 3.09123 1.24246C3.9276 1.24246 4.60639 1.92125 4.60639 2.75762V9.12125C4.60639 9.45459 4.33366 9.72731 4.00033 9.72731C3.66699 9.72731 3.39426 9.45459 3.39426 9.12125V3.36368H2.48517V9.12125C2.48517 9.95762 3.16396 10.6364 4.00033 10.6364C4.83669 10.6364 5.51548 9.95762 5.51548 9.12125V2.75762C5.51548 1.41822 4.43063 0.333374 3.09123 0.333374C1.75184 0.333374 0.666992 1.41822 0.666992 2.75762V10.3334C0.666992 12.1758 2.1579 13.6667 4.00033 13.6667C5.84275 13.6667 7.33366 12.1758 7.33366 10.3334V3.36368H6.42457Z"
+                                        fill="#683191"
+                                      ></path>
+                                    </svg>
+                                  </div>
+                                  <span className="file-names">{data.user_document_filename}</span>
+                                </div>
+                              }
+                              <p className="">
+                                {data.reason}
+                              </p>
+                            </div>
+                          </div>
+                        </Fragment>
+                      ))}
+                    </div>
+                  </div>
+                )
+                  :
+                  (
+                    <div className="mt-3">
+                      {t("NorecordsfoundLabel")}
+                    </div>
+                  )}
+              </div>
+            </div>
+          </div>
+
+        </Offcanvas.Body>
+      </Offcanvas>
     </Fragment>
   );
 };

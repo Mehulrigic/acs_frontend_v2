@@ -1226,7 +1226,7 @@ const BrokerFileDetail = () => {
                     <div className="step-1">
                       <div className="div">
                         <div className="step-2">
-                          <h2>Notes du courtier</h2>
+                          <h2>Notes du Courtier</h2>
                           <Select
                             options={NotesOptions}
                             onChange={(selectedOption) => GetDocumentFileNotesList(id, selectedOption?.value)}

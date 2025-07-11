@@ -4819,7 +4819,7 @@ const AdminFileDetail = () => {
           <div className="step-1">
             <div className="div">
               <div className="step-2">
-                <h2>Notes du Gestionnaire</h2>
+                <h2>Notes du Administrateur</h2>
                 <Select
                   options={NotesOptions}
                   onChange={(selectedOption) => GetDocumentFileNotesList(id, selectedOption?.value)}
