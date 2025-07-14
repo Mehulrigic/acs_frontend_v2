@@ -14,6 +14,7 @@ const MissingDocument = (props) => {
 
   const [showmodal, setShowmodal] = useState(false);
   const [reasonMessage, setReasonMessage] = useState("");
+  const [isImportant, setIsImportant] = useState(false);
   const [flashMessage, setFlashMessage] = useState({ type: "", message: "" });
 
   const handleModalClose = () => setShowmodal(false);
@@ -39,6 +40,7 @@ const MissingDocument = (props) => {
       user_document_id: id,
       // user_document_file_id: selectDocumentId,
       reason: reasonMessage,
+      is_important: isImportant ? 1 : 0,
       type: "note"
     };
     try {
@@ -89,9 +91,29 @@ const MissingDocument = (props) => {
                   {flashMessage.message}
                 </div>
               )}
-              <Form.Group className="mt-3 mb-3" controlId="exampleForm.ControlTextarea1">
-                <Form.Control placeholder='Votre message' as="textarea" rows={3} name='reason' onChange={(e) => setReasonMessage(e.target.value)} />
-              </Form.Group>
+
+              <div className="mt-3">
+                <Form.Group className="mt-3 mb-3" controlId="exampleForm.ControlTextarea1">
+                  <Form.Control 
+                    placeholder='Votre message' 
+                    as="textarea" 
+                    rows={3} 
+                    name='reason' 
+                    onChange={(e) => setReasonMessage(e.target.value)} 
+                  />
+                </Form.Group>
+                <Form.Group controlId="importantNoteCheckbox" className="mt-2 mb-0">
+                  <div style={{ display: "flex", alignItems: "center", gap: "8px", cursor: "pointer" }}>
+                    <Form.Check
+                      type="checkbox"
+                      name="isImportant"
+                      value={isImportant}
+                      onChange={(e) => setIsImportant(e.target.checked)}
+                    />
+                    <Form.Label style={{ cursor: "pointer", paddingTop: "10px" }}>Remarque importante</Form.Label>
+                  </div>
+                </Form.Group>
+              </div>
             </Form>
           </Modal.Body>
           <Modal.Footer>
