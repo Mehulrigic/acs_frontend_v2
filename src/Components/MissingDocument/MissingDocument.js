@@ -16,6 +16,7 @@ const MissingDocument = (props) => {
   const [reasonMessage, setReasonMessage] = useState("");
   const [isImportant, setIsImportant] = useState(false);
   const [flashMessage, setFlashMessage] = useState({ type: "", message: "" });
+  const [loading, setLoading] = useState(false);
 
   const handleModalClose = () => setShowmodal(false);
   const handleModalShow = () => setShowmodal(true);
@@ -32,10 +33,16 @@ const MissingDocument = (props) => {
 
   const AddDocumentDisabilityReason = async (e) => {
     e.preventDefault();
+    
+    if (loading) return;
+
     if (reasonMessage == "") {
       setFlashMessage({ type: "error", message: t("requriedErrorMessageLabel") });
       return;
     }
+
+    setLoading(true);
+
     var disabilityReasonData = {
       user_document_id: id,
       // user_document_file_id: selectDocumentId,
@@ -43,23 +50,29 @@ const MissingDocument = (props) => {
       is_important: isImportant ? 1 : 0,
       type: "note"
     };
+
     try {
       const response = await MissingDocumentService.add_document_disability_reason(disabilityReasonData);
       if (response.data.status) {
+        setLoading(false);
         setReasonMessage("");
         GetHistoryListDocument(id, sort, search, currentPage, selectActionType);
         handleModalClose();
       } else {
+        setLoading(false);
         setFlashMessage({
           type: "error",
           message: t("somethingWentWrong"),
         });
       }
     } catch (error) {
+      setLoading(false);
       setFlashMessage({
         type: "error",
         message: t("somethingWentWrong"),
       });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -118,7 +131,7 @@ const MissingDocument = (props) => {
           </Modal.Body>
           <Modal.Footer>
             <div className="text-end">
-              <Button variant="primary" type="submit">Ajouter</Button>
+              <Button variant="primary" type="submit" disabled={loading}>Ajouter</Button>
             </div>
           </Modal.Footer>
         </Form>

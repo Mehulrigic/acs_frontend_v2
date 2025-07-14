@@ -18,6 +18,7 @@ import AcsManagerFileService from "../../API/AcsManager/AcsManagerFileService";
 import AddNote from "../../Components/AddNote/AddNote";
 import Select from "react-select";
 import MissingDocument from "../../Components/MissingDocument/MissingDocument";
+import { BsPatchExclamation } from "react-icons/bs";
 
 const BrokerFileDetail = () => {
   const { t } = useTranslation();
@@ -26,6 +27,7 @@ const BrokerFileDetail = () => {
   const scrollRef = useRef(null);
 
   const [isLoading, setIsLoading] = useState(false);
+  const [isNoteLoading, setIsNoteLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('otherdocument');
   const [activeSubTab, setActiveSubTab] = useState("speaker");
   const [history, setHistory] = useState([]);
@@ -423,16 +425,18 @@ const BrokerFileDetail = () => {
   };
 
   const GetDocumentFileNotesList = async (id, filter) => {
-    setIsLoading(true);
+    setIsNoteLoading(true);
     try {
-      var userData = {
-        is_important: filter == 1 ? 1 : filter == 0 ? 0 : ""
+      let userData = null;
+
+      if (filter == 0 || filter == 1) {
+        userData = { is_important: filter };
       }
 
       const response = await FilePageService.document_file_notes(id, userData);
 
       if (response.data.status) {
-        setIsLoading(false);
+        setIsNoteLoading(false);
         setInvalidReasonNoteList(response.data.data || []);
         setRecordsToShowNote(3);
         if (scrollRef.current) {
@@ -440,7 +444,7 @@ const BrokerFileDetail = () => {
         }
       }
     } catch (error) {
-      setIsLoading(false);
+      setIsNoteLoading(false);
       console.log(error);
     }
   };
@@ -1243,62 +1247,74 @@ const BrokerFileDetail = () => {
                             }}
                             placeholder={"Sélectionnez le type de note"}
                             isSearchable={true}
+                            className={isNoteLoading ? "mb-5" : ""}
                           />
-                          {displayedRecordsNote?.length > 0 ? (
-                            <div
-                              ref={scrollRef}
-                              className="scroll-container mt-3"
-                              onScroll={handleScrollNote}
-                              style={{
-                                maxHeight: "300px",
-                                overflowY: "auto",
-                                scrollbarWidth: "thin"
-                              }}
-                            >
-                              <div style={{ height: "400px" }}>
-                                {displayedRecordsNote?.map((data) => (
-                                  <Fragment>
-                                    <div className="note-box mb-3">
-                                      <div className="d-flex justify-content-between align-items-center top-part">
-                                        <p className="m-0">{data.type == "note" ? "Note" : "Invalide"}</p>
-                                        <p className="m-0 create-date">créé le {data.created_on}</p>
-                                      </div>
-                                      <div className="inner-box">
-                                        {data.type == "note" && data.user_document_filename &&
-                                          <div className="d-flex align-items-center mb-3">
-                                            <div className="icon d-flex">
-                                              <svg
-                                                width="16"
-                                                height="16"
-                                                viewBox="0 0 8 14"
-                                                fill="none"
-                                                xmlns="http://www.w3.org/2000/svg"
-                                              >
-                                                <path
-                                                  d="M6.42457 3.36368V10.3334C6.42457 11.6728 5.33972 12.7576 4.00033 12.7576C2.66093 12.7576 1.57608 11.6728 1.57608 10.3334V2.75762C1.57608 1.92125 2.25487 1.24246 3.09123 1.24246C3.9276 1.24246 4.60639 1.92125 4.60639 2.75762V9.12125C4.60639 9.45459 4.33366 9.72731 4.00033 9.72731C3.66699 9.72731 3.39426 9.45459 3.39426 9.12125V3.36368H2.48517V9.12125C2.48517 9.95762 3.16396 10.6364 4.00033 10.6364C4.83669 10.6364 5.51548 9.95762 5.51548 9.12125V2.75762C5.51548 1.41822 4.43063 0.333374 3.09123 0.333374C1.75184 0.333374 0.666992 1.41822 0.666992 2.75762V10.3334C0.666992 12.1758 2.1579 13.6667 4.00033 13.6667C5.84275 13.6667 7.33366 12.1758 7.33366 10.3334V3.36368H6.42457Z"
-                                                  fill="#683191"
-                                                ></path>
-                                              </svg>
-                                            </div>
-                                            <span className="file-names">{data.user_document_filename}</span>
+
+                          {isNoteLoading ? <Loading /> :
+                            displayedRecordsNote?.length > 0 ? (
+                              <div
+                                ref={scrollRef}
+                                className="scroll-container mt-3"
+                                onScroll={handleScrollNote}
+                                style={{
+                                  maxHeight: "300px",
+                                  overflowY: "auto",
+                                  scrollbarWidth: "thin"
+                                }}
+                              >
+                                <div style={{ height: "400px" }}>
+                                  {displayedRecordsNote?.map((data) => (
+                                    <Fragment>
+                                      <div className="note-box mb-3">
+                                        <div className="d-flex justify-content-between align-items-center top-part">
+                                          <p className="m-0">{data.type == "note" ? "Note" : "Invalide"}</p>
+                                          <div className="d-flex align-items-center gap-2">
+                                            {data.is_important == 1 && (
+                                              <BsPatchExclamation
+                                                style={{ color: "red", fontSize: "1.0rem", cursor: "pointer" }}
+                                                title="Remarque importante"
+                                              />
+                                            )}
+                                            <p className="m-0 create-date">créé le {data.created_on}</p>
                                           </div>
-                                        }
-                                        <p className="">
-                                          {data.reason}
-                                        </p>
+                                        </div>
+                                        <div className="inner-box">
+                                          {data.type == "note" && data.user_document_filename &&
+                                            <div className="d-flex align-items-center mb-3">
+                                              <div className="icon d-flex">
+                                                <svg
+                                                  width="16"
+                                                  height="16"
+                                                  viewBox="0 0 8 14"
+                                                  fill="none"
+                                                  xmlns="http://www.w3.org/2000/svg"
+                                                >
+                                                  <path
+                                                    d="M6.42457 3.36368V10.3334C6.42457 11.6728 5.33972 12.7576 4.00033 12.7576C2.66093 12.7576 1.57608 11.6728 1.57608 10.3334V2.75762C1.57608 1.92125 2.25487 1.24246 3.09123 1.24246C3.9276 1.24246 4.60639 1.92125 4.60639 2.75762V9.12125C4.60639 9.45459 4.33366 9.72731 4.00033 9.72731C3.66699 9.72731 3.39426 9.45459 3.39426 9.12125V3.36368H2.48517V9.12125C2.48517 9.95762 3.16396 10.6364 4.00033 10.6364C4.83669 10.6364 5.51548 9.95762 5.51548 9.12125V2.75762C5.51548 1.41822 4.43063 0.333374 3.09123 0.333374C1.75184 0.333374 0.666992 1.41822 0.666992 2.75762V10.3334C0.666992 12.1758 2.1579 13.6667 4.00033 13.6667C5.84275 13.6667 7.33366 12.1758 7.33366 10.3334V3.36368H6.42457Z"
+                                                    fill="#683191"
+                                                  ></path>
+                                                </svg>
+                                              </div>
+                                              <span className="file-names">{data.user_document_filename}</span>
+                                            </div>
+                                          }
+                                          <p className="">
+                                            {data.reason}
+                                          </p>
+                                        </div>
                                       </div>
-                                    </div>
-                                  </Fragment>
-                                ))}
+                                    </Fragment>
+                                  ))}
+                                </div>
                               </div>
-                            </div>
-                          )
+                            )
                             :
                             (
-                              <div className="mt-3">
-                                {t("NorecordsfoundLabel")}
-                              </div>
-                            )}
+                                <div className="mt-3">
+                                  {t("NorecordsfoundLabel")}
+                                </div>
+                            )
+                          }
                         </div>
                       </div>
                     </div>

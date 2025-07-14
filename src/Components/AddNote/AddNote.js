@@ -14,6 +14,7 @@ const AddNote = (props) => {
     const [reasonMessage, setReasonMessage] = useState("");
     const [isImportant, setIsImportant] = useState(false);
     const [flashMessage, setFlashMessage] = useState({ type: "", message: "" });
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         if (flashMessage.message) {
@@ -27,11 +28,16 @@ const AddNote = (props) => {
 
     const AddDocumentNote = async (e) => {
         e.preventDefault();
+        
+        if (loading) return;
+
         if (reasonMessage == "") {
             setFlashMessage({ type: "error", message: t("requriedErrorMessageLabel") });
             return;
         }
         
+        setLoading(true);
+
         var addNoteData = {
             user_document_id: id,
             user_document_file_id: selectDocumentId,
@@ -43,19 +49,24 @@ const AddNote = (props) => {
         try {
             const response = await MissingDocumentService.add_document_disability_reason(addNoteData);
             if (response.data.status) {
+                setLoading(false);
                 setReasonMessage("");
                 handleModalClose();
             } else {
+                setLoading(false);
                 setFlashMessage({
                     type: "error",
                     message: response.data.message || t("somethingWentWrong"),
                 });
             }
         } catch (error) {
+            setLoading(false);
             setFlashMessage({
                 type: "error",
                 message: error.response.data.message || t("somethingWentWrong"),
             });
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -126,7 +137,7 @@ const AddNote = (props) => {
                     </Modal.Body>
                     <Modal.Footer>
                         <div className="text-end">
-                            <Button variant="primary" type="submit">
+                            <Button variant="primary" type="submit" disabled={loading}>
                                 Ajouter
                             </Button>
                         </div>

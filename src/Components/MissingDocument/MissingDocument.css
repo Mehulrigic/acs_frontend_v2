@@ -9,7 +9,7 @@
     border: none;
     color: #76787B;
     min-height: 168px;
-    margin-bottom: 96px;
+    /* margin-bottom: 96px; */
 }
 @media(max-width:767px){
     .missing-doc-modal .modal-body textarea{

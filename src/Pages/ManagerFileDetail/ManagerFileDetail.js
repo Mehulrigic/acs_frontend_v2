@@ -27,6 +27,7 @@ import DocViewer, { DocViewerRenderers } from "@cyntler/react-doc-viewer";
 import "@cyntler/react-doc-viewer/dist/index.css";
 import SpeakerManagementService from "../../API/SpeakerManagement/SpeakerManagementService";
 import AddNote from "../../Components/AddNote/AddNote";
+import { BsPatchExclamation } from "react-icons/bs";
 
 const ManagerFileDetail = () => {
   const { t } = useTranslation();
@@ -37,6 +38,7 @@ const ManagerFileDetail = () => {
   const now = 66;
   const nows = 37;
   const [isLoading, setIsLoading] = useState(false);
+  const [isNoteLoading, setIsNoteLoading] = useState(false);
   const [currentFileIndex, setCurrentFileIndex] = useState(0);
   const [showSpeakerId, setShowSpeakerId] = useState("");
   const [showDocumentId, setShowDocumentId] = useState("");
@@ -1698,16 +1700,18 @@ const ManagerFileDetail = () => {
   };
 
   const GetDocumentFileNotesList = async (id, filter) => {
-    setIsLoading(true);
+    setIsNoteLoading(true);
     try {
-      var userData = {
-        is_important: filter == 1 ? 1 : filter == 0 ? 0 : ""
+      let userData = null;
+
+      if (filter == 0 || filter == 1) {
+        userData = { is_important: filter };
       }
 
       const response = await FilePageService.document_file_notes(id, userData);
 
       if (response.data.status) {
-        setIsLoading(false);
+        setIsNoteLoading(false);
         setInvalidReasonNoteList(response.data.data || []);
         setRecordsToShowNote(3);
         if (scrollRef.current) {
@@ -1715,7 +1719,7 @@ const ManagerFileDetail = () => {
         }
       }
     } catch (error) {
-      setIsLoading(false);
+      setIsNoteLoading(false);
       console.log(error);
     }
   };
@@ -4836,27 +4840,38 @@ const ManagerFileDetail = () => {
                   }}
                   placeholder={"Sélectionnez le type de note"}
                   isSearchable={true}
+                  className={isNoteLoading ? "mb-5" : ""}
                 />
-                {displayedRecordsNote?.length > 0 ? (
-                  <div
-                    ref={scrollRef}
-                    className="scroll-container mt-3"
-                    onScroll={handleScrollNote}
-                    style={{
-                      maxHeight: "300px",
-                      overflowY: "auto",
-                      scrollbarWidth: "thin"
-                    }}
-                  >
-                    <div style={{ height: "300px" }}>
-                      {displayedRecordsNote?.map((data) => (
-                        <Fragment>
-                          <div className="note-box mb-3">
-                            <div className="d-flex justify-content-between align-items-center top-part">
-                              <p className="m-0">{data.type == "note" ? "Note" : "Invalide"}</p>
-                              <p className="m-0 create-date">créé le {data.created_on}</p>
-                            </div>
-                            <div className="inner-box">
+
+                {isNoteLoading ? <Loading /> :
+                  displayedRecordsNote?.length > 0 ? (
+                    <div
+                      ref={scrollRef}
+                      className="scroll-container mt-3"
+                      onScroll={handleScrollNote}
+                      style={{
+                        maxHeight: "300px",
+                        overflowY: "auto",
+                        scrollbarWidth: "thin"
+                      }}
+                    >
+                      <div style={{ height: "300px" }}>
+                        {displayedRecordsNote?.map((data) => (
+                          <Fragment>
+                            <div className="note-box mb-3">
+                              <div className="d-flex justify-content-between align-items-center top-part">
+                                <p className="m-0">{data.type == "note" ? "Note" : "Invalide"}</p>
+                                <div className="d-flex align-items-center gap-2">
+                                  {data.is_important == 1 && (
+                                    <BsPatchExclamation
+                                      style={{ color: "red", fontSize: "1.0rem", cursor: "pointer" }}
+                                      title="Remarque importante"
+                                    />
+                                  )}
+                                  <p className="m-0 create-date">créé le {data.created_on}</p>
+                                </div>
+                              </div>
+                              <div className="inner-box">
                                 {data.type == "note" && data.user_document_filename &&
                                   <div className="d-flex align-items-center mb-3">
                                     <div className="icon d-flex">
@@ -4876,22 +4891,23 @@ const ManagerFileDetail = () => {
                                     <span className="file-names">{data.user_document_filename}</span>
                                   </div>
                                 }
-                              <p className="">
-                                {data.reason}
-                              </p>
+                                <p className="">
+                                  {data.reason}
+                                </p>
+                              </div>
                             </div>
-                          </div>
-                        </Fragment>
-                      ))}
+                          </Fragment>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                )
+                  )
                   :
                   (
                     <div className="mt-3">
                       {t("NorecordsfoundLabel")}
                     </div>
-                  )}
+                  )
+                }
               </div>
             </div>
           </div>
