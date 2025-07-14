@@ -1231,7 +1231,7 @@ const BrokerFileDetail = () => {
                     <div className="step-1">
                       <div className="div">
                         <div className="step-2">
-                          <h2>Notes du Courtier</h2>
+                          <h2>Liste de notes</h2>
                           <Select
                             options={NotesOptions}
                             onChange={(selectedOption) => GetDocumentFileNotesList(id, selectedOption?.value)}
@@ -1298,6 +1298,21 @@ const BrokerFileDetail = () => {
                                               <span className="file-names">{data.user_document_filename}</span>
                                             </div>
                                           }
+
+                                          {data.added_by && (
+                                            <p
+                                              className="position-absolute"
+                                              style={{
+                                                bottom: '5px',
+                                                right: '10px',
+                                                fontSize: '0.875rem',
+                                                color: '#999',
+                                                margin: 0,
+                                              }}
+                                            >
+                                              — {`${data.added_by?.first_name ?? ''} ${data.added_by?.last_name ?? ''}`}
+                                            </p>
+                                          )}
                                           <p className="">
                                             {data.reason}
                                           </p>

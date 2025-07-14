@@ -317,3 +317,7 @@ line-height: 21.86px;
         display: inline-block;
     }
 }
+
+.inner-box {
+  position: relative;
+}

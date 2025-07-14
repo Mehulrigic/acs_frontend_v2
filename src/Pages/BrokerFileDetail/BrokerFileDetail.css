@@ -67,3 +67,7 @@ margin-left: 10px;
     color: #292C2F;
     font-weight: 500;
 }
+
+.inner-box {
+  position: relative;
+}

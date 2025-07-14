@@ -207,3 +207,7 @@ button.btn.btn-primary.add-intervenant{
     border-radius: 4px;
     cursor: pointer;
 }
+
+.inner-box {
+  position: relative;
+}
