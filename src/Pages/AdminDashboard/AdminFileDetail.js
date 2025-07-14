@@ -237,7 +237,7 @@ const AdminFileDetail = () => {
 
   useEffect(() => {
     if (showNote) {
-      GetDocumentFileNotesList(id);
+      GetDocumentFileNotesList(id, "");
     }
   }, [showNote]);
 
@@ -1701,7 +1701,7 @@ const AdminFileDetail = () => {
     setIsLoading(true);
     try {
       var userData = {
-        is_important: filter ? filter : 1
+        is_important: filter == 1 ? 1 : filter == 0 ? 0 : ""
       }
 
       const response = await FilePageService.document_file_notes(id, userData);
@@ -1740,6 +1740,7 @@ const AdminFileDetail = () => {
   const displayedRecordsNote = invalidReasonNoteList?.slice(0, recordsToShowNOte);
 
   const NotesOptions = [
+    { value: "", label: "Toutes les notes" },
     { value: "1", label: "Importante" },
     { value: "0", label: "Général" },
   ];

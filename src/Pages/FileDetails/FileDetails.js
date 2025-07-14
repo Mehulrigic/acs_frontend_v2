@@ -264,7 +264,7 @@ const FileDetails = () => {
 
   useEffect(() => {
     if (showNote) {
-      GetDocumentFileNotesList(id);
+      GetDocumentFileNotesList(id, "");
     }
   }, [showNote]);
 
@@ -1463,7 +1463,7 @@ const handleUpdateFileChange = (event) => {
     setIsLoading(true);
     try {
       var userData = {
-        is_important: filter ? filter : 1
+        is_important: filter == 1 ? 1 : filter == 0 ? 0 : ""
       }
 
       const response = await FilePageService.document_file_notes(id, userData);
@@ -1498,6 +1498,7 @@ const handleUpdateFileChange = (event) => {
   };
 
   const NotesOptions = [
+    { value: "", label: "Toutes les notes" },
     { value: "1", label: "Importante" },
     { value: "0", label: "Général" },
   ];
