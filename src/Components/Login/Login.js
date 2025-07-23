@@ -203,7 +203,7 @@ const Login = () => {
                 </Form>
               </div>
 
-              <div className="text-center mt-5 make-account-inner">
+              <div className="text-center mt-4 make-account-inner">
                 <Link
                   onClick={handleShow}
                   to="/"

@@ -24,6 +24,24 @@ ul.pagination {
   ul.pagination .page-link{
     padding: 10px 15px;
   }
+  .pagination li {
+    margin-right: 6px;
+}
+  ul.pagination .page-link {
+    padding: 10px 15px;
+    border-radius: 18px !important;
+    height: 46px;
+    width: 46px;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    color: #e84455;
+    border: none;background-color: #ffe1e4;
+}
+  ul.pagination li.active  .page-link{
+    background-color: #e84455;
+    color: #FFFFFF;
+  }
   @media(max-width:767px){
     ul.pagination{
       flex-wrap: wrap;

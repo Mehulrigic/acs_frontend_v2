@@ -214,7 +214,7 @@ const ManagerDashboard = () => {
             eventKey="toProcess"
           >
 
-            <div className="table-wrapper mt-32 p-0">
+            <div className="table-wrapper mt-0 p-0">
               <div className="d-flex align-aitems-center gap-2 justify-content-between">
                 <h2 className='m-0'>
                   {/* Dossier à traiter ({totalRecords}) */}
@@ -668,7 +668,7 @@ const ManagerDashboard = () => {
             eventKey="receipts_to_come"
           >
 
-            <div className="table-wrapper mt-32 p-0">
+            <div className="table-wrapper mt-0 p-0">
               <div className="d-flex align-aitems-center gap-2 justify-content-between">
                 <h2 className='m-0'>
                   {/* Dossier à traiter ({totalRecords}) */}
@@ -1122,7 +1122,7 @@ const ManagerDashboard = () => {
             title="Réceptions passées"
           >
 
-            <div className="table-wrapper mt-32 p-0">
+            <div className="table-wrapper mt-0 p-0">
               <div className="d-flex align-aitems-center gap-2 justify-content-between">
                 <h2 className='m-0'>
                   {/* Dossier à traiter ({totalRecords}) */}

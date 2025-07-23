@@ -13,10 +13,11 @@
     fill:#FF0000 ;
 }
 .broker-dashboard .nav-tabs{
-    background-color: var(--broker-light);
+    /* background-color: var(--broker-light); */
 }
-.broker-dashboard .nav-tabs .nav-link.active{
-    color: var(--broker-color);
+.broker-dashboard .nav-tabs .nav-link.active,.broker-dashboard .nav-tabs .nav-link:hover{
+    color: var(--broker-color);    border: 1px solid var(--broker-color) !important;
+      background-color: #fff4fa;
 }
 .broker-dashboard  .nav-tabs .nav-link.active::after{
    background:var(--broker-color) ;
