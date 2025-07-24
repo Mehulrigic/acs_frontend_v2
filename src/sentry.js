@@ -58,17 +58,108 @@ export const initSentry = () => {
                         dialog.style.top = dialogTop + 'px';
                         dialog.style.right = 'auto';
                         dialog.style.bottom = 'auto';
+                        dialog.style.zIndex = '10000';
                     }
                 };
 
-                // Watch for dialog appearance
-                const observer = new MutationObserver(() => {
+                // Function to handle focus management for Sentry dialog
+                const handleSentryFocus = () => {
                     const dialog = shadowHost.shadowRoot.querySelector('.dialog__position');
                     if (dialog && dialog.style.display !== 'none') {
-                        setTimeout(positionDialog, 10);
+                        // Find all focusable elements in the Sentry dialog
+                        const focusableElements = dialog.querySelectorAll(
+                            'input, textarea, button, select, [tabindex]:not([tabindex="-1"])'
+                        );
+
+                        // Track the last focused element within the Sentry dialog
+                        let lastFocusedElement = null;
+
+                        // Prevent other modals from stealing focus
+                        const preventFocusSteal = (e) => {
+                            // Check if the focused element is outside the Sentry dialog
+                            if (!dialog.contains(e.target) && e.target !== btn) {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                // Return focus to the last focused element, or first input if none
+                                if (lastFocusedElement && dialog.contains(lastFocusedElement)) {
+                                    lastFocusedElement.focus();
+                                } else {
+                                    const firstInput = dialog.querySelector('input[type="text"], input[type="email"], textarea');
+                                    if (firstInput) {
+                                        firstInput.focus();
+                                        lastFocusedElement = firstInput;
+                                    }
+                                }
+                            }
+                        };
+
+                        // Track focus within the Sentry dialog
+                        const trackFocus = (e) => {
+                            if (dialog.contains(e.target)) {
+                                lastFocusedElement = e.target;
+                            }
+                        };
+
+                        // Add event listeners to prevent focus stealing and track focus
+                        document.addEventListener('focusin', preventFocusSteal, true);
+                        document.addEventListener('focusin', trackFocus);
+
+                        // Store the event listener references for cleanup
+                        dialog._focusHandler = preventFocusSteal;
+                        dialog._trackHandler = trackFocus;
+
+                        // Also add click event to inputs to ensure focus
+                        focusableElements.forEach(element => {
+                            element.addEventListener('mousedown', (e) => {
+                                e.stopPropagation();
+                            });
+                            element.addEventListener('click', (e) => {
+                                e.stopPropagation();
+                                element.focus();
+                                lastFocusedElement = element;
+                            });
+                        });
+                    }
+                };
+
+                // Function to cleanup focus management
+                const cleanupSentryFocus = () => {
+                    const dialog = shadowHost.shadowRoot.querySelector('.dialog__position');
+                    if (dialog) {
+                        if (dialog._focusHandler) {
+                            document.removeEventListener('focusin', dialog._focusHandler, true);
+                            delete dialog._focusHandler;
+                        }
+                        if (dialog._trackHandler) {
+                            document.removeEventListener('focusin', dialog._trackHandler);
+                            delete dialog._trackHandler;
+                        }
+                    }
+                };
+
+                // Watch for dialog appearance and handle focus
+                const observer = new MutationObserver((mutations) => {
+                    const dialog = shadowHost.shadowRoot.querySelector('.dialog__position');
+                    if (dialog) {
+                        const isVisible = dialog.style.display !== 'none' &&
+                            getComputedStyle(dialog).display !== 'none';
+
+                        if (isVisible) {
+                            setTimeout(() => {
+                                positionDialog();
+                                handleSentryFocus();
+                            }, 10);
+                        } else {
+                            cleanupSentryFocus();
+                        }
                     }
                 });
-                observer.observe(shadowHost.shadowRoot, { childList: true, subtree: true, attributes: true });
+                observer.observe(shadowHost.shadowRoot, {
+                    childList: true,
+                    subtree: true,
+                    attributes: true,
+                    attributeFilter: ['style', 'class']
+                });
 
                 btn.addEventListener('mousedown', function (e) {
                     isDragging = true;
@@ -117,7 +208,10 @@ export const initSentry = () => {
                         dragged = false;
                     } else {
                         // Position dialog when button is clicked
-                        setTimeout(positionDialog, 10);
+                        setTimeout(() => {
+                            positionDialog();
+                            handleSentryFocus();
+                        }, 10);
                     }
                 }, true);
             }
