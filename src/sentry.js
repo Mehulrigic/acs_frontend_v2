@@ -41,10 +41,58 @@ export const initSentry = () => {
 
                 // Function to position dialog at button location
                 const positionDialog = () => {
-                    const dialog = shadowHost.shadowRoot.querySelector('.dialog__position');
+                    const captureBtn = shadowHost.shadowRoot.querySelector('button.btn.btn--default');
                     const content = shadowHost.shadowRoot.querySelector('.dialog__content');
+                    const dialog = shadowHost.shadowRoot.querySelector('.dialog__position');
+                    const contentcapture = shadowHost.shadowRoot.querySelector('.dialog__content_capture');
 
-                    if (dialog && btn && !content) {
+                    if (captureBtn && content) {
+                        clearInterval(interval);
+
+                        captureBtn.addEventListener('click', () => {
+                            content.classList.add('dialog__content_capture');
+                        });
+                    }
+
+                    if (captureBtn && contentcapture) {
+                        clearInterval(interval);
+
+                        captureBtn.addEventListener('click', () => {
+                            content.classList.remove('dialog__content_capture'); // Remove the class
+
+                            // Reset styles applied during full screen mode
+                            content.style.width = '';
+                            content.style.height = '';
+                            content.style.maxWidth = '';
+                            content.style.maxHeight = '';
+                            content.style.borderRadius = '';
+                            content.style.boxShadow = '';
+                            content.style.overflow = '';
+                            content.style.padding = '';
+
+                            content.style.removeProperty('--dialog-border-radius');
+                            content.style.removeProperty('--dialog-padding');
+
+                            // Optionally reset dialog too
+                            if (dialog) {
+                                dialog.style.width = '';
+                                dialog.style.height = '';
+                                dialog.style.top = '';
+                                dialog.style.left = '';
+                                dialog.style.right = '';
+                                dialog.style.bottom = '';
+                            }
+
+                            // Optionally restore scroll
+                            document.documentElement.style.height = '';
+                            document.body.style.height = '';
+                            document.body.style.overflow = '';
+                        });
+                    }
+
+
+
+                    if (dialog && btn) {
                         const btnRect = btn.getBoundingClientRect();
                         const dialogRect = dialog.getBoundingClientRect();
 
@@ -55,14 +103,15 @@ export const initSentry = () => {
                         dialogLeft = Math.max(0, Math.min(dialogLeft, window.innerWidth - dialogRect.width));
                         dialogTop = Math.max(0, Math.min(dialogTop, window.innerHeight - dialogRect.height));
 
-                        dialog.style.position = 'fixed';
-                        dialog.style.left = dialogLeft + 'px';
-                        dialog.style.top = dialogTop + 'px';
-                        dialog.style.right = 'auto';
-                        dialog.style.bottom = 'auto';
-                        dialog.style.zIndex = '10000';
+                        if (contentcapture) {
+                            // Force dialog and content to full screen
+                            dialog.style.top = '0';
+                            dialog.style.left = '0';
+                            dialog.style.right = '0';
+                            dialog.style.bottom = '0';
+                            dialog.style.width = '100vw';
+                            dialog.style.height = '100vh';
 
-                        if (content) {
                             content.style.width = '100%';
                             content.style.height = '100%';
                             content.style.maxWidth = 'none';
@@ -75,8 +124,16 @@ export const initSentry = () => {
                             // Optional override of CSS vars
                             content.style.setProperty('--dialog-border-radius', '0');
                             content.style.setProperty('--dialog-padding', '2rem');
+                        } else {
+                            dialog.style.position = 'fixed';
+                            dialog.style.left = dialogLeft + 'px';
+                            dialog.style.top = dialogTop + 'px';
+                            dialog.style.right = 'auto';
+                            dialog.style.bottom = 'auto';
+                            dialog.style.zIndex = '10000';
                         }
                     }
+
                 };
 
                 const handleSentryFocus = () => {
