@@ -42,7 +42,9 @@ export const initSentry = () => {
                 // Function to position dialog at button location
                 const positionDialog = () => {
                     const dialog = shadowHost.shadowRoot.querySelector('.dialog__position');
-                    if (dialog && btn) {
+                    const content = shadowHost.shadowRoot.querySelector('.dialog__content');
+
+                    if (dialog && btn && !content) {
                         const btnRect = btn.getBoundingClientRect();
                         const dialogRect = dialog.getBoundingClientRect();
 
@@ -59,10 +61,24 @@ export const initSentry = () => {
                         dialog.style.right = 'auto';
                         dialog.style.bottom = 'auto';
                         dialog.style.zIndex = '10000';
+
+                        if (content) {
+                            content.style.width = '100%';
+                            content.style.height = '100%';
+                            content.style.maxWidth = 'none';
+                            content.style.maxHeight = 'none';
+                            content.style.borderRadius = '0';
+                            content.style.boxShadow = 'none';
+                            content.style.overflow = 'auto';
+                            content.style.padding = '2rem';
+
+                            // Optional override of CSS vars
+                            content.style.setProperty('--dialog-border-radius', '0');
+                            content.style.setProperty('--dialog-padding', '2rem');
+                        }
                     }
                 };
 
-                // Function to handle focus management for Sentry dialog
                 const handleSentryFocus = () => {
                     const dialog = shadowHost.shadowRoot.querySelector('.dialog__position');
                     if (dialog && dialog.style.display !== 'none') {
