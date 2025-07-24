@@ -34,9 +34,9 @@
 }
 .side-panel-container .link-section ul li{
     list-style: none;
-    margin-bottom: 7px;
-    border-bottom: 1px solid #2b4966;
-    padding-bottom: 7px;
+    margin-bottom: 6px;
+    /* border-bottom: 1px solid #2b4966; */
+    padding-bottom: 6px;
 }
 .side-panel-container .link-section ul li a{
     /* background-color: var(--primary-light); */
@@ -46,8 +46,8 @@
     font-size: 16px;
     font-weight: 400;
     line-height: 21.86px;
-    padding: 10px;
-    border-radius: 8px;
+     padding: 18px 24px;
+    border-radius: 18px;
     transition: all 0.4s ease;
     align-items: center;
     gap:10px;

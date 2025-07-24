@@ -39,9 +39,9 @@ body {
   box-sizing: border-box;
   /* font-family: "Manrope", serif; */
   font-family: "Poppins", sans-serif;
-  font-size: 16px;
   font-weight: 400;
-  line-height: 21.86px;
+  font-size: 14px;
+  line-height: 26px;
   /* color: var(--black-color); */
   color: var(--dark-body-color);
   background-color: var(--white-color);
@@ -326,6 +326,12 @@ text-align: left;
     line-height: 21.86px;
     color: var(--table-th-color);
     padding: 17px 16px;
+
+font-weight: 400;
+font-size: 16px;
+line-height: 100%;
+letter-spacing: 0px;
+
 }
 .table-wrap td{
   padding: 17px 16px;
@@ -357,6 +363,13 @@ cursor: pointer;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+
+font-weight: 400;
+font-size: 16px;
+
+line-height: 100%;
+letter-spacing: 0px;
+
 
 }
 .table-wrap .form-select:focus{
@@ -442,7 +455,7 @@ cursor: pointer;
   }
   .modal-content{
     box-shadow: 0px 4px 10px 0px #00000026;
-    background-color: var(--white-color);
+    background-color: var(--white-color);    border-radius: 24px;
   }
   .modal-title.h4{
     /* font-family: "Nunito"; */
@@ -603,6 +616,128 @@ a.sorting-icon.rotate svg {
 .top-header a svg path {
   fill: var(--tertiary-color);
 }
+
+span.file-type-icon {
+    height: 54px;
+    width: 54px;
+    background-color: #58CDFF;
+    border-radius: 18px;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 20px;
+}
+span.doc-status {
+    height: 12px;
+    width: 12px;
+    display: inline-block;
+    border-radius: 4px;
+}
+span.doc-status.success{
+    background-color: #00A389;
+}
+span.doc-status.warning{
+    background-color: #FFBB54;
+}
+span.doc-status.danger{
+    background-color: #FF5B5B;
+}
+.inner-tab-screen .tab-content{
+  padding: 0;
+}
+span.back-screen {
+    height: 54px;
+    width: 54px;
+    display: inline-flex;
+    background-color: #e4f2ff;
+    border-radius: 18px;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+span.back-screen  svg {
+    transform: rotate(90deg);
+}
+.check-document-panel .side-by-side-panel .left-panel{
+    transform: translateX(200%);
+
+    transition: all 0.4s ease;    z-index: -1;
+    position: relative;
+
+}
+.show-reader .check-document-panel .side-by-side-panel .left-panel{
+  transform: translateX(0);  z-index: 1;
+}
+.update-canvas .top-header{
+  justify-content: end !important;
+  gap: 15px;
+}
+.show-reader .update-canvas .top-header{
+  justify-content: space-between !important;
+}
+.update-canvas{
+  overflow-x: hidden;
+}
+.update-inside-tab .tab-content{
+  padding: 0;
+}
+.update-canvas .inner-detail {
+    position: relative;
+}
+button.btn.btn-primary.show-doc-reader {
+    position: absolute;
+    left: -110px;
+    transform: rotate(-90deg);
+    top: 40%;
+    border-radius: 18px 18px 0 0;
+    min-width: 158px;
+    background-color: #00366b !important;
+    z-index: 2;
+}
+button.btn.btn-primary.show-doc-reader:hover {
+    background-color: #00366b !important;
+    opacity: 1;
+}
+.custom-grid-card {
+    background-color: #F3F2F7;
+    border-radius: 24px;
+    padding: 30px;
+    /* border: 1px solid #F3F2F7; */
+}
+
+/* TimeLine Css */
+.timeline {
+    position: relative;
+    margin-left: 6px;
+    padding-left: 30px;
+    border-left: 2px solid #ccc;
+    margin-top: 20px;
+}
+
+.timeline-item {
+  position: relative;
+  margin-bottom: 33px;
+}
+
+.timeline-dot {
+position: absolute;
+    left: -39px;
+    top: 0px;
+    width: 16px;
+    height: 16px;
+    background: white;
+    border: 3px solid #265582;
+    border-radius: 50%;
+}
+
+
+
+.timeline-content p {
+  margin: 8px 0 0;
+  color: #a3a3a3;
+  font-size: 14px;
+  line-height: 1.6;
+}
 @media(max-width:1350px){
   .top-header > div:nth-child(2) {
     flex-wrap: wrap;
@@ -612,6 +747,19 @@ a.sorting-icon.rotate svg {
 }
 }
 @media (max-width: 767px) {
+  .check-document-panel .side-by-side-panel .left-panel{
+    transform: translateX(0);
+    transition: all 0.4s ease;    z-index: 1;
+    position: relative;
+
+}
+  .btn.btn-primary {
+
+    font-size: 15px;
+   
+    padding: 14px 14px;
+
+}
   .detail-header * {
     width: 100%;
     text-align: center !important;
@@ -639,6 +787,9 @@ a.sorting-icon.rotate svg {
   }
 }
 @media(max-width:991px){
+  button.btn.btn-primary.show-doc-reader{
+    display: none;
+  }
   .offcanvas.account-request-pannel{
     z-index: 2999;
   }
