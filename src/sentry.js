@@ -41,7 +41,57 @@ export const initSentry = () => {
 
                 // Function to position dialog at button location
                 const positionDialog = () => {
+                    const captureBtn = shadowHost.shadowRoot.querySelector('button.btn.btn--default');
+                    const content = shadowHost.shadowRoot.querySelector('.dialog__content');
                     const dialog = shadowHost.shadowRoot.querySelector('.dialog__position');
+                    const contentcapture = shadowHost.shadowRoot.querySelector('.dialog__content_capture');
+
+                    if (captureBtn && content) {
+                        clearInterval(interval);
+
+                        captureBtn.addEventListener('click', () => {
+                            content.classList.add('dialog__content_capture');
+                        });
+                    }
+
+                    if (captureBtn && contentcapture) {
+                        clearInterval(interval);
+
+                        captureBtn.addEventListener('click', () => {
+                            content.classList.remove('dialog__content_capture'); // Remove the class
+
+                            // Reset styles applied during full screen mode
+                            content.style.width = '';
+                            content.style.height = '';
+                            content.style.maxWidth = '';
+                            content.style.maxHeight = '';
+                            content.style.borderRadius = '';
+                            content.style.boxShadow = '';
+                            content.style.overflow = '';
+                            content.style.padding = '';
+
+                            content.style.removeProperty('--dialog-border-radius');
+                            content.style.removeProperty('--dialog-padding');
+
+                            // Optionally reset dialog too
+                            if (dialog) {
+                                dialog.style.width = '';
+                                dialog.style.height = '';
+                                dialog.style.top = '';
+                                dialog.style.left = '';
+                                dialog.style.right = '';
+                                dialog.style.bottom = '';
+                            }
+
+                            // Optionally restore scroll
+                            document.documentElement.style.height = '';
+                            document.body.style.height = '';
+                            document.body.style.overflow = '';
+                        });
+                    }
+
+
+
                     if (dialog && btn) {
                         const btnRect = btn.getBoundingClientRect();
                         const dialogRect = dialog.getBoundingClientRect();
@@ -53,22 +103,136 @@ export const initSentry = () => {
                         dialogLeft = Math.max(0, Math.min(dialogLeft, window.innerWidth - dialogRect.width));
                         dialogTop = Math.max(0, Math.min(dialogTop, window.innerHeight - dialogRect.height));
 
-                        dialog.style.position = 'fixed';
-                        dialog.style.left = dialogLeft + 'px';
-                        dialog.style.top = dialogTop + 'px';
-                        dialog.style.right = 'auto';
-                        dialog.style.bottom = 'auto';
+                        if (contentcapture) {
+                            // Force dialog and content to full screen
+                            dialog.style.top = '0';
+                            dialog.style.left = '0';
+                            dialog.style.right = '0';
+                            dialog.style.bottom = '0';
+                            dialog.style.width = '100vw';
+                            dialog.style.height = '100vh';
+
+                            content.style.width = '100%';
+                            content.style.height = '100%';
+                            content.style.maxWidth = 'none';
+                            content.style.maxHeight = 'none';
+                            content.style.borderRadius = '0';
+                            content.style.boxShadow = 'none';
+                            content.style.overflow = 'auto';
+                            content.style.padding = '2rem';
+
+                            // Optional override of CSS vars
+                            content.style.setProperty('--dialog-border-radius', '0');
+                            content.style.setProperty('--dialog-padding', '2rem');
+                        } else {
+                            dialog.style.position = 'fixed';
+                            dialog.style.left = dialogLeft + 'px';
+                            dialog.style.top = dialogTop + 'px';
+                            dialog.style.right = 'auto';
+                            dialog.style.bottom = 'auto';
+                            dialog.style.zIndex = '10000';
+                        }
+                    }
+
+                };
+
+                const handleSentryFocus = () => {
+                    const dialog = shadowHost.shadowRoot.querySelector('.dialog__position');
+                    if (dialog && dialog.style.display !== 'none') {
+                        // Find all focusable elements in the Sentry dialog
+                        const focusableElements = dialog.querySelectorAll(
+                            'input, textarea, button, select, [tabindex]:not([tabindex="-1"])'
+                        );
+
+                        // Track the last focused element within the Sentry dialog
+                        let lastFocusedElement = null;
+
+                        // Prevent other modals from stealing focus
+                        const preventFocusSteal = (e) => {
+                            // Check if the focused element is outside the Sentry dialog
+                            if (!dialog.contains(e.target) && e.target !== btn) {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                // Return focus to the last focused element, or first input if none
+                                if (lastFocusedElement && dialog.contains(lastFocusedElement)) {
+                                    lastFocusedElement.focus();
+                                } else {
+                                    const firstInput = dialog.querySelector('input[type="text"], input[type="email"], textarea');
+                                    if (firstInput) {
+                                        firstInput.focus();
+                                        lastFocusedElement = firstInput;
+                                    }
+                                }
+                            }
+                        };
+
+                        // Track focus within the Sentry dialog
+                        const trackFocus = (e) => {
+                            if (dialog.contains(e.target)) {
+                                lastFocusedElement = e.target;
+                            }
+                        };
+
+                        // Add event listeners to prevent focus stealing and track focus
+                        document.addEventListener('focusin', preventFocusSteal, true);
+                        document.addEventListener('focusin', trackFocus);
+
+                        // Store the event listener references for cleanup
+                        dialog._focusHandler = preventFocusSteal;
+                        dialog._trackHandler = trackFocus;
+
+                        // Also add click event to inputs to ensure focus
+                        focusableElements.forEach(element => {
+                            element.addEventListener('mousedown', (e) => {
+                                e.stopPropagation();
+                            });
+                            element.addEventListener('click', (e) => {
+                                e.stopPropagation();
+                                element.focus();
+                                lastFocusedElement = element;
+                            });
+                        });
                     }
                 };
 
-                // Watch for dialog appearance
-                const observer = new MutationObserver(() => {
+                // Function to cleanup focus management
+                const cleanupSentryFocus = () => {
                     const dialog = shadowHost.shadowRoot.querySelector('.dialog__position');
-                    if (dialog && dialog.style.display !== 'none') {
-                        setTimeout(positionDialog, 10);
+                    if (dialog) {
+                        if (dialog._focusHandler) {
+                            document.removeEventListener('focusin', dialog._focusHandler, true);
+                            delete dialog._focusHandler;
+                        }
+                        if (dialog._trackHandler) {
+                            document.removeEventListener('focusin', dialog._trackHandler);
+                            delete dialog._trackHandler;
+                        }
+                    }
+                };
+
+                // Watch for dialog appearance and handle focus
+                const observer = new MutationObserver((mutations) => {
+                    const dialog = shadowHost.shadowRoot.querySelector('.dialog__position');
+                    if (dialog) {
+                        const isVisible = dialog.style.display !== 'none' &&
+                            getComputedStyle(dialog).display !== 'none';
+
+                        if (isVisible) {
+                            setTimeout(() => {
+                                positionDialog();
+                                handleSentryFocus();
+                            }, 10);
+                        } else {
+                            cleanupSentryFocus();
+                        }
                     }
                 });
-                observer.observe(shadowHost.shadowRoot, { childList: true, subtree: true, attributes: true });
+                observer.observe(shadowHost.shadowRoot, {
+                    childList: true,
+                    subtree: true,
+                    attributes: true,
+                    attributeFilter: ['style', 'class']
+                });
 
                 btn.addEventListener('mousedown', function (e) {
                     isDragging = true;
@@ -117,7 +281,10 @@ export const initSentry = () => {
                         dragged = false;
                     } else {
                         // Position dialog when button is clicked
-                        setTimeout(positionDialog, 10);
+                        setTimeout(() => {
+                            positionDialog();
+                            handleSentryFocus();
+                        }, 10);
                     }
                 }, true);
             }

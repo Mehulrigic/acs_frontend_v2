@@ -87,10 +87,10 @@ const AddBroker = (props) => {
               />
             </Form.Group>
             <Form.Group className='mt-16' controlId="broker_city">
-              <Form.Label>City <span>*</span></Form.Label>
+              <Form.Label>{t("city")} <span>*</span></Form.Label>
               <Form.Control
                 type="text"
-                placeholder={"City"}
+                placeholder={t("city")}
                 name="broker_city"
               />
             </Form.Group>
