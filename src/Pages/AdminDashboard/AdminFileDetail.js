@@ -1799,7 +1799,7 @@ const AdminFileDetail = () => {
               <div className="d-flex align-items-center check-status">
                 <p className="m-0" style={{ paddingRight: "10px" }}>Etat du chantier : </p>
                 <div style={{ paddingRight: "10px" }}>
-                  <Form.Select aria-label="Etat du chantier" style={{ minHeight: "62px" }} value={editUserSiteStatus} onChange={(e) => handleSiteStatusChange(e.target.value)}>
+                  <Form.Select aria-label="Etat du chantier" style={{ minHeight: "45px" }} value={editUserSiteStatus} onChange={(e) => handleSiteStatusChange(e.target.value)}>
                     <option value="on_site">En cours de chantier</option>
                     <option value="end_of_site">Fin de chantier</option>
                   </Form.Select>
@@ -1834,7 +1834,7 @@ const AdminFileDetail = () => {
               Voir les raisons
             </Link>
             <p className="m-0" style={{ paddingRight: "10px" }}>Envoyer à : </p>
-            <Form.Select aria-label="Etat du chantier" class="form-select" style={{ minHeight: "62px", width: "25%", fontFamily: "Manrope" }} value={sendToFileStatus} onChange={(e) => handleSendFileShow(e.target.value)}>
+            <Form.Select aria-label="Etat du chantier" class="form-select" style={{ minHeight: "45px", width: "25%", fontFamily: "Manrope" }} value={sendToFileStatus} onChange={(e) => handleSendFileShow(e.target.value)}>
               <option value="" disabled selected>Envoyer à</option>
               <option value="transfer_to_insurer">Transfert à l'assureur</option>
               <option value="transfer_to_broker">Transfert au Courtier</option>

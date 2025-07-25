@@ -28,7 +28,7 @@ margin-top: 32px;
     /* font-family: "Nunito"; */
     font-family: "Poppins", sans-serif;
     font-size: 16px;
-    font-weight: 700;
+    font-weight: 600;
     line-height: 21.82px;
     background-color: #FDFDFD;
     border-radius: 24px;
@@ -37,7 +37,7 @@ margin-top: 32px;
 .add-document,.check-document{
     font-family: "Manrope";
     font-size: 16px;
-    font-weight: 700;
+    font-weight: 600;
     line-height: 21.86px;
     text-decoration-line: underline;
     text-decoration-style: solid;
@@ -94,7 +94,7 @@ color: #292C2F;
 
 }
 .replace-document span{
-    font-weight: 700;
+    font-weight: 600;
     margin-left: 24px;
 }
 .add-folder-panel.offcanvas.check-document-panel{

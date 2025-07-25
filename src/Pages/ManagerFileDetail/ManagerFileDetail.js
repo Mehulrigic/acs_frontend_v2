@@ -30,6 +30,15 @@ import AddNote from "../../Components/AddNote/AddNote";
 import { BsPatchExclamation } from "react-icons/bs";
 
 const ManagerFileDetail = () => {
+    const [isVisible, setIsVisible] = useState(false);
+
+  const toggleDetail = (e) => {
+    e.preventDefault(); // prevent page reload if using <a>
+    setIsVisible(!isVisible);
+  };
+    const [selectedType, setSelectedType] = useState('');
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedUser, setSelectedUser] = useState('');
   const [showReader, setShowReader] = useState(false);
 
   const toggleReader = () => {
@@ -1943,7 +1952,7 @@ const ManagerFileDetail = () => {
         className="dashboard-main-content manager-dashboard"
         style={{ backgroundColor: rightPanelThemeColor }}
       >
-        <div className="top-header mb-32">
+        <div className="top-header mb-0">
           <div className="d-flex align-items-center">
             <Link onClick={handleBack} disabled={history.length === 0}>
               <svg
@@ -1970,7 +1979,7 @@ const ManagerFileDetail = () => {
           <div className="mt-3 d-md-flex justify-content-between align-items-center">
             <h1 className="m-0 mb-md-0 mb-3">Dossier {showUserFolderName}</h1>
 
-            <div className="d-flex align-items-center check-status">
+            {/* <div className="d-flex align-items-center check-status">
               <div className="d-flex align-items-center check-status">
                 <p className="m-0" style={{ paddingRight: "10px" }}>
                   Etat du chantier :{" "}
@@ -1978,7 +1987,7 @@ const ManagerFileDetail = () => {
                 <div style={{ paddingRight: "10px" }}>
                   <Form.Select
                     aria-label="Etat du chantier"
-                    style={{ minHeight: "62px" }}
+                    style={{ minHeight: "45px" }}
                     value={editUserSiteStatus}
                     onChange={(e) => handleSiteStatusChange(e.target.value)}
                   >
@@ -2005,12 +2014,17 @@ const ManagerFileDetail = () => {
                   ? "Mise en demeure"
                   : t("invalidLabel")}
               </div>
-            </div>
+            </div> */}
           </div>
           <div
             className="detail-header"
             style={{ display: "flex", justifyContent: "right" }}
           >
+            <div style={{ marginRight: "20px" }} className="div">
+                <Link onClick={toggleDetail} className="fold-unfold-link link-wrap">
+      {isVisible ? 'Fold Detail' : 'Unfold Detail'}
+    </Link>
+            </div>
             <div style={{ marginRight: "20px" }}>
               <MissingDocument
                 link={true}
@@ -2034,7 +2048,7 @@ const ManagerFileDetail = () => {
             <Form.Select
               aria-label="Etat du chantier"
               class="form-select"
-              style={{ minHeight: "62px", width: "25%", fontFamily: "Manrope" }}
+              style={{ minHeight: "45px", width: "25%", fontFamily: "Manrope" }}
               value={sendToFileStatus}
               onChange={(e) => handleSendFileShow(e.target.value)}
             >
@@ -2047,6 +2061,84 @@ const ManagerFileDetail = () => {
               <option value="transfer_to_broker">Transfert au Courtier</option>
               <option value="to_be_decided">A statuer</option>
             </Form.Select>
+          </div>
+
+          <div className={`detail-header second-header ${isVisible ? 'show' : ''}`}>
+            <div className="d-flex align-items-center check-status">
+              <div className="d-flex align-items-center check-status">
+                <p className="m-0" style={{ paddingRight: "10px" }}>
+                  Etat du chantier :{" "}
+                </p>
+                <div style={{ paddingRight: "10px" }}>
+                  <Form.Select
+                    aria-label="Etat du chantier"
+                    style={{ minHeight: "45px" }}
+                    value={editUserSiteStatus}
+                    onChange={(e) => handleSiteStatusChange(e.target.value)}
+                  >
+                    <option value="on_site">En cours de chantier</option>
+                    <option value="end_of_site">Fin de chantier</option>
+                  </Form.Select>
+                </div>
+              </div>
+
+              <div className="d-flex flex-wrap gap-3">
+
+              <div className="d-flex align-items-center">
+              <p className="m-0">Statut : </p>
+              <div className="status">
+                {showUserDocumentData?.status === "to_be_checked"
+                  ? t("toBeCheckedLabel")
+                  : showUserDocumentData?.status === "validated"
+                  ? t("validatedLabel")
+                  : showUserDocumentData?.status === "transfer_to_insurer"
+                  ? "Transfert à l'assureur"
+                  : showUserDocumentData?.status === "transfer_to_broker"
+                  ? "Transfert au Courtier"
+                  : showUserDocumentData?.status === "transfer_to_manager"
+                  ? "Transfert au Gestionnaire"
+                  : showUserDocumentData?.status === "to_be_decided"
+                  ? "A statuer"
+                  : showUserDocumentData?.status === "formal_notice"
+                  ? "Mise en demeure"
+                  : t("invalidLabel")}
+              </div>
+              </div>
+
+              <div className="d-flex align-items-center">
+              <p className="m-0">DOC : </p>
+              <div className="status">
+                15/07/2025
+              </div>
+              </div>
+
+              <div className="d-flex align-items-center">
+
+              <p className="m-0">Date fin prévisionnelle : </p>
+              <div className="status">
+                27/07/2026
+              </div>
+              </div>
+
+              <div className="d-flex align-items-center">
+              <p className="m-0">Coût prévisionnel : </p>
+              <div className="status">
+                10 450 000€
+              </div>
+              </div>
+
+
+              <div className="d-flex align-items-center">
+              <p className="m-0">Nom du preneur assurance : </p>
+              <div className="status">
+                Taratata patata
+              </div>
+              </div>
+
+              </div>
+
+
+            </div>
           </div>
         </div>
         <Tabs
@@ -2065,7 +2157,7 @@ const ManagerFileDetail = () => {
             )}
 
             <div className="row">
-              <div className="col-md-6">
+              <div className="col-md-7">
                 <h2 className="mb-3">Detailed Information</h2>
                 <div className="custom-grid-card">
                   <h3>Documents # of registered documents</h3>
@@ -2255,10 +2347,75 @@ const ManagerFileDetail = () => {
                   </div>
                 </div>
               </div>
-              <div className="col-md-6">
+              <div className="col-md-5">
                  <h2 className="mb-3">Events</h2>
                 <div className="custom-grid-card">
-5 last events
+
+
+                <div className="last-event-card">
+<div className="d-flex flex-wrap gap-2 mb-3">
+        {/* Type Filter */}
+        <select 
+          className="form-select w-auto"
+          value={selectedType}
+          onChange={(e) => setSelectedType(e.target.value)}
+        >
+          <option value="">Select Type</option>
+          <option value="notes">Notes</option>
+          <option value="action">Action</option>
+        </select>
+
+
+
+        {/* User Filter */}
+        <select 
+          className="form-select w-auto"
+          value={selectedUser}
+          onChange={(e) => setSelectedUser(e.target.value)}
+        >
+          <option value="">Select User</option>
+          <option value="user1">User 1</option>
+          <option value="user2">User 2</option>
+        </select>
+                {/* Date Filter */}
+        <DatePicker
+          selected={selectedDate}
+          onChange={(date) => setSelectedDate(date)}
+          className="form-control"
+          placeholderText="Select Date"
+          dateFormat="dd/MM/yyyy"
+        />
+      </div>
+                      5 last events
+                            <div class="timeline">
+    <div class="timeline-item">
+      <div class="timeline-dot"></div>
+      <div class="timeline-content">
+        <h5>January 2nd, 04:35 AM</h5>
+        <p> <strong>Note :-</strong> Illum omnis quo illum nisi. Nesciunt est accusamus. Blanditiis nisi quae eum nisi similique. Modi consequuntur totam</p>
+      </div>
+    </div>
+
+    <div class="timeline-item">
+      <div class="timeline-dot"></div>
+      <div class="timeline-content">
+        <h5>January 4th, 06:19 AM</h5>
+        <p><strong>Note :-</strong>  Corrupti unde qui molestiae labore ad adipisci veniam perspiciatis quasi. Quae labore vel.</p>
+      </div>
+    </div>
+
+    <div class="timeline-item">
+      <div class="timeline-dot"></div>
+      <div class="timeline-content">
+        <h5>January 5th, 12:34 AM</h5>
+        <p><strong>Action :-</strong> Maiores doloribus qui. Repellat accusamus minima ipsa ipsam aut debitis quis sit voluptates. Amet necessitatibus non minus quaerat et quis.</p>
+        <p><strong>Action Name:-</strong>Lorem, ipsum dolor.</p>
+        <p><strong>User id:-</strong>Ipsum115880</p>
+      </div>
+    </div>
+                </div>
+                                <button type="submit" class="btn-secondary btn btn-primary">See All</button>
+                </div>
                 <div className="last-msg-card">
                     3 Last Important Unread messages
                       <div class="timeline">
@@ -2286,7 +2443,7 @@ const ManagerFileDetail = () => {
       </div>
     </div>
                 </div>
-                <button type="submit" class="btn-secondary btn btn-primary">View All</button>
+                <button type="submit" class="btn-secondary btn btn-primary">See All</button>
                 </div>
 
                 </div>

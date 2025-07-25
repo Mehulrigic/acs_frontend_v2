@@ -38,7 +38,7 @@
     border: none;
 }
 .custom-tab .nav-tabs .nav-link{
-    font-weight: 700;
+    font-weight: 600;
     color: var(--white-color);
     font-family: "Manrope", serif;
     border: none;
@@ -158,7 +158,7 @@ line-height: 19.12px;
 
 
 .react-datepicker__header ,h2.react-datepicker__current-month,.custom-tab .tab-content h2.react-datepicker__current-month{
-    font-weight: 700;
+    font-weight: 600;
 }
 div#proxy-renderer {
     height: 100%;

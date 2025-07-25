@@ -18,7 +18,7 @@
 .login-container .right-column h2{
 color: #00366B;
 font-size: 24px;
-font-weight: 700;
+font-weight: 600;
 line-height: 32.78px;
 margin-bottom: 10px;
 }
@@ -82,13 +82,13 @@ line-height: 21.82px;
 .offcanvas.account-request-pannel .offcanvas-body h2{
     color: #00366B;
     margin-bottom: 32px;
-    font-weight: 700;
+    font-weight: 600;
 }
 
 .canvas-footer button{
 background-color: var(--tertiary-color);
 font-size: 16px;
-font-weight: 700;
+font-weight: 600;
 line-height: 21.86px;
 text-align: center;
 border: none;
