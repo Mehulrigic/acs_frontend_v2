@@ -45,12 +45,16 @@ export const initSentry = () => {
                     const content = shadowHost.shadowRoot.querySelector('.dialog__content');
                     const dialog = shadowHost.shadowRoot.querySelector('.dialog__position');
                     const contentcapture = shadowHost.shadowRoot.querySelector('.dialog__content_capture');
+                    const imageContainer = shadowHost.shadowRoot.querySelector('.editor__image-container');
+                    const formError = shadowHost.shadowRoot.querySelector('.form__error-container');
 
-                    if (captureBtn && content) {
+                    if (captureBtn && content && imageContainer) {
                         clearInterval(interval);
 
                         captureBtn.addEventListener('click', () => {
-                            content.classList.add('dialog__content_capture');
+                            if (!formError) {
+                                content.classList.add('dialog__content_capture');
+                            }
                         });
                     }
 
@@ -58,9 +62,9 @@ export const initSentry = () => {
                         clearInterval(interval);
 
                         captureBtn.addEventListener('click', () => {
-                            content.classList.remove('dialog__content_capture'); // Remove the class
+                            content.classList.remove('dialog__content_capture');
 
-                            // Reset styles applied during full screen mode
+                            // Reset styles
                             content.style.width = '';
                             content.style.height = '';
                             content.style.maxWidth = '';
@@ -69,11 +73,9 @@ export const initSentry = () => {
                             content.style.boxShadow = '';
                             content.style.overflow = '';
                             content.style.padding = '';
-
                             content.style.removeProperty('--dialog-border-radius');
                             content.style.removeProperty('--dialog-padding');
 
-                            // Optionally reset dialog too
                             if (dialog) {
                                 dialog.style.width = '';
                                 dialog.style.height = '';
@@ -83,14 +85,11 @@ export const initSentry = () => {
                                 dialog.style.bottom = '';
                             }
 
-                            // Optionally restore scroll
                             document.documentElement.style.height = '';
                             document.body.style.height = '';
                             document.body.style.overflow = '';
                         });
                     }
-
-
 
                     if (dialog && btn) {
                         const btnRect = btn.getBoundingClientRect();
@@ -99,12 +98,11 @@ export const initSentry = () => {
                         let dialogLeft = btnRect.left;
                         let dialogTop = btnRect.top;
 
-                        // Ensure dialog stays within viewport
                         dialogLeft = Math.max(0, Math.min(dialogLeft, window.innerWidth - dialogRect.width));
                         dialogTop = Math.max(0, Math.min(dialogTop, window.innerHeight - dialogRect.height));
 
-                        if (contentcapture) {
-                            // Force dialog and content to full screen
+                        if (imageContainer && !formError) {
+                            // Fullscreen only when image container exists and form error is NOT present
                             dialog.style.top = '0';
                             dialog.style.left = '0';
                             dialog.style.right = '0';
@@ -121,7 +119,6 @@ export const initSentry = () => {
                             content.style.overflow = 'auto';
                             content.style.padding = '2rem';
 
-                            // Optional override of CSS vars
                             content.style.setProperty('--dialog-border-radius', '0');
                             content.style.setProperty('--dialog-padding', '2rem');
                         } else {
@@ -133,8 +130,9 @@ export const initSentry = () => {
                             dialog.style.zIndex = '10000';
                         }
                     }
-
                 };
+
+
 
                 const handleSentryFocus = () => {
                     const dialog = shadowHost.shadowRoot.querySelector('.dialog__position');
