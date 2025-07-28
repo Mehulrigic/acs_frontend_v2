@@ -810,6 +810,28 @@ color: #212836;
     justify-content: start;
     align-items: start !important;
 }
+.insurers-dashboard .d-flex.align-items-center.check-status,
+.broker-dashboard .d-flex.align-items-center.check-status,
+.broker-dashboard .d-flex.align-items-center.check-status,
+.admin-dashboard .d-flex.align-items-center.check-status{
+    flex-direction: row;
+    align-items: center !important;
+    flex-wrap: wrap;
+}
+.broker-dashboard .timeline-dot {
+
+    border: 3px solid var(--broker-color);
+
+}
+.broker-dashboard .dashboard-tab span.file-type-icon {
+    background-color: var(--broker-color);
+}
+.broker-dashboard span.back-screen{
+      background-color: #fff4fa;
+}
+.broker-dashboard span.back-screen svg path{
+  fill: var(--broker-color);
+}
 @media(max-width:1350px){
   .top-header > div:nth-child(2) {
     flex-wrap: wrap;
@@ -819,6 +841,19 @@ color: #212836;
 }
 }
 @media (max-width: 767px) {
+    .sm-fix {
+      justify-content: center;
+    }
+  .sm-fix svg{
+    flex: 0 0 20px;
+  }
+    .sm-fix span{
+    flex: 0 0 160px;
+  }
+  .insurers-dashboard .d-flex.align-items-center.check-status, .broker-dashboard .d-flex.align-items-center.check-status, .broker-dashboard .d-flex.align-items-center.check-status, .admin-dashboard .d-flex.align-items-center.check-status {
+
+    gap: 0;
+}
   .form-grid-2x2 {
 
     grid-template-columns: repeat(1, 1fr);
