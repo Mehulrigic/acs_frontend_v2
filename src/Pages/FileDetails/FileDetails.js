@@ -4424,7 +4424,7 @@ const FileDetails = () => {
                                 <td>
                                   <div class="action-btn">
                                     <Link
-                                      onClick={(e) => {
+                                    /*  onClick={(e) => {
                                         e.stopPropagation();
                                         handleViewShowSpeaker();
                                         setShowSpeakerId(data.id);
@@ -4434,7 +4434,8 @@ const FileDetails = () => {
                                         setTotalMissingDocument(
                                           data.missing_document_count
                                         );
-                                      }}
+                                      }}*/
+                                     onClick={() => setShowSpeakerInner(true)}
                                       class="view"
                                       href="/user-management"
                                       data-discover="true"

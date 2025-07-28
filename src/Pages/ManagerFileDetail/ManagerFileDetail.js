@@ -5221,18 +5221,19 @@ const ManagerFileDetail = () => {
                               <td>
                                 <div class="action-btn">
                                   <Link
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      handleViewShowSpeaker();
-                                      setActiveSubTab("speaker");
-                                      setShowSpeakerId(data.id);
-                                      setTotalSpeakerDocument(
-                                        data.user_document_count
-                                      );
-                                      setTotalMissingDocument(
-                                        data.missing_document_count
-                                      );
-                                    }}
+                                    // onClick={(e) => {
+                                    //   e.stopPropagation();
+                                    //   handleViewShowSpeaker();
+                                    //   setActiveSubTab("speaker");
+                                    //   setShowSpeakerId(data.id);
+                                    //   setTotalSpeakerDocument(
+                                    //     data.user_document_count
+                                    //   );
+                                    //   setTotalMissingDocument(
+                                    //     data.missing_document_count
+                                    //   );
+                                    // }}
+                                    onClick={() => setShowSpeakerInner(true)}
                                     class="view"
                                     href="/user-management"
                                     data-discover="true"
