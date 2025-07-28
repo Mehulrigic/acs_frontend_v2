@@ -16,7 +16,7 @@
     background-color: #9CAC1C0D;
 }
 .add-speaker-btn.btn.btn-primary{
-    padding: 13px 26px;
+    /* padding: 13px 26px; */
 }
 
 .side-col {
@@ -38,11 +38,15 @@
     border: none;
 }
 .custom-tab .nav-tabs .nav-link{
-    font-weight: 700;
+    font-weight: 600;
     color: var(--white-color);
     font-family: "Manrope", serif;
     border: none;
     padding: 25px 16px;
+    margin: 0;background-color: transparent;
+}
+.custom-tab .nav-tabs .nav-link:hover{
+    background-color: transparent;
 }
 .custom-tab .nav-tabs .nav-link.active{
     border-radius: 0;
@@ -59,6 +63,7 @@
     bottom: 0px;
     height: 4px;
     width: 83%;
+    display: block;
 }
 .custom-tab .tab-content{
     border-radius: 0;
@@ -153,7 +158,7 @@ line-height: 19.12px;
 
 
 .react-datepicker__header ,h2.react-datepicker__current-month,.custom-tab .tab-content h2.react-datepicker__current-month{
-    font-weight: 700;
+    font-weight: 600;
 }
 div#proxy-renderer {
     height: 100%;

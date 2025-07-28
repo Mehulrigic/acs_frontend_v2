@@ -16,14 +16,15 @@
 }
 .add-folder-panel.offcanvas .offcanvas-title.h5{
     color: #76787B;
-    font-family: "Nunito", serif;
+    /* font-family: "Nunito", serif; */
+    font-family: "Poppins", sans-serif;
 font-size: 16px;
 font-weight: 400;
 line-height: 21.82px;
 
 }
 .add-folder-panel.offcanvas h2{
-    font-weight: 700;
+    font-weight: 600;
     color: var(--primary-dark);
 }
 .add-folder-panel.offcanvas .offcanvas-header,.add-folder-panel.offcanvas .offcanvas-body,.add-folder-panel.offcanvas .offcanvas-footer{
@@ -45,7 +46,7 @@ line-height: 21.82px;
 .add-folder-panel .offcanvas-footer button {
     background-color: var(--tertiary-color);
     font-size: 16px;
-    font-weight: 700;
+    font-weight: 600;
     line-height: 21.86px;
     text-align: center;
     border: none;
@@ -126,7 +127,7 @@ display: flex;
   .upload-file{
     background-image: url('data:image/svg+xml,<svg width="20" height="10" viewBox="0 0 20 10" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1.9 5C1.9 3.29 3.29 1.9 5 1.9H9V0H5C2.24 0 0 2.24 0 5C0 7.76 2.24 10 5 10H9V8.1H5C3.29 8.1 1.9 6.71 1.9 5ZM6 6H14V4H6V6ZM15 0H11V1.9H15C16.71 1.9 18.1 3.29 18.1 5C18.1 6.71 16.71 8.1 15 8.1H11V10H15C17.76 10 20 7.76 20 5C20 2.24 17.76 0 15 0Z" fill="%23292C2F"/></svg>');
 font-size: 16px;
-font-weight: 700;
+font-weight: 600;
 line-height: 21.86px;
 padding: 13px 13px 13px 40px;
 background-color: #9CAC1C0D;
@@ -177,7 +178,7 @@ display: flex
   .add-folder-panel .step-4 .file-number{
     color: #292C2F;
     font-size: 16px;
-    font-weight: 700;
+    font-weight: 600;
     line-height: 21.86px;
     
   }
@@ -196,7 +197,7 @@ display: flex
 .add-folder-panel .close-sutter,.link-wrap{
 color: var(--tertiary-color);
 font-size: 16px;
-font-weight: 700;
+font-weight: 600;
 line-height: 21.86px;
 text-align: left;
 text-decoration-line: underline;

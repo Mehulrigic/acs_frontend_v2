@@ -37,6 +37,8 @@ const Paginations = ({ currentPage, totalPages, onPageChange }) => {
   };
 
   return (
+    <div className="d-md-flex justify-content-between align-items-center">
+      <p className="m-0 text-center text-md-left">Showing 4 of 256 data</p>
     <Pagination>
       <Pagination.First onClick={() => handlePageClick(1)} disabled={currentPage === 1} />
       <Pagination.Prev onClick={() => handlePageClick(currentPage - 1)} disabled={currentPage === 1} />
@@ -44,6 +46,7 @@ const Paginations = ({ currentPage, totalPages, onPageChange }) => {
       <Pagination.Next onClick={() => handlePageClick(currentPage + 1)} disabled={currentPage === totalPages} />
       <Pagination.Last onClick={() => handlePageClick(totalPages)} disabled={currentPage === totalPages} />
     </Pagination>
+    </div>
   );
 };
 

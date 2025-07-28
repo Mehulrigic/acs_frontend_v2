@@ -1339,7 +1339,7 @@ const BrokerFileDetail = () => {
 
               <p className="m-0">Envoyer à : </p>
               <div>
-                <Form.Select aria-label="Etat du chantier" style={{ minHeight: "30px", fontFamily: "Manrope" }} value={sendToFileStatus} onChange={(e) => handleSendFileShow(e.target.value)}>
+                <Form.Select aria-label="Etat du chantier" style={{ minHeight: "45px", fontFamily: "Manrope" }} value={sendToFileStatus} onChange={(e) => handleSendFileShow(e.target.value)}>
                   <option value="" disabled selected>Envoyer à</option>
                   <option value="transfer_to_insurer">Transfert à l'assureur</option>
                   <option value="transfer_to_manager">Transfert au Gestionnaire</option>

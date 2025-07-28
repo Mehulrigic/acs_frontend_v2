@@ -17,7 +17,7 @@
     margin: 0 8px;
 }
 .statistics-container .over-period span{
-    font-weight: 700;
+    font-weight: 600;
 }
 .statistic-row {
     display: flex;
@@ -44,7 +44,7 @@
 }
 .statistic-row .statistic-col .each-box h2{
 font-size: 48px;
-font-weight: 700;
+font-weight: 600;
 line-height: 65.57px;
 margin: 0 0 4px 0; 
 }
