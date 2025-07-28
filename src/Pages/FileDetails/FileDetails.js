@@ -1732,7 +1732,8 @@ const FileDetails = () => {
             </h1>
           </div>
 
-          <div className="detail-header s">
+          <div className="detail-header  new-update-header">
+            <div className="d-flex justify-content-between w-100 align-items-center">
             <div className="d-flex gap-2 w-auto sm-fix">
               <svg
                 width="20"
@@ -1748,7 +1749,7 @@ const FileDetails = () => {
               </svg>
               <span>Dossier à vérifier</span>
             </div>
-            <div className="d-sm-flex align-items-center gap-3 flex-wrap">
+            <div className="d-sm-flex align-items-center gap-3 flex-wrap ms-auto">
               <div style={{ marginRight: "0" }} className="div">
                 <Link
                   onClick={toggleDetail}
@@ -2142,10 +2143,11 @@ const FileDetails = () => {
                 </Offcanvas>
               </div>
             </div>
-          </div>
-          <div
-            className={`detail-header second-header ${isVisible ? "show" : ""}`}
+            </div>
+                      <div
+            className={`second-header ${isVisible ? "show" : ""}`}
           >
+            <div className="grid-view">
             <div className="d-flex align-items-center check-status">
               <div
                 className="d-flex align-items-center check-status"
@@ -2176,8 +2178,10 @@ const FileDetails = () => {
                   ? "Mise en demeure"
                   : t("invalidLabel")}
               </div>
-            </div>
+            </div></div>
           </div>
+          </div>
+
         </div>
         <Tabs
           activeKey={activeTab}
@@ -2391,6 +2395,52 @@ const FileDetails = () => {
                     </Table>
                   </div>
                 </div>
+                                <h2 className="mb-3 mt-3">Task</h2>
+                <div className="custom-grid-card">
+                  <h3>Coming Task - to be determined</h3>
+                  <div className="table-wrap mt-24">
+                    <Table responsive hover>
+                      <thead>
+                        <tr>
+                          <th>Name of Task</th>
+                          <th>Dead line</th>
+                          <th>Task description</th>
+                          <th>Name of responsible</th>
+                          <th>status</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>Task 1</td>
+                          <td>dead line</td>
+                          <td>Task description</td>
+                          <td>Name of responsible</td>
+                          <td>
+                            <span class="checked badges">À vérifier</span>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>Task 1</td>
+                          <td>dead line</td>
+                          <td>Task description</td>
+                          <td>Name of responsible</td>
+                          <td>
+                            <span class="checked badges">À vérifier</span>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>Task 1</td>
+                          <td>dead line</td>
+                          <td>Task description</td>
+                          <td>Name of responsible</td>
+                          <td>
+                            <span class="checked badges">À vérifier</span>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </Table>
+                  </div>
+                </div>
               </div>
               <div className="col-md-5">
                 <h2 className="mb-3">Events</h2>
@@ -2520,52 +2570,7 @@ const FileDetails = () => {
                     </button>
                   </div>
                 </div>
-                <h2 className="mb-3 mt-3">Task</h2>
-                <div className="custom-grid-card">
-                  <h3>Coming Task - to be determined</h3>
-                  <div className="table-wrap mt-24">
-                    <Table responsive hover>
-                      <thead>
-                        <tr>
-                          <th>Name of Task</th>
-                          <th>Dead line</th>
-                          <th>Task description</th>
-                          <th>Name of responsible</th>
-                          <th>status</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <td>Task 1</td>
-                          <td>dead line</td>
-                          <td>Task description</td>
-                          <td>Name of responsible</td>
-                          <td>
-                            <span class="checked badges">À vérifier</span>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>Task 1</td>
-                          <td>dead line</td>
-                          <td>Task description</td>
-                          <td>Name of responsible</td>
-                          <td>
-                            <span class="checked badges">À vérifier</span>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>Task 1</td>
-                          <td>dead line</td>
-                          <td>Task description</td>
-                          <td>Name of responsible</td>
-                          <td>
-                            <span class="checked badges">À vérifier</span>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </Table>
-                  </div>
-                </div>
+
               </div>
             </div>
           </Tab>

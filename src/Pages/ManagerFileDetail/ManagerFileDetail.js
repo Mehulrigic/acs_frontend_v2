@@ -2017,9 +2017,9 @@ const ManagerFileDetail = () => {
             </div> */}
           </div>
           <div
-            className="detail-header"
-            style={{ display: "flex", justifyContent: "right" }}
+            className="detail-header new-update-header"
           >
+            <div className="d-flex align-items-center ms-auto top-part">
             <div style={{ marginRight: "20px" }} className="div">
                 <Link onClick={toggleDetail} className="fold-unfold-link link-wrap">
       {isVisible ? 'Fold Detail' : 'Unfold Detail'}
@@ -2061,9 +2061,8 @@ const ManagerFileDetail = () => {
               <option value="transfer_to_broker">Transfert au Courtier</option>
               <option value="to_be_decided">A statuer</option>
             </Form.Select>
-          </div>
-
-          <div className={`detail-header second-header ${isVisible ? 'show' : ''}`}>
+</div>
+          <div className={`second-header ${isVisible ? 'show' : ''}`}>
             <div className="d-flex align-items-center check-status">
               <div className="d-flex align-items-center check-status">
                 <p className="m-0" style={{ paddingRight: "10px" }}>
@@ -2082,7 +2081,7 @@ const ManagerFileDetail = () => {
                 </div>
               </div>
 
-              <div className="d-flex flex-wrap gap-3">
+              <div className="grid-view">
 
               <div className="d-flex align-items-center">
               <p className="m-0">Statut : </p>
@@ -2140,6 +2139,10 @@ const ManagerFileDetail = () => {
 
             </div>
           </div>
+            
+          </div>
+
+
         </div>
         <Tabs
           activeKey={activeTab}
@@ -2253,6 +2256,8 @@ const ManagerFileDetail = () => {
                   </div>
                 </div>
 
+                
+
                  <div className="custom-grid-card mt-3">
                   <h3>Intervenants # of registered Intervenants</h3>
                   <div className="table-wrap mt-24">
@@ -2342,6 +2347,47 @@ const ManagerFileDetail = () => {
                             <span className="doc-status danger"></span>
                           </td>
                         </tr>
+                      </tbody>
+                    </Table>
+                  </div>
+                </div>
+
+                                <h2 className="mb-3 mt-3">Task</h2>
+                <div className="custom-grid-card">
+                  <h3>Coming Task - to be determined</h3>
+                  <div className="table-wrap mt-24">
+                    <Table responsive hover>
+                      <thead>
+                        <tr>
+                          <th>Name of Task</th>
+                          <th>Dead line</th>
+                          <th>Task description</th>
+                          <th>Name of responsible</th>
+                          <th>status</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                          <tr>
+                            <td>Task 1</td>
+                            <td>dead line</td>
+                            <td>Task description</td>
+                            <td>Name of responsible</td>
+                            <td><span class="checked badges">À vérifier</span></td>
+                          </tr>
+                                                    <tr>
+                            <td>Task 1</td>
+                            <td>dead line</td>
+                            <td>Task description</td>
+                            <td>Name of responsible</td>
+                            <td><span class="checked badges">À vérifier</span></td>
+                          </tr>
+                                                    <tr>
+                            <td>Task 1</td>
+                            <td>dead line</td>
+                            <td>Task description</td>
+                            <td>Name of responsible</td>
+                            <td><span class="checked badges">À vérifier</span></td>
+                          </tr>
                       </tbody>
                     </Table>
                   </div>
@@ -2447,46 +2493,7 @@ const ManagerFileDetail = () => {
                 </div>
 
                 </div>
-                <h2 className="mb-3 mt-3">Task</h2>
-                <div className="custom-grid-card">
-                  <h3>Coming Task - to be determined</h3>
-                  <div className="table-wrap mt-24">
-                    <Table responsive hover>
-                      <thead>
-                        <tr>
-                          <th>Name of Task</th>
-                          <th>Dead line</th>
-                          <th>Task description</th>
-                          <th>Name of responsible</th>
-                          <th>status</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                          <tr>
-                            <td>Task 1</td>
-                            <td>dead line</td>
-                            <td>Task description</td>
-                            <td>Name of responsible</td>
-                            <td><span class="checked badges">À vérifier</span></td>
-                          </tr>
-                                                    <tr>
-                            <td>Task 1</td>
-                            <td>dead line</td>
-                            <td>Task description</td>
-                            <td>Name of responsible</td>
-                            <td><span class="checked badges">À vérifier</span></td>
-                          </tr>
-                                                    <tr>
-                            <td>Task 1</td>
-                            <td>dead line</td>
-                            <td>Task description</td>
-                            <td>Name of responsible</td>
-                            <td><span class="checked badges">À vérifier</span></td>
-                          </tr>
-                      </tbody>
-                    </Table>
-                  </div>
-                </div>
+
               </div>
             </div>
           </Tab>
@@ -4805,7 +4812,7 @@ const ManagerFileDetail = () => {
                                 variant="primary"
                                 onClick={() => HandleGetDetails(SIRETNumber)}
                                 style={{
-                                  height: "62px",
+                                  height: "52px",
                                   borderTopLeftRadius: 0,
                                   borderBottomLeftRadius: 0,
                                 }}

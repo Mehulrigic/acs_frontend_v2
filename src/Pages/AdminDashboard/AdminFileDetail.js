@@ -4753,7 +4753,7 @@ const AdminFileDetail = () => {
                                 variant="primary"
                                 onClick={() => HandleGetDetails(SIRETNumber)}
                                 style={{
-                                  height: "62px",
+                                  height: "52px",
                                   borderTopLeftRadius: 0,
                                   borderBottomLeftRadius: 0,
                                 }}

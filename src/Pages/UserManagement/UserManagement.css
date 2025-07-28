@@ -1,11 +1,11 @@
 .nav-tabs .nav-link{
     /* font-family: "Nunito"; */
     font-family: "Poppins", sans-serif;
-    font-size: 16px;
-    font-weight: 500;
+    font-size: 15px;
+    font-weight: 400;
     line-height: 100%;
     color: var(--dark-body-color);
-    padding: 19px 26px 19px 26px;
+    padding: 15px 26px 15px 26px;
     border: 1px solid transparent !important;
     position: relative;
     background-color: #FFFFFF;
