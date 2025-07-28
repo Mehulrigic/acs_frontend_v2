@@ -30,13 +30,18 @@ import AddNote from "../../Components/AddNote/AddNote";
 import { BsPatchExclamation } from "react-icons/bs";
 
 const ManagerFileDetail = () => {
-    const [isVisible, setIsVisible] = useState(false);
+  const { t } = useTranslation();
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const scrollRef = useRef(null);
+
+  const [isVisible, setIsVisible] = useState(false);
 
   const toggleDetail = (e) => {
-    e.preventDefault(); // prevent page reload if using <a>
+    e.preventDefault();
     setIsVisible(!isVisible);
   };
-    const [selectedType, setSelectedType] = useState('');
+  const [selectedType, setSelectedType] = useState('');
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedUser, setSelectedUser] = useState('');
   const [showReader, setShowReader] = useState(false);
@@ -45,7 +50,6 @@ const ManagerFileDetail = () => {
     setShowReader((prev) => {
       const newState = !prev;
 
-      // Toggle class on body
       if (newState) {
         document.body.classList.add("show-reader");
       } else {
@@ -55,22 +59,17 @@ const ManagerFileDetail = () => {
       return newState;
     });
   };
-  const { t } = useTranslation();
-  const { id } = useParams();
-  const navigate = useNavigate();
-  const scrollRef = useRef(null);
 
   const now = 66;
   const nows = 37;
   const [isLoading, setIsLoading] = useState(false);
+  const [isSpeakerLoading, setIsSpeakerLoading] = useState(false);
   const [isNoteLoading, setIsNoteLoading] = useState(false);
   const [currentFileIndex, setCurrentFileIndex] = useState(0);
   const [showSpeakerId, setShowSpeakerId] = useState("");
   const [showDocumentId, setShowDocumentId] = useState("");
   const [showFinalModal, setShowFinalModal] = useState(false);
-  const [showUserDocumentAfterDeleteFile, setShowUserDocumentAfterDeleteFile] =
-    useState(false);
-  const [deleteSpeakerDocId, setDeleteSpeakerDocId] = useState("");
+  const [showUserDocumentAfterDeleteFile, setShowUserDocumentAfterDeleteFile] = useState(false);
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const handleCloseDeleteModal = () => setShowDeleteModal(false);
@@ -80,27 +79,13 @@ const ManagerFileDetail = () => {
   const handleCloseDeleteModalSpeaker = () => setShowDeleteModalSpeaker(false);
   const handleShowDeleteModalSpeaker = () => setShowDeleteModalSpeaker(true);
 
-  const [showDeleteModalSpeakerDocument, setShowDeleteModalSpeakerDocument] =
-    useState(false);
-  const handleCloseDeleteModalSpeakerDocument = () =>
-    setShowDeleteModalSpeakerDocument(false);
-  const handleShowDeleteModalSpeakerDocument = () =>
-    setShowDeleteModalSpeakerDocument(true);
-
   const handleCloseFinalModal = () => setShowFinalModal(false);
   const handleShowFinalModal = () => setShowFinalModal(true);
 
   const [contractNo, setContractNo] = useState("");
-  const [selectBroker, setSelectBroker] = useState("");
-  const [brokerList, setBrokerList] = useState([]);
-
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
-
   const [startDate4, setStartDate4] = useState(null);
-  const [startDate5, setStartDate5] = useState(null);
-  const [startDate6, setStartDate6] = useState(null);
-
   const [paperList, setPaperList] = useState([]);
   const [documentTypeList, setDocumentTypeList] = useState([]);
   const [selectDocumentType, setSelectDocumentType] = useState("");
@@ -117,10 +102,8 @@ const ManagerFileDetail = () => {
   const [fileDetail, setFileDetail] = useState();
   const [speakerDetail, setSpeakerDetail] = useState({});
   const [speakerDocumentTypeList, setSpeakerDocumentTypeList] = useState([]);
-  const [markIsReadCount, setMarkIsReadCount] = useState(0);
   const [missingDocumentList, setMissingDocumentList] = useState([]);
   const [historyDocumentList, setHistoryDocumentList] = useState([]);
-  const [recordsToShow, setRecordsToShow] = useState(2);
   const [showUserDocumentDataId, setShowUserDocumentDataId] = useState("");
   const [showSpeakerDocument, setShowSpeakerDocument] = useState([]);
   const [fileList, setFileList] = useState([]);
@@ -149,14 +132,14 @@ const ManagerFileDetail = () => {
   const [totalSpeakerRecords, setTotalSpeakerRecords] = useState(0);
   const [totalMissingRecords, setTotalMissingRecords] = useState(0);
   const [activeTab, setActiveTab] = useState("dashboard");
-  const [activeSubTab, setActiveSubTab] = useState("speaker");
+  const [activeDocumentTab, setActiveDocumentTab] = useState("document");
+  const [activeSubTab, setActiveSubTab] = useState("documents");
   const [history, setHistory] = useState([]);
   const [totalSpeakerDocument, setTotalSpeakerDocument] = useState(0);
   const [totalMissingDocument, setTotalMissingDocument] = useState(0);
   const [selectDocumentId, setSelectDocumentId] = useState("");
   const [selectDocumentFileName, setSelectDocumentFileName] = useState("");
   const [isRotated, setIsRotated] = useState(false);
-  const [showSepeakerInner, setShowSpeakerInner] = useState(false);
 
   const [sort, setSort] = useState({ key: "created_at", value: "desc" });
 
@@ -194,11 +177,11 @@ const ManagerFileDetail = () => {
     setFileList([]);
   };
 
-  const [showViewSpeaker, setShowViewSpeaker] = useState(false);
-  const handleViewShowSpeaker = () => setShowViewSpeaker(true);
+  const [showSepeakerInner, setShowSpeakerInner] = useState(false);
+  const handleViewShowSpeaker = () => setShowSpeakerInner(true);
   const handleViewCloseSpeaker = () => {
     SpeakerList(id, sort, currentPage);
-    setShowViewSpeaker(false);
+    setShowSpeakerInner(false);
   };
 
   const [showViewPaperDoc, setShowViewPaperDoc] = useState(false);
@@ -281,7 +264,7 @@ const ManagerFileDetail = () => {
     if (flashMessage.message) {
       const timer = setTimeout(() => {
         setFlashMessage({ type: "", message: "" });
-      }, 3000); // Adjust time as needed
+      }, 3000);
 
       return () => clearTimeout(timer);
     }
@@ -289,7 +272,7 @@ const ManagerFileDetail = () => {
     if (flashMessageStoreDoc.message) {
       const timer = setTimeout(() => {
         setFlashMessageStoreDoc({ type: "", message: "" });
-      }, 2000); // Adjust time as needed
+      }, 2000);
 
       return () => {
         handleViewCloseSpeaker();
@@ -324,37 +307,34 @@ const ManagerFileDetail = () => {
   useEffect(() => {
     if (activeTab === "information") {
       FolderDetail(id);
-      BrokerList();
       SpeakerDropDownList("", 1);
     }
     if (activeTab === "document") {
-      PaperList(
-        id,
-        sort,
-        1,
-        editUserStatus,
-        selectDocumentType,
-        selectSpeakerId
-      );
-      DocumentTypeList();
-      SpeakerDropDownList("", 1);
+      if (activeDocumentTab === "missingdocument") {
+        GetMissingDocumentList(id, sort, 1, selectIsRequired);
+      } else {
+        PaperList(
+          id,
+          sort,
+          1,
+          editUserStatus,
+          selectDocumentType,
+          selectSpeakerId
+        );
+        DocumentTypeList();
+        SpeakerDropDownList("", 1);
+      }
     }
     if (activeTab === "intervenants") {
-      SpeakerList(id, sort, 1);
-    }
-    if (activeTab === "missingdocument") {
-      GetMissingDocumentList(id, sort, 1, selectIsRequired);
+      SpeakerList(id, sort, currentPage);
     }
     if (activeTab === "history") {
       GetHistoryListDocument(id, sort, search, currentPage, selectActionType);
     }
-  }, [activeTab]);
+  }, [activeTab, activeDocumentTab, sort]);
 
   useEffect(() => {
-    if (showViewSpeaker) {
-      if (activeSubTab === "speaker") {
-        SpeakerDetail(showSpeakerId);
-      }
+    if (showSepeakerInner && activeTab === "intervenants") {
       if (activeSubTab === "documents") {
         ShowSpeakerDocument(id, sort, "", 1, "", "", showSpeakerId);
       }
@@ -362,29 +342,7 @@ const ManagerFileDetail = () => {
         SpeakerDocumentTypeList(id, showSpeakerId);
       }
     }
-  }, [activeSubTab, showViewSpeaker]);
-
-  useEffect(() => {
-    if (activeTab === "document") {
-      PaperList(
-        id,
-        sort,
-        currentPage,
-        editUserStatus,
-        selectDocumentType,
-        selectSpeakerId
-      );
-    }
-    if (activeTab === "intervenants") {
-      SpeakerList(id, sort, currentPage);
-    }
-    if (activeTab === "missingdocument") {
-      GetMissingDocumentList(id, sort, currentPage, selectIsRequired);
-    }
-    if (activeTab === "history") {
-      GetHistoryListDocument(id, sort, search, currentPage, selectActionType);
-    }
-  }, [sort]);
+  }, [activeTab, activeSubTab, showSepeakerInner]);
 
   useEffect(() => {
     if (showCheck && !showDeleteModal) {
@@ -400,17 +358,6 @@ const ManagerFileDetail = () => {
     validateDocumnetFilter,
     showUserDocumentFileData,
   ]);
-
-  // const MarkHistoryAsReadAllDocument = async (id) => {
-  //   try {
-  //     const response = await FilePageService.mark_history_all_as_read(id);
-  //     if (response.data.status) {
-  //       GetHistoryListDocument(id, sort, search, currentPage, selectActionType);
-  //     }
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // };
 
   const GetHistoryListDocument = async (
     id,
@@ -435,8 +382,6 @@ const ManagerFileDetail = () => {
 
       if (response.data.status) {
         setIsLoading(false);
-        // const markIsRead = response.data.history.data.filter((data) => data.is_read == 0);
-        // setMarkIsReadCount(markIsRead.length);
         setHistoryDocumentList(response.data.history.data);
         setCurrentPage(response.data.history.meta.current_page);
         setTotalPages(response.data.history.meta.last_page);
@@ -465,27 +410,6 @@ const ManagerFileDetail = () => {
     setSelectActionType(selectedValue);
     GetHistoryListDocument(id, sort, search, currentPage, selectedValue);
   };
-
-  // const handleScroll = (e) => {
-  //   const { scrollTop, scrollHeight, clientHeight } = e.target;
-  //   if (scrollTop + clientHeight >= scrollHeight - 5) {
-  //     setRecordsToShow((prev) =>
-  //       Math.min(prev + 2, historyDocumentList.length)
-  //     );
-  //   }
-  // };
-
-  // const displayedRecords = historyDocumentList.slice(0, recordsToShow);
-  // const MarkHistoryAsReadDocument = async (id) => {
-  //   try {
-  //     const response = await FilePageService.mark_history_as_read(id);
-  //     if (response.data.status) {
-  //       GetHistoryListDocument(showUserDocumentDataId);
-  //     }
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // };
 
   const ShowSpeakerDocument = async (
     id,
@@ -541,51 +465,6 @@ const ManagerFileDetail = () => {
     }
   };
 
-  // const handleUpdateFileChange = async (event) => {
-  //   const files = Array.from(event.target.files); // Only get the first selected file
-
-  //   const newFiles = [];
-
-  //   const convertToBase64 = (file) => {
-  //     return new Promise((resolve, reject) => {
-  //       const reader = new FileReader();
-  //       reader.onload = () => resolve(reader.result.split(",")[1]); // Extract only Base64 content
-  //       reader.onerror = (error) => reject(error);
-  //       reader.readAsDataURL(file);
-  //     });
-  //   };
-
-  //   for (const file of files) {
-  //     if (!allowedFileTypes.includes(file.type)) {
-  //       setFlashMessage({
-  //         type: "error",
-  //         message: `Ce type de document n'est pas pris en charge: ${file.name}`,
-  //       });
-  //       return; // Exit if invalid file type
-  //     }
-  //     console.log(file);
-  //     if (file.size > maxFileSize) {
-  //       setFlashMessage({
-  //         type: "error",
-  //         message: `Limite de taille atteinte. Vos fichiers ne doivent pas dépasser 50 Mo: ${file.name}`,
-  //       });
-  //       return; // Exit if file size is too large
-  //     }
-
-  //     const base64File = await convertToBase64(file);
-
-  //     newFiles.push({
-  //       file: base64File,
-  //       name: file.name,
-  //     });
-  //   }
-  //   if (newFiles.length > 0) {
-  //     setFileList((prevFiles) => [...prevFiles, ...newFiles]);
-  //   }
-
-  //   event.target.value = ""; // Reset the file input
-  // };
-
   const handleUpdateFileChange = (event) => {
     const files = Array.from(event.target.files);
     const newFiles = [];
@@ -607,14 +486,14 @@ const ManagerFileDetail = () => {
         return;
       }
 
-      newFiles.push(file); // Keep File object
+      newFiles.push(file);
     }
 
     if (newFiles.length > 0) {
       setFileList((prevFiles) => [...prevFiles, ...newFiles]);
     }
 
-    event.target.value = ""; // Reset file input
+    event.target.value = "";
   };
 
   const allowedFileTypes = [
@@ -629,53 +508,6 @@ const ManagerFileDetail = () => {
 
   const maxFileSize = 50 * 1024 * 1024;
 
-  // const AddMissingDocument = async (e) => {
-  //   e.preventDefault();
-  //   try {
-  //     const documents = [];
-
-  //     if (fileList?.length) {
-  //       documents.push(...fileList);
-  //     }
-
-  //     var userData = {
-  //       speaker_id: showSpeakerId,
-  //       missing_document_id: missingDocumentId,
-  //       documents: documents
-  //     }
-
-  //     const response = await FilePageService.add_missing_document(id, userData);
-
-  //     if (response.data.status) {
-  //       setFileList([]);
-  //       setFlashMessageStoreDoc({
-  //         type: "success",
-  //         message: response.data.message || t("somethingWentWrong"),
-  //       });
-
-  //       if (activeTab === "speakerdocument") {
-  //         if (activeSubTab === "documentType") {
-  //           SpeakerDocumentTypeList(id, showSpeakerId);
-  //         }
-  //       }
-  //       if (activeTab === "missingdocument") {
-  //         GetMissingDocumentList(id, sort, 1, selectIsRequired);
-  //       }
-  //       ShowUserDocumentData(id);
-  //     } else {
-  //       setFlashMessageStoreDoc({
-  //         type: "error",
-  //         message: response.data.message || t("somethingWentWrong"),
-  //       });
-  //     }
-  //   } catch (error) {
-  //     setFlashMessageStoreDoc({
-  //       type: "error",
-  //       message: t("somethingWentWrong"),
-  //     });
-  //   }
-  // };
-
   const AddMissingDocument = async (e) => {
     e.preventDefault();
     setDocumentUploading(true);
@@ -687,7 +519,7 @@ const ManagerFileDetail = () => {
 
       if (fileList?.length) {
         fileList.forEach((file) => {
-          formData.append("documents[]", file); // Use array-style key for multiple files
+          formData.append("documents[]", file);
         });
       }
 
@@ -713,8 +545,21 @@ const ManagerFileDetail = () => {
             SpeakerDocumentTypeList(id, showSpeakerId);
           }
         }
-        if (activeTab === "missingdocument") {
-          GetMissingDocumentList(id, sort, currentPage, selectIsRequired);
+        if (activeTab === "document") {
+          if (activeDocumentTab === "missingdocument") {
+            GetMissingDocumentList(id, sort, currentPage, selectIsRequired);
+          } else {
+            PaperList(
+              id,
+              sort,
+              currentPage,
+              editUserStatus,
+              selectDocumentType,
+              selectSpeakerId
+            );
+            DocumentTypeList();
+            SpeakerDropDownList("", 1);
+          }
         }
 
         ShowUserDocumentData(id);
@@ -759,20 +604,14 @@ const ManagerFileDetail = () => {
         setShowUserCompanyName(response.data.documents.company_name);
         setTotalMissingRecords(response.data.documents.total_missing_doc);
         setTotalSpeakerRecords(response.data.documents.total_speakers);
-        setTotalPaperRecords(
-          response.data.documents.user_document_files?.length
-        );
+        setTotalPaperRecords(response.data.documents.user_document_files?.length);
         setStartDate(response.data.documents.start_date);
         setEndDate(response.data.documents.complete_date);
 
-        setPolicyholderName(
-          response.data.documents.insurance_policyholder_name
-        );
+        setPolicyholderName(response.data.documents.insurance_policyholder_name);
         setEstimatedSiteCost(response.data.documents.estimated_site_cost);
         setEstimatedStartDate(response.data.documents.estimated_start_date);
-        setEstimatedCompletionDate(
-          response.data.documents.estimated_completion_date
-        );
+        setEstimatedCompletionDate(response.data.documents.estimated_completion_date);
         setFinaldSiteCost(response.data.documents.final_site_cost);
         setFinalStartDate(response.data.documents.final_start_date);
         setFinalCompletionDate(response.data.documents.final_completion_date);
@@ -785,9 +624,7 @@ const ManagerFileDetail = () => {
         } else {
           setSendToFileStatus("");
         }
-        setShowUserDocumentFileData(
-          response.data.documents.user_document_files
-        );
+        setShowUserDocumentFileData(response.data.documents.user_document_files);
         setUserDocumentFileDataChanges(fileDataChanges);
         setShowDocumentId(fileDataChanges[0].id);
         if (showCheck && showDeleteModal) {
@@ -862,8 +699,6 @@ const ManagerFileDetail = () => {
         setIsLoading(false);
         setFolderDetail(response.data.documents);
         setStartDate4(response.data.documents.created_at);
-        setStartDate5(response.data.documents.start_date);
-        setStartDate6(response.data.documents.complete_date);
         setEditUserSiteStatus(response.data.documents.site_status);
       } else {
         setIsLoading(false);
@@ -1030,7 +865,7 @@ const ManagerFileDetail = () => {
   };
 
   const options = [
-    { value: "", label: t("SelectSpeaker") }, // null option for default selection
+    { value: "", label: t("SelectSpeaker") },
     ...speakerDropDownList?.map((speaker) => ({
       value: speaker.id,
       label: speaker.company_name + " - " + speaker.siren_number,
@@ -1082,13 +917,16 @@ const ManagerFileDetail = () => {
 
   const SpeakerDetail = async (showSpeakerId) => {
     setIsLoading(true);
+    setIsSpeakerLoading(true);
     try {
       const response = await AcsManagerFileService.speakerdetail(showSpeakerId);
       if (response.data.status) {
         setIsLoading(false);
+        setIsSpeakerLoading(false);
         setSpeakerDetail(response.data);
       } else {
         setIsLoading(false);
+        setIsSpeakerLoading(false);
         setFlashMessage({
           type: "error",
           message: response.data.message || t("somethingWentWrong"),
@@ -1096,6 +934,7 @@ const ManagerFileDetail = () => {
       }
     } catch (error) {
       setIsLoading(false);
+      setIsSpeakerLoading(false);
       setFlashMessage({
         type: "error",
         message: t("somethingWentWrong"),
@@ -1220,20 +1059,21 @@ const ManagerFileDetail = () => {
 
   const handlePageChange = (page) => {
     if (activeTab === "document") {
-      PaperList(
-        id,
-        sort,
-        page,
-        editUserStatus,
-        selectDocumentType,
-        selectSpeakerId
-      );
+      if (activeDocumentTab === "missingdocument") {
+        GetMissingDocumentList(id, sort, page, selectIsRequired);
+      } else {
+        PaperList(
+          id,
+          sort,
+          page,
+          editUserStatus,
+          selectDocumentType,
+          selectSpeakerId
+        );
+      }
     }
     if (activeTab === "intervenants") {
       SpeakerList(id, sort, page);
-    }
-    if (activeTab === "missingdocument") {
-      GetMissingDocumentList(id, sort, page, selectIsRequired);
     }
     if (activeTab === "history") {
       GetHistoryListDocument(id, sort, search, page, selectActionType);
@@ -1246,11 +1086,26 @@ const ManagerFileDetail = () => {
   };
 
   const handleSelect = (key) => {
-    setHistory((prevHistory) => [...prevHistory, activeTab]);
+    setHistory((prevHistory) => [
+      ...prevHistory,
+      { activeTab, activeDocumentTab, activeSubTab },
+    ]);
     setActiveTab(key);
   };
 
+  const handleSelectDocument = (key) => {
+    setHistory((prevHistory) => [
+      ...prevHistory,
+      { activeTab, activeDocumentTab, activeSubTab },
+    ]);
+    setActiveDocumentTab(key);
+  };
+
   const handleSubTabSelect = (key) => {
+    setHistory((prevHistory) => [
+      ...prevHistory,
+      { activeTab, activeDocumentTab, activeSubTab },
+    ]);
     setActiveSubTab(key);
   };
 
@@ -1454,29 +1309,6 @@ const ManagerFileDetail = () => {
     }
   };
 
-  const HandleDeleteSpeakerDocument = async () => {
-    try {
-      const response = await AcsManagerFileService.delete_speaker_from_file(
-        deleteSpeakerDocId
-      );
-      if (response.data.status) {
-        handleCloseDeleteModalSpeakerDocument();
-        ShowSpeakerDocument(id, sort, "", 1, "", "", showSpeakerId);
-        PaperList(
-          id,
-          sort,
-          currentPage,
-          editUserStatus,
-          selectDocumentType,
-          selectSpeakerId
-        );
-        SpeakerList(id, sort, currentPage);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
   const HandleDeleteDocumentFile = async () => {
     try {
       const response = await FilePageService.delete_document_file(
@@ -1492,16 +1324,20 @@ const ManagerFileDetail = () => {
           }
         }
         if (activeTab === "document") {
-          PaperList(
-            id,
-            sort,
-            currentPage,
-            editUserStatus,
-            selectDocumentType,
-            selectSpeakerId
-          );
-          DocumentTypeList();
-          SpeakerDropDownList("", 1);
+          if (activeDocumentTab === "missingdocument") {
+            GetMissingDocumentList(id, sort, 1, selectIsRequired);
+          } else {
+            PaperList(
+              id,
+              sort,
+              1,
+              editUserStatus,
+              selectDocumentType,
+              selectSpeakerId
+            );
+            DocumentTypeList();
+            SpeakerDropDownList("", 1);
+          }
         }
       }
     } catch (error) {
@@ -1513,7 +1349,7 @@ const ManagerFileDetail = () => {
     if (dateString) {
       const date = new Date(dateString);
       const day = String(date.getDate()).padStart(2, "0");
-      const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are zero-based
+      const month = String(date.getMonth() + 1).padStart(2, "0");
       const year = date.getFullYear();
       return `${day}/${month}/${year}`;
     } else {
@@ -1523,7 +1359,7 @@ const ManagerFileDetail = () => {
 
   const getFormattedDate = (dateString) => {
     const [day, month, year] = dateString.split("/");
-    return new Date(`${month}/${day}/${year}`); // Convert to MM/DD/YYYY format
+    return new Date(`${month}/${day}/${year}`);
   };
 
   const ValidateDocumentFile = async (e) => {
@@ -1543,10 +1379,6 @@ const ManagerFileDetail = () => {
         validateDocumentFileData
       );
       if (response.data.status) {
-        const sortSpeaker = {
-          key: "company_name",
-          value: "asc",
-        };
         setIsLoading(false);
         handleCloseFinalModal();
         handleCheckClose();
@@ -1634,13 +1466,28 @@ const ManagerFileDetail = () => {
     }
   };
 
+  const safeHistoryEntry = (entry) =>
+    typeof entry === "string"
+      ? {
+        activeTab: entry,
+        activeDocumentTab: null,
+        activeSubTab: null,
+      }
+      : {
+        activeTab: entry.activeTab || null,
+        activeDocumentTab: entry.activeDocumentTab || null,
+        activeSubTab: entry.activeSubTab || null,
+      };
+
   const handleBack = () => {
     setHistory((prevHistory) => {
       const newHistory = [...prevHistory];
-      const previousTab = newHistory.pop();
+      const previousTab = safeHistoryEntry(newHistory.pop());
 
       if (previousTab) {
-        setActiveTab(previousTab);
+        if (previousTab.activeTab) setActiveTab(previousTab.activeTab);
+        if (previousTab.activeDocumentTab) setActiveDocumentTab(previousTab.activeDocumentTab);
+        if (previousTab.activeSubTab) setActiveSubTab(previousTab.activeSubTab);
         return newHistory;
       } else {
         navigate("/manager-files");
@@ -1658,14 +1505,14 @@ const ManagerFileDetail = () => {
       (key) => paperModalColumns[key]
     );
     setSelectedSpeakerColumns(newSelectedColumns);
-    handleAddPaperColClose(); // Close the modal
+    handleAddPaperColClose();
   };
 
   const handleClickRotate = (column) => {
     const direction =
       sort.key === column ? (sort.value === "desc" ? "asc" : "desc") : "asc";
     setSort({ key: column, value: direction });
-    setIsRotated(!isRotated); // Toggle the class on click
+    setIsRotated(!isRotated);
   };
 
   const docs = [
@@ -1681,25 +1528,21 @@ const ManagerFileDetail = () => {
 
     if (fileExtension === "pdf") {
       const fileUrl = `${process.env.REACT_APP_API}/file/${showUserFolderName}/${fileName}`;
-      // Fetch the PDF file as a Blob
+
       fetch(fileUrl)
-        .then((response) => response.blob()) // Convert the response to a Blob
+        .then((response) => response.blob())
         .then((blob) => {
-          // Create a URL for the Blob
           const blobUrl = URL.createObjectURL(blob);
 
-          // Create a temporary link to download the Blob
           const tempLink = document.createElement("a");
           tempLink.href = blobUrl;
           tempLink.download = fileName;
 
-          // Append the link to the body and trigger the download
           document.body.appendChild(tempLink);
           tempLink.click();
 
-          // Clean up by removing the temporary link
           document.body.removeChild(tempLink);
-          URL.revokeObjectURL(blobUrl); // Release the object URL after the download
+          URL.revokeObjectURL(blobUrl);
         })
         .catch((error) => {
           console.error("Error downloading PDF:", error);
@@ -1736,16 +1579,20 @@ const ManagerFileDetail = () => {
           SpeakerDropDownList("", 1);
         }
         if (activeTab === "document") {
-          PaperList(
-            id,
-            sort,
-            currentPage,
-            editUserStatus,
-            selectDocumentType,
-            selectSpeakerId
-          );
-          DocumentTypeList();
-          SpeakerDropDownList("", 1);
+          if (activeDocumentTab === "missingdocument") {
+            GetMissingDocumentList(id, sort, 1, selectIsRequired);
+          } else {
+            PaperList(
+              id,
+              sort,
+              1,
+              editUserStatus,
+              selectDocumentType,
+              selectSpeakerId
+            );
+            DocumentTypeList();
+            SpeakerDropDownList("", 1);
+          }
         }
         if (activeTab === "intervenants") {
           SpeakerList(id, sort, currentPage);
@@ -1798,7 +1645,6 @@ const ManagerFileDetail = () => {
         : "",
       estimated_site_cost: estimatedSiteCost || "",
       final_site_cost: finalSiteCost || "",
-      broker_id: selectBroker ? selectBroker : "",
     };
 
     try {
@@ -1825,22 +1671,6 @@ const ManagerFileDetail = () => {
   const handleChange = (e) => {
     const value = e.target.value;
     setContractNo(value);
-  };
-
-  const BrokerList = async () => {
-    try {
-      const response = await AddFolderPanelService.broker_list();
-      if (response.data.status) {
-        setBrokerList(response.data.brokerList);
-      } else {
-        setFlashMessage({
-          type: "error",
-          message: response.data.message || t("somethingWentWrong"),
-        });
-      }
-    } catch (error) {
-      console.log(error);
-    }
   };
 
   const HandleGetDetails = async (siretNumber) => {
@@ -1932,18 +1762,17 @@ const ManagerFileDetail = () => {
     <Fragment>
       <style>
         {" "}
-        {` button.btn.btn-primary  { background-color: ${
-          localStorage.getItem("button_color")
-            ? JSON.parse(localStorage.getItem("button_color"))
-            : "#e84455"
-        } !Important};`}{" "}
+        {` button.btn.btn-primary  { background-color: ${localStorage.getItem("button_color")
+          ? JSON.parse(localStorage.getItem("button_color"))
+          : "#e84455"
+          } !Important};`}{" "}
       </style>
 
       <SidePanel
         sidebarLogo={
           logoImageShow == "" ||
-          logoImageShow == null ||
-          logoImageShow == undefined
+            logoImageShow == null ||
+            logoImageShow == undefined
             ? logo
             : `${process.env.REACT_APP_IMAGE_URL}/${logoImageShow}`
         }
@@ -1978,52 +1807,15 @@ const ManagerFileDetail = () => {
 
           <div className="mt-3 d-md-flex justify-content-between align-items-center">
             <h1 className="m-0 mb-md-0 mb-3">Dossier {showUserFolderName}</h1>
-
-            {/* <div className="d-flex align-items-center check-status">
-              <div className="d-flex align-items-center check-status">
-                <p className="m-0" style={{ paddingRight: "10px" }}>
-                  Etat du chantier :{" "}
-                </p>
-                <div style={{ paddingRight: "10px" }}>
-                  <Form.Select
-                    aria-label="Etat du chantier"
-                    style={{ minHeight: "45px" }}
-                    value={editUserSiteStatus}
-                    onChange={(e) => handleSiteStatusChange(e.target.value)}
-                  >
-                    <option value="on_site">En cours de chantier</option>
-                    <option value="end_of_site">Fin de chantier</option>
-                  </Form.Select>
-                </div>
-              </div>
-              <p className="m-0">Statut : </p>
-              <div className="status">
-                {showUserDocumentData?.status === "to_be_checked"
-                  ? t("toBeCheckedLabel")
-                  : showUserDocumentData?.status === "validated"
-                  ? t("validatedLabel")
-                  : showUserDocumentData?.status === "transfer_to_insurer"
-                  ? "Transfert à l'assureur"
-                  : showUserDocumentData?.status === "transfer_to_broker"
-                  ? "Transfert au Courtier"
-                  : showUserDocumentData?.status === "transfer_to_manager"
-                  ? "Transfert au Gestionnaire"
-                  : showUserDocumentData?.status === "to_be_decided"
-                  ? "A statuer"
-                  : showUserDocumentData?.status === "formal_notice"
-                  ? "Mise en demeure"
-                  : t("invalidLabel")}
-              </div>
-            </div> */}
           </div>
           <div
             className="detail-header"
             style={{ display: "flex", justifyContent: "right" }}
           >
             <div style={{ marginRight: "20px" }} className="div">
-                <Link onClick={toggleDetail} className="fold-unfold-link link-wrap">
-      {isVisible ? 'Fold Detail' : 'Unfold Detail'}
-    </Link>
+              <Link onClick={toggleDetail} className="fold-unfold-link link-wrap">
+                {isVisible ? 'Fold Detail' : 'Unfold Detail'}
+              </Link>
             </div>
             <div style={{ marginRight: "20px" }}>
               <MissingDocument
@@ -2084,71 +1876,67 @@ const ManagerFileDetail = () => {
 
               <div className="d-flex flex-wrap gap-3">
 
-              <div className="d-flex align-items-center">
-              <p className="m-0">Statut : </p>
-              <div className="status">
-                {showUserDocumentData?.status === "to_be_checked"
-                  ? t("toBeCheckedLabel")
-                  : showUserDocumentData?.status === "validated"
-                  ? t("validatedLabel")
-                  : showUserDocumentData?.status === "transfer_to_insurer"
-                  ? "Transfert à l'assureur"
-                  : showUserDocumentData?.status === "transfer_to_broker"
-                  ? "Transfert au Courtier"
-                  : showUserDocumentData?.status === "transfer_to_manager"
-                  ? "Transfert au Gestionnaire"
-                  : showUserDocumentData?.status === "to_be_decided"
-                  ? "A statuer"
-                  : showUserDocumentData?.status === "formal_notice"
-                  ? "Mise en demeure"
-                  : t("invalidLabel")}
-              </div>
-              </div>
+                <div className="d-flex align-items-center">
+                  <p className="m-0">Statut : </p>
+                  <div className="status">
+                    {showUserDocumentData?.status === "to_be_checked"
+                      ? t("toBeCheckedLabel")
+                      : showUserDocumentData?.status === "validated"
+                      ? t("validatedLabel")
+                      : showUserDocumentData?.status === "transfer_to_insurer"
+                      ? "Transfert à l'assureur"
+                      : showUserDocumentData?.status === "transfer_to_broker"
+                      ? "Transfert au Courtier"
+                      : showUserDocumentData?.status === "transfer_to_manager"
+                      ? "Transfert au Gestionnaire"
+                      : showUserDocumentData?.status === "to_be_decided"
+                      ? "A statuer"
+                      : showUserDocumentData?.status === "formal_notice"
+                      ? "Mise en demeure"
+                      : t("invalidLabel")}
+                  </div>
+                </div>
 
-              <div className="d-flex align-items-center">
-              <p className="m-0">DOC : </p>
-              <div className="status">
-                15/07/2025
-              </div>
-              </div>
+                <div className="d-flex align-items-center">
+                  <p className="m-0">DOC : </p>
+                  <div className="status">
+                    15/07/2025
+                  </div>
+                </div>
 
-              <div className="d-flex align-items-center">
+                <div className="d-flex align-items-center">
+                  <p className="m-0">Date fin prévisionnelle : </p>
+                  <div className="status">
+                    27/07/2026
+                  </div>
+                </div>
 
-              <p className="m-0">Date fin prévisionnelle : </p>
-              <div className="status">
-                27/07/2026
-              </div>
-              </div>
+                <div className="d-flex align-items-center">
+                  <p className="m-0">Coût prévisionnel : </p>
+                  <div className="status">
+                    10 450 000€
+                  </div>
+                </div>
 
-              <div className="d-flex align-items-center">
-              <p className="m-0">Coût prévisionnel : </p>
-              <div className="status">
-                10 450 000€
+                <div className="d-flex align-items-center">
+                  <p className="m-0">Nom du preneur assurance : </p>
+                  <div className="status">
+                    Taratata patata
+                  </div>
+                </div>
               </div>
-              </div>
-
-
-              <div className="d-flex align-items-center">
-              <p className="m-0">Nom du preneur assurance : </p>
-              <div className="status">
-                Taratata patata
-              </div>
-              </div>
-
-              </div>
-
-
             </div>
           </div>
         </div>
+
         <Tabs
           activeKey={activeTab}
           onSelect={handleSelect}
-          defaultActiveKey="document"
+          defaultActiveKey="dashboard"
           id="uncontrolled-tab-example"
           className=""
         >
-          {/* Information Tab */}
+          {/* Dashboard Tab */}
           <Tab className="dashboard-tab" eventKey="dashboard" title="Dashboard">
             {isLoading && (
               <div className="loading-overlay">
@@ -2200,24 +1988,24 @@ const ManagerFileDetail = () => {
                         </tr>
                         <tr>
                           <td>                            <div className="d-flex align-items-center">
-                              <span className="file-type-icon">
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  width="24"
-                                  height="24"
-                                  viewBox="0 0 24 24"
-                                  fill="none"
-                                >
-                                  <path
-                                    d="M12.65 2.23994C12.4689 2.08503 12.2383 1.99992 12 1.99994H5C4.73478 1.99994 4.48043 2.1053 4.29289 2.29283C4.10536 2.48037 4 2.73472 4 2.99994V20.9999C4 21.2652 4.10536 21.5195 4.29289 21.7071C4.48043 21.8946 4.73478 21.9999 5 21.9999H19C19.2652 21.9999 19.5196 21.8946 19.7071 21.7071C19.8946 21.5195 20 21.2652 20 20.9999V8.99994C20 8.8555 19.9687 8.71277 19.9083 8.58157C19.8479 8.45038 19.7598 8.33383 19.65 8.23994L12.65 2.23994ZM13 5.16994L16.3 7.99994H13V5.16994ZM18 19.9999H6V3.99994H11V8.99994C11 9.26516 11.1054 9.51951 11.2929 9.70705C11.4804 9.89458 11.7348 9.99994 12 9.99994H18V19.9999Z"
-                                    fill="white"
-                                  />
-                                </svg>
-                              </span>
-                              <span className="text-elips">
-                                General documents
-                              </span>
-                            </div></td>
+                            <span className="file-type-icon">
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="24"
+                                height="24"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                              >
+                                <path
+                                  d="M12.65 2.23994C12.4689 2.08503 12.2383 1.99992 12 1.99994H5C4.73478 1.99994 4.48043 2.1053 4.29289 2.29283C4.10536 2.48037 4 2.73472 4 2.99994V20.9999C4 21.2652 4.10536 21.5195 4.29289 21.7071C4.48043 21.8946 4.73478 21.9999 5 21.9999H19C19.2652 21.9999 19.5196 21.8946 19.7071 21.7071C19.8946 21.5195 20 21.2652 20 20.9999V8.99994C20 8.8555 19.9687 8.71277 19.9083 8.58157C19.8479 8.45038 19.7598 8.33383 19.65 8.23994L12.65 2.23994ZM13 5.16994L16.3 7.99994H13V5.16994ZM18 19.9999H6V3.99994H11V8.99994C11 9.26516 11.1054 9.51951 11.2929 9.70705C11.4804 9.89458 11.7348 9.99994 12 9.99994H18V19.9999Z"
+                                  fill="white"
+                                />
+                              </svg>
+                            </span>
+                            <span className="text-elips">
+                              General documents
+                            </span>
+                          </div></td>
                           <td>2</td>
                           <td>
                             <span className="doc-status warning"></span>
@@ -2225,24 +2013,24 @@ const ManagerFileDetail = () => {
                         </tr>
                         <tr>
                           <td>                            <div className="d-flex align-items-center">
-                              <span className="file-type-icon">
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  width="24"
-                                  height="24"
-                                  viewBox="0 0 24 24"
-                                  fill="none"
-                                >
-                                  <path
-                                    d="M12.65 2.23994C12.4689 2.08503 12.2383 1.99992 12 1.99994H5C4.73478 1.99994 4.48043 2.1053 4.29289 2.29283C4.10536 2.48037 4 2.73472 4 2.99994V20.9999C4 21.2652 4.10536 21.5195 4.29289 21.7071C4.48043 21.8946 4.73478 21.9999 5 21.9999H19C19.2652 21.9999 19.5196 21.8946 19.7071 21.7071C19.8946 21.5195 20 21.2652 20 20.9999V8.99994C20 8.8555 19.9687 8.71277 19.9083 8.58157C19.8479 8.45038 19.7598 8.33383 19.65 8.23994L12.65 2.23994ZM13 5.16994L16.3 7.99994H13V5.16994ZM18 19.9999H6V3.99994H11V8.99994C11 9.26516 11.1054 9.51951 11.2929 9.70705C11.4804 9.89458 11.7348 9.99994 12 9.99994H18V19.9999Z"
-                                    fill="white"
-                                  />
-                                </svg>
-                              </span>
-                              <span className="text-elips">
-                                Studies Report
-                              </span>
-                            </div></td>
+                            <span className="file-type-icon">
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="24"
+                                height="24"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                              >
+                                <path
+                                  d="M12.65 2.23994C12.4689 2.08503 12.2383 1.99992 12 1.99994H5C4.73478 1.99994 4.48043 2.1053 4.29289 2.29283C4.10536 2.48037 4 2.73472 4 2.99994V20.9999C4 21.2652 4.10536 21.5195 4.29289 21.7071C4.48043 21.8946 4.73478 21.9999 5 21.9999H19C19.2652 21.9999 19.5196 21.8946 19.7071 21.7071C19.8946 21.5195 20 21.2652 20 20.9999V8.99994C20 8.8555 19.9687 8.71277 19.9083 8.58157C19.8479 8.45038 19.7598 8.33383 19.65 8.23994L12.65 2.23994ZM13 5.16994L16.3 7.99994H13V5.16994ZM18 19.9999H6V3.99994H11V8.99994C11 9.26516 11.1054 9.51951 11.2929 9.70705C11.4804 9.89458 11.7348 9.99994 12 9.99994H18V19.9999Z"
+                                  fill="white"
+                                />
+                              </svg>
+                            </span>
+                            <span className="text-elips">
+                              Studies Report
+                            </span>
+                          </div></td>
                           <td>2</td>
                           <td>
                             <span className="doc-status danger"></span>
@@ -2253,7 +2041,7 @@ const ManagerFileDetail = () => {
                   </div>
                 </div>
 
-                 <div className="custom-grid-card mt-3">
+                <div className="custom-grid-card mt-3">
                   <h3>Intervenants # of registered Intervenants</h3>
                   <div className="table-wrap mt-24">
                     <Table responsive hover>
@@ -2293,25 +2081,26 @@ const ManagerFileDetail = () => {
                           </td>
                         </tr>
                         <tr>
-                          <td>                            <div className="d-flex align-items-center">
-                              <span className="file-type-icon">
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  width="24"
-                                  height="24"
-                                  viewBox="0 0 24 24"
-                                  fill="none"
-                                >
-                                  <path
-                                    d="M12.65 2.23994C12.4689 2.08503 12.2383 1.99992 12 1.99994H5C4.73478 1.99994 4.48043 2.1053 4.29289 2.29283C4.10536 2.48037 4 2.73472 4 2.99994V20.9999C4 21.2652 4.10536 21.5195 4.29289 21.7071C4.48043 21.8946 4.73478 21.9999 5 21.9999H19C19.2652 21.9999 19.5196 21.8946 19.7071 21.7071C19.8946 21.5195 20 21.2652 20 20.9999V8.99994C20 8.8555 19.9687 8.71277 19.9083 8.58157C19.8479 8.45038 19.7598 8.33383 19.65 8.23994L12.65 2.23994ZM13 5.16994L16.3 7.99994H13V5.16994ZM18 19.9999H6V3.99994H11V8.99994C11 9.26516 11.1054 9.51951 11.2929 9.70705C11.4804 9.89458 11.7348 9.99994 12 9.99994H18V19.9999Z"
-                                    fill="white"
-                                  />
-                                </svg>
-                              </span>
-                              <span className="text-elips">
-                                General documents
-                              </span>
-                            </div></td>
+                          <td>                            
+                            <div className="d-flex align-items-center">
+                            <span className="file-type-icon">
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="24"
+                                height="24"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                              >
+                                <path
+                                  d="M12.65 2.23994C12.4689 2.08503 12.2383 1.99992 12 1.99994H5C4.73478 1.99994 4.48043 2.1053 4.29289 2.29283C4.10536 2.48037 4 2.73472 4 2.99994V20.9999C4 21.2652 4.10536 21.5195 4.29289 21.7071C4.48043 21.8946 4.73478 21.9999 5 21.9999H19C19.2652 21.9999 19.5196 21.8946 19.7071 21.7071C19.8946 21.5195 20 21.2652 20 20.9999V8.99994C20 8.8555 19.9687 8.71277 19.9083 8.58157C19.8479 8.45038 19.7598 8.33383 19.65 8.23994L12.65 2.23994ZM13 5.16994L16.3 7.99994H13V5.16994ZM18 19.9999H6V3.99994H11V8.99994C11 9.26516 11.1054 9.51951 11.2929 9.70705C11.4804 9.89458 11.7348 9.99994 12 9.99994H18V19.9999Z"
+                                  fill="white"
+                                />
+                              </svg>
+                            </span>
+                            <span className="text-elips">
+                              General documents
+                            </span>
+                          </div></td>
                           <td>2</td>
                           <td>
                             <span className="doc-status warning"></span>
@@ -2319,24 +2108,24 @@ const ManagerFileDetail = () => {
                         </tr>
                         <tr>
                           <td>                            <div className="d-flex align-items-center">
-                              <span className="file-type-icon">
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  width="24"
-                                  height="24"
-                                  viewBox="0 0 24 24"
-                                  fill="none"
-                                >
-                                  <path
-                                    d="M12.65 2.23994C12.4689 2.08503 12.2383 1.99992 12 1.99994H5C4.73478 1.99994 4.48043 2.1053 4.29289 2.29283C4.10536 2.48037 4 2.73472 4 2.99994V20.9999C4 21.2652 4.10536 21.5195 4.29289 21.7071C4.48043 21.8946 4.73478 21.9999 5 21.9999H19C19.2652 21.9999 19.5196 21.8946 19.7071 21.7071C19.8946 21.5195 20 21.2652 20 20.9999V8.99994C20 8.8555 19.9687 8.71277 19.9083 8.58157C19.8479 8.45038 19.7598 8.33383 19.65 8.23994L12.65 2.23994ZM13 5.16994L16.3 7.99994H13V5.16994ZM18 19.9999H6V3.99994H11V8.99994C11 9.26516 11.1054 9.51951 11.2929 9.70705C11.4804 9.89458 11.7348 9.99994 12 9.99994H18V19.9999Z"
-                                    fill="white"
-                                  />
-                                </svg>
-                              </span>
-                              <span className="text-elips">
-                                Studies Report
-                              </span>
-                            </div></td>
+                            <span className="file-type-icon">
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="24"
+                                height="24"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                              >
+                                <path
+                                  d="M12.65 2.23994C12.4689 2.08503 12.2383 1.99992 12 1.99994H5C4.73478 1.99994 4.48043 2.1053 4.29289 2.29283C4.10536 2.48037 4 2.73472 4 2.99994V20.9999C4 21.2652 4.10536 21.5195 4.29289 21.7071C4.48043 21.8946 4.73478 21.9999 5 21.9999H19C19.2652 21.9999 19.5196 21.8946 19.7071 21.7071C19.8946 21.5195 20 21.2652 20 20.9999V8.99994C20 8.8555 19.9687 8.71277 19.9083 8.58157C19.8479 8.45038 19.7598 8.33383 19.65 8.23994L12.65 2.23994ZM13 5.16994L16.3 7.99994H13V5.16994ZM18 19.9999H6V3.99994H11V8.99994C11 9.26516 11.1054 9.51951 11.2929 9.70705C11.4804 9.89458 11.7348 9.99994 12 9.99994H18V19.9999Z"
+                                  fill="white"
+                                />
+                              </svg>
+                            </span>
+                            <span className="text-elips">
+                              Studies Report
+                            </span>
+                          </div></td>
                           <td>2</td>
                           <td>
                             <span className="doc-status danger"></span>
@@ -2348,103 +2137,103 @@ const ManagerFileDetail = () => {
                 </div>
               </div>
               <div className="col-md-5">
-                 <h2 className="mb-3">Events</h2>
+                <h2 className="mb-3">Events</h2>
                 <div className="custom-grid-card">
 
 
-                <div className="last-event-card">
-<div className="d-flex flex-wrap gap-2 mb-3">
-        {/* Type Filter */}
-        <select 
-          className="form-select w-auto"
-          value={selectedType}
-          onChange={(e) => setSelectedType(e.target.value)}
-        >
-          <option value="">Select Type</option>
-          <option value="notes">Notes</option>
-          <option value="action">Action</option>
-        </select>
+                  <div className="last-event-card">
+                    <div className="d-flex flex-wrap gap-2 mb-3">
+                      {/* Type Filter */}
+                      <select
+                        className="form-select w-auto"
+                        value={selectedType}
+                        onChange={(e) => setSelectedType(e.target.value)}
+                      >
+                        <option value="">Select Type</option>
+                        <option value="notes">Notes</option>
+                        <option value="action">Action</option>
+                      </select>
 
 
 
-        {/* User Filter */}
-        <select 
-          className="form-select w-auto"
-          value={selectedUser}
-          onChange={(e) => setSelectedUser(e.target.value)}
-        >
-          <option value="">Select User</option>
-          <option value="user1">User 1</option>
-          <option value="user2">User 2</option>
-        </select>
-                {/* Date Filter */}
-        <DatePicker
-          selected={selectedDate}
-          onChange={(date) => setSelectedDate(date)}
-          className="form-control"
-          placeholderText="Select Date"
-          dateFormat="dd/MM/yyyy"
-        />
-      </div>
-                      5 last events
-                            <div class="timeline">
-    <div class="timeline-item">
-      <div class="timeline-dot"></div>
-      <div class="timeline-content">
-        <h5>January 2nd, 04:35 AM</h5>
-        <p> <strong>Note :-</strong> Illum omnis quo illum nisi. Nesciunt est accusamus. Blanditiis nisi quae eum nisi similique. Modi consequuntur totam</p>
-      </div>
-    </div>
+                      {/* User Filter */}
+                      <select
+                        className="form-select w-auto"
+                        value={selectedUser}
+                        onChange={(e) => setSelectedUser(e.target.value)}
+                      >
+                        <option value="">Select User</option>
+                        <option value="user1">User 1</option>
+                        <option value="user2">User 2</option>
+                      </select>
+                      {/* Date Filter */}
+                      <DatePicker
+                        selected={selectedDate}
+                        onChange={(date) => setSelectedDate(date)}
+                        className="form-control"
+                        placeholderText="Select Date"
+                        dateFormat="dd/MM/yyyy"
+                      />
+                    </div>
+                    5 last events
+                    <div class="timeline">
+                      <div class="timeline-item">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-content">
+                          <h5>January 2nd, 04:35 AM</h5>
+                          <p> <strong>Note :-</strong> Illum omnis quo illum nisi. Nesciunt est accusamus. Blanditiis nisi quae eum nisi similique. Modi consequuntur totam</p>
+                        </div>
+                      </div>
 
-    <div class="timeline-item">
-      <div class="timeline-dot"></div>
-      <div class="timeline-content">
-        <h5>January 4th, 06:19 AM</h5>
-        <p><strong>Note :-</strong>  Corrupti unde qui molestiae labore ad adipisci veniam perspiciatis quasi. Quae labore vel.</p>
-      </div>
-    </div>
+                      <div class="timeline-item">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-content">
+                          <h5>January 4th, 06:19 AM</h5>
+                          <p><strong>Note :-</strong>  Corrupti unde qui molestiae labore ad adipisci veniam perspiciatis quasi. Quae labore vel.</p>
+                        </div>
+                      </div>
 
-    <div class="timeline-item">
-      <div class="timeline-dot"></div>
-      <div class="timeline-content">
-        <h5>January 5th, 12:34 AM</h5>
-        <p><strong>Action :-</strong> Maiores doloribus qui. Repellat accusamus minima ipsa ipsam aut debitis quis sit voluptates. Amet necessitatibus non minus quaerat et quis.</p>
-        <p><strong>Action Name:-</strong>Lorem, ipsum dolor.</p>
-        <p><strong>User id:-</strong>Ipsum115880</p>
-      </div>
-    </div>
-                </div>
-                                <button type="submit" class="btn-secondary btn btn-primary">See All</button>
-                </div>
-                <div className="last-msg-card">
+                      <div class="timeline-item">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-content">
+                          <h5>January 5th, 12:34 AM</h5>
+                          <p><strong>Action :-</strong> Maiores doloribus qui. Repellat accusamus minima ipsa ipsam aut debitis quis sit voluptates. Amet necessitatibus non minus quaerat et quis.</p>
+                          <p><strong>Action Name:-</strong>Lorem, ipsum dolor.</p>
+                          <p><strong>User id:-</strong>Ipsum115880</p>
+                        </div>
+                      </div>
+                    </div>
+                    <button type="submit" class="btn-secondary btn btn-primary">See All</button>
+                  </div>
+                  <div className="last-msg-card">
                     3 Last Important Unread messages
-                      <div class="timeline">
-    <div class="timeline-item">
-      <div class="timeline-dot"></div>
-      <div class="timeline-content">
-        <h5>January 2nd, 04:35 AM</h5>
-        <p>Illum omnis quo illum nisi. Nesciunt est accusamus. Blanditiis nisi quae eum nisi similique. Modi consequuntur totam</p>
-      </div>
-    </div>
+                    <div class="timeline">
+                      <div class="timeline-item">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-content">
+                          <h5>January 2nd, 04:35 AM</h5>
+                          <p>Illum omnis quo illum nisi. Nesciunt est accusamus. Blanditiis nisi quae eum nisi similique. Modi consequuntur totam</p>
+                        </div>
+                      </div>
 
-    <div class="timeline-item">
-      <div class="timeline-dot"></div>
-      <div class="timeline-content">
-        <h5>January 4th, 06:19 AM</h5>
-        <p>Corrupti unde qui molestiae labore ad adipisci veniam perspiciatis quasi. Quae labore vel.</p>
-      </div>
-    </div>
+                      <div class="timeline-item">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-content">
+                          <h5>January 4th, 06:19 AM</h5>
+                          <p>Corrupti unde qui molestiae labore ad adipisci veniam perspiciatis quasi. Quae labore vel.</p>
+                        </div>
+                      </div>
 
-    <div class="timeline-item">
-      <div class="timeline-dot"></div>
-      <div class="timeline-content">
-        <h5>January 5th, 12:34 AM</h5>
-        <p>Maiores doloribus qui. Repellat accusamus minima ipsa ipsam aut debitis quis sit voluptates. Amet necessitatibus non minus quaerat et quis.</p>
-      </div>
-    </div>
-                </div>
-                <button type="submit" class="btn-secondary btn btn-primary">See All</button>
-                </div>
+                      <div class="timeline-item">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-content">
+                          <h5>January 5th, 12:34 AM</h5>
+                          <p>Maiores doloribus qui. Repellat accusamus minima ipsa ipsam aut debitis quis sit voluptates. Amet necessitatibus non minus quaerat et quis.</p>
+                        </div>
+                      </div>
+                    </div>
+                    <button type="submit" class="btn-secondary btn btn-primary">See All</button>
+                  </div>
 
                 </div>
                 <h2 className="mb-3 mt-3">Task</h2>
@@ -2462,27 +2251,27 @@ const ManagerFileDetail = () => {
                         </tr>
                       </thead>
                       <tbody>
-                          <tr>
-                            <td>Task 1</td>
-                            <td>dead line</td>
-                            <td>Task description</td>
-                            <td>Name of responsible</td>
-                            <td><span class="checked badges">À vérifier</span></td>
-                          </tr>
-                                                    <tr>
-                            <td>Task 1</td>
-                            <td>dead line</td>
-                            <td>Task description</td>
-                            <td>Name of responsible</td>
-                            <td><span class="checked badges">À vérifier</span></td>
-                          </tr>
-                                                    <tr>
-                            <td>Task 1</td>
-                            <td>dead line</td>
-                            <td>Task description</td>
-                            <td>Name of responsible</td>
-                            <td><span class="checked badges">À vérifier</span></td>
-                          </tr>
+                        <tr>
+                          <td>Task 1</td>
+                          <td>dead line</td>
+                          <td>Task description</td>
+                          <td>Name of responsible</td>
+                          <td><span class="checked badges">À vérifier</span></td>
+                        </tr>
+                        <tr>
+                          <td>Task 1</td>
+                          <td>dead line</td>
+                          <td>Task description</td>
+                          <td>Name of responsible</td>
+                          <td><span class="checked badges">À vérifier</span></td>
+                        </tr>
+                        <tr>
+                          <td>Task 1</td>
+                          <td>dead line</td>
+                          <td>Task description</td>
+                          <td>Name of responsible</td>
+                          <td><span class="checked badges">À vérifier</span></td>
+                        </tr>
                       </tbody>
                     </Table>
                   </div>
@@ -2490,6 +2279,7 @@ const ManagerFileDetail = () => {
               </div>
             </div>
           </Tab>
+
           {/* Information Tab */}
           <Tab eventKey="information" title="Information dossier">
             {isLoading && (
@@ -2500,11 +2290,10 @@ const ManagerFileDetail = () => {
             <Form className="mt-24 " onSubmit={UpdateFolderInfo}>
               {flashMessage.message && (
                 <div
-                  className={`mt-3 mx-w-320 alert ${
-                    flashMessage.type === "success"
-                      ? "alert-success"
-                      : "alert-danger"
-                  } text-center`}
+                  className={`mt-3 mx-w-320 alert ${flashMessage.type === "success"
+                    ? "alert-success"
+                    : "alert-danger"
+                    } text-center`}
                   role="alert"
                 >
                   {flashMessage.message}
@@ -2580,10 +2369,10 @@ const ManagerFileDetail = () => {
                       placeholder="Nom du courtier"
                       value={
                         showUserDocumentData?.broker?.first_name
-                          ? showUserDocumentData?.broker?.first_name
-                          : "" + "" + showUserDocumentData?.broker?.last_name
-                          ? showUserDocumentData?.broker?.last_name
-                          : ""
+                        ? showUserDocumentData?.broker?.first_name
+                        : "" + "" + showUserDocumentData?.broker?.last_name
+                        ? showUserDocumentData?.broker?.last_name
+                        : ""
                       }
                     />
                   </Form.Group>
@@ -2734,54 +2523,18 @@ const ManagerFileDetail = () => {
                     Annuler
                   </Button>
                 </div>
-
-                {/* <Form.Group className="mb-3" controlId="names">
-                <Form.Label>Nom et prénom du demandeur</Form.Label>
-                <Form.Control
-                  type="text"
-                  placeholder="Nom et prénom du demandeur"
-                  value={folderDetail.customer_name || "-"}
-                />
-              </Form.Group> */}
-
-                {/* <Form.Group className="mb-3" controlId="start-date">
-                <Form.Label className="d-block">Début du chantier</Form.Label>
-                <DatePicker
-                  placeholderText="Selectionner une date"
-                  selected={startDate5 ? getFormattedDate(startDate5) : null}
-                  onChange={(date) => setStartDate5(formatDate(date))}
-                  dateFormat="dd/MM/yyyy"
-                  locale={fr}
-                />
-              </Form.Group> */}
-
-                {/* <Form.Group className="mb-3" controlId="end-date">
-                <Form.Label className="d-block">Fin du chantier</Form.Label>
-                <DatePicker
-                  placeholderText="Selectionner une date"
-                  selected={startDate6 ? getFormattedDate(startDate6) : null}
-                  onChange={(date) => setStartDate6(formatDate(date))}
-                  dateFormat="dd/MM/yyyy"
-                  locale={fr}
-                />
-              </Form.Group> */}
               </div>
             </Form>
           </Tab>
 
-          {/* Information Tab */}
-          <Tab
-            className="update-inside-tab"
-            eventKey="documents"
-            title="Documents"
-          >
+          {/* Documents Tab */}
+          <Tab className="update-inside-tab" eventKey="document" title="Documents">
             {isLoading && (
               <div className="loading-overlay">
                 <Loading />
               </div>
             )}
-            {/* Nested Tabs must be wrapped in a new <Tabs> component */}
-            <Tabs defaultActiveKey="document" className="mt-0 mb-0 ">
+            <Tabs defaultActiveKey="document" className="mt-0 mb-0 " activeKey={activeDocumentTab} onSelect={handleSelectDocument}>
               {/* Paper Tab */}
               <Tab
                 eventKey="document"
@@ -2789,9 +2542,7 @@ const ManagerFileDetail = () => {
               >
                 <div className="table-wrapper mt-0 p-0">
                   <div class="d-md-flex align-items-center gap-2 justify-content-between">
-                    <h2 class="m-md-0 mb-3">
-                      {/* Documents ({totalPapers}) */}
-                    </h2>
+                    <h2 class="m-md-0 mb-3"></h2>
                     <div class="">
                       {endDate == null ? (
                         <div></div>
@@ -2868,7 +2619,7 @@ const ManagerFileDetail = () => {
                                   }}
                                 >
                                   {showUserDocumentFileData &&
-                                  showUserDocumentFileData.length > 0 ? (
+                                    showUserDocumentFileData.length > 0 ? (
                                     showUserDocumentFileData.map((doc) => (
                                       <option key={doc.id} value={doc.id}>
                                         {doc.filename}
@@ -2887,11 +2638,10 @@ const ManagerFileDetail = () => {
                                 style={{ marginTop: "4px" }}
                               >
                                 <button
-                                  className={`filter-btn ${
-                                    validateDocumnetFilter === ""
-                                      ? "active"
-                                      : ""
-                                  }`}
+                                  className={`filter-btn ${validateDocumnetFilter === ""
+                                    ? "active"
+                                    : ""
+                                    }`}
                                   onClick={() => setValidateDocumnetFilter("")}
                                   style={{
                                     border: `2px solid ${buttonColor}`,
@@ -2908,11 +2658,10 @@ const ManagerFileDetail = () => {
                                   Tous
                                 </button>
                                 <button
-                                  className={`filter-btn ${
-                                    validateDocumnetFilter === "to_be_checked"
-                                      ? "active"
-                                      : ""
-                                  }`}
+                                  className={`filter-btn ${validateDocumnetFilter === "to_be_checked"
+                                    ? "active"
+                                    : ""
+                                    }`}
                                   onClick={() =>
                                     setValidateDocumnetFilter("to_be_checked")
                                   }
@@ -2931,11 +2680,10 @@ const ManagerFileDetail = () => {
                                   {t("toBeCheckedLabel")}
                                 </button>
                                 <button
-                                  className={`filter-btn ${
-                                    validateDocumnetFilter === "invalid"
-                                      ? "active"
-                                      : ""
-                                  }`}
+                                  className={`filter-btn ${validateDocumnetFilter === "invalid"
+                                    ? "active"
+                                    : ""
+                                    }`}
                                   onClick={() =>
                                     setValidateDocumnetFilter("invalid")
                                   }
@@ -3037,11 +2785,10 @@ const ManagerFileDetail = () => {
                                       <div className="main-part">
                                         {flashMessage.message && (
                                           <div
-                                            className={`alert ${
-                                              flashMessage.type === "success"
-                                                ? "alert-success"
-                                                : "alert-danger"
-                                            } text-center`}
+                                            className={`alert ${flashMessage.type === "success"
+                                              ? "alert-success"
+                                              : "alert-danger"
+                                              } text-center`}
                                             role="alert"
                                           >
                                             {flashMessage.message}
@@ -3058,7 +2805,7 @@ const ManagerFileDetail = () => {
                                         <Form.Select
                                           className="mb-3"
                                           aria-label="statusSelectAria"
-                                          value={editUserStatus} // Bind the value to editUserStatus
+                                          value={editUserStatus}
                                           onChange={(e) =>
                                             handleStatusChange(e.target.value)
                                           }
@@ -3165,7 +2912,7 @@ const ManagerFileDetail = () => {
                                         </div>
 
                                         {currentFileIndex <
-                                        userDocumentFileDataChanges.length -
+                                          userDocumentFileDataChanges.length -
                                           1 ? (
                                           <>
                                             <Button
@@ -3261,11 +3008,7 @@ const ManagerFileDetail = () => {
                                               type="text"
                                               placeholder="Nom et prénom du demandeur"
                                               value={showUserCompanyName}
-                                              onChange={(e) =>
-                                                setShowUserCompanyName(
-                                                  e.target.value
-                                                )
-                                              }
+                                              onChange={(e) => setShowUserCompanyName(e.target.value)}
                                             />
                                           </Form.Group>
 
@@ -3428,224 +3171,224 @@ const ManagerFileDetail = () => {
                             {selectedSpeakerColumns.includes(
                               "fileNameLabe"
                             ) && (
-                              <th>
-                                <div className="d-flex align-items-center">
-                                  <span>Nom du fichier</span>
-                                  <div>
-                                    <Link
-                                      className={`sorting-icon ms-2`}
-                                      onClick={() =>
-                                        handleClickRotate("filename")
-                                      }
-                                    >
-                                      {sort.value === "asc" && (
-                                        <svg
-                                          width="24"
-                                          height="24"
-                                          viewBox="0 0 24 24"
-                                          fill="none"
-                                          xmlns="http://www.w3.org/2000/svg"
-                                        >
-                                          <path
-                                            d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
-                                            fill="black"
-                                          />
-                                          <path
-                                            d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
-                                            fill="black"
-                                            fill-opacity="0.5"
-                                          />
-                                        </svg>
-                                      )}
+                                <th>
+                                  <div className="d-flex align-items-center">
+                                    <span>Nom du fichier</span>
+                                    <div>
+                                      <Link
+                                        className={`sorting-icon ms-2`}
+                                        onClick={() =>
+                                          handleClickRotate("filename")
+                                        }
+                                      >
+                                        {sort.value === "asc" && (
+                                          <svg
+                                            width="24"
+                                            height="24"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                          >
+                                            <path
+                                              d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
+                                              fill="black"
+                                            />
+                                            <path
+                                              d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
+                                              fill="black"
+                                              fill-opacity="0.5"
+                                            />
+                                          </svg>
+                                        )}
 
-                                      {sort.value === "desc" && (
-                                        <svg
-                                          width="24"
-                                          height="24"
-                                          viewBox="0 0 24 24"
-                                          fill="none"
-                                          xmlns="http://www.w3.org/2000/svg"
-                                        >
-                                          <path
-                                            d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
-                                            fill="black"
-                                            fill-opacity="0.5"
-                                          />
-                                          <path
-                                            d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
-                                            fill="black"
-                                          />
-                                        </svg>
-                                      )}
-                                    </Link>
+                                        {sort.value === "desc" && (
+                                          <svg
+                                            width="24"
+                                            height="24"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                          >
+                                            <path
+                                              d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
+                                              fill="black"
+                                              fill-opacity="0.5"
+                                            />
+                                            <path
+                                              d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
+                                              fill="black"
+                                            />
+                                          </svg>
+                                        )}
+                                      </Link>
+                                    </div>
                                   </div>
-                                </div>
-                              </th>
-                            )}
+                                </th>
+                              )}
                             {selectedSpeakerColumns.includes(
                               "speakerLabel"
                             ) && (
-                              <th className="select-drop elips-dropdown">
-                                <div className="d-flex align-items-center">
-                                  <div>
-                                    <Form.Select
-                                      aria-label="statusSelectAria"
-                                      value={selectSpeakerId}
-                                      onChange={handleTableSpeakerChange}
-                                    >
-                                      <option value="">
-                                        {t("speakerLabel")}
-                                      </option>
-                                      {speakerDropDownList?.length > 0 ? (
-                                        speakerDropDownList?.map((speaker) => (
-                                          <option
-                                            key={speaker.id}
-                                            value={speaker.id}
-                                          >
-                                            {speaker.company_name +
-                                              " - " +
-                                              speaker.siren_number}
-                                          </option>
-                                        ))
-                                      ) : (
+                                <th className="select-drop elips-dropdown">
+                                  <div className="d-flex align-items-center">
+                                    <div>
+                                      <Form.Select
+                                        aria-label="statusSelectAria"
+                                        value={selectSpeakerId}
+                                        onChange={handleTableSpeakerChange}
+                                      >
                                         <option value="">
-                                          {t("NorecordsfoundLabel")}
+                                          {t("speakerLabel")}
                                         </option>
-                                      )}
-                                    </Form.Select>
-                                  </div>
-                                  <div>
-                                    <Link
-                                      className={`sorting-icon ms-2`}
-                                      onClick={() =>
-                                        handleClickRotate(
-                                          "speaker.company_name"
-                                        )
-                                      }
-                                    >
-                                      {sort.value === "asc" && (
-                                        <svg
-                                          width="24"
-                                          height="24"
-                                          viewBox="0 0 24 24"
-                                          fill="none"
-                                          xmlns="http://www.w3.org/2000/svg"
-                                        >
-                                          <path
-                                            d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
-                                            fill="black"
-                                          />
-                                          <path
-                                            d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
-                                            fill="black"
-                                            fill-opacity="0.5"
-                                          />
-                                        </svg>
-                                      )}
+                                        {speakerDropDownList?.length > 0 ? (
+                                          speakerDropDownList?.map((speaker) => (
+                                            <option
+                                              key={speaker.id}
+                                              value={speaker.id}
+                                            >
+                                              {speaker.company_name +
+                                                " - " +
+                                                speaker.siren_number}
+                                            </option>
+                                          ))
+                                        ) : (
+                                          <option value="">
+                                            {t("NorecordsfoundLabel")}
+                                          </option>
+                                        )}
+                                      </Form.Select>
+                                    </div>
+                                    <div>
+                                      <Link
+                                        className={`sorting-icon ms-2`}
+                                        onClick={() =>
+                                          handleClickRotate(
+                                            "speaker.company_name"
+                                          )
+                                        }
+                                      >
+                                        {sort.value === "asc" && (
+                                          <svg
+                                            width="24"
+                                            height="24"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                          >
+                                            <path
+                                              d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
+                                              fill="black"
+                                            />
+                                            <path
+                                              d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
+                                              fill="black"
+                                              fill-opacity="0.5"
+                                            />
+                                          </svg>
+                                        )}
 
-                                      {sort.value === "desc" && (
-                                        <svg
-                                          width="24"
-                                          height="24"
-                                          viewBox="0 0 24 24"
-                                          fill="none"
-                                          xmlns="http://www.w3.org/2000/svg"
-                                        >
-                                          <path
-                                            d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
-                                            fill="black"
-                                            fill-opacity="0.5"
-                                          />
-                                          <path
-                                            d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
-                                            fill="black"
-                                          />
-                                        </svg>
-                                      )}
-                                    </Link>
+                                        {sort.value === "desc" && (
+                                          <svg
+                                            width="24"
+                                            height="24"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                          >
+                                            <path
+                                              d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
+                                              fill="black"
+                                              fill-opacity="0.5"
+                                            />
+                                            <path
+                                              d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
+                                              fill="black"
+                                            />
+                                          </svg>
+                                        )}
+                                      </Link>
+                                    </div>
                                   </div>
-                                </div>
-                              </th>
-                            )}
+                                </th>
+                              )}
                             {selectedSpeakerColumns.includes(
                               "Type de document"
                             ) && (
-                              <th className="select-drop elips-dropdown">
-                                <div className="d-flex align-items-center">
-                                  <div>
-                                    <Form.Select
-                                      aria-label="Choisir un type de document"
-                                      value={selectDocumentType}
-                                      onChange={handleDocumentTypeChange}
-                                    >
-                                      <option value="">Type de document</option>
-                                      {documentTypeList?.length > 0 ? (
-                                        documentTypeList?.map((doctype) => (
-                                          <option
-                                            key={doctype.id}
-                                            value={doctype.id}
-                                          >
-                                            {doctype.name}
+                                <th className="select-drop elips-dropdown">
+                                  <div className="d-flex align-items-center">
+                                    <div>
+                                      <Form.Select
+                                        aria-label="Choisir un type de document"
+                                        value={selectDocumentType}
+                                        onChange={handleDocumentTypeChange}
+                                      >
+                                        <option value="">Type de document</option>
+                                        {documentTypeList?.length > 0 ? (
+                                          documentTypeList?.map((doctype) => (
+                                            <option
+                                              key={doctype.id}
+                                              value={doctype.id}
+                                            >
+                                              {doctype.name}
+                                            </option>
+                                          ))
+                                        ) : (
+                                          <option value="">
+                                            {t("NorecordsfoundLabel")}
                                           </option>
-                                        ))
-                                      ) : (
-                                        <option value="">
-                                          {t("NorecordsfoundLabel")}
-                                        </option>
-                                      )}
-                                    </Form.Select>
-                                  </div>
-                                  <div>
-                                    <Link
-                                      className={`sorting-icon ms-2`}
-                                      onClick={() =>
-                                        handleClickRotate("docType.name")
-                                      }
-                                    >
-                                      {sort.value === "asc" && (
-                                        <svg
-                                          width="24"
-                                          height="24"
-                                          viewBox="0 0 24 24"
-                                          fill="none"
-                                          xmlns="http://www.w3.org/2000/svg"
-                                        >
-                                          <path
-                                            d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
-                                            fill="black"
-                                          />
-                                          <path
-                                            d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
-                                            fill="black"
-                                            fill-opacity="0.5"
-                                          />
-                                        </svg>
-                                      )}
+                                        )}
+                                      </Form.Select>
+                                    </div>
+                                    <div>
+                                      <Link
+                                        className={`sorting-icon ms-2`}
+                                        onClick={() =>
+                                          handleClickRotate("docType.name")
+                                        }
+                                      >
+                                        {sort.value === "asc" && (
+                                          <svg
+                                            width="24"
+                                            height="24"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                          >
+                                            <path
+                                              d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
+                                              fill="black"
+                                            />
+                                            <path
+                                              d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
+                                              fill="black"
+                                              fill-opacity="0.5"
+                                            />
+                                          </svg>
+                                        )}
 
-                                      {sort.value === "desc" && (
-                                        <svg
-                                          width="24"
-                                          height="24"
-                                          viewBox="0 0 24 24"
-                                          fill="none"
-                                          xmlns="http://www.w3.org/2000/svg"
-                                        >
-                                          <path
-                                            d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
-                                            fill="black"
-                                            fill-opacity="0.5"
-                                          />
-                                          <path
-                                            d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
-                                            fill="black"
-                                          />
-                                        </svg>
-                                      )}
-                                    </Link>
+                                        {sort.value === "desc" && (
+                                          <svg
+                                            width="24"
+                                            height="24"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                          >
+                                            <path
+                                              d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
+                                              fill="black"
+                                              fill-opacity="0.5"
+                                            />
+                                            <path
+                                              d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
+                                              fill="black"
+                                            />
+                                          </svg>
+                                        )}
+                                      </Link>
+                                    </div>
                                   </div>
-                                </div>
-                              </th>
-                            )}
+                                </th>
+                              )}
                             {selectedSpeakerColumns.includes("status") && (
                               <th className="select-drop elips-dropdown">
                                 <div className="d-flex align-items-center">
@@ -3743,45 +3486,45 @@ const ManagerFileDetail = () => {
                         </thead>
                         <tbody>
                           {paperList?.length > 0 &&
-                          selectedSpeakerColumns?.length > 0 ? (
+                            selectedSpeakerColumns?.length > 0 ? (
                             paperList?.map((data) => (
                               <tr>
                                 {selectedSpeakerColumns.includes(
                                   "fileNameLabe"
                                 ) && (
-                                  <td>
-                                    <div className="d-flex align-items-center">
-                                      <span className="file-type-icon">
-                                        <svg
-                                          xmlns="http://www.w3.org/2000/svg"
-                                          width="24"
-                                          height="24"
-                                          viewBox="0 0 24 24"
-                                          fill="none"
-                                        >
-                                          <path
-                                            d="M12.65 2.23994C12.4689 2.08503 12.2383 1.99992 12 1.99994H5C4.73478 1.99994 4.48043 2.1053 4.29289 2.29283C4.10536 2.48037 4 2.73472 4 2.99994V20.9999C4 21.2652 4.10536 21.5195 4.29289 21.7071C4.48043 21.8946 4.73478 21.9999 5 21.9999H19C19.2652 21.9999 19.5196 21.8946 19.7071 21.7071C19.8946 21.5195 20 21.2652 20 20.9999V8.99994C20 8.8555 19.9687 8.71277 19.9083 8.58157C19.8479 8.45038 19.7598 8.33383 19.65 8.23994L12.65 2.23994ZM13 5.16994L16.3 7.99994H13V5.16994ZM18 19.9999H6V3.99994H11V8.99994C11 9.26516 11.1054 9.51951 11.2929 9.70705C11.4804 9.89458 11.7348 9.99994 12 9.99994H18V19.9999Z"
-                                            fill="white"
-                                          />
-                                        </svg>
-                                      </span>
-                                      <span className="text-elips">
-                                        {data.file_name}
-                                      </span>
-                                    </div>
-                                  </td>
-                                )}
+                                    <td>
+                                      <div className="d-flex align-items-center">
+                                        <span className="file-type-icon">
+                                          <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            width="24"
+                                            height="24"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                          >
+                                            <path
+                                              d="M12.65 2.23994C12.4689 2.08503 12.2383 1.99992 12 1.99994H5C4.73478 1.99994 4.48043 2.1053 4.29289 2.29283C4.10536 2.48037 4 2.73472 4 2.99994V20.9999C4 21.2652 4.10536 21.5195 4.29289 21.7071C4.48043 21.8946 4.73478 21.9999 5 21.9999H19C19.2652 21.9999 19.5196 21.8946 19.7071 21.7071C19.8946 21.5195 20 21.2652 20 20.9999V8.99994C20 8.8555 19.9687 8.71277 19.9083 8.58157C19.8479 8.45038 19.7598 8.33383 19.65 8.23994L12.65 2.23994ZM13 5.16994L16.3 7.99994H13V5.16994ZM18 19.9999H6V3.99994H11V8.99994C11 9.26516 11.1054 9.51951 11.2929 9.70705C11.4804 9.89458 11.7348 9.99994 12 9.99994H18V19.9999Z"
+                                              fill="white"
+                                            />
+                                          </svg>
+                                        </span>
+                                        <span className="text-elips">
+                                          {data.file_name}
+                                        </span>
+                                      </div>
+                                    </td>
+                                  )}
                                 {selectedSpeakerColumns.includes(
                                   "speakerLabel"
                                 ) && (
-                                  <td>
-                                    {data.speaker
-                                      ? data.speaker?.company_name +
+                                    <td>
+                                      {data.speaker
+                                        ? data.speaker?.company_name +
                                         " - " +
                                         data.speaker?.siren_number
-                                      : "-"}
-                                  </td>
-                                )}
+                                        : "-"}
+                                    </td>
+                                  )}
                                 {selectedSpeakerColumns.includes(
                                   "Type de document"
                                 ) && <td>{data.docType.name}</td>}
@@ -3913,7 +3656,6 @@ const ManagerFileDetail = () => {
                                           />
                                         </svg>
                                       </Link>
-                                      {/* {data.status !== "verified" && */}
                                       <Link
                                         class="doc"
                                         href="/user-management"
@@ -3936,7 +3678,6 @@ const ManagerFileDetail = () => {
                                           />
                                         </svg>
                                       </Link>
-                                      {/* } */}
                                       <Link
                                         class="delete"
                                         href="/user-management"
@@ -3979,10 +3720,13 @@ const ManagerFileDetail = () => {
                       currentPage={currentPage}
                       totalPages={totalPages}
                       onPageChange={handlePageChange}
+                      itemsPerPage={10}
+                      totalItems={totalPaperRecords}
                     />
                   )}
                 </div>
               </Tab>
+
               {/* Missing Documnet Tab */}
               <Tab
                 eventKey="missingdocument"
@@ -3990,7 +3734,6 @@ const ManagerFileDetail = () => {
               >
                 <div className="table-wrapper mt-0 p-0">
                   <div className="d-md-flex align-items-center gap-2 justify-content-between">
-                    {/* <h2 className="m-md-0 mb-3">Documents manquants ({totalMissingRecords})</h2> */}
                     <div className="">
                       <Offcanvas
                         className="add-folder-panel"
@@ -4012,11 +3755,10 @@ const ManagerFileDetail = () => {
                                 </h2>
                                 {flashMessageStoreDoc.message && (
                                   <div
-                                    className={`mt-3 alert ${
-                                      flashMessageStoreDoc.type === "success"
-                                        ? "alert-success"
-                                        : "alert-danger"
-                                    } text-center`}
+                                    className={`mt-3 alert ${flashMessageStoreDoc.type === "success"
+                                      ? "alert-success"
+                                      : "alert-danger"
+                                      } text-center`}
                                     role="alert"
                                   >
                                     {flashMessageStoreDoc.message}
@@ -4307,6 +4049,8 @@ const ManagerFileDetail = () => {
                       currentPage={currentPage}
                       totalPages={totalPages}
                       onPageChange={handlePageChange}
+                      itemsPerPage={10}
+                      totalItems={totalMissingRecords}
                     />
                   )}
                 </div>
@@ -4320,18 +4064,16 @@ const ManagerFileDetail = () => {
             title={`Intervenants (${totalSpeakerRecords || 0})`}
           >
             {/* screen 1 */}
-
             {showSepeakerInner ? (
               <div className="inner-tab-screen">
                 <div className="d-md-flex">
                   <div className="me-0 me-md-4">
                     {flashMessage.message && (
                       <div
-                        className={`alert ${
-                          flashMessage.type === "success"
-                            ? "alert-success"
-                            : "alert-danger"
-                        } text-center`}
+                        className={`alert ${flashMessage.type === "success"
+                          ? "alert-success"
+                          : "alert-danger"
+                          } text-center`}
                         role="alert"
                       >
                         {flashMessage.message}
@@ -4339,17 +4081,16 @@ const ManagerFileDetail = () => {
                     )}
                     {flashMessageStoreDoc.message && (
                       <div
-                        className={`mt-3 alert ${
-                          flashMessageStoreDoc.type === "success"
-                            ? "alert-success"
-                            : "alert-danger"
-                        } text-center`}
+                        className={`mt-3 alert ${flashMessageStoreDoc.type === "success"
+                          ? "alert-success"
+                          : "alert-danger"
+                          } text-center`}
                         role="alert"
                       >
                         {flashMessageStoreDoc.message}
                       </div>
                     )}
-                    {isLoading ? (
+                    {isSpeakerLoading ? (
                       <Loading />
                     ) : (
                       <Form>
@@ -4494,11 +4235,12 @@ const ManagerFileDetail = () => {
                   <div className="flex-fill">
                     <Tabs
                       onSelect={handleSubTabSelect}
-                      defaultActiveKey="dddd"
+                      defaultActiveKey="intervenants"
+                      activeKey={activeSubTab}
                       id="uncontrolled-tab-example"
                     >
                       <Tab
-                        eventKey="dddd"
+                        eventKey="documents"
                         title={`Documents (${totalSpeakerDocument})`}
                       >
                         {isLoading ? (
@@ -4636,22 +4378,23 @@ const ManagerFileDetail = () => {
                                 currentPage={currentPage}
                                 totalPages={totalPages}
                                 onPageChange={handlePageChangeView}
+                                itemsPerPage={10}
+                                totalItems={totalSpeakerDocument}
                               />
                             )}
                           </div>
                         )}
                       </Tab>
                       <Tab
-                        eventKey="d-type"
+                        eventKey="documentType"
                         title={`Documents manquants (${totalMissingDocument})`}
                       >
                         {flashMessage.message && (
                           <div
-                            className={`alert ${
-                              flashMessage.type === "success"
-                                ? "alert-success"
-                                : "alert-danger"
-                            } text-center`}
+                            className={`alert ${flashMessage.type === "success"
+                              ? "alert-success"
+                              : "alert-danger"
+                              } text-center`}
                             role="alert"
                           >
                             {flashMessage.message}
@@ -4774,11 +4517,10 @@ const ManagerFileDetail = () => {
                           <h2>Nouvel intervenant</h2>
                           {flashMessage.message && (
                             <div
-                              className={`alert ${
-                                flashMessage.type === "success"
-                                  ? "alert-success"
-                                  : "alert-danger"
-                              } text-center`}
+                              className={`alert ${flashMessage.type === "success"
+                                ? "alert-success"
+                                : "alert-danger"
+                                } text-center`}
                               role="alert"
                             >
                               {flashMessage.message}
@@ -5204,7 +4946,7 @@ const ManagerFileDetail = () => {
                       <tbody>
                         {speakerList?.length > 0 ? (
                           speakerList?.map((data) => (
-                            <tr onClick={() => setShowSpeakerInner(true)}>
+                            <tr>
                               <td>{data.siren_number}</td>
                               <td>
                                 <span className="text-elips">
@@ -5224,14 +4966,11 @@ const ManagerFileDetail = () => {
                                     onClick={(e) => {
                                       e.stopPropagation();
                                       handleViewShowSpeaker();
-                                      setActiveSubTab("speaker");
+                                      SpeakerDetail(data.id);
+                                      setActiveSubTab("documents");
                                       setShowSpeakerId(data.id);
-                                      setTotalSpeakerDocument(
-                                        data.user_document_count
-                                      );
-                                      setTotalMissingDocument(
-                                        data.missing_document_count
-                                      );
+                                      setTotalSpeakerDocument(data.user_document_count);
+                                      setTotalMissingDocument(data.missing_document_count);
                                     }}
                                     class="view"
                                     href="/user-management"
@@ -5290,6 +5029,8 @@ const ManagerFileDetail = () => {
                     currentPage={currentPage}
                     totalPages={totalPages}
                     onPageChange={handlePageChange}
+                    itemsPerPage={10}
+                    totalItems={totalSpeakerRecords}
                   />
                 )}
               </div>
@@ -5299,95 +5040,6 @@ const ManagerFileDetail = () => {
           </Tab>
 
           {/* History Tab */}
-          {/* <Tab eventKey="history" title="Historique">
-            <div className="mb-3 d-md-flex justify-content-between align-items-center">
-              {markIsReadCount > 0 && (
-                <button
-                  className="custom-btn"
-                  onClick={() => MarkHistoryAsReadAllDocument(id)}
-                >
-                  Marquer comme tout lu
-                </button>
-              )}
-            </div>
-            {isLoading ? (
-              <Loading />
-            ) : (
-              <div
-                className="scroll-container" // Set a scrollable container
-                onScroll={handleScroll}
-                style={{
-                  maxHeight: "240px", // Set container height
-                  overflowY: "auto", // Enable scrolling
-                  scrollbarWidth: "thin",
-                }}
-              >
-                {displayedRecords?.length > 0 ? (
-                  displayedRecords?.map((data) => (
-                    <Fragment>
-                      <div className="note-box mb-3">
-                        <div className="d-flex justify-content-between align-items-center top-part">
-                          <p className="m-0">
-                            {data.type == "note"
-                              ? "Note"
-                              : "Invalide"}
-                          </p>
-                          <p className="m-0 create-date">
-                            créé le {data.created_on}
-                          </p>
-                        </div>
-                        <div
-                          className="inner-box"
-                          style={{
-                            backgroundColor:
-                              data.is_read === 0 ? "#b0f0fa" : "#e3f0f2",
-                          }}
-                        >
-                          <div className="d-md-flex justify-content-between align-items-center mb-2">
-                            <div className="d-flex align-items-center mb-3">
-                              {data.type != "note" && (
-                                <div className="icon d-flex">
-                                  <svg
-                                    width="16"
-                                    height="16"
-                                    viewBox="0 0 8 14"
-                                    fill="none"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                  >
-                                    <path
-                                      d="M6.42457 3.36368V10.3334C6.42457 11.6728 5.33972 12.7576 4.00033 12.7576C2.66093 12.7576 1.57608 11.6728 1.57608 10.3334V2.75762C1.57608 1.92125 2.25487 1.24246 3.09123 1.24246C3.9276 1.24246 4.60639 1.92125 4.60639 2.75762V9.12125C4.60639 9.45459 4.33366 9.72731 4.00033 9.72731C3.66699 9.72731 3.39426 9.45459 3.39426 9.12125V3.36368H2.48517V9.12125C2.48517 9.95762 3.16396 10.6364 4.00033 10.6364C4.83669 10.6364 5.51548 9.95762 5.51548 9.12125V2.75762C5.51548 1.41822 4.43063 0.333374 3.09123 0.333374C1.75184 0.333374 0.666992 1.41822 0.666992 2.75762V10.3334C0.666992 12.1758 2.1579 13.6667 4.00033 13.6667C5.84275 13.6667 7.33366 12.1758 7.33366 10.3334V3.36368H6.42457Z"
-                                      fill="#683191"
-                                    ></path>
-                                  </svg>
-                                </div>
-                              )}
-                              <div className="file-names">
-                                {data.user_document_filename}
-                              </div>
-                            </div>
-                            {data.is_read != 1 && (
-                              <button
-                                className="custom-btn"
-                                onClick={() =>
-                                  MarkHistoryAsReadDocument(data.id)
-                                }
-                              >
-                                Marquer Comme lu
-                              </button>
-                            )}
-                          </div>
-                          <p className="">{data.reason}</p>
-                        </div>
-                      </div>
-                    </Fragment>
-                  ))
-                ) : (
-                  <div className="inner-box">{t("NorecordsfoundLabel")}</div>
-                )}
-              </div>
-            )}
-          </Tab> */}
-
           <Tab eventKey="history" title="Historique">
             <div className="table-wrapper mt-16 p-0">
               <div className="d-md-flex align-items-center gap-2 justify-content-between">
@@ -5496,6 +5148,8 @@ const ManagerFileDetail = () => {
                   currentPage={currentPage}
                   totalPages={totalPages}
                   onPageChange={handlePageChange}
+                  itemsPerPage={10}
+                  totalItems={totalHistoryRecords}
                 />
               )}
             </div>
@@ -5544,8 +5198,8 @@ const ManagerFileDetail = () => {
                           <td>
                             {fileDetail?.speaker
                               ? fileDetail?.speaker?.company_name +
-                                " - " +
-                                fileDetail?.speaker?.siren_number
+                              " - " +
+                              fileDetail?.speaker?.siren_number
                               : "-"}
                           </td>
 
@@ -5605,13 +5259,6 @@ const ManagerFileDetail = () => {
               </div>
             </div>
           </Offcanvas.Body>
-          <div className="offcanvas-footer text-end">
-            {/* <button
-            className="btn btn-primary"
-          >
-            Suivant
-          </button> */}
-          </div>
         </Offcanvas>
 
         {/* Delete Confirmation Popup */}
@@ -5713,412 +5360,6 @@ const ManagerFileDetail = () => {
             </Button>
           </Modal.Footer>
         </Modal>
-
-        {/* Delete Confirmation Popup Document from speaker */}
-        <Modal
-          className="final-modal"
-          show={showDeleteModalSpeakerDocument}
-          onHide={handleCloseDeleteModalSpeakerDocument}
-        >
-          <Modal.Header closeButton>
-            <Modal.Title>
-              <h2>Confirmation</h2>
-            </Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <p>Etes-vous sûr de vouloir supprimer le fichier?</p>
-          </Modal.Body>
-          <Modal.Footer>
-            <Button
-              className="cancel-btn"
-              variant="primary"
-              onClick={handleCloseDeleteModalSpeakerDocument}
-            >
-              Annuler
-            </Button>
-            <Button variant="primary" onClick={HandleDeleteSpeakerDocument}>
-              {t("confirmbtnLabel")}
-            </Button>
-          </Modal.Footer>
-        </Modal>
-
-        {/* View Speaker Pop Up Design */}
-        <Offcanvas
-          className="add-folder-panel"
-          placement={"end"}
-          show={showViewSpeaker}
-          onHide={handleViewCloseSpeaker}
-        >
-          <Offcanvas.Header className="" closeButton>
-            <Offcanvas.Title>Détail intervenant</Offcanvas.Title>
-          </Offcanvas.Header>
-          <Offcanvas.Body>
-            <Tabs
-              activeKey={activeSubTab}
-              onSelect={handleSubTabSelect}
-              id="uncontrolled-tab-example"
-            >
-              <Tab eventKey="speaker" title="Informations générales ">
-                {flashMessage.message && (
-                  <div
-                    className={`alert ${
-                      flashMessage.type === "success"
-                        ? "alert-success"
-                        : "alert-danger"
-                    } text-center`}
-                    role="alert"
-                  >
-                    {flashMessage.message}
-                  </div>
-                )}
-                {flashMessageStoreDoc.message && (
-                  <div
-                    className={`mt-3 alert ${
-                      flashMessageStoreDoc.type === "success"
-                        ? "alert-success"
-                        : "alert-danger"
-                    } text-center`}
-                    role="alert"
-                  >
-                    {flashMessageStoreDoc.message}
-                  </div>
-                )}
-                {isLoading ? (
-                  <Loading />
-                ) : (
-                  <Form>
-                    <Form.Label>
-                      N° de SIRET <span>*</span>
-                    </Form.Label>
-                    <Form.Control
-                      className="mb-3"
-                      type="text"
-                      placeholder="SIRET"
-                      name="siren_number"
-                      disabled
-                      value={
-                        speakerDetail?.siren_number
-                          ? speakerDetail?.siren_number
-                          : "-"
-                      }
-                      onChange={(e) =>
-                        setSpeakerDetail({
-                          ...speakerDetail,
-                          siren_number: e.target.value,
-                        })
-                      }
-                    />
-                    <Form.Label>
-                      Nom société <span>*</span>
-                    </Form.Label>
-                    <Form.Control
-                      className="mb-3"
-                      type="text"
-                      placeholder="Nom société"
-                      defaultValue="Mark"
-                      name="company_name"
-                      disabled
-                      value={
-                        speakerDetail?.company_name
-                          ? speakerDetail?.company_name
-                          : "-"
-                      }
-                      onChange={(e) =>
-                        setSpeakerDetail({
-                          ...speakerDetail,
-                          company_name: e.target.value,
-                        })
-                      }
-                    />
-                    <Form.Label>
-                      Adresse <span>*</span>
-                    </Form.Label>
-                    <Form.Control
-                      className="mb-3"
-                      type="text"
-                      placeholder="Adresse"
-                      name="address"
-                      disabled
-                      value={
-                        speakerDetail?.address ? speakerDetail?.address : "-"
-                      }
-                      onChange={(e) =>
-                        setSpeakerDetail({
-                          ...speakerDetail,
-                          address: e.target.value,
-                        })
-                      }
-                    />
-
-                    <div className="d-md-flex align-items-center side-col">
-                      <Form.Group className="post-code" controlId="postcode">
-                        <Form.Label>
-                          Code postal <span>*</span>
-                        </Form.Label>
-                        <Form.Control
-                          className="mb-3"
-                          type="text"
-                          placeholder="Code postal"
-                          name="postcode"
-                          disabled
-                          value={
-                            speakerDetail?.postcode
-                              ? speakerDetail?.postcode
-                              : "-"
-                          }
-                          onChange={(e) =>
-                            setSpeakerDetail({
-                              ...speakerDetail,
-                              postcode: e.target.value,
-                            })
-                          }
-                        />
-                      </Form.Group>
-
-                      <Form.Group className="" controlId="city">
-                        <Form.Label>
-                          Ville <span>*</span>
-                        </Form.Label>
-                        <Form.Control
-                          className="mb-3"
-                          type="text"
-                          placeholder="Ville"
-                          name="city"
-                          disabled
-                          value={
-                            speakerDetail?.city ? speakerDetail?.city : "-"
-                          }
-                          onChange={(e) =>
-                            setSpeakerDetail({
-                              ...speakerDetail,
-                              city: e.target.value,
-                            })
-                          }
-                        />
-                      </Form.Group>
-                    </div>
-                  </Form>
-                )}
-              </Tab>
-              <Tab
-                eventKey="documents"
-                title={`Documents (${totalSpeakerDocument})`}
-              >
-                {isLoading ? (
-                  <Loading />
-                ) : (
-                  <div className="table-wrapper mt-16 p-0">
-                    <div className="table-wrap mt-24">
-                      <Table responsive hover>
-                        <thead>
-                          <tr>
-                            <th>Nom du fichier</th>
-                            <th>Type de document</th>
-                            <th>Statut</th>
-                            <th>Actions</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {showSpeakerDocument?.length > 0 ? (
-                            showSpeakerDocument?.map((data) => (
-                              <tr>
-                                <td>{data.filename}</td>
-                                <td>{data.docType?.name}</td>
-                                <td>
-                                  {data.status == "to_be_checked" ? (
-                                    <span className="checked badges">
-                                      {t("toBeCheckedLabel")}
-                                    </span>
-                                  ) : data.status == "verified" ? (
-                                    <span className="verified badges">
-                                      {t("verified")}
-                                    </span>
-                                  ) : (
-                                    <span className="incomplete badges">
-                                      {t("invalidLabel")}
-                                    </span>
-                                  )}
-                                </td>
-                                <td>
-                                  <Link
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      e.preventDefault();
-                                      HandleDownloadFile(data);
-                                    }}
-                                    className="download"
-                                    href="/user-management"
-                                    data-discover="true"
-                                    title="Télécharger"
-                                  >
-                                    <svg
-                                      width="24"
-                                      height="24"
-                                      viewBox="0 0 24 24"
-                                      fill="none"
-                                      xmlns="http://www.w3.org/2000/svg"
-                                    >
-                                      <path
-                                        d="M14 2H6C4.9 2 4.01 2.9 4.01 4L4 20C4 21.1 4.89 22 5.99 22H18C19.1 22 20 21.1 20 20V8L14 2ZM18 20H6V4H13V9H18V20Z"
-                                        fill="#e84455"
-                                      />
-                                      <path
-                                        d="M8 14L12 18L16 14"
-                                        stroke="#e84455"
-                                        stroke-width="1.5"
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                      />
-                                      <path
-                                        d="M12 11V18"
-                                        stroke="#e84455"
-                                        stroke-width="1.5"
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                      />
-                                    </svg>
-                                  </Link>
-                                  {/* {data.status !== "verified" && */}
-                                  <Link
-                                    className="delete"
-                                    data-discover="true"
-                                    title="Supprimer"
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      handleShowDeleteModal();
-                                      setShowDocumentId(data.id);
-                                    }}
-                                  >
-                                    <svg
-                                      width="24"
-                                      height="24"
-                                      viewBox="0 0 24 24"
-                                      fill="none"
-                                      xmlns="http://www.w3.org/2000/svg"
-                                    >
-                                      <path
-                                        d="M16 9V19H8V9H16ZM14.5 3H9.5L8.5 4H5V6H19V4H15.5L14.5 3ZM18 7H6V19C6 20.1 6.9 21 8 21H16C17.1 21 18 20.1 18 19V7Z"
-                                        fill="#e84455"
-                                      />
-                                    </svg>
-                                  </Link>
-                                  {/* } */}
-                                </td>
-                              </tr>
-                            ))
-                          ) : (
-                            <tr style={{ textAlign: "center" }}>
-                              <td colSpan="4">{t("NorecordsfoundLabel")}</td>
-                            </tr>
-                          )}
-                        </tbody>
-                      </Table>
-                    </div>
-                    {totalSpeakerDocument > 10 && (
-                      <Paginations
-                        currentPage={currentPage}
-                        totalPages={totalPages}
-                        onPageChange={handlePageChangeView}
-                      />
-                    )}
-                  </div>
-                )}
-              </Tab>
-              <Tab
-                eventKey="documentType"
-                title={`Documents manquants (${totalMissingDocument})`}
-              >
-                {flashMessage.message && (
-                  <div
-                    className={`alert ${
-                      flashMessage.type === "success"
-                        ? "alert-success"
-                        : "alert-danger"
-                    } text-center`}
-                    role="alert"
-                  >
-                    {flashMessage.message}
-                  </div>
-                )}
-                {isLoading ? (
-                  <Loading />
-                ) : (
-                  <div className="table-wrapper mt-16 p-0">
-                    <div className="table-wrap mt-24">
-                      <Table responsive hover>
-                        <thead>
-                          <tr>
-                            <th>Type de document</th>
-                            <th>Non Requis</th>
-                            <th>Action</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {speakerDocumentTypeList?.length > 0 ? (
-                            speakerDocumentTypeList?.map((data) => (
-                              <tr>
-                                <td>{data.documentType.name}</td>
-                                <td>
-                                  <div style={{ marginTop: "4px" }}>
-                                    <input
-                                      type="checkbox"
-                                      checked={data.is_required === 0}
-                                      onChange={() =>
-                                        handleCheckboxChange(data.id)
-                                      }
-                                      className="form-check-input"
-                                    />
-                                  </div>
-                                </td>
-                                <td>
-                                  <Link
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      handleMissingDocShow();
-                                      setMissingDocumentId(data.id);
-                                    }}
-                                    className="doc"
-                                    href="/user-management"
-                                    data-discover="true"
-                                    title="Ajouter un document manquants"
-                                  >
-                                    <svg
-                                      width="16"
-                                      height="20"
-                                      viewBox="0 0 16 20"
-                                      fill="none"
-                                      xmlns="http://www.w3.org/2000/svg"
-                                    >
-                                      <path
-                                        d="M9 9H7V12H4V14H7V17H9V14H12V12H9V9ZM10 0H2C0.9 0 0 0.9 0 2V18C0 19.1 0.89 20 1.99 20H14C15.1 20 16 19.1 16 18V6L10 0ZM14 18H2V2H9V7H14V18Z"
-                                        fill="#e84455"
-                                      />
-                                    </svg>
-                                  </Link>
-                                </td>
-                              </tr>
-                            ))
-                          ) : (
-                            <tr style={{ textAlign: "center" }}>
-                              <td colSpan="3">{t("NorecordsfoundLabel")}</td>
-                            </tr>
-                          )}
-                        </tbody>
-                      </Table>
-                    </div>
-                    {speakerDocumentTypeList?.length > 0 && (
-                      <div class="">
-                        <Button onClick={() => DocumentTypeUpdate()}>
-                          Valider
-                        </Button>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </Tab>
-            </Tabs>
-          </Offcanvas.Body>
-        </Offcanvas>
 
         {/* Speaker Add Col Modal */}
         <Modal show={showAddPaperCol} onHide={handleAddPaperColClose}>
@@ -6359,9 +5600,8 @@ const ManagerFileDetail = () => {
                                 }}
                               >
                                 —{" "}
-                                {`${data.added_by?.first_name ?? ""} ${
-                                  data.added_by?.last_name ?? ""
-                                }`}
+                                {`${data.added_by?.first_name ?? ""} ${data.added_by?.last_name ?? ""
+                                  }`}
                               </p>
                             )}
 

@@ -2,7 +2,7 @@ import React from "react";
 import Pagination from "react-bootstrap/Pagination";
 import "./Paginations.css";
 
-const Paginations = ({ currentPage, totalPages, onPageChange }) => {
+const Paginations = ({ currentPage, totalPages, onPageChange, itemsPerPage, totalItems }) => {
   const handlePageClick = (page) => {
     if (page >= 1 && page <= totalPages && page !== "...") {
       onPageChange(page);
@@ -23,6 +23,9 @@ const Paginations = ({ currentPage, totalPages, onPageChange }) => {
     return pages;
   };
 
+  const startItem = (currentPage - 1) * itemsPerPage + 1;
+  const endItem = Math.min(currentPage * itemsPerPage, totalItems);
+
   const renderPaginationItems = () => {
     return getVisiblePageNumbers().map((page, index) => (
       <Pagination.Item
@@ -38,7 +41,7 @@ const Paginations = ({ currentPage, totalPages, onPageChange }) => {
 
   return (
     <div className="d-md-flex justify-content-between align-items-center">
-      <p className="m-0 text-center text-md-left">Showing 4 of 256 data</p>
+      <p className="m-0 text-center text-md-left">Showing {startItem}–{endItem} of {totalItems} data</p>
     <Pagination>
       <Pagination.First onClick={() => handlePageClick(1)} disabled={currentPage === 1} />
       <Pagination.Prev onClick={() => handlePageClick(currentPage - 1)} disabled={currentPage === 1} />

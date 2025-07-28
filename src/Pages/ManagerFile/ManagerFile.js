@@ -661,6 +661,8 @@ const ManagerFile = () => {
               currentPage={currentPage}
               totalPages={totalPages}
               onPageChange={handlePageChange}
+              itemsPerPage={10}
+              totalItems={totalRecords}
             />
           }
         </div>
