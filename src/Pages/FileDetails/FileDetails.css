@@ -14,6 +14,9 @@
     padding: 4px 16px;
     margin-left: 10px;
 }
+.grid-view .status{
+    margin-left: 0;
+}
 .detail-header{
 margin-top: 32px;
     border: 1px solid var(--primary-dark);
