@@ -1811,6 +1811,55 @@ const BrokerFileDetail = () => {
                     </Table>
                   </div>
                 </div>
+                <h2 className="mb-3 mt-3">Task</h2>
+                <div className="custom-grid-card mt-3">
+
+                  <h3>Coming Task - to be determined</h3>
+                  <div className="table-wrap mt-24">
+                    <Table responsive hover>
+                      <thead>
+                        <tr>
+                          <th>Name of Task</th>
+                          <th>Dead line</th>
+                          <th>Task description</th>
+                          <th>Name of responsible</th>
+                          <th>status</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>Task 1</td>
+                          <td>dead line</td>
+                          <td>Task description</td>
+                          <td>Name of responsible</td>
+                          <td>
+                            <span class="checked badges">À vérifier</span>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>Task 1</td>
+                          <td>dead line</td>
+                          <td>Task description</td>
+                          <td>Name of responsible</td>
+                          <td>
+                            <span class="checked badges">À vérifier</span>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>Task 1</td>
+                          <td>dead line</td>
+                          <td>Task description</td>
+                          <td>Name of responsible</td>
+                          <td>
+                            <span class="checked badges">À vérifier</span>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </Table>
+                  </div>
+
+                </div>
+
               </div>
               <div className="col-md-5">
                 <h2 className="mb-3">Events</h2>
@@ -1940,52 +1989,7 @@ const BrokerFileDetail = () => {
                     </button>
                   </div>
                 </div>
-                <h2 className="mb-3 mt-3">Task</h2>
-                <div className="custom-grid-card">
-                  <h3>Coming Task - to be determined</h3>
-                  <div className="table-wrap mt-24">
-                    <Table responsive hover>
-                      <thead>
-                        <tr>
-                          <th>Name of Task</th>
-                          <th>Dead line</th>
-                          <th>Task description</th>
-                          <th>Name of responsible</th>
-                          <th>status</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <td>Task 1</td>
-                          <td>dead line</td>
-                          <td>Task description</td>
-                          <td>Name of responsible</td>
-                          <td>
-                            <span class="checked badges">À vérifier</span>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>Task 1</td>
-                          <td>dead line</td>
-                          <td>Task description</td>
-                          <td>Name of responsible</td>
-                          <td>
-                            <span class="checked badges">À vérifier</span>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>Task 1</td>
-                          <td>dead line</td>
-                          <td>Task description</td>
-                          <td>Name of responsible</td>
-                          <td>
-                            <span class="checked badges">À vérifier</span>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </Table>
-                  </div>
-                </div>
+
               </div>
             </div>
           </Tab>
