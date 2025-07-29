@@ -1422,7 +1422,7 @@ const BrokerFileDetail = () => {
                               className="scroll-container mt-3"
                               onScroll={handleScrollNote}
                               style={{
-                                maxHeight: "calc(100vh - 250px)",
+                                maxHeight: "calc(100vh - 300px)",
                                 overflowY: "auto",
                                 paddingRight: "5px",
                                 scrollbarWidth: "thin",
@@ -1833,7 +1833,7 @@ const BrokerFileDetail = () => {
                           <td>Task description</td>
                           <td>Name of responsible</td>
                           <td>
-                            <span class="checked badges">À vérifier</span>
+                            <span className="checked badges">À vérifier</span>
                           </td>
                         </tr>
                         <tr>
@@ -1842,7 +1842,7 @@ const BrokerFileDetail = () => {
                           <td>Task description</td>
                           <td>Name of responsible</td>
                           <td>
-                            <span class="checked badges">À vérifier</span>
+                            <span className="checked badges">À vérifier</span>
                           </td>
                         </tr>
                         <tr>
@@ -1851,7 +1851,7 @@ const BrokerFileDetail = () => {
                           <td>Task description</td>
                           <td>Name of responsible</td>
                           <td>
-                            <span class="checked badges">À vérifier</span>
+                            <span className="checked badges">À vérifier</span>
                           </td>
                         </tr>
                       </tbody>
@@ -1897,10 +1897,10 @@ const BrokerFileDetail = () => {
                       />
                     </div>
                     5 last events
-                    <div class="timeline">
-                      <div class="timeline-item">
-                        <div class="timeline-dot"></div>
-                        <div class="timeline-content">
+                    <div className="timeline">
+                      <div className="timeline-item">
+                        <div className="timeline-dot"></div>
+                        <div className="timeline-content">
                           <h5>January 2nd, 04:35 AM</h5>
                           <p>
                             {" "}
@@ -1911,9 +1911,9 @@ const BrokerFileDetail = () => {
                         </div>
                       </div>
 
-                      <div class="timeline-item">
-                        <div class="timeline-dot"></div>
-                        <div class="timeline-content">
+                      <div className="timeline-item">
+                        <div className="timeline-dot"></div>
+                        <div className="timeline-content">
                           <h5>January 4th, 06:19 AM</h5>
                           <p>
                             <strong>Note :-</strong> Corrupti unde qui molestiae
@@ -1923,9 +1923,9 @@ const BrokerFileDetail = () => {
                         </div>
                       </div>
 
-                      <div class="timeline-item">
-                        <div class="timeline-dot"></div>
-                        <div class="timeline-content">
+                      <div className="timeline-item">
+                        <div className="timeline-dot"></div>
+                        <div className="timeline-content">
                           <h5>January 5th, 12:34 AM</h5>
                           <p>
                             <strong>Action :-</strong> Maiores doloribus qui.
@@ -1942,16 +1942,16 @@ const BrokerFileDetail = () => {
                         </div>
                       </div>
                     </div>
-                    <button type="submit" class="btn-secondary btn btn-primary">
+                    <button type="submit" className="btn-secondary btn btn-primary">
                       See All
                     </button>
                   </div>
                   <div className="last-msg-card">
                     3 Last Important Unread messages
-                    <div class="timeline">
-                      <div class="timeline-item">
-                        <div class="timeline-dot"></div>
-                        <div class="timeline-content">
+                    <div className="timeline">
+                      <div className="timeline-item">
+                        <div className="timeline-dot"></div>
+                        <div className="timeline-content">
                           <h5>January 2nd, 04:35 AM</h5>
                           <p>
                             Illum omnis quo illum nisi. Nesciunt est accusamus.
@@ -1961,9 +1961,9 @@ const BrokerFileDetail = () => {
                         </div>
                       </div>
 
-                      <div class="timeline-item">
-                        <div class="timeline-dot"></div>
-                        <div class="timeline-content">
+                      <div className="timeline-item">
+                        <div className="timeline-dot"></div>
+                        <div className="timeline-content">
                           <h5>January 4th, 06:19 AM</h5>
                           <p>
                             Corrupti unde qui molestiae labore ad adipisci
@@ -1972,9 +1972,9 @@ const BrokerFileDetail = () => {
                         </div>
                       </div>
 
-                      <div class="timeline-item">
-                        <div class="timeline-dot"></div>
-                        <div class="timeline-content">
+                      <div className="timeline-item">
+                        <div className="timeline-dot"></div>
+                        <div className="timeline-content">
                           <h5>January 5th, 12:34 AM</h5>
                           <p>
                             Maiores doloribus qui. Repellat accusamus minima
@@ -1984,7 +1984,7 @@ const BrokerFileDetail = () => {
                         </div>
                       </div>
                     </div>
-                    <button type="submit" class="btn-secondary btn btn-primary">
+                    <button type="submit" className="btn-secondary btn btn-primary">
                       See All
                     </button>
                   </div>
@@ -2013,8 +2013,8 @@ const BrokerFileDetail = () => {
             title={`Documents (${totalRecordOther || 0})`}
           >
             <div className="table-wrapper mt-16 p-0">
-              <div class="d-md-flex align-items-center gap-2 justify-content-between">
-                <h2 class="m-md-0 mb-3">
+              <div className="d-md-flex align-items-center gap-2 justify-content-between">
+                <h2 className="m-md-0 mb-3">
                   {/* Documents ({totalRecordOther}) */}
                 </h2>
                 <Link
@@ -2065,7 +2065,7 @@ const BrokerFileDetail = () => {
                                     <path
                                       d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
                                       fill="black"
-                                      fill-opacity="0.5"
+                                      fillOpacity="0.5"
                                     />
                                   </svg>
                                 )}
@@ -2081,7 +2081,7 @@ const BrokerFileDetail = () => {
                                     <path
                                       d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
                                       fill="black"
-                                      fill-opacity="0.5"
+                                      fillOpacity="0.5"
                                     />
                                     <path
                                       d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
@@ -2143,7 +2143,7 @@ const BrokerFileDetail = () => {
                                       <path
                                         d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
                                         fill="black"
-                                        fill-opacity="0.5"
+                                        fillOpacity="0.5"
                                       />
                                     </svg>
                                   )}
@@ -2159,7 +2159,7 @@ const BrokerFileDetail = () => {
                                       <path
                                         d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
                                         fill="black"
-                                        fill-opacity="0.5"
+                                        fillOpacity="0.5"
                                       />
                                       <path
                                         d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
@@ -2222,7 +2222,7 @@ const BrokerFileDetail = () => {
                                       <path
                                         d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
                                         fill="black"
-                                        fill-opacity="0.5"
+                                        fillOpacity="0.5"
                                       />
                                     </svg>
                                   )}
@@ -2238,7 +2238,7 @@ const BrokerFileDetail = () => {
                                       <path
                                         d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
                                         fill="black"
-                                        fill-opacity="0.5"
+                                        fillOpacity="0.5"
                                       />
                                       <path
                                         d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
@@ -2294,7 +2294,7 @@ const BrokerFileDetail = () => {
                                       <path
                                         d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
                                         fill="black"
-                                        fill-opacity="0.5"
+                                        fillOpacity="0.5"
                                       />
                                     </svg>
                                   )}
@@ -2310,7 +2310,7 @@ const BrokerFileDetail = () => {
                                       <path
                                         d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
                                         fill="black"
-                                        fill-opacity="0.5"
+                                        fillOpacity="0.5"
                                       />
                                       <path
                                         d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
@@ -2421,7 +2421,7 @@ const BrokerFileDetail = () => {
                                     </svg>
                                   </Link>
                                   <Link
-                                    class="addnote"
+                                    className="addnote"
                                     href="/user-management"
                                     data-discover="true"
                                     onClick={() =>
@@ -2705,7 +2705,7 @@ const BrokerFileDetail = () => {
                                     <path
                                       d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
                                       fill="black"
-                                      fill-opacity="0.5"
+                                      fillOpacity="0.5"
                                     />
                                   </svg>
                                 )}
@@ -2721,7 +2721,7 @@ const BrokerFileDetail = () => {
                                     <path
                                       d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
                                       fill="black"
-                                      fill-opacity="0.5"
+                                      fillOpacity="0.5"
                                     />
                                     <path
                                       d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
@@ -2758,7 +2758,7 @@ const BrokerFileDetail = () => {
                                     <path
                                       d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
                                       fill="black"
-                                      fill-opacity="0.5"
+                                      fillOpacity="0.5"
                                     />
                                   </svg>
                                 )}
@@ -2774,7 +2774,7 @@ const BrokerFileDetail = () => {
                                     <path
                                       d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
                                       fill="black"
-                                      fill-opacity="0.5"
+                                      fillOpacity="0.5"
                                     />
                                     <path
                                       d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
@@ -3247,8 +3247,8 @@ const BrokerFileDetail = () => {
               </div>
 			   ) : (
             <div className="table-wrapper mt-10 p-0">
-              <div class="d-md-flex align-items-center gap-2 justify-content-between">
-                <h2 class="m-md-0 mb-3">
+              <div className="d-md-flex align-items-center gap-2 justify-content-between">
+                <h2 className="m-md-0 mb-3">
                   {/* Intervenants ({totalSpeaker}) */}
                 </h2>
                 <Form.Group
@@ -3315,7 +3315,7 @@ const BrokerFileDetail = () => {
                                       <path
                                         d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
                                         fill="black"
-                                        fill-opacity="0.5"
+                                        fillOpacity="0.5"
                                       />
                                     </svg>
                                   )}
@@ -3331,7 +3331,7 @@ const BrokerFileDetail = () => {
                                       <path
                                         d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
                                         fill="black"
-                                        fill-opacity="0.5"
+                                        fillOpacity="0.5"
                                       />
                                       <path
                                         d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
@@ -3371,7 +3371,7 @@ const BrokerFileDetail = () => {
                                       <path
                                         d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
                                         fill="black"
-                                        fill-opacity="0.5"
+                                        fillOpacity="0.5"
                                       />
                                     </svg>
                                   )}
@@ -3387,7 +3387,7 @@ const BrokerFileDetail = () => {
                                       <path
                                         d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
                                         fill="black"
-                                        fill-opacity="0.5"
+                                        fillOpacity="0.5"
                                       />
                                       <path
                                         d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
@@ -3426,7 +3426,7 @@ const BrokerFileDetail = () => {
                                       <path
                                         d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
                                         fill="black"
-                                        fill-opacity="0.5"
+                                        fillOpacity="0.5"
                                       />
                                     </svg>
                                   )}
@@ -3442,7 +3442,7 @@ const BrokerFileDetail = () => {
                                       <path
                                         d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
                                         fill="black"
-                                        fill-opacity="0.5"
+                                        fillOpacity="0.5"
                                       />
                                       <path
                                         d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
@@ -3482,7 +3482,7 @@ const BrokerFileDetail = () => {
                                       <path
                                         d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
                                         fill="black"
-                                        fill-opacity="0.5"
+                                        fillOpacity="0.5"
                                       />
                                     </svg>
                                   )}
@@ -3498,7 +3498,7 @@ const BrokerFileDetail = () => {
                                       <path
                                         d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
                                         fill="black"
-                                        fill-opacity="0.5"
+                                        fillOpacity="0.5"
                                       />
                                       <path
                                         d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
@@ -3537,7 +3537,7 @@ const BrokerFileDetail = () => {
                                       <path
                                         d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
                                         fill="black"
-                                        fill-opacity="0.5"
+                                        fillOpacity="0.5"
                                       />
                                     </svg>
                                   )}
@@ -3553,7 +3553,7 @@ const BrokerFileDetail = () => {
                                       <path
                                         d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
                                         fill="black"
-                                        fill-opacity="0.5"
+                                        fillOpacity="0.5"
                                       />
                                       <path
                                         d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
@@ -3614,7 +3614,7 @@ const BrokerFileDetail = () => {
                             ) && <td>{data.missing_document_count}</td>}
                             {selectedSpeakerColumns.includes("Actions") && (
                               <td>
-                                <div class="action-btn">
+                                <div className="action-btn">
                                   <Link
                                     // onClick={(e) => {
                                     //   e.stopPropagation();
@@ -3628,7 +3628,7 @@ const BrokerFileDetail = () => {
                                     //   );
                                     // }}
                                     onClick={() => setShowSpeakerInner(true)}
-                                    class="view"
+                                    className="view"
                                     href="/user-management"
                                     data-discover="true"
                                   >
@@ -3646,7 +3646,7 @@ const BrokerFileDetail = () => {
                                     </svg>
                                   </Link>
                                   <Link
-                                    class="delete"
+                                    className="delete"
                                     href="/user-management"
                                     data-discover="true"
                                     onClick={(e) => {

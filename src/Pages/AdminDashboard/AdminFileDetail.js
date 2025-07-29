@@ -2012,7 +2012,7 @@ const AdminFileDetail = () => {
             </p>
             <Form.Select
               aria-label="Etat du chantier"
-              class="form-select"
+              className="form-select"
               style={{ minHeight: "45px", width: "25%", fontFamily: "Manrope" }}
               value={sendToFileStatus}
               onChange={(e) => handleSendFileShow(e.target.value)}
@@ -2340,7 +2340,7 @@ const AdminFileDetail = () => {
                           <td>Task description</td>
                           <td>Name of responsible</td>
                           <td>
-                            <span class="checked badges">À vérifier</span>
+                            <span className="checked badges">À vérifier</span>
                           </td>
                         </tr>
                         <tr>
@@ -2349,7 +2349,7 @@ const AdminFileDetail = () => {
                           <td>Task description</td>
                           <td>Name of responsible</td>
                           <td>
-                            <span class="checked badges">À vérifier</span>
+                            <span className="checked badges">À vérifier</span>
                           </td>
                         </tr>
                         <tr>
@@ -2358,7 +2358,7 @@ const AdminFileDetail = () => {
                           <td>Task description</td>
                           <td>Name of responsible</td>
                           <td>
-                            <span class="checked badges">À vérifier</span>
+                            <span className="checked badges">À vérifier</span>
                           </td>
                         </tr>
                       </tbody>
@@ -2404,10 +2404,10 @@ const AdminFileDetail = () => {
                       />
                     </div>
                     5 last events
-                    <div class="timeline">
-                      <div class="timeline-item">
-                        <div class="timeline-dot"></div>
-                        <div class="timeline-content">
+                    <div className="timeline">
+                      <div className="timeline-item">
+                        <div className="timeline-dot"></div>
+                        <div className="timeline-content">
                           <h5>January 2nd, 04:35 AM</h5>
                           <p>
                             {" "}
@@ -2418,9 +2418,9 @@ const AdminFileDetail = () => {
                         </div>
                       </div>
 
-                      <div class="timeline-item">
-                        <div class="timeline-dot"></div>
-                        <div class="timeline-content">
+                      <div className="timeline-item">
+                        <div className="timeline-dot"></div>
+                        <div className="timeline-content">
                           <h5>January 4th, 06:19 AM</h5>
                           <p>
                             <strong>Note :-</strong> Corrupti unde qui molestiae
@@ -2430,9 +2430,9 @@ const AdminFileDetail = () => {
                         </div>
                       </div>
 
-                      <div class="timeline-item">
-                        <div class="timeline-dot"></div>
-                        <div class="timeline-content">
+                      <div className="timeline-item">
+                        <div className="timeline-dot"></div>
+                        <div className="timeline-content">
                           <h5>January 5th, 12:34 AM</h5>
                           <p>
                             <strong>Action :-</strong> Maiores doloribus qui.
@@ -2449,16 +2449,16 @@ const AdminFileDetail = () => {
                         </div>
                       </div>
                     </div>
-                    <button type="submit" class="btn-secondary btn btn-primary">
+                    <button type="submit" className="btn-secondary btn btn-primary">
                       See All
                     </button>
                   </div>
                   <div className="last-msg-card">
                     3 Last Important Unread messages
-                    <div class="timeline">
-                      <div class="timeline-item">
-                        <div class="timeline-dot"></div>
-                        <div class="timeline-content">
+                    <div className="timeline">
+                      <div className="timeline-item">
+                        <div className="timeline-dot"></div>
+                        <div className="timeline-content">
                           <h5>January 2nd, 04:35 AM</h5>
                           <p>
                             Illum omnis quo illum nisi. Nesciunt est accusamus.
@@ -2468,9 +2468,9 @@ const AdminFileDetail = () => {
                         </div>
                       </div>
 
-                      <div class="timeline-item">
-                        <div class="timeline-dot"></div>
-                        <div class="timeline-content">
+                      <div className="timeline-item">
+                        <div className="timeline-dot"></div>
+                        <div className="timeline-content">
                           <h5>January 4th, 06:19 AM</h5>
                           <p>
                             Corrupti unde qui molestiae labore ad adipisci
@@ -2479,9 +2479,9 @@ const AdminFileDetail = () => {
                         </div>
                       </div>
 
-                      <div class="timeline-item">
-                        <div class="timeline-dot"></div>
-                        <div class="timeline-content">
+                      <div className="timeline-item">
+                        <div className="timeline-dot"></div>
+                        <div className="timeline-content">
                           <h5>January 5th, 12:34 AM</h5>
                           <p>
                             Maiores doloribus qui. Repellat accusamus minima
@@ -2491,7 +2491,7 @@ const AdminFileDetail = () => {
                         </div>
                       </div>
                     </div>
-                    <button type="submit" class="btn-secondary btn btn-primary">
+                    <button type="submit" className="btn-secondary btn btn-primary">
                       See All
                     </button>
                   </div>
@@ -2521,7 +2521,7 @@ const AdminFileDetail = () => {
                 </div>
               )}
               <div className="table-wrapper mt-0 p-0">
-                <h2 class="mb-3">Général</h2>
+                <h2 className="mb-3">Général</h2>
 
                 <div className="form-grid-2x2">
                   <Form.Group className="mb-3" controlId="insurercode">
@@ -2599,7 +2599,7 @@ const AdminFileDetail = () => {
                   </Form.Group>
                 </div>
 
-                <h2 class="mb-3">Police</h2>
+                <h2 className="mb-3">Police</h2>
 
                 <div className="table-wrapper mt-0 p-0">
                   <div className="form-grid-2x2">
@@ -2798,11 +2798,11 @@ const AdminFileDetail = () => {
                 title={`Documents (${totalPaperRecords || 0})`}
               >
                 <div className="table-wrapper mt-0 p-0">
-                  <div class="d-md-flex align-items-center gap-2 justify-content-between">
-                    <h2 class="m-md-0 mb-3">
+                  <div className="d-md-flex align-items-center gap-2 justify-content-between">
+                    <h2 className="m-md-0 mb-3">
                       {/* Documents ({totalPapers}) */}
                     </h2>
-                    <div class="">
+                    <div className="">
                       {endDate == null ? (
                         <div></div>
                       ) : (
@@ -3462,7 +3462,7 @@ const AdminFileDetail = () => {
                                           <path
                                             d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
                                             fill="black"
-                                            fill-opacity="0.5"
+                                            fillOpacity="0.5"
                                           />
                                         </svg>
                                       )}
@@ -3478,7 +3478,7 @@ const AdminFileDetail = () => {
                                           <path
                                             d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
                                             fill="black"
-                                            fill-opacity="0.5"
+                                            fillOpacity="0.5"
                                           />
                                           <path
                                             d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
@@ -3547,7 +3547,7 @@ const AdminFileDetail = () => {
                                           <path
                                             d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
                                             fill="black"
-                                            fill-opacity="0.5"
+                                            fillOpacity="0.5"
                                           />
                                         </svg>
                                       )}
@@ -3563,7 +3563,7 @@ const AdminFileDetail = () => {
                                           <path
                                             d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
                                             fill="black"
-                                            fill-opacity="0.5"
+                                            fillOpacity="0.5"
                                           />
                                           <path
                                             d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
@@ -3626,7 +3626,7 @@ const AdminFileDetail = () => {
                                           <path
                                             d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
                                             fill="black"
-                                            fill-opacity="0.5"
+                                            fillOpacity="0.5"
                                           />
                                         </svg>
                                       )}
@@ -3642,7 +3642,7 @@ const AdminFileDetail = () => {
                                           <path
                                             d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
                                             fill="black"
-                                            fill-opacity="0.5"
+                                            fillOpacity="0.5"
                                           />
                                           <path
                                             d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
@@ -3700,7 +3700,7 @@ const AdminFileDetail = () => {
                                           <path
                                             d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
                                             fill="black"
-                                            fill-opacity="0.5"
+                                            fillOpacity="0.5"
                                           />
                                         </svg>
                                       )}
@@ -3716,7 +3716,7 @@ const AdminFileDetail = () => {
                                           <path
                                             d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
                                             fill="black"
-                                            fill-opacity="0.5"
+                                            fillOpacity="0.5"
                                           />
                                           <path
                                             d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
@@ -3813,12 +3813,12 @@ const AdminFileDetail = () => {
                                 )}
                                 {selectedSpeakerColumns.includes("Actions") && (
                                   <td>
-                                    <div class="action-btn">
+                                    <div className="action-btn">
                                       <Link
                                         onClick={() => {
                                           handleViewShowPaperDoc(data.id);
                                         }}
-                                        class="view"
+                                        className="view"
                                         data-discover="true"
                                       >
                                         <svg
@@ -3835,7 +3835,7 @@ const AdminFileDetail = () => {
                                         </svg>
                                       </Link>
                                       <Link
-                                        class="addnote"
+                                        className="addnote"
                                         href="/user-management"
                                         data-discover="true"
                                         onClick={() =>
@@ -3891,7 +3891,7 @@ const AdminFileDetail = () => {
                                         </svg>
                                       </Link>
                                       <Link
-                                        class="download"
+                                        className="download"
                                         href="/user-management"
                                         data-discover="true"
                                         onClick={(e) => {
@@ -3909,14 +3909,14 @@ const AdminFileDetail = () => {
                                           xmlns="http://www.w3.org/2000/svg"
                                         >
                                           <path
-                                            fill-rule="evenodd"
-                                            clip-rule="evenodd"
+                                            fillRule="evenodd"
+                                            clipRule="evenodd"
                                             d="M23 22C23 22.5523 22.5523 23 22 23H2C1.44772 23 1 22.5523 1 22C1 21.4477 1.44772 21 2 21H22C22.5523 21 23 21.4477 23 22Z"
                                             fill="#e84455"
                                           />
                                           <path
-                                            fill-rule="evenodd"
-                                            clip-rule="evenodd"
+                                            fillRule="evenodd"
+                                            clipRule="evenodd"
                                             d="M13.3099 18.6881C12.5581 19.3396 11.4419 19.3396 10.6901 18.6881L5.87088 14.5114C4.47179 13.2988 5.32933 11 7.18074 11L9.00001 11V3C9.00001 1.89543 9.89544 1 11 1L13 1C14.1046 1 15 1.89543 15 3L15 11H16.8193C18.6707 11 19.5282 13.2988 18.1291 14.5114L13.3099 18.6881ZM11.3451 16.6091C11.7209 16.9348 12.2791 16.9348 12.6549 16.6091L16.8193 13H14.5C13.6716 13 13 12.3284 13 11.5V3L11 3V11.5C11 12.3284 10.3284 13 9.50001 13L7.18074 13L11.3451 16.6091Z"
                                             fill="#e84455"
                                           />
@@ -3924,7 +3924,7 @@ const AdminFileDetail = () => {
                                       </Link>
                                       {/* {data.status !== "verified" && */}
                                       <Link
-                                        class="doc"
+                                        className="doc"
                                         href="/user-management"
                                         data-discover="true"
                                         onClick={() => {
@@ -3947,7 +3947,7 @@ const AdminFileDetail = () => {
                                       </Link>
                                       {/* } */}
                                       <Link
-                                        class="delete"
+                                        className="delete"
                                         href="/user-management"
                                         data-discover="true"
                                         onClick={() => {
@@ -4151,7 +4151,7 @@ const AdminFileDetail = () => {
                                         <path
                                           d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
                                           fill="black"
-                                          fill-opacity="0.5"
+                                          fillOpacity="0.5"
                                         />
                                       </svg>
                                     )}
@@ -4167,7 +4167,7 @@ const AdminFileDetail = () => {
                                         <path
                                           d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
                                           fill="black"
-                                          fill-opacity="0.5"
+                                          fillOpacity="0.5"
                                         />
                                         <path
                                           d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
@@ -4204,7 +4204,7 @@ const AdminFileDetail = () => {
                                         <path
                                           d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
                                           fill="black"
-                                          fill-opacity="0.5"
+                                          fillOpacity="0.5"
                                         />
                                       </svg>
                                     )}
@@ -4220,7 +4220,7 @@ const AdminFileDetail = () => {
                                         <path
                                           d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
                                           fill="black"
-                                          fill-opacity="0.5"
+                                          fillOpacity="0.5"
                                         />
                                         <path
                                           d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
@@ -4732,7 +4732,7 @@ const AdminFileDetail = () => {
                               </Table>
                             </div>
                             {speakerDocumentTypeList?.length > 0 && (
-                              <div class="">
+                              <div className="">
                                 <Button onClick={() => DocumentTypeUpdate()}>
                                   Valider
                                 </Button>
@@ -4747,11 +4747,11 @@ const AdminFileDetail = () => {
               </div>
             ) : (
               <div className="table-wrapper mt-0 p-0">
-                <div class="d-md-flex align-items-center gap-2 justify-content-between">
-                  <h2 class="m-md-0 mb-3">
+                <div className="d-md-flex align-items-center gap-2 justify-content-between">
+                  <h2 className="m-md-0 mb-3">
                     {/* Intervenants ({totalSpeaker}) */}
                   </h2>
-                  <div class="d-flex">
+                  <div className="d-flex">
                     <Button
                       className="d-flex align-items-center gap-3 add-speaker-btn"
                       variant="primary"
@@ -4963,7 +4963,7 @@ const AdminFileDetail = () => {
                                       <path
                                         d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
                                         fill="black"
-                                        fill-opacity="0.5"
+                                        fillOpacity="0.5"
                                       />
                                     </svg>
                                   )}
@@ -4979,7 +4979,7 @@ const AdminFileDetail = () => {
                                       <path
                                         d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
                                         fill="black"
-                                        fill-opacity="0.5"
+                                        fillOpacity="0.5"
                                       />
                                       <path
                                         d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
@@ -5016,7 +5016,7 @@ const AdminFileDetail = () => {
                                       <path
                                         d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
                                         fill="black"
-                                        fill-opacity="0.5"
+                                        fillOpacity="0.5"
                                       />
                                     </svg>
                                   )}
@@ -5032,7 +5032,7 @@ const AdminFileDetail = () => {
                                       <path
                                         d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
                                         fill="black"
-                                        fill-opacity="0.5"
+                                        fillOpacity="0.5"
                                       />
                                       <path
                                         d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
@@ -5069,7 +5069,7 @@ const AdminFileDetail = () => {
                                       <path
                                         d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
                                         fill="black"
-                                        fill-opacity="0.5"
+                                        fillOpacity="0.5"
                                       />
                                     </svg>
                                   )}
@@ -5085,7 +5085,7 @@ const AdminFileDetail = () => {
                                       <path
                                         d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
                                         fill="black"
-                                        fill-opacity="0.5"
+                                        fillOpacity="0.5"
                                       />
                                       <path
                                         d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
@@ -5123,7 +5123,7 @@ const AdminFileDetail = () => {
                                       <path
                                         d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
                                         fill="black"
-                                        fill-opacity="0.5"
+                                        fillOpacity="0.5"
                                       />
                                     </svg>
                                   )}
@@ -5139,7 +5139,7 @@ const AdminFileDetail = () => {
                                       <path
                                         d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
                                         fill="black"
-                                        fill-opacity="0.5"
+                                        fillOpacity="0.5"
                                       />
                                       <path
                                         d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
@@ -5176,7 +5176,7 @@ const AdminFileDetail = () => {
                                       <path
                                         d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
                                         fill="black"
-                                        fill-opacity="0.5"
+                                        fillOpacity="0.5"
                                       />
                                     </svg>
                                   )}
@@ -5192,7 +5192,7 @@ const AdminFileDetail = () => {
                                       <path
                                         d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
                                         fill="black"
-                                        fill-opacity="0.5"
+                                        fillOpacity="0.5"
                                       />
                                       <path
                                         d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
@@ -5224,7 +5224,7 @@ const AdminFileDetail = () => {
                               <td>{data.user_document_count}</td>
                               <td>{data.missing_document_count}</td>
                               <td>
-                                <div class="action-btn">
+                                <div className="action-btn">
                                   <Link
                                     // onClick={(e) => {
                                     //   e.stopPropagation();
@@ -5239,7 +5239,7 @@ const AdminFileDetail = () => {
                                     //   );
                                     // }}
                                     onClick={() => setShowSpeakerInner(true)}
-                                    class="view"
+                                    className="view"
                                     href="/user-management"
                                     data-discover="true"
                                   >
@@ -5257,7 +5257,7 @@ const AdminFileDetail = () => {
                                     </svg>
                                   </Link>
                                   <Link
-                                    class="delete"
+                                    className="delete"
                                     href="/user-management"
                                     data-discover="true"
                                     onClick={() => {
@@ -5570,7 +5570,7 @@ const AdminFileDetail = () => {
                           </td>
                           <td>
                             <Link
-                              class="download"
+                              className="download"
                               href="/user-management"
                               data-discover="true"
                               onClick={(e) => {
@@ -5587,14 +5587,14 @@ const AdminFileDetail = () => {
                                 xmlns="http://www.w3.org/2000/svg"
                               >
                                 <path
-                                  fill-rule="evenodd"
-                                  clip-rule="evenodd"
+                                  fillRule="evenodd"
+                                  clipRule="evenodd"
                                   d="M23 22C23 22.5523 22.5523 23 22 23H2C1.44772 23 1 22.5523 1 22C1 21.4477 1.44772 21 2 21H22C22.5523 21 23 21.4477 23 22Z"
                                   fill="#e84455"
                                 />
                                 <path
-                                  fill-rule="evenodd"
-                                  clip-rule="evenodd"
+                                  fillRule="evenodd"
+                                  clipRule="evenodd"
                                   d="M13.3099 18.6881C12.5581 19.3396 11.4419 19.3396 10.6901 18.6881L5.87088 14.5114C4.47179 13.2988 5.32933 11 7.18074 11L9.00001 11V3C9.00001 1.89543 9.89544 1 11 1L13 1C14.1046 1 15 1.89543 15 3L15 11H16.8193C18.6707 11 19.5282 13.2988 18.1291 14.5114L13.3099 18.6881ZM11.3451 16.6091C11.7209 16.9348 12.2791 16.9348 12.6549 16.6091L16.8193 13H14.5C13.6716 13 13 12.3284 13 11.5V3L11 3V11.5C11 12.3284 10.3284 13 9.50001 13L7.18074 13L11.3451 16.6091Z"
                                   fill="#e84455"
                                 />
@@ -6111,7 +6111,7 @@ const AdminFileDetail = () => {
                       </Table>
                     </div>
                     {speakerDocumentTypeList?.length > 0 && (
-                      <div class="">
+                      <div className="">
                         <Button onClick={() => DocumentTypeUpdate()}>
                           Valider
                         </Button>

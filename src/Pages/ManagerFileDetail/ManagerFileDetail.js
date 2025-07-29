@@ -14,6 +14,7 @@ import Dropdown from "react-bootstrap/Dropdown";
 import ProgressBar from "react-bootstrap/ProgressBar";
 import DatePicker from "react-datepicker";
 import { fr } from "date-fns/locale";
+import { parse, format } from 'date-fns';
 import logo from "../../acs-logo.png";
 import { useTranslation } from "react-i18next";
 import AcsManagerFileService from "../../API/AcsManager/AcsManagerFileService";
@@ -135,7 +136,13 @@ const ManagerFileDetail = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [activeDocumentTab, setActiveDocumentTab] = useState("document");
   const [activeSubTab, setActiveSubTab] = useState("documents");
-  const [history, setHistory] = useState([]);
+  const [history, setHistory] = useState([
+    {
+      activeTab: "dashboard",
+      activeDocumentTab: "document",
+      activeSubTab: "documents"
+    }
+  ]);
   const [totalSpeakerDocument, setTotalSpeakerDocument] = useState(0);
   const [totalMissingDocument, setTotalMissingDocument] = useState(0);
   const [selectDocumentId, setSelectDocumentId] = useState("");
@@ -1479,25 +1486,40 @@ const ManagerFileDetail = () => {
     }
   };
 
-  const safeHistoryEntry = (entry) =>
-    typeof entry === "string"
-      ? {
+  const safeHistoryEntry = (entry) => {
+    if (!entry) {
+      return {
+        activeTab: null,
+        activeDocumentTab: null,
+        activeSubTab: null,
+      };
+    }
+
+    if (typeof entry === "string") {
+      return {
         activeTab: entry,
         activeDocumentTab: null,
         activeSubTab: null,
-      }
-      : {
-        activeTab: entry.activeTab || null,
-        activeDocumentTab: entry.activeDocumentTab || null,
-        activeSubTab: entry.activeSubTab || null,
       };
+    }
+
+    return {
+      activeTab: entry.activeTab || null,
+      activeDocumentTab: entry.activeDocumentTab || null,
+      activeSubTab: entry.activeSubTab || null,
+    };
+  };
+
 
   const handleBack = () => {
     setHistory((prevHistory) => {
       const newHistory = [...prevHistory];
-      const previousTab = safeHistoryEntry(newHistory.pop());
+      const rawEntry = newHistory.pop();
+      const previousTab = safeHistoryEntry(rawEntry);
 
-      if (previousTab) {
+      const hasValidTab = previousTab.activeTab || previousTab.activeDocumentTab || previousTab.activeSubTab;
+
+      if (hasValidTab) {
         if (previousTab.activeTab) setActiveTab(previousTab.activeTab);
         if (previousTab.activeDocumentTab) setActiveDocumentTab(previousTab.activeDocumentTab);
         if (previousTab.activeSubTab) setActiveSubTab(previousTab.activeSubTab);
@@ -1866,6 +1888,15 @@ const ManagerFileDetail = () => {
     }
   };
 
+  const formatCreatedAt = (dateStr) => {
+    try {
+      const parsedDate = parse(dateStr, 'dd/MM/yyyy', new Date());
+      return format(parsedDate, 'MMMM do, hh:mm a');
+    } catch (e) {
+      return dateStr;
+    }
+  };
+
   return (
     <Fragment>
       <style>
@@ -1920,123 +1951,123 @@ const ManagerFileDetail = () => {
             className="detail-header new-update-header"
           >
             <div className="d-flex align-items-center ms-auto top-part">
-            <div style={{ marginRight: "20px" }} className="div">
-              <Link onClick={toggleDetail} className="fold-unfold-link link-wrap">
-                {isVisible ? 'Fold Detail' : 'Unfold Detail'}
-              </Link>
-            </div>
-            <div style={{ marginRight: "20px" }}>
-              <MissingDocument
-                link={true}
-                sort={sort}
-                search={search}
-                currentPage={currentPage}
-                selectActionType={selectActionType}
-                GetHistoryListDocument={GetHistoryListDocument}
-              />
-            </div>
-            <Link
-              className="link-wrap"
-              style={{ marginRight: "20px" }}
-              onClick={handleNoteShow}
-            >
-              Voir les raisons
-            </Link>
-            <p className="m-0" style={{ paddingRight: "10px" }}>
-              Envoyer à :{" "}
-            </p>
-            <Form.Select
-              aria-label="Etat du chantier"
-              class="form-select"
-              style={{ minHeight: "45px", width: "25%", fontFamily: "Manrope" }}
-              value={sendToFileStatus}
-              onChange={(e) => handleSendFileShow(e.target.value)}
-            >
-              <option value="" disabled selected>
-                Envoyer à
-              </option>
-              <option value="transfer_to_insurer">
-                Transfert à l'assureur
-              </option>
-              <option value="transfer_to_broker">Transfert au Courtier</option>
-              <option value="to_be_decided">A statuer</option>
-            </Form.Select>
-          </div>
-
-          <div className={`second-header ${isVisible ? 'show' : ''}`}>
-            <div className="d-flex align-items-center check-status">
-              <div className="d-flex align-items-center check-status">
-                <p className="m-0" style={{ paddingRight: "10px" }}>
-                  Etat du chantier :{" "}
-                </p>
-                <div style={{ paddingRight: "10px" }}>
-                  <Form.Select
-                    aria-label="Etat du chantier"
-                    style={{ minHeight: "45px" }}
-                    value={editUserSiteStatus}
-                    onChange={(e) => handleSiteStatusChange(e.target.value)}
-                  >
-                    <option value="on_site">En cours de chantier</option>
-                    <option value="end_of_site">Fin de chantier</option>
-                  </Form.Select>
-                </div>
+              <div style={{ marginRight: "20px" }} className="div">
+                <Link onClick={toggleDetail} className="fold-unfold-link link-wrap">
+                  {isVisible ? 'Fold Detail' : 'Unfold Detail'}
+                </Link>
               </div>
+              <div style={{ marginRight: "20px" }}>
+                <MissingDocument
+                  link={true}
+                  sort={sort}
+                  search={search}
+                  currentPage={currentPage}
+                  selectActionType={selectActionType}
+                  GetHistoryListDocument={GetHistoryListDocument}
+                />
+              </div>
+              <Link
+                className="link-wrap"
+                style={{ marginRight: "20px" }}
+                onClick={handleNoteShow}
+              >
+                Voir les raisons
+              </Link>
+              <p className="m-0" style={{ paddingRight: "10px" }}>
+                Envoyer à :{" "}
+              </p>
+              <Form.Select
+                aria-label="Etat du chantier"
+                className="form-select"
+                style={{ minHeight: "45px", width: "25%", fontFamily: "Manrope" }}
+                value={sendToFileStatus}
+                onChange={(e) => handleSendFileShow(e.target.value)}
+              >
+                <option value="" disabled selected>
+                  Envoyer à
+                </option>
+                <option value="transfer_to_insurer">
+                  Transfert à l'assureur
+                </option>
+                <option value="transfer_to_broker">Transfert au Courtier</option>
+                <option value="to_be_decided">A statuer</option>
+              </Form.Select>
+            </div>
 
-              <div className="grid-view">
-
-                <div className="d-flex align-items-center">
-                  <p className="m-0">Statut : </p>
-                  <div className="status">
-                    {showUserDocumentData?.status === "to_be_checked"
-                      ? t("toBeCheckedLabel")
-                      : showUserDocumentData?.status === "validated"
-                      ? t("validatedLabel")
-                      : showUserDocumentData?.status === "transfer_to_insurer"
-                      ? "Transfert à l'assureur"
-                      : showUserDocumentData?.status === "transfer_to_broker"
-                      ? "Transfert au Courtier"
-                      : showUserDocumentData?.status === "transfer_to_manager"
-                      ? "Transfert au Gestionnaire"
-                      : showUserDocumentData?.status === "to_be_decided"
-                      ? "A statuer"
-                      : showUserDocumentData?.status === "formal_notice"
-                      ? "Mise en demeure"
-                      : t("invalidLabel")}
+            <div className={`second-header ${isVisible ? 'show' : ''}`}>
+              <div className="d-flex align-items-center check-status">
+                <div className="d-flex align-items-center check-status">
+                  <p className="m-0" style={{ paddingRight: "10px" }}>
+                    Etat du chantier :{" "}
+                  </p>
+                  <div style={{ paddingRight: "10px" }}>
+                    <Form.Select
+                      aria-label="Etat du chantier"
+                      style={{ minHeight: "45px" }}
+                      value={editUserSiteStatus}
+                      onChange={(e) => handleSiteStatusChange(e.target.value)}
+                    >
+                      <option value="on_site">En cours de chantier</option>
+                      <option value="end_of_site">Fin de chantier</option>
+                    </Form.Select>
                   </div>
                 </div>
 
-                <div className="d-flex align-items-center">
-                  <p className="m-0">DOC : </p>
-                  <div className="status">
-                    15/07/2025
-                  </div>
-                </div>
+                <div className="grid-view">
 
-                <div className="d-flex align-items-center">
-                  <p className="m-0">Date fin prévisionnelle : </p>
-                  <div className="status">
-                    {showUserDocumentData?.estimated_completion_date}
+                  <div className="d-flex align-items-center">
+                    <p className="m-0">Statut : </p>
+                    <div className="status">
+                      {showUserDocumentData?.status === "to_be_checked"
+                        ? t("toBeCheckedLabel")
+                        : showUserDocumentData?.status === "validated"
+                          ? t("validatedLabel")
+                          : showUserDocumentData?.status === "transfer_to_insurer"
+                            ? "Transfert à l'assureur"
+                            : showUserDocumentData?.status === "transfer_to_broker"
+                              ? "Transfert au Courtier"
+                              : showUserDocumentData?.status === "transfer_to_manager"
+                                ? "Transfert au Gestionnaire"
+                                : showUserDocumentData?.status === "to_be_decided"
+                                  ? "A statuer"
+                                  : showUserDocumentData?.status === "formal_notice"
+                                    ? "Mise en demeure"
+                                    : t("invalidLabel")}
+                    </div>
                   </div>
-                </div>
 
-                <div className="d-flex align-items-center">
-                  <p className="m-0">Coût prévisionnel : </p>
-                  <div className="status">
-                    10 450 000€
+                  <div className="d-flex align-items-center">
+                    <p className="m-0">DOC : </p>
+                    <div className="status">
+                      15/07/2025
+                    </div>
                   </div>
-                </div>
 
-                <div className="d-flex align-items-center">
-                  <p className="m-0">Nom du preneur assurance : </p>
-                  <div className="status">
-                    {showUserDocumentData?.insurance_policyholder_name}
+                  <div className="d-flex align-items-center">
+                    <p className="m-0">Date fin prévisionnelle : </p>
+                    <div className="status">
+                      {showUserDocumentData?.estimated_completion_date}
+                    </div>
+                  </div>
+
+                  <div className="d-flex align-items-center">
+                    <p className="m-0">Coût prévisionnel : </p>
+                    <div className="status">
+                      10 450 000€
+                    </div>
+                  </div>
+
+                  <div className="d-flex align-items-center">
+                    <p className="m-0">Nom du preneur assurance : </p>
+                    <div className="status">
+                      {showUserDocumentData?.insurance_policyholder_name}
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
         <Tabs
           activeKey={activeTab}
@@ -2168,21 +2199,21 @@ const ManagerFileDetail = () => {
                           <td>dead line</td>
                           <td>Task description</td>
                           <td>Name of responsible</td>
-                          <td><span class="checked badges">À vérifier</span></td>
+                          <td><span className="checked badges">À vérifier</span></td>
                         </tr>
                         <tr>
                           <td>Task 1</td>
                           <td>dead line</td>
                           <td>Task description</td>
                           <td>Name of responsible</td>
-                          <td><span class="checked badges">À vérifier</span></td>
+                          <td><span className="checked badges">À vérifier</span></td>
                         </tr>
                         <tr>
                           <td>Task 1</td>
                           <td>dead line</td>
                           <td>Task description</td>
                           <td>Name of responsible</td>
-                          <td><span class="checked badges">À vérifier</span></td>
+                          <td><span className="checked badges">À vérifier</span></td>
                         </tr>
                       </tbody>
                     </Table>
@@ -2190,10 +2221,8 @@ const ManagerFileDetail = () => {
                 </div>
               </div>
               <div className="col-md-5">
-                <h2 className="mb-3">Events</h2>
+                <h2 className="mb-3">Événements</h2>
                 <div className="custom-grid-card">
-
-
                   <div className="last-event-card">
                     <div className="d-flex flex-wrap gap-2 mb-3">
                       {/* Type Filter */}
@@ -2207,8 +2236,6 @@ const ManagerFileDetail = () => {
                         <option value="action">Action</option>
                       </select>
 
-
-
                       {/* User Filter */}
                       <select
                         className="form-select w-auto"
@@ -2219,6 +2246,7 @@ const ManagerFileDetail = () => {
                         <option value="user1">User 1</option>
                         <option value="user2">User 2</option>
                       </select>
+
                       {/* Date Filter */}
                       <DatePicker
                         selected={selectedDate}
@@ -2228,64 +2256,58 @@ const ManagerFileDetail = () => {
                         dateFormat="dd/MM/yyyy"
                       />
                     </div>
-                    5 last events
-                    <div class="timeline">
-                      <div class="timeline-item">
-                        <div class="timeline-dot"></div>
-                        <div class="timeline-content">
-                          <h5>January 2nd, 04:35 AM</h5>
-                          <p> <strong>Note :-</strong> Illum omnis quo illum nisi. Nesciunt est accusamus. Blanditiis nisi quae eum nisi similique. Modi consequuntur totam</p>
-                        </div>
-                      </div>
+                    <span>5 derniers événements</span>
+                    <div className="timeline">
+                      {lastFiveEventList?.length > 0 ?
+                        lastFiveEventList?.map((data) => {
+                          const [beforeColon, afterColon] = data.action_details.split(":").map(s => s.trim());
+                          return (
+                            <div className="timeline-item">
+                              <div className="timeline-dot"></div>
+                              <div className="timeline-content">
+                                <h5>{formatCreatedAt(data.created_at)}</h5>
+                                <p>
+                                  {beforeColon ?
+                                    <>
+                                      <strong>{beforeColon} :-</strong> {afterColon}
+                                    </>
+                                    :
+                                    <>
+                                      <strong>{data.action_type} :-</strong> {data.action_details}
+                                    </>
+                                  }
+                                </p>
+                              </div>
+                            </div>
+                          );
+                        }) : (
+                          <div className="timeline-item">
+                            {t("NorecordsfoundLabel")}
+                          </div>
+                        )}
 
-                      <div class="timeline-item">
-                        <div class="timeline-dot"></div>
-                        <div class="timeline-content">
-                          <h5>January 4th, 06:19 AM</h5>
-                          <p><strong>Note :-</strong>  Corrupti unde qui molestiae labore ad adipisci veniam perspiciatis quasi. Quae labore vel.</p>
-                        </div>
-                      </div>
-
-                      <div class="timeline-item">
-                        <div class="timeline-dot"></div>
-                        <div class="timeline-content">
-                          <h5>January 5th, 12:34 AM</h5>
-                          <p><strong>Action :-</strong> Maiores doloribus qui. Repellat accusamus minima ipsa ipsam aut debitis quis sit voluptates. Amet necessitatibus non minus quaerat et quis.</p>
-                          <p><strong>Action Name:-</strong>Lorem, ipsum dolor.</p>
-                          <p><strong>User id:-</strong>Ipsum115880</p>
-                        </div>
-                      </div>
                     </div>
-                    <button type="submit" class="btn-secondary btn btn-primary">See All</button>
+                    <button className="btn-secondary btn btn-primary" onClick={() => setActiveTab("history")}>See All</button>
                   </div>
                   <div className="last-msg-card">
-                    3 Last Important Unread messages
-                    <div class="timeline">
-                      <div class="timeline-item">
-                        <div class="timeline-dot"></div>
-                        <div class="timeline-content">
-                          <h5>January 2nd, 04:35 AM</h5>
-                          <p>Illum omnis quo illum nisi. Nesciunt est accusamus. Blanditiis nisi quae eum nisi similique. Modi consequuntur totam</p>
-                        </div>
-                      </div>
-
-                      <div class="timeline-item">
-                        <div class="timeline-dot"></div>
-                        <div class="timeline-content">
-                          <h5>January 4th, 06:19 AM</h5>
-                          <p>Corrupti unde qui molestiae labore ad adipisci veniam perspiciatis quasi. Quae labore vel.</p>
-                        </div>
-                      </div>
-
-                      <div class="timeline-item">
-                        <div class="timeline-dot"></div>
-                        <div class="timeline-content">
-                          <h5>January 5th, 12:34 AM</h5>
-                          <p>Maiores doloribus qui. Repellat accusamus minima ipsa ipsam aut debitis quis sit voluptates. Amet necessitatibus non minus quaerat et quis.</p>
-                        </div>
-                      </div>
+                    3 derniers messages importants non lus
+                    <div className="timeline">
+                      {lastThreeNoteList?.length > 0 ?
+                        lastThreeNoteList?.map((data) => (
+                          <div className="timeline-item">
+                            <div className="timeline-dot"></div>
+                            <div className="timeline-content">
+                              <h5>{formatCreatedAt(data.created_on)}</h5>
+                              <p>{data.reason}</p>
+                            </div>
+                          </div>
+                        )) : (
+                          <div className="timeline-item">
+                            {t("NorecordsfoundLabel")}
+                          </div>
+                        )}
                     </div>
-                    <button type="submit" class="btn-secondary btn btn-primary">See All</button>
+                    <button className="btn-secondary btn btn-primary" onClick={handleNoteShow}>See All</button>
                   </div>
                 </div>
               </div>
@@ -2312,7 +2334,7 @@ const ManagerFileDetail = () => {
                 </div>
               )}
               <div className="table-wrapper mt-0 p-0">
-                <h2 class="mb-3">Général</h2>
+                <h2 className="mb-3">Général</h2>
 
                 <div className="form-grid-2x2">
                   <Form.Group className="mb-3" controlId="insurercode">
@@ -2381,16 +2403,16 @@ const ManagerFileDetail = () => {
                       placeholder="Nom du courtier"
                       value={
                         showUserDocumentData?.broker?.first_name
-                        ? showUserDocumentData?.broker?.first_name
-                        : "" + "" + showUserDocumentData?.broker?.last_name
-                        ? showUserDocumentData?.broker?.last_name
-                        : ""
+                          ? showUserDocumentData?.broker?.first_name
+                          : "" + "" + showUserDocumentData?.broker?.last_name
+                            ? showUserDocumentData?.broker?.last_name
+                            : ""
                       }
                     />
                   </Form.Group>
                 </div>
 
-                <h2 class="mb-3">Police</h2>
+                <h2 className="mb-3">Police</h2>
 
                 <div className="table-wrapper mt-0 p-0">
                   <div className="form-grid-2x2">
@@ -2553,9 +2575,9 @@ const ManagerFileDetail = () => {
                 title={`Documents (${totalPaperRecords || 0})`}
               >
                 <div className="table-wrapper mt-0 p-0">
-                  <div class="d-md-flex align-items-center gap-2 justify-content-between">
-                    <h2 class="m-md-0 mb-3"></h2>
-                    <div class="">
+                  <div className="d-md-flex align-items-center gap-2 justify-content-between">
+                    <h2 className="m-md-0 mb-3"></h2>
+                    <div className="">
                       {endDate == null ? (
                         <div></div>
                       ) : (
@@ -3208,7 +3230,7 @@ const ManagerFileDetail = () => {
                                             <path
                                               d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
                                               fill="black"
-                                              fill-opacity="0.5"
+                                              fillOpacity="0.5"
                                             />
                                           </svg>
                                         )}
@@ -3224,7 +3246,7 @@ const ManagerFileDetail = () => {
                                             <path
                                               d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
                                               fill="black"
-                                              fill-opacity="0.5"
+                                              fillOpacity="0.5"
                                             />
                                             <path
                                               d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
@@ -3293,7 +3315,7 @@ const ManagerFileDetail = () => {
                                             <path
                                               d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
                                               fill="black"
-                                              fill-opacity="0.5"
+                                              fillOpacity="0.5"
                                             />
                                           </svg>
                                         )}
@@ -3309,7 +3331,7 @@ const ManagerFileDetail = () => {
                                             <path
                                               d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
                                               fill="black"
-                                              fill-opacity="0.5"
+                                              fillOpacity="0.5"
                                             />
                                             <path
                                               d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
@@ -3372,7 +3394,7 @@ const ManagerFileDetail = () => {
                                             <path
                                               d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
                                               fill="black"
-                                              fill-opacity="0.5"
+                                              fillOpacity="0.5"
                                             />
                                           </svg>
                                         )}
@@ -3388,7 +3410,7 @@ const ManagerFileDetail = () => {
                                             <path
                                               d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
                                               fill="black"
-                                              fill-opacity="0.5"
+                                              fillOpacity="0.5"
                                             />
                                             <path
                                               d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
@@ -3446,7 +3468,7 @@ const ManagerFileDetail = () => {
                                           <path
                                             d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
                                             fill="black"
-                                            fill-opacity="0.5"
+                                            fillOpacity="0.5"
                                           />
                                         </svg>
                                       )}
@@ -3462,7 +3484,7 @@ const ManagerFileDetail = () => {
                                           <path
                                             d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
                                             fill="black"
-                                            fill-opacity="0.5"
+                                            fillOpacity="0.5"
                                           />
                                           <path
                                             d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
@@ -3559,12 +3581,12 @@ const ManagerFileDetail = () => {
                                 )}
                                 {selectedSpeakerColumns.includes("Actions") && (
                                   <td>
-                                    <div class="action-btn">
+                                    <div className="action-btn">
                                       <Link
                                         onClick={() => {
                                           handleViewShowPaperDoc(data.id);
                                         }}
-                                        class="view"
+                                        className="view"
                                         data-discover="true"
                                       >
                                         <svg
@@ -3581,7 +3603,7 @@ const ManagerFileDetail = () => {
                                         </svg>
                                       </Link>
                                       <Link
-                                        class="addnote"
+                                        className="addnote"
                                         href="/user-management"
                                         data-discover="true"
                                         onClick={() =>
@@ -3637,7 +3659,7 @@ const ManagerFileDetail = () => {
                                         </svg>
                                       </Link>
                                       <Link
-                                        class="download"
+                                        className="download"
                                         href="/user-management"
                                         data-discover="true"
                                         onClick={(e) => {
@@ -3655,21 +3677,21 @@ const ManagerFileDetail = () => {
                                           xmlns="http://www.w3.org/2000/svg"
                                         >
                                           <path
-                                            fill-rule="evenodd"
-                                            clip-rule="evenodd"
+                                            fillRule="evenodd"
+                                            clipRule="evenodd"
                                             d="M23 22C23 22.5523 22.5523 23 22 23H2C1.44772 23 1 22.5523 1 22C1 21.4477 1.44772 21 2 21H22C22.5523 21 23 21.4477 23 22Z"
                                             fill="#e84455"
                                           />
                                           <path
-                                            fill-rule="evenodd"
-                                            clip-rule="evenodd"
+                                            fillRule="evenodd"
+                                            clipRule="evenodd"
                                             d="M13.3099 18.6881C12.5581 19.3396 11.4419 19.3396 10.6901 18.6881L5.87088 14.5114C4.47179 13.2988 5.32933 11 7.18074 11L9.00001 11V3C9.00001 1.89543 9.89544 1 11 1L13 1C14.1046 1 15 1.89543 15 3L15 11H16.8193C18.6707 11 19.5282 13.2988 18.1291 14.5114L13.3099 18.6881ZM11.3451 16.6091C11.7209 16.9348 12.2791 16.9348 12.6549 16.6091L16.8193 13H14.5C13.6716 13 13 12.3284 13 11.5V3L11 3V11.5C11 12.3284 10.3284 13 9.50001 13L7.18074 13L11.3451 16.6091Z"
                                             fill="#e84455"
                                           />
                                         </svg>
                                       </Link>
                                       <Link
-                                        class="doc"
+                                        className="doc"
                                         href="/user-management"
                                         data-discover="true"
                                         onClick={() => {
@@ -3691,7 +3713,7 @@ const ManagerFileDetail = () => {
                                         </svg>
                                       </Link>
                                       <Link
-                                        class="delete"
+                                        className="delete"
                                         href="/user-management"
                                         data-discover="true"
                                         onClick={() => {
@@ -3896,7 +3918,7 @@ const ManagerFileDetail = () => {
                                         <path
                                           d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
                                           fill="black"
-                                          fill-opacity="0.5"
+                                          fillOpacity="0.5"
                                         />
                                       </svg>
                                     )}
@@ -3912,7 +3934,7 @@ const ManagerFileDetail = () => {
                                         <path
                                           d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
                                           fill="black"
-                                          fill-opacity="0.5"
+                                          fillOpacity="0.5"
                                         />
                                         <path
                                           d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
@@ -3949,7 +3971,7 @@ const ManagerFileDetail = () => {
                                         <path
                                           d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
                                           fill="black"
-                                          fill-opacity="0.5"
+                                          fillOpacity="0.5"
                                         />
                                       </svg>
                                     )}
@@ -3965,7 +3987,7 @@ const ManagerFileDetail = () => {
                                         <path
                                           d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
                                           fill="black"
-                                          fill-opacity="0.5"
+                                          fillOpacity="0.5"
                                         />
                                         <path
                                           d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
@@ -4483,7 +4505,7 @@ const ManagerFileDetail = () => {
                               </Table>
                             </div>
                             {speakerDocumentTypeList?.length > 0 && (
-                              <div class="">
+                              <div className="">
                                 <Button onClick={() => DocumentTypeUpdate()}>
                                   Valider
                                 </Button>
@@ -4498,11 +4520,11 @@ const ManagerFileDetail = () => {
               </div>
             ) : (
               <div className="table-wrapper mt-0 p-0">
-                <div class="d-md-flex align-items-center gap-2 justify-content-between">
-                  <h2 class="m-md-0 mb-3">
+                <div className="d-md-flex align-items-center gap-2 justify-content-between">
+                  <h2 className="m-md-0 mb-3">
                     {/* Intervenants ({totalSpeaker}) */}
                   </h2>
-                  <div class="d-flex">
+                  <div className="d-flex">
                     <Button
                       className="d-flex align-items-center gap-3 add-speaker-btn"
                       variant="primary"
@@ -4713,7 +4735,7 @@ const ManagerFileDetail = () => {
                                       <path
                                         d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
                                         fill="black"
-                                        fill-opacity="0.5"
+                                        fillOpacity="0.5"
                                       />
                                     </svg>
                                   )}
@@ -4729,7 +4751,7 @@ const ManagerFileDetail = () => {
                                       <path
                                         d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
                                         fill="black"
-                                        fill-opacity="0.5"
+                                        fillOpacity="0.5"
                                       />
                                       <path
                                         d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
@@ -4766,7 +4788,7 @@ const ManagerFileDetail = () => {
                                       <path
                                         d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
                                         fill="black"
-                                        fill-opacity="0.5"
+                                        fillOpacity="0.5"
                                       />
                                     </svg>
                                   )}
@@ -4782,7 +4804,7 @@ const ManagerFileDetail = () => {
                                       <path
                                         d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
                                         fill="black"
-                                        fill-opacity="0.5"
+                                        fillOpacity="0.5"
                                       />
                                       <path
                                         d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
@@ -4819,7 +4841,7 @@ const ManagerFileDetail = () => {
                                       <path
                                         d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
                                         fill="black"
-                                        fill-opacity="0.5"
+                                        fillOpacity="0.5"
                                       />
                                     </svg>
                                   )}
@@ -4835,7 +4857,7 @@ const ManagerFileDetail = () => {
                                       <path
                                         d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
                                         fill="black"
-                                        fill-opacity="0.5"
+                                        fillOpacity="0.5"
                                       />
                                       <path
                                         d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
@@ -4873,7 +4895,7 @@ const ManagerFileDetail = () => {
                                       <path
                                         d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
                                         fill="black"
-                                        fill-opacity="0.5"
+                                        fillOpacity="0.5"
                                       />
                                     </svg>
                                   )}
@@ -4889,7 +4911,7 @@ const ManagerFileDetail = () => {
                                       <path
                                         d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
                                         fill="black"
-                                        fill-opacity="0.5"
+                                        fillOpacity="0.5"
                                       />
                                       <path
                                         d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
@@ -4926,7 +4948,7 @@ const ManagerFileDetail = () => {
                                       <path
                                         d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
                                         fill="black"
-                                        fill-opacity="0.5"
+                                        fillOpacity="0.5"
                                       />
                                     </svg>
                                   )}
@@ -4942,7 +4964,7 @@ const ManagerFileDetail = () => {
                                       <path
                                         d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
                                         fill="black"
-                                        fill-opacity="0.5"
+                                        fillOpacity="0.5"
                                       />
                                       <path
                                         d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
@@ -4975,7 +4997,7 @@ const ManagerFileDetail = () => {
 
                               <td>{data.missing_document_count}</td>
                               <td>
-                                <div class="action-btn">
+                                <div className="action-btn">
                                   <Link
                                     onClick={(e) => {
                                       e.stopPropagation();
@@ -4986,7 +5008,7 @@ const ManagerFileDetail = () => {
                                       setTotalSpeakerDocument(data.user_document_count);
                                       setTotalMissingDocument(data.missing_document_count);
                                     }}
-                                    class="view"
+                                    className="view"
                                     href="/user-management"
                                     data-discover="true"
                                   >
@@ -5004,7 +5026,7 @@ const ManagerFileDetail = () => {
                                     </svg>
                                   </Link>
                                   <Link
-                                    class="delete"
+                                    className="delete"
                                     href="/user-management"
                                     data-discover="true"
                                     onClick={() => {
@@ -5234,7 +5256,7 @@ const ManagerFileDetail = () => {
                           </td>
                           <td>
                             <Link
-                              class="download"
+                              className="download"
                               href="/user-management"
                               data-discover="true"
                               onClick={(e) => {
@@ -5251,14 +5273,14 @@ const ManagerFileDetail = () => {
                                 xmlns="http://www.w3.org/2000/svg"
                               >
                                 <path
-                                  fill-rule="evenodd"
-                                  clip-rule="evenodd"
+                                  fillRule="evenodd"
+                                  clipRule="evenodd"
                                   d="M23 22C23 22.5523 22.5523 23 22 23H2C1.44772 23 1 22.5523 1 22C1 21.4477 1.44772 21 2 21H22C22.5523 21 23 21.4477 23 22Z"
                                   fill="#e84455"
                                 />
                                 <path
-                                  fill-rule="evenodd"
-                                  clip-rule="evenodd"
+                                  fillRule="evenodd"
+                                  clipRule="evenodd"
                                   d="M13.3099 18.6881C12.5581 19.3396 11.4419 19.3396 10.6901 18.6881L5.87088 14.5114C4.47179 13.2988 5.32933 11 7.18074 11L9.00001 11V3C9.00001 1.89543 9.89544 1 11 1L13 1C14.1046 1 15 1.89543 15 3L15 11H16.8193C18.6707 11 19.5282 13.2988 18.1291 14.5114L13.3099 18.6881ZM11.3451 16.6091C11.7209 16.9348 12.2791 16.9348 12.6549 16.6091L16.8193 13H14.5C13.6716 13 13 12.3284 13 11.5V3L11 3V11.5C11 12.3284 10.3284 13 9.50001 13L7.18074 13L11.3451 16.6091Z"
                                   fill="#e84455"
                                 />
@@ -5549,7 +5571,7 @@ const ManagerFileDetail = () => {
                     className="scroll-container mt-3"
                     onScroll={handleScrollNote}
                     style={{
-                      maxHeight: "calc(100vh - 250px)",
+                      maxHeight: "calc(100vh - 300px)",
                       overflowY: "auto",
                       paddingRight: "5px",
                       scrollbarWidth: "thin",

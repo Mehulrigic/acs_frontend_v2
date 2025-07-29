@@ -245,13 +245,13 @@ const ManagerFile = () => {
                             {sort.value === "asc" &&
                               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z" fill="black" />
-                                <path d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z" fill="black" fill-opacity="0.5" />
+                                <path d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z" fill="black" fillOpacity="0.5" />
                               </svg>
                             }
 
                             {sort.value === "desc" &&
                               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z" fill="black" fill-opacity="0.5" />
+                                <path d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z" fill="black" fillOpacity="0.5" />
                                 <path d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z" fill="black" />
                               </svg>
                             }
@@ -270,13 +270,13 @@ const ManagerFile = () => {
                             {sort.value === "asc" &&
                               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z" fill="black" />
-                                <path d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z" fill="black" fill-opacity="0.5" />
+                                <path d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z" fill="black" fillOpacity="0.5" />
                               </svg>
                             }
 
                             {sort.value === "desc" &&
                               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z" fill="black" fill-opacity="0.5" />
+                                <path d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z" fill="black" fillOpacity="0.5" />
                                 <path d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z" fill="black" />
                               </svg>
                             }
@@ -295,13 +295,13 @@ const ManagerFile = () => {
                             {sort.value === "asc" &&
                               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z" fill="black" />
-                                <path d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z" fill="black" fill-opacity="0.5" />
+                                <path d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z" fill="black" fillOpacity="0.5" />
                               </svg>
                             }
 
                             {sort.value === "desc" &&
                               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z" fill="black" fill-opacity="0.5" />
+                                <path d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z" fill="black" fillOpacity="0.5" />
                                 <path d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z" fill="black" />
                               </svg>
                             }
@@ -320,13 +320,13 @@ const ManagerFile = () => {
                             {sort.value === "asc" &&
                               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z" fill="black" />
-                                <path d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z" fill="black" fill-opacity="0.5" />
+                                <path d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z" fill="black" fillOpacity="0.5" />
                               </svg>
                             }
 
                             {sort.value === "desc" &&
                               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z" fill="black" fill-opacity="0.5" />
+                                <path d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z" fill="black" fillOpacity="0.5" />
                                 <path d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z" fill="black" />
                               </svg>
                             }
@@ -345,13 +345,13 @@ const ManagerFile = () => {
                             {sort.value === "asc" &&
                               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z" fill="black" />
-                                <path d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z" fill="black" fill-opacity="0.5" />
+                                <path d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z" fill="black" fillOpacity="0.5" />
                               </svg>
                             }
 
                             {sort.value === "desc" &&
                               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z" fill="black" fill-opacity="0.5" />
+                                <path d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z" fill="black" fillOpacity="0.5" />
                                 <path d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z" fill="black" />
                               </svg>
                             }
@@ -370,13 +370,13 @@ const ManagerFile = () => {
                             {sort.value === "asc" &&
                               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z" fill="black" />
-                                <path d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z" fill="black" fill-opacity="0.5" />
+                                <path d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z" fill="black" fillOpacity="0.5" />
                               </svg>
                             }
 
                             {sort.value === "desc" &&
                               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z" fill="black" fill-opacity="0.5" />
+                                <path d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z" fill="black" fillOpacity="0.5" />
                                 <path d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z" fill="black" />
                               </svg>
                             }
@@ -395,13 +395,13 @@ const ManagerFile = () => {
                             {sort.value === "asc" &&
                               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z" fill="black" />
-                                <path d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z" fill="black" fill-opacity="0.5" />
+                                <path d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z" fill="black" fillOpacity="0.5" />
                               </svg>
                             }
 
                             {sort.value === "desc" &&
                               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z" fill="black" fill-opacity="0.5" />
+                                <path d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z" fill="black" fillOpacity="0.5" />
                                 <path d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z" fill="black" />
                               </svg>
                             }
@@ -420,13 +420,13 @@ const ManagerFile = () => {
                             {sort.value === "asc" &&
                               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z" fill="black" />
-                                <path d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z" fill="black" fill-opacity="0.5" />
+                                <path d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z" fill="black" fillOpacity="0.5" />
                               </svg>
                             }
 
                             {sort.value === "desc" &&
                               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z" fill="black" fill-opacity="0.5" />
+                                <path d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z" fill="black" fillOpacity="0.5" />
                                 <path d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z" fill="black" />
                               </svg>
                             }
@@ -445,13 +445,13 @@ const ManagerFile = () => {
                             {sort.value === "asc" &&
                               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z" fill="black" />
-                                <path d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z" fill="black" fill-opacity="0.5" />
+                                <path d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z" fill="black" fillOpacity="0.5" />
                               </svg>
                             }
 
                             {sort.value === "desc" &&
                               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z" fill="black" fill-opacity="0.5" />
+                                <path d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z" fill="black" fillOpacity="0.5" />
                                 <path d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z" fill="black" />
                               </svg>
                             }
@@ -470,13 +470,13 @@ const ManagerFile = () => {
                             {sort.value === "asc" &&
                               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z" fill="black" />
-                                <path d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z" fill="black" fill-opacity="0.5" />
+                                <path d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z" fill="black" fillOpacity="0.5" />
                               </svg>
                             }
 
                             {sort.value === "desc" &&
                               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z" fill="black" fill-opacity="0.5" />
+                                <path d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z" fill="black" fillOpacity="0.5" />
                                 <path d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z" fill="black" />
                               </svg>
                             }
@@ -512,13 +512,13 @@ const ManagerFile = () => {
                               {sort.value === "asc" &&
                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                   <path d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z" fill="black" />
-                                  <path d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z" fill="black" fill-opacity="0.5" />
+                                  <path d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z" fill="black" fillOpacity="0.5" />
                                 </svg>
                               }
 
                               {sort.value === "desc" &&
                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                  <path d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z" fill="black" fill-opacity="0.5" />
+                                  <path d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z" fill="black" fillOpacity="0.5" />
                                   <path d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z" fill="black" />
                                 </svg>
                               }
@@ -545,13 +545,13 @@ const ManagerFile = () => {
                               {sort.value === "asc" &&
                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                   <path d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z" fill="black" />
-                                  <path d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z" fill="black" fill-opacity="0.5" />
+                                  <path d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z" fill="black" fillOpacity="0.5" />
                                 </svg>
                               }
 
                               {sort.value === "desc" &&
                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                  <path d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z" fill="black" fill-opacity="0.5" />
+                                  <path d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z" fill="black" fillOpacity="0.5" />
                                   <path d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z" fill="black" />
                                 </svg>
                               }
