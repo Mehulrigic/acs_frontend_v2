@@ -7,11 +7,11 @@ import { useState } from "react";
 import Tabs from "react-bootstrap/Tabs";
 import Tab from "react-bootstrap/Tab";
 import { Button, Form, Offcanvas } from "react-bootstrap";
-import logo from "../../ass-logo.png"
+import logo from "../../ass-logo.png";
 import { useTranslation } from "react-i18next";
 import AddFolderPanelService from "../../API/AddFolderPanel/AddFolderPanelService";
 import FilePageService from "../../API/FilePage/FilePageService";
-import Modal from 'react-bootstrap/Modal';
+import Modal from "react-bootstrap/Modal";
 import Paginations from "../../Components/Paginations/Paginations";
 import Loading from "../../Common/Loading";
 import AcsManagerFileService from "../../API/AcsManager/AcsManagerFileService";
@@ -19,8 +19,35 @@ import AddNote from "../../Components/AddNote/AddNote";
 import Select from "react-select";
 import MissingDocument from "../../Components/MissingDocument/MissingDocument";
 import { BsPatchExclamation } from "react-icons/bs";
-
+import DatePicker from "react-datepicker";
 const BrokerFileDetail = () => {
+  const [showSepeakerInner, setShowSpeakerInner] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+
+  const toggleDetail = (e) => {
+    e.preventDefault(); // prevent page reload if using <a>
+    setIsVisible(!isVisible);
+  };
+  const [selectedType, setSelectedType] = useState("");
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedUser, setSelectedUser] = useState("");
+  const [showReader, setShowReader] = useState(false);
+
+  const toggleReader = () => {
+    setShowReader((prev) => {
+      const newState = !prev;
+
+      // Toggle class on body
+      if (newState) {
+        document.body.classList.add("show-reader");
+      } else {
+        document.body.classList.remove("show-reader");
+      }
+
+      return newState;
+    });
+  };
+
   const { t } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
@@ -28,7 +55,7 @@ const BrokerFileDetail = () => {
 
   const [isLoading, setIsLoading] = useState(false);
   const [isNoteLoading, setIsNoteLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState('otherdocument');
+  const [activeTab, setActiveTab] = useState("dashboard");
   const [activeSubTab, setActiveSubTab] = useState("speaker");
   const [history, setHistory] = useState([]);
   const [documentTypeList, setDocumentTypeList] = useState([]);
@@ -48,7 +75,10 @@ const BrokerFileDetail = () => {
   const [invalidRecordsToShowNOte, setInvalidRecordsToShowNote] = useState(3);
   const [showOtherDocument, setShowOtherDocument] = useState([]);
   const [flashMessage, setFlashMessage] = useState({ type: "", message: "" });
-  const [flashMessageStoreDoc, setFlashMessageStoreDoc] = useState({ type: "", message: "" });
+  const [flashMessageStoreDoc, setFlashMessageStoreDoc] = useState({
+    type: "",
+    message: "",
+  });
   // const [showUserDocumentDataId, setShowUserDocumentDataId] = useState("");
   const [fileList, setFileList] = useState([]);
   const [showDocumentId, setShowDocumentId] = useState("");
@@ -77,11 +107,11 @@ const BrokerFileDetail = () => {
 
   const [speakerModalColumns, setSpeakerModalColumns] = useState({
     "N° de SIRET": true,
-    "Intervenant": true,
+    Intervenant: true,
     "Dernière MaJ": true,
     "Doc. associés": true,
     "Doc. Manquants": true,
-    "Actions": true
+    Actions: true,
   });
 
   const [selectedSpeakerColumns, setSelectedSpeakerColumns] = useState(
@@ -93,7 +123,7 @@ const BrokerFileDetail = () => {
     speakerLabel: true,
     "Type de document": true,
     status: true,
-    Actions: true
+    Actions: true,
   });
 
   const [selectedOtherDocColumns, setSelectedOtherDocColumns] = useState(
@@ -119,7 +149,7 @@ const BrokerFileDetail = () => {
   const [showAddOtherCol, setShowAddOtherCol] = useState(false);
   const handleAddOtherColClose = () => setShowAddOtherCol(false);
   const handleAddOtherColShow = () => setShowAddOtherCol(true);
-  
+
   const [documentUploading, setDocumentUploading] = useState(false);
   const [showDoc, setShowDoc] = useState(false);
   const handleDocShow = () => setShowDoc(true);
@@ -127,7 +157,7 @@ const BrokerFileDetail = () => {
     setShowDoc(false);
     setDocumentUploading(false);
     setFileList([]);
-  }
+  };
 
   const [showMissingDoc, setShowMissingDoc] = useState(false);
   const handleMissingDocShow = () => setShowMissingDoc(true);
@@ -163,7 +193,13 @@ const BrokerFileDetail = () => {
     setActiveTab(activeTab);
     setShowViewSpeaker(false);
     if (activeTab === "otherdocument") {
-      ShowOtherDocument(id, sort, currentPage, editUserStatus, selectDocumentType);
+      ShowOtherDocument(
+        id,
+        sort,
+        currentPage,
+        editUserStatus,
+        selectDocumentType
+      );
       SpeakerDropDownList("", 1);
       DocumentTypeList();
     }
@@ -209,7 +245,9 @@ const BrokerFileDetail = () => {
     const token = localStorage.getItem("authToken");
     if (token && userRole.includes("Courtier")) {
       const logo_image = JSON.parse(localStorage.getItem("logo_image"));
-      const right_panel_color = JSON.parse(localStorage.getItem("right_panel_color"));
+      const right_panel_color = JSON.parse(
+        localStorage.getItem("right_panel_color")
+      );
       setRightPanelThemeColor(right_panel_color);
       setLogoImageShow(logo_image);
       ShowUserDocumentData(id);
@@ -221,7 +259,13 @@ const BrokerFileDetail = () => {
 
   useEffect(() => {
     if (activeTab === "otherdocument") {
-      ShowOtherDocument(id, sort, currentPage, editUserStatus, selectDocumentType);
+      ShowOtherDocument(
+        id,
+        sort,
+        currentPage,
+        editUserStatus,
+        selectDocumentType
+      );
       SpeakerDropDownList("", 1);
       DocumentTypeList();
     }
@@ -242,7 +286,15 @@ const BrokerFileDetail = () => {
         SpeakerDetail(showSpeakerId);
       }
       if (activeSubTab === "documents") {
-        ShowSpeakerDocument(id, sort, search, currentPage, editUserStatus, selectDocumentType, showSpeakerId);
+        ShowSpeakerDocument(
+          id,
+          sort,
+          search,
+          currentPage,
+          editUserStatus,
+          selectDocumentType,
+          showSpeakerId
+        );
       }
       if (activeSubTab === "documentType") {
         SpeakerDocumentTypeList(id, showSpeakerId);
@@ -269,14 +321,19 @@ const BrokerFileDetail = () => {
       if (response.data.status) {
         setIsLoading(false);
         setShowUserDocumentData(response.data.documents);
-        if (response.data.documents.status == "transfer_to_manager" || response.data.documents.status == "transfer_to_insurer") {
+        if (
+          response.data.documents.status == "transfer_to_manager" ||
+          response.data.documents.status == "transfer_to_insurer"
+        ) {
           setSendToFileStatus(response.data.documents.status);
         } else {
           setSendToFileStatus("");
         }
         setShowUserFolderName(response.data.documents.folder_name);
         setTotalMissingRecords(response.data.documents.total_missing_doc);
-        setTotalRecordOther(response.data.documents.user_document_files?.length);
+        setTotalRecordOther(
+          response.data.documents.user_document_files?.length
+        );
         setTotalSpeaker(response.data.documents.total_speakers);
       }
     } catch (error) {
@@ -291,12 +348,12 @@ const BrokerFileDetail = () => {
       var userData = {
         sort: {
           key: sort.key,
-          value: sort.value
+          value: sort.value,
         },
         page,
         status: status,
-        type: type
-      }
+        type: type,
+      };
       const response = await FilePageService.show_other_document(id, userData);
       if (response.data.status) {
         setIsLoading(false);
@@ -319,7 +376,9 @@ const BrokerFileDetail = () => {
         page,
       };
 
-      const response = await AcsManagerFileService.speaker_DropDown_List(userData);
+      const response = await AcsManagerFileService.speaker_DropDown_List(
+        userData
+      );
       if (response.data.status) {
         setIsLoading(false);
         setSpeakerDropDownList(response.data.speakers);
@@ -363,20 +422,28 @@ const BrokerFileDetail = () => {
     }
   };
 
-  const ShowSpeakerDocument = async (id, sort, search, page = 1, status, type, speaker) => {
+  const ShowSpeakerDocument = async (
+    id,
+    sort,
+    search,
+    page = 1,
+    status,
+    type,
+    speaker
+  ) => {
     setIsLoading(true);
     try {
       var userData = {
         search,
         sort: {
           key: sort.key,
-          value: sort.value
+          value: sort.value,
         },
         page,
         status: status,
         type: type,
-        speaker_id: speaker
-      }
+        speaker_id: speaker,
+      };
 
       const response = await FilePageService.speaker_document(id, userData);
 
@@ -394,7 +461,13 @@ const BrokerFileDetail = () => {
     }
   };
 
-  const GetHistoryListDocument = async (id, sort, search, page = 1, actionType) => {
+  const GetHistoryListDocument = async (
+    id,
+    sort,
+    search,
+    page = 1,
+    actionType
+  ) => {
     setIsLoading(true);
     try {
       var userData = {
@@ -454,9 +527,12 @@ const BrokerFileDetail = () => {
     try {
       var userData = {
         sort: sort,
-        page
-      }
-      const response = await FilePageService.missing_document_list(id, userData);
+        page,
+      };
+      const response = await FilePageService.missing_document_list(
+        id,
+        userData
+      );
       if (response.data.status) {
         setIsLoading(false);
         setMissingDocumentList(response.data.data.data);
@@ -503,8 +579,8 @@ const BrokerFileDetail = () => {
     try {
       var userDate = {
         user_document_id: folderId,
-        speaker_id: speakerId
-      }
+        speaker_id: speakerId,
+      };
       const response = await AcsManagerFileService.document_type(userDate);
       if (response.data.status) {
         setIsLoading(false);
@@ -555,7 +631,10 @@ const BrokerFileDetail = () => {
       if (response.data.status) {
         setDocumentTypeList(response.data.docTypeList);
       } else {
-        setFlashMessage({ type: "error", message: response.data.message || t("somethingWentWrong") });
+        setFlashMessage({
+          type: "error",
+          message: response.data.message || t("somethingWentWrong"),
+        });
       }
     } catch (error) {
       setFlashMessage({ type: "error", message: t("somethingWentWrong") });
@@ -570,7 +649,14 @@ const BrokerFileDetail = () => {
   const handleTableSpeakerChange = (e) => {
     const selectedValue = e.target.value;
     setSelectSpeakerId(selectedValue);
-    ShowOtherDocument(id, sort, currentPage, editUserStatus, selectDocumentType, selectedValue);
+    ShowOtherDocument(
+      id,
+      sort,
+      currentPage,
+      editUserStatus,
+      selectDocumentType,
+      selectedValue
+    );
   };
 
   const handleDocumentTypeChange = (e) => {
@@ -579,7 +665,13 @@ const BrokerFileDetail = () => {
       (doctype) => doctype.id == selectedValue
     );
     setSelectDocumentType(selectedDocument?.id || "");
-    ShowOtherDocument(id, sort, currentPage, editUserStatus, selectedDocument?.id);
+    ShowOtherDocument(
+      id,
+      sort,
+      currentPage,
+      editUserStatus,
+      selectedDocument?.id
+    );
   };
 
   const handleSelect = (key) => {
@@ -600,7 +692,7 @@ const BrokerFileDetail = () => {
         setActiveTab(previousTab);
         return newHistory;
       } else {
-        navigate('/courtier-files');
+        navigate("/courtier-files");
         return [];
       }
     });
@@ -624,7 +716,10 @@ const BrokerFileDetail = () => {
       fileList.forEach((file, index) => {
         formData.append(`documents[${index}][file]`, file);
         formData.append(`documents[${index}][filename]`, file.name);
-        formData.append(`documents[${index}][doc_type_id]`, filterDocTypeBroker?.id || "");
+        formData.append(
+          `documents[${index}][doc_type_id]`,
+          filterDocTypeBroker?.id || ""
+        );
       });
 
       const response = await FilePageService.add_document_files(id, formData);
@@ -638,7 +733,13 @@ const BrokerFileDetail = () => {
         });
 
         if (activeTab === "otherdocument") {
-          ShowOtherDocument(id, sort, currentPage, editUserStatus, selectDocumentType);
+          ShowOtherDocument(
+            id,
+            sort,
+            currentPage,
+            editUserStatus,
+            selectDocumentType
+          );
           SpeakerDropDownList("", 1);
           DocumentTypeList();
         }
@@ -673,7 +774,10 @@ const BrokerFileDetail = () => {
       formData.append("filename", fileList[0].name); // plain text name
       formData.append("file", fileList[0]); // actual binary file
 
-      const response = await FilePageService.update_document_files(showDocumentId, formData);
+      const response = await FilePageService.update_document_files(
+        showDocumentId,
+        formData
+      );
 
       if (response.data.status) {
         setDocumentUploading(false);
@@ -686,7 +790,13 @@ const BrokerFileDetail = () => {
         });
 
         if (activeTab === "otherdocument") {
-          ShowOtherDocument(id, sort, currentPage, editUserStatus, selectDocumentType);
+          ShowOtherDocument(
+            id,
+            sort,
+            currentPage,
+            editUserStatus,
+            selectDocumentType
+          );
           SpeakerDropDownList("", 1);
           DocumentTypeList();
         }
@@ -705,7 +815,6 @@ const BrokerFileDetail = () => {
       });
     }
   };
-
 
   // const AddMissingDocument = async (e) => {
   //   e.preventDefault();
@@ -755,7 +864,6 @@ const BrokerFileDetail = () => {
   //   }
   // };
 
-
   const AddMissingDocument = async (e) => {
     e.preventDefault();
     setDocumentUploading(true);
@@ -772,9 +880,13 @@ const BrokerFileDetail = () => {
         });
       }
 
-      const response = await FilePageService.add_missing_document(id, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      const response = await FilePageService.add_missing_document(
+        id,
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
 
       if (response.data.status) {
         setDocumentUploading(false);
@@ -816,13 +928,23 @@ const BrokerFileDetail = () => {
   const HandleDeleteDocumentFile = async (e) => {
     e.preventDefault();
     try {
-      const response = await FilePageService.delete_document_file(showDocumentId);
+      const response = await FilePageService.delete_document_file(
+        showDocumentId
+      );
       if (response.data.status) {
         handleCloseDeleteModal();
         ShowUserDocumentData(id);
         if (activeTab === "speakerdocument") {
           if (activeSubTab === "documents") {
-            ShowSpeakerDocument(id, sort, search, 1, editUserStatus, selectDocumentType, showSpeakerId);
+            ShowSpeakerDocument(
+              id,
+              sort,
+              search,
+              1,
+              editUserStatus,
+              selectDocumentType,
+              showSpeakerId
+            );
           }
         }
         if (activeTab === "otherdocument") {
@@ -838,7 +960,10 @@ const BrokerFileDetail = () => {
 
   const HandleDeleteSpeaker = async () => {
     try {
-      const response = await AcsManagerFileService.delete_speaker(id, showSpeakerId);
+      const response = await AcsManagerFileService.delete_speaker(
+        id,
+        showSpeakerId
+      );
       if (response.data.status) {
         handleCloseDeleteSpeakerModal();
         setActiveTab(activeTab);
@@ -923,7 +1048,6 @@ const BrokerFileDetail = () => {
     event.target.value = ""; // Reset the file input
   };
 
-
   const handlePageChange = (page) => {
     setCurrentPage(page);
     if (activeTab === "speakerdocument") {
@@ -945,7 +1069,15 @@ const BrokerFileDetail = () => {
   const handlePageChangeView = (page) => {
     setCurrentPage(page);
     if (activeSubTab === "documents") {
-      ShowSpeakerDocument(id, sort, search, page, editUserStatus, selectDocumentType, showSpeakerId);
+      ShowSpeakerDocument(
+        id,
+        sort,
+        search,
+        page,
+        editUserStatus,
+        selectDocumentType,
+        showSpeakerId
+      );
     }
   };
 
@@ -959,21 +1091,31 @@ const BrokerFileDetail = () => {
   const handleScrollNote = (e) => {
     const { scrollTop, scrollHeight, clientHeight } = e.target;
     if (scrollTop + clientHeight >= scrollHeight - 50) {
-      setRecordsToShowNote((prev) => Math.min(prev + 3, invalidReasonNoteList.length));
+      setRecordsToShowNote((prev) =>
+        Math.min(prev + 3, invalidReasonNoteList.length)
+      );
     }
   };
 
   const handleScrollInvalidReason = (e) => {
     const { scrollTop, scrollHeight, clientHeight } = e.target;
     if (scrollTop + clientHeight >= scrollHeight - 5) {
-      setInvalidRecordsToShowNote((prev) => Math.min(prev + 3, invalidReasonList.length));
+      setInvalidRecordsToShowNote((prev) =>
+        Math.min(prev + 3, invalidReasonList.length)
+      );
     }
   };
 
   // const displayedRecords = historyDocumentList.slice(0, recordsToShow);
-  const displayedRecordsNote = invalidReasonNoteList.slice(0, recordsToShowNote);
-  
-  const displayedInvalidResonList = invalidReasonList.slice(0, invalidRecordsToShowNOte);
+  const displayedRecordsNote = invalidReasonNoteList.slice(
+    0,
+    recordsToShowNote
+  );
+
+  const displayedInvalidResonList = invalidReasonList.slice(
+    0,
+    invalidRecordsToShowNOte
+  );
 
   const handleSpeakerCheckboxChange = (key) => {
     setSpeakerModalColumns((prev) => ({ ...prev, [key]: !prev[key] }));
@@ -1000,7 +1142,8 @@ const BrokerFileDetail = () => {
   };
 
   const handleClickRotate = (column) => {
-    const direction = sort.key === column ? sort.value === "desc" ? "asc" : "desc" : "asc";
+    const direction =
+      sort.key === column ? (sort.value === "desc" ? "asc" : "desc") : "asc";
     setSort({ key: column, value: direction });
     setIsRotated(!isRotated); // Toggle the class on click
   };
@@ -1044,19 +1187,19 @@ const BrokerFileDetail = () => {
   const HandleDownloadFile = (data) => {
     const filePath = data.filepath;
     const fileName = data.filename;
-    const fileExtension = fileName.split('.').pop().toLowerCase();
+    const fileExtension = fileName.split(".").pop().toLowerCase();
 
-    if (fileExtension === 'pdf') {
-      const fileUrl = `${process.env.REACT_APP_API}/file/${showUserFolderName}/${fileName}`
+    if (fileExtension === "pdf") {
+      const fileUrl = `${process.env.REACT_APP_API}/file/${showUserFolderName}/${fileName}`;
       // Fetch the PDF file as a Blob
       fetch(fileUrl)
-        .then(response => response.blob()) // Convert the response to a Blob
-        .then(blob => {
+        .then((response) => response.blob()) // Convert the response to a Blob
+        .then((blob) => {
           // Create a URL for the Blob
           const blobUrl = URL.createObjectURL(blob);
 
           // Create a temporary link to download the Blob
-          const tempLink = document.createElement('a');
+          const tempLink = document.createElement("a");
           tempLink.href = blobUrl;
           tempLink.download = fileName;
 
@@ -1068,11 +1211,11 @@ const BrokerFileDetail = () => {
           document.body.removeChild(tempLink);
           URL.revokeObjectURL(blobUrl); // Release the object URL after the download
         })
-        .catch(error => {
-          console.error('Error downloading PDF:', error);
+        .catch((error) => {
+          console.error("Error downloading PDF:", error);
         });
     } else {
-      const tempLink = document.createElement('a');
+      const tempLink = document.createElement("a");
       tempLink.href = `${process.env.REACT_APP_IMAGE_URL}/${filePath}`;
       tempLink.download = fileName;
 
@@ -1103,8 +1246,11 @@ const BrokerFileDetail = () => {
     try {
       var userData = {
         status: sendToFileStatus,
-      }
-      const response = await FilePageService.update_document_status(id, userData);
+      };
+      const response = await FilePageService.update_document_status(
+        id,
+        userData
+      );
       if (response.data.status) {
         handleSendFileClose();
         ShowUserDocumentData(id);
@@ -1132,14 +1278,34 @@ const BrokerFileDetail = () => {
 
   return (
     <Fragment>
-      <style> {` button.btn.btn-primary  { background-color: ${localStorage.getItem('button_color') ? JSON.parse(localStorage.getItem('button_color')) : "#e84455"} !Important};`} </style>
-      
+      <style>
+        {" "}
+        {` button.btn.btn-primary  { background-color: ${
+          localStorage.getItem("button_color")
+            ? JSON.parse(localStorage.getItem("button_color"))
+            : "#e84455"
+        } !Important};`}{" "}
+      </style>
+
       <div className="broker-side-pannel">
         <SidePanel
-          sidebarLogo={(logoImageShow == "" || logoImageShow == null || logoImageShow == undefined) ? logo : `${process.env.REACT_APP_IMAGE_URL}/${logoImageShow}`}
+          sidebarLogo={
+            logoImageShow == "" ||
+            logoImageShow == null ||
+            logoImageShow == undefined
+              ? logo
+              : `${process.env.REACT_APP_IMAGE_URL}/${logoImageShow}`
+          }
         />
       </div>
-      <div className="dashboard-main-content broker-dashboard" style={{ backgroundColor: rightPanelThemeColor ? rightPanelThemeColor : "#feeaf5" }}>
+      <div
+        className="dashboard-main-content broker-dashboard"
+        style={{
+          backgroundColor: rightPanelThemeColor
+            ? rightPanelThemeColor
+            : "#feeaf5",
+        }}
+      >
         <div className="top-header mb-32">
           <div className="d-flex align-items-center">
             <Link onClick={handleBack} disabled={history.length === 0}>
@@ -1166,28 +1332,11 @@ const BrokerFileDetail = () => {
             <h1 className="m-0 mb-md-0 mb-3">
               Dossier {showUserDocumentData?.folder_name}
             </h1>
-            <div className="d-flex align-items-center check-status">
-              <div className="d-flex align-items-center check-status" style={{ paddingRight: "10px" }}>
-                <p className="m-0">Etat du chantier : </p>
-                <div className="status">{showUserDocumentData?.site_status === "on_site" ? "En cours de chantier" : "Fin de chantier"}</div>
-              </div>
-              <p className="m-0">Statut : </p>
-              <div className="status">
-                {
-                  showUserDocumentData?.status === "to_be_checked" ? t("toBeCheckedLabel") :
-                  showUserDocumentData?.status === "validated" ? t("validatedLabel") :
-                  showUserDocumentData?.status === "transfer_to_insurer" ? "Transfert à l'assureur" :
-                  showUserDocumentData?.status === "transfer_to_broker" ? "Transfert au Courtier" :
-                  showUserDocumentData?.status === "transfer_to_manager" ? "Transfert au Gestionnaire" :
-                  showUserDocumentData?.status === "to_be_decided" ? "A statuer" :
-                  showUserDocumentData?.status === "formal_notice" ? "Mise en demeure" : t("invalidLabel")
-                }
-              </div>
-            </div>
           </div>
 
-          <div className="detail-header">
-            <div className="d-flex gap-2">
+          <div className="detail-header new-update-header">
+            <div className="d-flex justify-content-between w-100 align-items-center flex-1366-column">
+            <div className="d-flex gap-2 sm-fix">
               <svg
                 width="20"
                 height="20"
@@ -1202,8 +1351,16 @@ const BrokerFileDetail = () => {
               </svg>
               <span>Dossier à vérifier</span>
             </div>
-            <div className="d-sm-flex align-items-center gap-3">
-              <div style={{ marginRight: "20px" }}>
+            <div className="d-sm-flex align-items-center gap-3 flex-wrap ms-sm-auto text-center">
+              <div style={{ marginRight: "0" }} className="my-1 my-md-0">
+                <Link
+                  onClick={toggleDetail}
+                  className="fold-unfold-link link-wrap"
+                >
+                  {isVisible ? "Fold Detail" : "Unfold Detail"}
+                </Link>
+              </div>
+              <div className="my-1 my-md-0" style={{ marginRight: "20px" }}>
                 <MissingDocument
                   link={true}
                   sort={sort}
@@ -1214,7 +1371,7 @@ const BrokerFileDetail = () => {
                 />
               </div>
               {/* See the Reason */}
-              <div className="add-document mb-sm-0 mb-2 mt-sm-0 mt-2">
+              <div className="add-document my-1 my-md-0">
                 <Link className="link-wrap" onClick={handleNoteShow}>
                   Voir les raisons
                 </Link>
@@ -1227,22 +1384,29 @@ const BrokerFileDetail = () => {
                   <Offcanvas.Header closeButton>
                     <Offcanvas.Title>Dossier incomplet</Offcanvas.Title>
                   </Offcanvas.Header>
-                  <Offcanvas.Body style={{ overflow: "hidden", maxHeight: "80vh" }}>
+                  <Offcanvas.Body
+                    style={{ overflow: "hidden", maxHeight: "80vh" }}
+                  >
                     <div className="step-1">
                       <div className="div">
                         <div className="step-2">
                           <h2>Liste de notes</h2>
                           <Select
                             options={NotesOptions}
-                            onChange={(selectedOption) => GetDocumentFileNotesList(id, selectedOption?.value)}
+                            onChange={(selectedOption) =>
+                              GetDocumentFileNotesList(
+                                id,
+                                selectedOption?.value
+                              )
+                            }
                             styles={{
                               container: (provided) => ({
                                 ...provided,
-                                width: '50%',
+                                width: "50%",
                               }),
                               menu: (provided) => ({
                                 ...provided,
-                                width: '100%',
+                                width: "100%",
                               }),
                             }}
                             placeholder={"Sélectionnez le type de note"}
@@ -1250,36 +1414,48 @@ const BrokerFileDetail = () => {
                             className={isNoteLoading ? "mb-5" : ""}
                           />
 
-                          {isNoteLoading ? <Loading /> :
-                            displayedRecordsNote?.length > 0 ? (
-                              <div
-                                ref={scrollRef}
-                                className="scroll-container mt-3"
-                                onScroll={handleScrollNote}
-                                style={{
-                                  maxHeight: "calc(100vh - 250px)",
-                                  overflowY: "auto",
-                                  paddingRight: "5px",
-                                  scrollbarWidth: "thin"
-                                }}
-                              >
-                                {displayedRecordsNote?.map((data) => (
-                                  <Fragment key={data.id}>
-                                    <div className="note-box mb-3">
-                                      <div className="d-flex justify-content-between align-items-center top-part">
-                                        <p className="m-0">{data.type == "note" ? "Note" : "Invalide"}</p>
-                                        <div className="d-flex align-items-center gap-2">
-                                          {data.is_important == 1 && (
-                                            <BsPatchExclamation
-                                              style={{ color: "red", fontSize: "1.0rem", cursor: "pointer" }}
-                                              title="Remarque importante"
-                                            />
-                                          )}
-                                          <p className="m-0 create-date">créé le {data.created_on}</p>
-                                        </div>
+                          {isNoteLoading ? (
+                            <Loading />
+                          ) : displayedRecordsNote?.length > 0 ? (
+                            <div
+                              ref={scrollRef}
+                              className="scroll-container mt-3"
+                              onScroll={handleScrollNote}
+                              style={{
+                                maxHeight: "calc(100vh - 250px)",
+                                overflowY: "auto",
+                                paddingRight: "5px",
+                                scrollbarWidth: "thin",
+                              }}
+                            >
+                              {displayedRecordsNote?.map((data) => (
+                                <Fragment key={data.id}>
+                                  <div className="note-box mb-3">
+                                    <div className="d-flex justify-content-between align-items-center top-part">
+                                      <p className="m-0">
+                                        {data.type == "note"
+                                          ? "Note"
+                                          : "Invalide"}
+                                      </p>
+                                      <div className="d-flex align-items-center gap-2">
+                                        {data.is_important == 1 && (
+                                          <BsPatchExclamation
+                                            style={{
+                                              color: "red",
+                                              fontSize: "1.0rem",
+                                              cursor: "pointer",
+                                            }}
+                                            title="Remarque importante"
+                                          />
+                                        )}
+                                        <p className="m-0 create-date">
+                                          créé le {data.created_on}
+                                        </p>
                                       </div>
-                                      <div className="inner-box">
-                                        {data.type == "note" && data.user_document_filename &&
+                                    </div>
+                                    <div className="inner-box">
+                                      {data.type == "note" &&
+                                        data.user_document_filename && (
                                           <div className="d-flex align-items-center mb-3">
                                             <div className="icon d-flex">
                                               <svg
@@ -1295,58 +1471,132 @@ const BrokerFileDetail = () => {
                                                 ></path>
                                               </svg>
                                             </div>
-                                            <span className="file-names">{data.user_document_filename}</span>
+                                            <span className="file-names">
+                                              {data.user_document_filename}
+                                            </span>
                                           </div>
-                                        }
-
-                                        {data.added_by && (
-                                          <p
-                                            className="position-absolute"
-                                            style={{
-                                              bottom: '5px',
-                                              right: '10px',
-                                              fontSize: '0.875rem',
-                                              color: '#999',
-                                              margin: 0,
-                                            }}
-                                          >
-                                            — {`${data.added_by?.first_name ?? ''} ${data.added_by?.last_name ?? ''}`}
-                                          </p>
                                         )}
-                                        <p className="">
-                                          {data.reason}
+
+                                      {data.added_by && (
+                                        <p
+                                          className="position-absolute"
+                                          style={{
+                                            bottom: "5px",
+                                            right: "10px",
+                                            fontSize: "0.875rem",
+                                            color: "#999",
+                                            margin: 0,
+                                          }}
+                                        >
+                                          —{" "}
+                                          {`${
+                                            data.added_by?.first_name ?? ""
+                                          } ${data.added_by?.last_name ?? ""}`}
                                         </p>
-                                      </div>
+                                      )}
+                                      <p className="">{data.reason}</p>
                                     </div>
-                                  </Fragment>
-                                ))}
-                              </div>
-                            )
-                            :
-                            (
-                                <div className="mt-3">
-                                  {t("NorecordsfoundLabel")}
-                                </div>
-                            )
-                          }
+                                  </div>
+                                </Fragment>
+                              ))}
+                            </div>
+                          ) : (
+                            <div className="mt-3">
+                              {t("NorecordsfoundLabel")}
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>
-
                   </Offcanvas.Body>
                 </Offcanvas>
               </div>
 
-              <p className="m-0">Envoyer à : </p>
+              <p className="m-0 my-1 my-md-0">Envoyer à : </p>
               <div>
-                <Form.Select aria-label="Etat du chantier" style={{ minHeight: "45px", fontFamily: "Manrope" }} value={sendToFileStatus} onChange={(e) => handleSendFileShow(e.target.value)}>
-                  <option value="" disabled selected>Envoyer à</option>
-                  <option value="transfer_to_insurer">Transfert à l'assureur</option>
-                  <option value="transfer_to_manager">Transfert au Gestionnaire</option>
+                <Form.Select
+                  aria-label="Etat du chantier"
+                  style={{ minHeight: "45px", fontFamily: "Manrope" }}
+                  value={sendToFileStatus}
+                  onChange={(e) => handleSendFileShow(e.target.value)}
+                >
+                  <option value="" disabled selected>
+                    Envoyer à
+                  </option>
+                  <option value="transfer_to_insurer">
+                    Transfert à l'assureur
+                  </option>
+                  <option value="transfer_to_manager">
+                    Transfert au Gestionnaire
+                  </option>
                 </Form.Select>
               </div>
             </div>
+            </div>
+          <div
+            className={`second-header ${isVisible ? "show" : ""}`}
+          >
+            <div className="grid-view">
+            <div className="d-flex align-items-center check-status">
+                <p className="m-0">Etat du chantier : </p>
+                <div className="status">
+                  {showUserDocumentData?.site_status === "on_site"
+                    ? "En cours de chantier"
+                    : "Fin de chantier"}
+                </div>
+            </div>
+            <div className="d-flex align-items-center check-status">
+                              <p className="m-0">Statut : </p>
+                <div className="status">
+                {showUserDocumentData?.status === "to_be_checked"
+                  ? t("toBeCheckedLabel")
+                  : showUserDocumentData?.status === "validated"
+                  ? t("validatedLabel")
+                  : showUserDocumentData?.status === "transfer_to_insurer"
+                  ? "Transfert à l'assureur"
+                  : showUserDocumentData?.status === "transfer_to_broker"
+                  ? "Transfert au Courtier"
+                  : showUserDocumentData?.status === "transfer_to_manager"
+                  ? "Transfert au Gestionnaire"
+                  : showUserDocumentData?.status === "to_be_decided"
+                  ? "A statuer"
+                  : showUserDocumentData?.status === "formal_notice"
+                  ? "Mise en demeure"
+                  : t("invalidLabel")}
+                </div>
+            </div>
+            <div className="d-flex align-items-center check-status">
+              <p className="m-0">DOC : </p>
+              <div className="status">
+                15/07/2025
+              </div>
+              </div>
+
+              <div className="d-flex align-items-center check-status">
+
+              <p className="m-0">Date fin prévisionnelle : </p>
+              <div className="status">
+                27/07/2026
+              </div>
+              </div>
+
+              <div className="d-flex align-items-center check-status">
+              <p className="m-0">Coût prévisionnel : </p>
+              <div className="status">
+                10 450 000€
+              </div>
+              </div>
+
+              <div className="d-flex align-items-center check-status">
+              <p className="m-0">Nom du preneur assurance : </p>
+              <div className="status">
+                Taratata patata
+              </div>
+              </div>
+              </div>
           </div>
+          </div>
+
         </div>
         <Tabs
           activeKey={activeTab}
@@ -1354,8 +1604,414 @@ const BrokerFileDetail = () => {
           id="uncontrolled-tab-example"
           className=""
         >
-          {/* Other Document Tab */}
-          <Tab eventKey="otherdocument" title={`Documents (${totalRecordOther || 0})`}>
+          {/* Dashboard  Tab */}
+
+          <Tab className="dashboard-tab" eventKey="dashboard" title="Dashboard">
+            {isLoading && (
+              <div className="loading-overlay">
+                <Loading />
+              </div>
+            )}
+
+            <div className="row">
+              <div className="col-md-7">
+                <h2 className="mb-3">Detailed Information</h2>
+                <div className="custom-grid-card">
+                  <h3>Documents # of registered documents</h3>
+                  <div className="table-wrap mt-24">
+                    <Table responsive hover>
+                      <thead>
+                        <tr>
+                          <th>Name of document</th>
+                          <th>Number of document</th>
+                          <th>Status</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>
+                            <div className="d-flex align-items-center">
+                              <span className="file-type-icon">
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  width="24"
+                                  height="24"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                >
+                                  <path
+                                    d="M12.65 2.23994C12.4689 2.08503 12.2383 1.99992 12 1.99994H5C4.73478 1.99994 4.48043 2.1053 4.29289 2.29283C4.10536 2.48037 4 2.73472 4 2.99994V20.9999C4 21.2652 4.10536 21.5195 4.29289 21.7071C4.48043 21.8946 4.73478 21.9999 5 21.9999H19C19.2652 21.9999 19.5196 21.8946 19.7071 21.7071C19.8946 21.5195 20 21.2652 20 20.9999V8.99994C20 8.8555 19.9687 8.71277 19.9083 8.58157C19.8479 8.45038 19.7598 8.33383 19.65 8.23994L12.65 2.23994ZM13 5.16994L16.3 7.99994H13V5.16994ZM18 19.9999H6V3.99994H11V8.99994C11 9.26516 11.1054 9.51951 11.2929 9.70705C11.4804 9.89458 11.7348 9.99994 12 9.99994H18V19.9999Z"
+                                    fill="white"
+                                  />
+                                </svg>
+                              </span>
+                              <span className="text-elips">
+                                General documents
+                              </span>
+                            </div>
+                          </td>
+                          <td>2</td>
+                          <td>
+                            <span className="doc-status success"></span>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>
+                            {" "}
+                            <div className="d-flex align-items-center">
+                              <span className="file-type-icon">
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  width="24"
+                                  height="24"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                >
+                                  <path
+                                    d="M12.65 2.23994C12.4689 2.08503 12.2383 1.99992 12 1.99994H5C4.73478 1.99994 4.48043 2.1053 4.29289 2.29283C4.10536 2.48037 4 2.73472 4 2.99994V20.9999C4 21.2652 4.10536 21.5195 4.29289 21.7071C4.48043 21.8946 4.73478 21.9999 5 21.9999H19C19.2652 21.9999 19.5196 21.8946 19.7071 21.7071C19.8946 21.5195 20 21.2652 20 20.9999V8.99994C20 8.8555 19.9687 8.71277 19.9083 8.58157C19.8479 8.45038 19.7598 8.33383 19.65 8.23994L12.65 2.23994ZM13 5.16994L16.3 7.99994H13V5.16994ZM18 19.9999H6V3.99994H11V8.99994C11 9.26516 11.1054 9.51951 11.2929 9.70705C11.4804 9.89458 11.7348 9.99994 12 9.99994H18V19.9999Z"
+                                    fill="white"
+                                  />
+                                </svg>
+                              </span>
+                              <span className="text-elips">
+                                General documents
+                              </span>
+                            </div>
+                          </td>
+                          <td>2</td>
+                          <td>
+                            <span className="doc-status warning"></span>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>
+                            {" "}
+                            <div className="d-flex align-items-center">
+                              <span className="file-type-icon">
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  width="24"
+                                  height="24"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                >
+                                  <path
+                                    d="M12.65 2.23994C12.4689 2.08503 12.2383 1.99992 12 1.99994H5C4.73478 1.99994 4.48043 2.1053 4.29289 2.29283C4.10536 2.48037 4 2.73472 4 2.99994V20.9999C4 21.2652 4.10536 21.5195 4.29289 21.7071C4.48043 21.8946 4.73478 21.9999 5 21.9999H19C19.2652 21.9999 19.5196 21.8946 19.7071 21.7071C19.8946 21.5195 20 21.2652 20 20.9999V8.99994C20 8.8555 19.9687 8.71277 19.9083 8.58157C19.8479 8.45038 19.7598 8.33383 19.65 8.23994L12.65 2.23994ZM13 5.16994L16.3 7.99994H13V5.16994ZM18 19.9999H6V3.99994H11V8.99994C11 9.26516 11.1054 9.51951 11.2929 9.70705C11.4804 9.89458 11.7348 9.99994 12 9.99994H18V19.9999Z"
+                                    fill="white"
+                                  />
+                                </svg>
+                              </span>
+                              <span className="text-elips">Studies Report</span>
+                            </div>
+                          </td>
+                          <td>2</td>
+                          <td>
+                            <span className="doc-status danger"></span>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </Table>
+                  </div>
+                </div>
+
+                <div className="custom-grid-card mt-3">
+                  <h3>Intervenants # of registered Intervenants</h3>
+                  <div className="table-wrap mt-24">
+                    <Table responsive hover>
+                      <thead>
+                        <tr>
+                          <th>Name of Intervenants</th>
+                          <th>Number of Intervenants</th>
+                          <th>Status</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>
+                            <div className="d-flex align-items-center">
+                              <span className="file-type-icon">
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  width="24"
+                                  height="24"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                >
+                                  <path
+                                    d="M12.65 2.23994C12.4689 2.08503 12.2383 1.99992 12 1.99994H5C4.73478 1.99994 4.48043 2.1053 4.29289 2.29283C4.10536 2.48037 4 2.73472 4 2.99994V20.9999C4 21.2652 4.10536 21.5195 4.29289 21.7071C4.48043 21.8946 4.73478 21.9999 5 21.9999H19C19.2652 21.9999 19.5196 21.8946 19.7071 21.7071C19.8946 21.5195 20 21.2652 20 20.9999V8.99994C20 8.8555 19.9687 8.71277 19.9083 8.58157C19.8479 8.45038 19.7598 8.33383 19.65 8.23994L12.65 2.23994ZM13 5.16994L16.3 7.99994H13V5.16994ZM18 19.9999H6V3.99994H11V8.99994C11 9.26516 11.1054 9.51951 11.2929 9.70705C11.4804 9.89458 11.7348 9.99994 12 9.99994H18V19.9999Z"
+                                    fill="white"
+                                  />
+                                </svg>
+                              </span>
+                              <span className="text-elips">
+                                General documents
+                              </span>
+                            </div>
+                          </td>
+                          <td>2</td>
+                          <td>
+                            <span className="doc-status success"></span>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>
+                            {" "}
+                            <div className="d-flex align-items-center">
+                              <span className="file-type-icon">
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  width="24"
+                                  height="24"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                >
+                                  <path
+                                    d="M12.65 2.23994C12.4689 2.08503 12.2383 1.99992 12 1.99994H5C4.73478 1.99994 4.48043 2.1053 4.29289 2.29283C4.10536 2.48037 4 2.73472 4 2.99994V20.9999C4 21.2652 4.10536 21.5195 4.29289 21.7071C4.48043 21.8946 4.73478 21.9999 5 21.9999H19C19.2652 21.9999 19.5196 21.8946 19.7071 21.7071C19.8946 21.5195 20 21.2652 20 20.9999V8.99994C20 8.8555 19.9687 8.71277 19.9083 8.58157C19.8479 8.45038 19.7598 8.33383 19.65 8.23994L12.65 2.23994ZM13 5.16994L16.3 7.99994H13V5.16994ZM18 19.9999H6V3.99994H11V8.99994C11 9.26516 11.1054 9.51951 11.2929 9.70705C11.4804 9.89458 11.7348 9.99994 12 9.99994H18V19.9999Z"
+                                    fill="white"
+                                  />
+                                </svg>
+                              </span>
+                              <span className="text-elips">
+                                General documents
+                              </span>
+                            </div>
+                          </td>
+                          <td>2</td>
+                          <td>
+                            <span className="doc-status warning"></span>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>
+                            {" "}
+                            <div className="d-flex align-items-center">
+                              <span className="file-type-icon">
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  width="24"
+                                  height="24"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                >
+                                  <path
+                                    d="M12.65 2.23994C12.4689 2.08503 12.2383 1.99992 12 1.99994H5C4.73478 1.99994 4.48043 2.1053 4.29289 2.29283C4.10536 2.48037 4 2.73472 4 2.99994V20.9999C4 21.2652 4.10536 21.5195 4.29289 21.7071C4.48043 21.8946 4.73478 21.9999 5 21.9999H19C19.2652 21.9999 19.5196 21.8946 19.7071 21.7071C19.8946 21.5195 20 21.2652 20 20.9999V8.99994C20 8.8555 19.9687 8.71277 19.9083 8.58157C19.8479 8.45038 19.7598 8.33383 19.65 8.23994L12.65 2.23994ZM13 5.16994L16.3 7.99994H13V5.16994ZM18 19.9999H6V3.99994H11V8.99994C11 9.26516 11.1054 9.51951 11.2929 9.70705C11.4804 9.89458 11.7348 9.99994 12 9.99994H18V19.9999Z"
+                                    fill="white"
+                                  />
+                                </svg>
+                              </span>
+                              <span className="text-elips">Studies Report</span>
+                            </div>
+                          </td>
+                          <td>2</td>
+                          <td>
+                            <span className="doc-status danger"></span>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </Table>
+                  </div>
+                </div>
+                <h2 className="mb-3 mt-3">Task</h2>
+                <div className="custom-grid-card mt-3">
+
+                  <h3>Coming Task - to be determined</h3>
+                  <div className="table-wrap mt-24">
+                    <Table responsive hover>
+                      <thead>
+                        <tr>
+                          <th>Name of Task</th>
+                          <th>Dead line</th>
+                          <th>Task description</th>
+                          <th>Name of responsible</th>
+                          <th>status</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>Task 1</td>
+                          <td>dead line</td>
+                          <td>Task description</td>
+                          <td>Name of responsible</td>
+                          <td>
+                            <span class="checked badges">À vérifier</span>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>Task 1</td>
+                          <td>dead line</td>
+                          <td>Task description</td>
+                          <td>Name of responsible</td>
+                          <td>
+                            <span class="checked badges">À vérifier</span>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>Task 1</td>
+                          <td>dead line</td>
+                          <td>Task description</td>
+                          <td>Name of responsible</td>
+                          <td>
+                            <span class="checked badges">À vérifier</span>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </Table>
+                  </div>
+
+                </div>
+
+              </div>
+              <div className="col-md-5">
+                <h2 className="mb-3">Events</h2>
+                <div className="custom-grid-card">
+                  <div className="last-event-card">
+                    <div className="d-flex flex-wrap gap-2 mb-3">
+                      {/* Type Filter */}
+                      <select
+                        className="form-select w-auto"
+                        value={selectedType}
+                        onChange={(e) => setSelectedType(e.target.value)}
+                      >
+                        <option value="">Select Type</option>
+                        <option value="notes">Notes</option>
+                        <option value="action">Action</option>
+                      </select>
+
+                      {/* User Filter */}
+                      <select
+                        className="form-select w-auto"
+                        value={selectedUser}
+                        onChange={(e) => setSelectedUser(e.target.value)}
+                      >
+                        <option value="">Select User</option>
+                        <option value="user1">User 1</option>
+                        <option value="user2">User 2</option>
+                      </select>
+                      {/* Date Filter */}
+                      <DatePicker
+                        selected={selectedDate}
+                        onChange={(date) => setSelectedDate(date)}
+                        className="form-control"
+                        placeholderText="Select Date"
+                        dateFormat="dd/MM/yyyy"
+                      />
+                    </div>
+                    5 last events
+                    <div class="timeline">
+                      <div class="timeline-item">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-content">
+                          <h5>January 2nd, 04:35 AM</h5>
+                          <p>
+                            {" "}
+                            <strong>Note :-</strong> Illum omnis quo illum nisi.
+                            Nesciunt est accusamus. Blanditiis nisi quae eum
+                            nisi similique. Modi consequuntur totam
+                          </p>
+                        </div>
+                      </div>
+
+                      <div class="timeline-item">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-content">
+                          <h5>January 4th, 06:19 AM</h5>
+                          <p>
+                            <strong>Note :-</strong> Corrupti unde qui molestiae
+                            labore ad adipisci veniam perspiciatis quasi. Quae
+                            labore vel.
+                          </p>
+                        </div>
+                      </div>
+
+                      <div class="timeline-item">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-content">
+                          <h5>January 5th, 12:34 AM</h5>
+                          <p>
+                            <strong>Action :-</strong> Maiores doloribus qui.
+                            Repellat accusamus minima ipsa ipsam aut debitis
+                            quis sit voluptates. Amet necessitatibus non minus
+                            quaerat et quis.
+                          </p>
+                          <p>
+                            <strong>Action Name:-</strong>Lorem, ipsum dolor.
+                          </p>
+                          <p>
+                            <strong>User id:-</strong>Ipsum115880
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    <button type="submit" class="btn-secondary btn btn-primary">
+                      See All
+                    </button>
+                  </div>
+                  <div className="last-msg-card">
+                    3 Last Important Unread messages
+                    <div class="timeline">
+                      <div class="timeline-item">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-content">
+                          <h5>January 2nd, 04:35 AM</h5>
+                          <p>
+                            Illum omnis quo illum nisi. Nesciunt est accusamus.
+                            Blanditiis nisi quae eum nisi similique. Modi
+                            consequuntur totam
+                          </p>
+                        </div>
+                      </div>
+
+                      <div class="timeline-item">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-content">
+                          <h5>January 4th, 06:19 AM</h5>
+                          <p>
+                            Corrupti unde qui molestiae labore ad adipisci
+                            veniam perspiciatis quasi. Quae labore vel.
+                          </p>
+                        </div>
+                      </div>
+
+                      <div class="timeline-item">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-content">
+                          <h5>January 5th, 12:34 AM</h5>
+                          <p>
+                            Maiores doloribus qui. Repellat accusamus minima
+                            ipsa ipsam aut debitis quis sit voluptates. Amet
+                            necessitatibus non minus quaerat et quis.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    <button type="submit" class="btn-secondary btn btn-primary">
+                      See All
+                    </button>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </Tab>
+
+          {/* Document  Tab */}
+
+          <Tab
+            className="update-inside-tab"
+            eventKey="documents"
+            title="Documents"
+          >
+            {isLoading && (
+              <div className="loading-overlay">
+                <Loading />
+              </div>
+            )}
+            <Tabs defaultActiveKey="documentdddd" className="mt-0 mb-0 ">
+                          {/* Other Document Tab */}
+          <Tab
+            eventKey="documentdddd"
+            title={`Documents (${totalRecordOther || 0})`}
+          >
             <div className="table-wrapper mt-16 p-0">
               <div class="d-md-flex align-items-center gap-2 justify-content-between">
                 <h2 class="m-md-0 mb-3">
@@ -1379,12 +2035,14 @@ const BrokerFileDetail = () => {
                   ajouter un document
                 </Link>
               </div>
-              {isLoading ? <Loading /> :
+              {isLoading ? (
+                <Loading />
+              ) : (
                 <div className="table-wrap mt-24">
                   <Table responsive hover>
                     <thead>
                       <tr>
-                        {selectedOtherDocColumns.includes("fileNameLabe") &&
+                        {selectedOtherDocColumns.includes("fileNameLabe") && (
                           <th>
                             <div className="d-flex align-items-center">
                               <span>{t("fileNameLabe")}</span>
@@ -1392,23 +2050,49 @@ const BrokerFileDetail = () => {
                                 className={`sorting-icon ms-2`}
                                 onClick={() => handleClickRotate("filename")}
                               >
-                                {sort.value === "asc" &&
-                                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z" fill="black" />
-                                    <path d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z" fill="black" fill-opacity="0.5" />
+                                {sort.value === "asc" && (
+                                  <svg
+                                    width="24"
+                                    height="24"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                  >
+                                    <path
+                                      d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
+                                      fill="black"
+                                    />
+                                    <path
+                                      d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
+                                      fill="black"
+                                      fill-opacity="0.5"
+                                    />
                                   </svg>
-                                }
+                                )}
 
-                                {sort.value === "desc" &&
-                                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z" fill="black" fill-opacity="0.5" />
-                                    <path d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z" fill="black" />
+                                {sort.value === "desc" && (
+                                  <svg
+                                    width="24"
+                                    height="24"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                  >
+                                    <path
+                                      d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
+                                      fill="black"
+                                      fill-opacity="0.5"
+                                    />
+                                    <path
+                                      d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
+                                      fill="black"
+                                    />
                                   </svg>
-                                }
+                                )}
                               </Link>
                             </div>
                           </th>
-                        }
+                        )}
                         {selectedOtherDocColumns.includes("speakerLabel") && (
                           <th className="select-drop elips-dropdown">
                             <div className="d-flex align-items-center">
@@ -1419,17 +2103,22 @@ const BrokerFileDetail = () => {
                                   onChange={handleTableSpeakerChange}
                                 >
                                   <option value="">{t("speakerLabel")}</option>
-                                  {speakerDropDownList?.length > 0 ?
+                                  {speakerDropDownList?.length > 0 ? (
                                     speakerDropDownList?.map((speaker) => (
-                                      <option key={speaker.id} value={speaker.id}>
+                                      <option
+                                        key={speaker.id}
+                                        value={speaker.id}
+                                      >
                                         {speaker.company_name +
                                           " - " +
                                           speaker.siren_number}
                                       </option>
-                                    )) : (
-                                      <option value="">{t("NorecordsfoundLabel")}</option>
-                                    )
-                                  }
+                                    ))
+                                  ) : (
+                                    <option value="">
+                                      {t("NorecordsfoundLabel")}
+                                    </option>
+                                  )}
                                 </Form.Select>
                               </div>
                               <div>
@@ -1483,7 +2172,9 @@ const BrokerFileDetail = () => {
                             </div>
                           </th>
                         )}
-                        {selectedOtherDocColumns.includes("Type de document") && (
+                        {selectedOtherDocColumns.includes(
+                          "Type de document"
+                        ) && (
                           <th className="select-drop elips-dropdown">
                             <div className="d-flex align-items-center">
                               <div>
@@ -1493,35 +2184,68 @@ const BrokerFileDetail = () => {
                                   onChange={handleDocumentTypeChange}
                                 >
                                   <option value="">Type de document</option>
-                                  {documentTypeList?.length > 0 ?
+                                  {documentTypeList?.length > 0 ? (
                                     documentTypeList?.map((doctype) => (
-                                      <option key={doctype.id} value={doctype.id}>
+                                      <option
+                                        key={doctype.id}
+                                        value={doctype.id}
+                                      >
                                         {doctype.name}
                                       </option>
-                                    )) : (
-                                      <option value="">{t("NorecordsfoundLabel")}</option>
-                                    )
-                                  }
+                                    ))
+                                  ) : (
+                                    <option value="">
+                                      {t("NorecordsfoundLabel")}
+                                    </option>
+                                  )}
                                 </Form.Select>
                               </div>
                               <div>
                                 <Link
                                   className={`sorting-icon ms-2`}
-                                  onClick={() => handleClickRotate("docType.name")}
+                                  onClick={() =>
+                                    handleClickRotate("docType.name")
+                                  }
                                 >
-                                  {sort.value === "asc" &&
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                      <path d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z" fill="black" />
-                                      <path d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z" fill="black" fill-opacity="0.5" />
+                                  {sort.value === "asc" && (
+                                    <svg
+                                      width="24"
+                                      height="24"
+                                      viewBox="0 0 24 24"
+                                      fill="none"
+                                      xmlns="http://www.w3.org/2000/svg"
+                                    >
+                                      <path
+                                        d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
+                                        fill="black"
+                                      />
+                                      <path
+                                        d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
+                                        fill="black"
+                                        fill-opacity="0.5"
+                                      />
                                     </svg>
-                                  }
+                                  )}
 
-                                  {sort.value === "desc" &&
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                      <path d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z" fill="black" fill-opacity="0.5" />
-                                      <path d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z" fill="black" />
+                                  {sort.value === "desc" && (
+                                    <svg
+                                      width="24"
+                                      height="24"
+                                      viewBox="0 0 24 24"
+                                      fill="none"
+                                      xmlns="http://www.w3.org/2000/svg"
+                                    >
+                                      <path
+                                        d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
+                                        fill="black"
+                                        fill-opacity="0.5"
+                                      />
+                                      <path
+                                        d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
+                                        fill="black"
+                                      />
                                     </svg>
-                                  }
+                                  )}
                                 </Link>
                               </div>
                             </div>
@@ -1534,12 +2258,20 @@ const BrokerFileDetail = () => {
                                 <Form.Select
                                   aria-label="statusSelectAria"
                                   value={editUserStatus}
-                                  onChange={(e) => handleStatusChange(e.target.value)}
+                                  onChange={(e) =>
+                                    handleStatusChange(e.target.value)
+                                  }
                                 >
                                   <option value="">{t("status")}</option>
-                                  <option value="to_be_checked">{t("toBeCheckedLabel")}</option>
-                                  <option value="verified">{t("verified")}</option>
-                                  <option value="invalid">{t("invalidLabel")}</option>
+                                  <option value="to_be_checked">
+                                    {t("toBeCheckedLabel")}
+                                  </option>
+                                  <option value="verified">
+                                    {t("verified")}
+                                  </option>
+                                  <option value="invalid">
+                                    {t("invalidLabel")}
+                                  </option>
                                 </Form.Select>
                               </div>
                               <div>
@@ -1547,25 +2279,53 @@ const BrokerFileDetail = () => {
                                   className={`sorting-icon ms-2`}
                                   onClick={() => handleClickRotate("status")}
                                 >
-                                  {sort.value === "asc" &&
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                      <path d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z" fill="black" />
-                                      <path d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z" fill="black" fill-opacity="0.5" />
+                                  {sort.value === "asc" && (
+                                    <svg
+                                      width="24"
+                                      height="24"
+                                      viewBox="0 0 24 24"
+                                      fill="none"
+                                      xmlns="http://www.w3.org/2000/svg"
+                                    >
+                                      <path
+                                        d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
+                                        fill="black"
+                                      />
+                                      <path
+                                        d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
+                                        fill="black"
+                                        fill-opacity="0.5"
+                                      />
                                     </svg>
-                                  }
+                                  )}
 
-                                  {sort.value === "desc" &&
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                      <path d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z" fill="black" fill-opacity="0.5" />
-                                      <path d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z" fill="black" />
+                                  {sort.value === "desc" && (
+                                    <svg
+                                      width="24"
+                                      height="24"
+                                      viewBox="0 0 24 24"
+                                      fill="none"
+                                      xmlns="http://www.w3.org/2000/svg"
+                                    >
+                                      <path
+                                        d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
+                                        fill="black"
+                                        fill-opacity="0.5"
+                                      />
+                                      <path
+                                        d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
+                                        fill="black"
+                                      />
                                     </svg>
-                                  }
+                                  )}
                                 </Link>
                               </div>
                             </div>
                           </th>
                         )}
-                        {selectedOtherDocColumns.includes("Actions") && <th>Actions</th>}
+                        {selectedOtherDocColumns.includes("Actions") && (
+                          <th>Actions</th>
+                        )}
                         <th style={{ textAlign: "right" }}>
                           <Link onClick={handleAddOtherColShow}>
                             <svg
@@ -1575,31 +2335,48 @@ const BrokerFileDetail = () => {
                               fill="none"
                               xmlns="http://www.w3.org/2000/svg"
                             >
-                              <path d="M14 8H8V14H6V8H0V6H6V0H8V6H14V8Z" fill="black" />
+                              <path
+                                d="M14 8H8V14H6V8H0V6H6V0H8V6H14V8Z"
+                                fill="black"
+                              />
                             </svg>
                           </Link>
                         </th>
                       </tr>
                     </thead>
                     <tbody>
-                      {(showOtherDocument?.length > 0 && selectedOtherDocColumns?.length > 0) ?
+                      {showOtherDocument?.length > 0 &&
+                      selectedOtherDocColumns?.length > 0 ? (
                         showOtherDocument?.map((data) => (
-                          <tr onClick={() => data.status === 'invalid' && handleInvalidReason(data.id)}>
-                            {selectedOtherDocColumns.includes("fileNameLabe") && (
+                          <tr
+                            onClick={() =>
+                              data.status === "invalid" &&
+                              handleInvalidReason(data.id)
+                            }
+                          >
+                            {selectedOtherDocColumns.includes(
+                              "fileNameLabe"
+                            ) && (
                               <td>
-                                <span className="text-elips">{data.filename}</span>
+                                <span className="text-elips">
+                                  {data.filename}
+                                </span>
                               </td>
                             )}
-                            {selectedOtherDocColumns.includes("speakerLabel") &&
+                            {selectedOtherDocColumns.includes(
+                              "speakerLabel"
+                            ) && (
                               <td>
                                 {data.speaker
                                   ? data.speaker?.company_name +
-                                  " - " +
-                                  data.speaker?.siren_number
+                                    " - " +
+                                    data.speaker?.siren_number
                                   : "-"}
                               </td>
-                            }
-                            {selectedOtherDocColumns.includes("Type de document") && <td>{data.docType.name}</td>}
+                            )}
+                            {selectedOtherDocColumns.includes(
+                              "Type de document"
+                            ) && <td>{data.docType.name}</td>}
                             {selectedOtherDocColumns.includes("status") && (
                               <td>
                                 {data.status == "to_be_checked" ? (
@@ -1647,7 +2424,12 @@ const BrokerFileDetail = () => {
                                     class="addnote"
                                     href="/user-management"
                                     data-discover="true"
-                                    onClick={() => handleAddNoteModalOpen(data.id, data.filename)}
+                                    onClick={() =>
+                                      handleAddNoteModalOpen(
+                                        data.id,
+                                        data.filename
+                                      )
+                                    }
                                   >
                                     <svg
                                       width="24"
@@ -1722,7 +2504,11 @@ const BrokerFileDetail = () => {
                                     className="delete"
                                     href="/user-management"
                                     data-discover="true"
-                                    onClick={(e) => { e.stopPropagation(); handleShowDeleteModal(); setShowDocumentId(data.id); }}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleShowDeleteModal();
+                                      setShowDocumentId(data.id);
+                                    }}
                                   >
                                     <svg
                                       width="24"
@@ -1743,431 +2529,6 @@ const BrokerFileDetail = () => {
                             <td></td>
                           </tr>
                         ))
-                        :
-                        (
-                          <tr style={{ textAlign: "center" }}>
-                            <td colSpan="6">
-                              {t("NorecordsfoundLabel")}
-                            </td>
-                          </tr>
-                        )
-                      }
-                    </tbody>
-                  </Table>
-                </div>
-              }
-              {totalRecordOther > 10 &&
-                <Paginations
-                  currentPage={currentPage}
-                  totalPages={totalPages}
-                  onPageChange={handlePageChange}
-                />
-              }
-            </div>
-          </Tab>
-
-          {/* Speakers Tab */}
-          <Tab eventKey="speakerdocument" title={`Intervenants (${totalSpeaker || 0})`}>
-            <div className="table-wrapper mt-10 p-0">
-              <div class="d-md-flex align-items-center gap-2 justify-content-between">
-                <h2 class="m-md-0 mb-3">
-                  {/* Intervenants ({totalSpeaker}) */}
-                </h2>
-                <Form.Group
-                  className="relative"
-                  controlId="exampleForm.ControlInput1"
-                >
-                  <Form.Control
-                    type="search"
-                    placeholder="Rechercher"
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    onKeyDown={handleKeyPress}
-                  />
-                  <div className="search-icon" style={{ cursor: "pointer" }} onClick={() => handleSearchChange(search, 1)}>
-                    <svg
-                      width="18"
-                      height="18"
-                      viewBox="0 0 18 18"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M12.7549 11.2549H11.9649L11.6849 10.9849C12.6649 9.84488 13.2549 8.36488 13.2549 6.75488C13.2549 3.16488 10.3449 0.254883 6.75488 0.254883C3.16488 0.254883 0.254883 3.16488 0.254883 6.75488C0.254883 10.3449 3.16488 13.2549 6.75488 13.2549C8.36488 13.2549 9.84488 12.6649 10.9849 11.6849L11.2549 11.9649V12.7549L16.2549 17.7449L17.7449 16.2549L12.7549 11.2549ZM6.75488 11.2549C4.26488 11.2549 2.25488 9.24488 2.25488 6.75488C2.25488 4.26488 4.26488 2.25488 6.75488 2.25488C9.24488 2.25488 11.2549 4.26488 11.2549 6.75488C11.2549 9.24488 9.24488 11.2549 6.75488 11.2549Z"
-                        fill="#998f90"
-                      />
-                    </svg>
-                  </div>
-                </Form.Group>
-              </div>
-              {isLoading ? (
-                <Loading />
-              ) : (
-                <div className="table-wrap mt-24">
-                  <Table responsive hover>
-                    <thead>
-                      <tr>
-                        {selectedSpeakerColumns.includes("N° de SIRET") &&
-                          <th>
-                            <div className="d-flex align-items-center">
-                              <span>N° de SIRET</span>
-                              <div>
-                                <Link
-                                  className={`sorting-icon ms-2`}
-                                  onClick={() =>
-                                    handleClickRotate("siren_number")
-                                  }
-                                >
-                                  {sort.value === "asc" && (
-                                    <svg
-                                      width="24"
-                                      height="24"
-                                      viewBox="0 0 24 24"
-                                      fill="none"
-                                      xmlns="http://www.w3.org/2000/svg"
-                                    >
-                                      <path
-                                        d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
-                                        fill="black"
-                                      />
-                                      <path
-                                        d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
-                                        fill="black"
-                                        fill-opacity="0.5"
-                                      />
-                                    </svg>
-                                  )}
-
-                                  {sort.value === "desc" && (
-                                    <svg
-                                      width="24"
-                                      height="24"
-                                      viewBox="0 0 24 24"
-                                      fill="none"
-                                      xmlns="http://www.w3.org/2000/svg"
-                                    >
-                                      <path
-                                        d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
-                                        fill="black"
-                                        fill-opacity="0.5"
-                                      />
-                                      <path
-                                        d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
-                                        fill="black"
-                                      />
-                                    </svg>
-                                  )}
-                                </Link>
-                              </div>
-                            </div>
-                          </th>
-                        }
-                        {selectedSpeakerColumns.includes("Intervenant") &&
-                          <th>
-                            <div className="d-flex align-items-center">
-                              <span>Intervenant</span>
-                              <div>
-                                <Link
-                                  className={`sorting-icon ms-2`}
-                                  onClick={() =>
-                                    handleClickRotate("company_name")
-                                  }
-                                >
-                                  {sort.value === "asc" && (
-                                    <svg
-                                      width="24"
-                                      height="24"
-                                      viewBox="0 0 24 24"
-                                      fill="none"
-                                      xmlns="http://www.w3.org/2000/svg"
-                                    >
-                                      <path
-                                        d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
-                                        fill="black"
-                                      />
-                                      <path
-                                        d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
-                                        fill="black"
-                                        fill-opacity="0.5"
-                                      />
-                                    </svg>
-                                  )}
-
-                                  {sort.value === "desc" && (
-                                    <svg
-                                      width="24"
-                                      height="24"
-                                      viewBox="0 0 24 24"
-                                      fill="none"
-                                      xmlns="http://www.w3.org/2000/svg"
-                                    >
-                                      <path
-                                        d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
-                                        fill="black"
-                                        fill-opacity="0.5"
-                                      />
-                                      <path
-                                        d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
-                                        fill="black"
-                                      />
-                                    </svg>
-                                  )}
-                                </Link>
-                              </div>
-                            </div>
-                          </th>
-                        }
-                        {selectedSpeakerColumns.includes("Dernière MaJ") &&
-                          <th>
-                            <div className="d-flex align-items-center">
-                              <span>Dernière MaJ</span>
-                              <div>
-                                <Link
-                                  className={`sorting-icon ms-2`}
-                                  onClick={() => handleClickRotate("updated_at")}
-                                >
-                                  {sort.value === "asc" && (
-                                    <svg
-                                      width="24"
-                                      height="24"
-                                      viewBox="0 0 24 24"
-                                      fill="none"
-                                      xmlns="http://www.w3.org/2000/svg"
-                                    >
-                                      <path
-                                        d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
-                                        fill="black"
-                                      />
-                                      <path
-                                        d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
-                                        fill="black"
-                                        fill-opacity="0.5"
-                                      />
-                                    </svg>
-                                  )}
-
-                                  {sort.value === "desc" && (
-                                    <svg
-                                      width="24"
-                                      height="24"
-                                      viewBox="0 0 24 24"
-                                      fill="none"
-                                      xmlns="http://www.w3.org/2000/svg"
-                                    >
-                                      <path
-                                        d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
-                                        fill="black"
-                                        fill-opacity="0.5"
-                                      />
-                                      <path
-                                        d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
-                                        fill="black"
-                                      />
-                                    </svg>
-                                  )}
-                                </Link>
-                              </div>
-                            </div>
-                          </th>
-                        }
-                        {selectedSpeakerColumns.includes("Doc. associés") &&
-                          <th>
-                            <div className="d-flex align-items-center">
-                              <span>Doc. associés</span>
-                              <div>
-                                <Link
-                                  className={`sorting-icon ms-2`}
-                                  onClick={() =>
-                                    handleClickRotate("user_document_count")
-                                  }
-                                >
-                                  {sort.value === "asc" && (
-                                    <svg
-                                      width="24"
-                                      height="24"
-                                      viewBox="0 0 24 24"
-                                      fill="none"
-                                      xmlns="http://www.w3.org/2000/svg"
-                                    >
-                                      <path
-                                        d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
-                                        fill="black"
-                                      />
-                                      <path
-                                        d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
-                                        fill="black"
-                                        fill-opacity="0.5"
-                                      />
-                                    </svg>
-                                  )}
-
-                                  {sort.value === "desc" && (
-                                    <svg
-                                      width="24"
-                                      height="24"
-                                      viewBox="0 0 24 24"
-                                      fill="none"
-                                      xmlns="http://www.w3.org/2000/svg"
-                                    >
-                                      <path
-                                        d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
-                                        fill="black"
-                                        fill-opacity="0.5"
-                                      />
-                                      <path
-                                        d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
-                                        fill="black"
-                                      />
-                                    </svg>
-                                  )}
-                                </Link>
-                              </div>
-                            </div>
-                          </th>
-                        }
-                        {selectedSpeakerColumns.includes("Doc. Manquants") &&
-                          <th>
-                            <div className="d-flex align-items-center">
-                              <span>Doc. Manquants</span>
-                              <div>
-                                <Link
-                                  className={`sorting-icon ms-2`}
-                                  onClick={() =>
-                                    handleClickRotate("user_document_count")
-                                  }
-                                >
-                                  {sort.value === "asc" && (
-                                    <svg
-                                      width="24"
-                                      height="24"
-                                      viewBox="0 0 24 24"
-                                      fill="none"
-                                      xmlns="http://www.w3.org/2000/svg"
-                                    >
-                                      <path
-                                        d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
-                                        fill="black"
-                                      />
-                                      <path
-                                        d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
-                                        fill="black"
-                                        fill-opacity="0.5"
-                                      />
-                                    </svg>
-                                  )}
-
-                                  {sort.value === "desc" && (
-                                    <svg
-                                      width="24"
-                                      height="24"
-                                      viewBox="0 0 24 24"
-                                      fill="none"
-                                      xmlns="http://www.w3.org/2000/svg"
-                                    >
-                                      <path
-                                        d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
-                                        fill="black"
-                                        fill-opacity="0.5"
-                                      />
-                                      <path
-                                        d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
-                                        fill="black"
-                                      />
-                                    </svg>
-                                  )}
-                                </Link>
-                              </div>
-                            </div>
-                          </th>
-                        }
-                        {selectedSpeakerColumns.includes("Actions") && <th>Actions</th>}
-                        <th style={{ textAlign: "right" }}>
-                          <Link onClick={handleAddSpeakerColShow}>
-                            <svg
-                              width="16"
-                              height="16"
-                              viewBox="0 0 14 14"
-                              fill="none"
-                              xmlns="http://www.w3.org/2000/svg"
-                            >
-                              <path d="M14 8H8V14H6V8H0V6H6V0H8V6H14V8Z" fill="black" />
-                            </svg>
-                          </Link>
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {(speakerList?.length > 0 && selectedSpeakerColumns.length > 0) ? (
-                        speakerList?.map((data) => (
-                          <tr>
-                            {selectedSpeakerColumns.includes("N° de SIRET") && <td>{data.siren_number}</td>}
-                            {selectedSpeakerColumns.includes("Intervenant") &&
-                              <td>
-                                <span className="text-elips">
-                                  {data.company_name}
-                                </span>
-                              </td>
-                            }
-                            {selectedSpeakerColumns.includes("Dernière MaJ") && <td>{data.updated_at}</td>}
-                            {selectedSpeakerColumns.includes("Doc. associés") && <td>{data.user_document_count}</td>}
-                            {selectedSpeakerColumns.includes("Doc. Manquants") && <td>{data.missing_document_count}</td>}
-                            {selectedSpeakerColumns.includes("Actions") &&
-                              <td>
-                                <div class="action-btn">
-                                  <Link
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      handleViewShowSpeaker();
-                                      setShowSpeakerId(data.id);
-                                      setTotalSpeakerDocument(data.user_document_count);
-                                      setTotalMissingDocument(data.missing_document_count);
-                                    }}
-                                    class="view"
-                                    href="/user-management"
-                                    data-discover="true"
-                                  >
-                                    <svg
-                                      width="24"
-                                      height="24"
-                                      viewBox="0 0 24 24"
-                                      fill="none"
-                                      xmlns="http://www.w3.org/2000/svg"
-                                    >
-                                      <path
-                                        d="M12 6.5C15.79 6.5 19.17 8.63 20.82 12C19.17 15.37 15.8 17.5 12 17.5C8.2 17.5 4.83 15.37 3.18 12C4.83 8.63 8.21 6.5 12 6.5ZM12 4.5C7 4.5 2.73 7.61 1 12C2.73 16.39 7 19.5 12 19.5C17 19.5 21.27 16.39 23 12C21.27 7.61 17 4.5 12 4.5ZM12 9.5C13.38 9.5 14.5 10.62 14.5 12C14.5 13.38 13.38 14.5 12 14.5C10.62 14.5 9.5 13.38 9.5 12C9.5 10.62 10.62 9.5 12 9.5ZM12 7.5C9.52 7.5 7.5 9.52 7.5 12C7.5 14.48 9.52 16.5 12 16.5C14.48 16.5 16.5 14.48 16.5 12C16.5 9.52 14.48 7.5 12 7.5Z"
-                                        fill="#00366B"
-                                      />
-                                    </svg>
-                                  </Link>
-                                  <Link
-                                    class="delete"
-                                    href="/user-management"
-                                    data-discover="true"
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      handleShowDeleteSpeakerModal();
-                                      setShowSpeakerId(data.id);
-                                    }}
-                                  >
-                                    <svg
-                                      width="24"
-                                      height="24"
-                                      viewBox="0 0 24 24"
-                                      fill="none"
-                                      xmlns="http://www.w3.org/2000/svg"
-                                    >
-                                      <path
-                                        d="M16 9V19H8V9H16ZM14.5 3H9.5L8.5 4H5V6H19V4H15.5L14.5 3ZM18 7H6V19C6 20.1 6.9 21 8 21H16C17.1 21 18 20.1 18 19V7Z"
-                                        fill="#00366B"
-                                      />
-                                    </svg>
-                                  </Link>
-                                </div>
-                              </td>
-                            }
-                            <td></td>
-                          </tr>
-                        ))
                       ) : (
                         <tr style={{ textAlign: "center" }}>
                           <td colSpan="6">{t("NorecordsfoundLabel")}</td>
@@ -2177,7 +2538,7 @@ const BrokerFileDetail = () => {
                   </Table>
                 </div>
               )}
-              {totalSpeaker > 10 && (
+              {totalRecordOther > 10 && (
                 <Paginations
                   currentPage={currentPage}
                   totalPages={totalPages}
@@ -2186,9 +2547,12 @@ const BrokerFileDetail = () => {
               )}
             </div>
           </Tab>
-
-          {/* Missing Document Tab */}
-          <Tab eventKey="missingdocument" title={`Documents manquants (${totalMissingRecords || 0})`}>
+		  
+		            {/* Missing Document Tab */}
+          <Tab
+            eventKey="missingdocument"
+            title={`Documents manquants (${totalMissingRecords || 0})`}
+          >
             <div className="table-wrapper mt-16 p-0">
               <div className="d-md-flex align-items-center gap-2 justify-content-between">
                 {/* <h2 className="m-md-0 mb-3">Documents manquants ({totalMissingRecords})</h2> */}
@@ -2200,19 +2564,24 @@ const BrokerFileDetail = () => {
                     onHide={() => handleMissingDocClose()}
                   >
                     <Offcanvas.Header closeButton>
-                      <Offcanvas.Title>Ajouter un document manquants</Offcanvas.Title>
+                      <Offcanvas.Title>
+                        Ajouter un document manquants
+                      </Offcanvas.Title>
                     </Offcanvas.Header>
                     <Offcanvas.Body>
                       <div className="step-1">
                         <div className="div">
                           <div className="step-2">
-                            <h2>Ajouter un document manquants <span>*</span></h2>
+                            <h2>
+                              Ajouter un document manquants <span>*</span>
+                            </h2>
                             {flashMessageStoreDoc.message && (
                               <div
-                                className={`mt-3 alert ${flashMessageStoreDoc.type === "success"
-                                  ? "alert-success"
-                                  : "alert-danger"
-                                  } text-center`}
+                                className={`mt-3 alert ${
+                                  flashMessageStoreDoc.type === "success"
+                                    ? "alert-success"
+                                    : "alert-danger"
+                                } text-center`}
                                 role="alert"
                               >
                                 {flashMessageStoreDoc.message}
@@ -2229,7 +2598,9 @@ const BrokerFileDetail = () => {
                                   e.preventDefault();
                                   const files = e.dataTransfer.files;
                                   if (files.length) {
-                                    handleUpdateFileChange({ target: { files } });
+                                    handleUpdateFileChange({
+                                      target: { files },
+                                    });
                                   }
                                 }}
                               >
@@ -2252,7 +2623,8 @@ const BrokerFileDetail = () => {
                                   </span>
                                 </p>
                                 <span>
-                                  {t("documentsAcceptedLabel")}: mot, exceller, pdf, PowerPoint
+                                  {t("documentsAcceptedLabel")}: mot, exceller,
+                                  pdf, PowerPoint
                                 </span>
                                 <Form.Control
                                   type="file"
@@ -2301,7 +2673,9 @@ const BrokerFileDetail = () => {
                   </Offcanvas>
                 </div>
               </div>
-              {isLoading ? <Loading /> :
+              {isLoading ? (
+                <Loading />
+              ) : (
                 <div className="table-wrap mt-24">
                   <Table responsive hover>
                     <thead>
@@ -2416,11 +2790,15 @@ const BrokerFileDetail = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {missingDocumentList?.length > 0 ?
+                      {missingDocumentList?.length > 0 ? (
                         missingDocumentList?.map((data) => (
                           <tr>
                             <td>{data.documentType.name}</td>
-                            <td className="bold-font">{data.speaker.company_name != "" ? data.speaker.company_name : '-'}</td>
+                            <td className="bold-font">
+                              {data.speaker.company_name != ""
+                                ? data.speaker.company_name
+                                : "-"}
+                            </td>
                             <td>
                               <div className="action-btn">
                                 <Link
@@ -2434,31 +2812,890 @@ const BrokerFileDetail = () => {
                                   data-discover="true"
                                   title="Ajouter un Document"
                                 >
-                                  <svg width="16" height="20" viewBox="0 0 16 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M9 9H7V12H4V14H7V17H9V14H12V12H9V9ZM10 0H2C0.9 0 0 0.9 0 2V18C0 19.1 0.89 20 1.99 20H14C15.1 20 16 19.1 16 18V6L10 0ZM14 18H2V2H9V7H14V18Z" fill="black" />
+                                  <svg
+                                    width="16"
+                                    height="20"
+                                    viewBox="0 0 16 20"
+                                    fill="none"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                  >
+                                    <path
+                                      d="M9 9H7V12H4V14H7V17H9V14H12V12H9V9ZM10 0H2C0.9 0 0 0.9 0 2V18C0 19.1 0.89 20 1.99 20H14C15.1 20 16 19.1 16 18V6L10 0ZM14 18H2V2H9V7H14V18Z"
+                                      fill="black"
+                                    />
                                   </svg>
                                 </Link>
                               </div>
                             </td>
                           </tr>
                         ))
-                        : (
-                          <tr style={{ textAlign: "center" }}>
-                            <td colSpan='4'>{t("NorecordsfoundLabel")}</td>
-                          </tr>
-                        )}
+                      ) : (
+                        <tr style={{ textAlign: "center" }}>
+                          <td colSpan="4">{t("NorecordsfoundLabel")}</td>
+                        </tr>
+                      )}
                     </tbody>
                   </Table>
-                </div>}
-              {totalMissingRecords > 10 &&
+                </div>
+              )}
+              {totalMissingRecords > 10 && (
                 <Paginations
                   currentPage={currentPage}
                   totalPages={totalPages}
                   onPageChange={handlePageChange}
                 />
-              }
+              )}
             </div>
           </Tab>
+            </Tabs>
+          </Tab>
+
+
+
+          {/* Speakers Tab */}
+          <Tab
+            eventKey="speakerdocument"
+            title={`Intervenants (${totalSpeaker || 0})`}
+          >
+             {showSepeakerInner ? (
+              <div className="inner-tab-screen">
+                <div className="row">
+                  <div className="col-md-4">
+                    {flashMessage.message && (
+                  <div
+                    className={`alert ${
+                      flashMessage.type === "success"
+                        ? "alert-success"
+                        : "alert-danger"
+                    } text-center`}
+                    role="alert"
+                  >
+                    {flashMessage.message}
+                  </div>
+                )}
+                {flashMessageStoreDoc.message && (
+                  <div
+                    className={`mt-3 alert ${
+                      flashMessageStoreDoc.type === "success"
+                        ? "alert-success"
+                        : "alert-danger"
+                    } text-center`}
+                    role="alert"
+                  >
+                    {flashMessageStoreDoc.message}
+                  </div>
+                )}
+                {isLoading ? (
+                  <Loading />
+                ) : (
+                  <Form>
+                                             <div className="d-block mb-2">
+                          <span
+                            className="back-screen"
+                            onClick={() => setShowSpeakerInner(false)}
+                          >
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="18"
+                              height="23"
+                              viewBox="0 0 18 23"
+                              fill="none"
+                            >
+                              <path
+                                d="M17.4148 11.8702C17.0398 11.4952 16.5311 11.2846 16.0008 11.2846C15.4705 11.2846 14.9619 11.4952 14.5868 11.8702L11.0008 15.4562V2.28418C11.0008 1.75375 10.7901 1.24504 10.415 0.869966C10.04 0.494893 9.53125 0.28418 9.00081 0.28418C8.47038 0.28418 7.96167 0.494893 7.5866 0.869966C7.21153 1.24504 7.00081 1.75375 7.00081 2.28418V15.4562L3.41481 11.8702C3.03761 11.5059 2.53241 11.3043 2.00801 11.3088C1.48362 11.3134 0.981993 11.5237 0.611177 11.8945C0.240361 12.2654 0.0300231 12.767 0.0254662 13.2914C0.0209094 13.8158 0.222498 14.321 0.586814 14.6982L7.58681 21.6982C7.96187 22.0731 8.47049 22.2838 9.00081 22.2838C9.53114 22.2838 10.0398 22.0731 10.4148 21.6982L17.4148 14.6982C17.7898 14.3231 18.0004 13.8145 18.0004 13.2842C18.0004 12.7539 17.7898 12.2452 17.4148 11.8702Z"
+                                fill="#00366B"
+                              />
+                            </svg>
+                          </span>
+                        </div>
+                    <Form.Label>
+                      N° de SIRET <span>*</span>
+                    </Form.Label>
+                    <Form.Control
+                      className="mb-3"
+                      type="text"
+                      placeholder="SIRET"
+                      name="siren_number"
+                      disabled
+                      value={
+                        speakerDetail?.siren_number
+                          ? speakerDetail?.siren_number
+                          : "-"
+                      }
+                      onChange={(e) =>
+                        setSpeakerDetail({
+                          ...speakerDetail,
+                          siren_number: e.target.value,
+                        })
+                      }
+                    />
+                    <Form.Label>
+                      Nom société <span>*</span>
+                    </Form.Label>
+                    <Form.Control
+                      className="mb-3"
+                      type="text"
+                      placeholder="Nom société"
+                      defaultValue="Mark"
+                      name="company_name"
+                      disabled
+                      value={
+                        speakerDetail?.company_name
+                          ? speakerDetail?.company_name
+                          : "-"
+                      }
+                      onChange={(e) =>
+                        setSpeakerDetail({
+                          ...speakerDetail,
+                          company_name: e.target.value,
+                        })
+                      }
+                    />
+                    <Form.Label>
+                      Adresse <span>*</span>
+                    </Form.Label>
+                    <Form.Control
+                      className="mb-3"
+                      type="text"
+                      placeholder="Adresse"
+                      name="address"
+                      disabled
+                      value={
+                        speakerDetail?.address ? speakerDetail?.address : "-"
+                      }
+                      onChange={(e) =>
+                        setSpeakerDetail({
+                          ...speakerDetail,
+                          address: e.target.value,
+                        })
+                      }
+                    />
+
+                    <div className="d-md-flex align-items-center side-col">
+                      <Form.Group className="post-code" controlId="postcode">
+                        <Form.Label>
+                          Code postal <span>*</span>
+                        </Form.Label>
+                        <Form.Control
+                          className="mb-3"
+                          type="text"
+                          placeholder="Code postal"
+                          name="postcode"
+                          disabled
+                          value={
+                            speakerDetail?.postcode
+                              ? speakerDetail?.postcode
+                              : "-"
+                          }
+                          onChange={(e) =>
+                            setSpeakerDetail({
+                              ...speakerDetail,
+                              postcode: e.target.value,
+                            })
+                          }
+                        />
+                      </Form.Group>
+
+                      <Form.Group className="" controlId="city">
+                        <Form.Label>
+                          Ville <span>*</span>
+                        </Form.Label>
+                        <Form.Control
+                          className="mb-3"
+                          type="text"
+                          placeholder="Ville"
+                          name="city"
+                          disabled
+                          value={
+                            speakerDetail?.city ? speakerDetail?.city : "-"
+                          }
+                          onChange={(e) =>
+                            setSpeakerDetail({
+                              ...speakerDetail,
+                              city: e.target.value,
+                            })
+                          }
+                        />
+                      </Form.Group>
+                    </div>
+                  </Form>
+                )}
+                  </div>
+                  <div className="col-md-8 flex-fill">
+                    <Tabs
+                    onSelect={handleSubTabSelect}
+                    defaultActiveKey="documents"
+                    id="uncontrolled-tab-example"
+                    >
+               <Tab
+                eventKey="documents"
+                title={`Documents (${totalSpeakerDocument})`}
+              >
+                {isLoading ? (
+                  <Loading />
+                ) : (
+                  <div className="table-wrapper mt-16 p-0">
+                    <div className="table-wrap mt-24">
+                      <Table responsive hover>
+                        <thead>
+                          <tr>
+                            <th>Nom du fichier</th>
+                            <th>Type de document</th>
+                            <th>Statut</th>
+                            <th>Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {showSpeakerDocument?.length > 0 ? (
+                            showSpeakerDocument?.map((data) => (
+                              <tr>
+                                <td><div className="d-flex align-items-center">
+                                          <span className="file-type-icon">
+                                            <svg
+                                              xmlns="http://www.w3.org/2000/svg"
+                                              width="24"
+                                              height="24"
+                                              viewBox="0 0 24 24"
+                                              fill="none"
+                                            >
+                                              <path
+                                                d="M12.65 2.23994C12.4689 2.08503 12.2383 1.99992 12 1.99994H5C4.73478 1.99994 4.48043 2.1053 4.29289 2.29283C4.10536 2.48037 4 2.73472 4 2.99994V20.9999C4 21.2652 4.10536 21.5195 4.29289 21.7071C4.48043 21.8946 4.73478 21.9999 5 21.9999H19C19.2652 21.9999 19.5196 21.8946 19.7071 21.7071C19.8946 21.5195 20 21.2652 20 20.9999V8.99994C20 8.8555 19.9687 8.71277 19.9083 8.58157C19.8479 8.45038 19.7598 8.33383 19.65 8.23994L12.65 2.23994ZM13 5.16994L16.3 7.99994H13V5.16994ZM18 19.9999H6V3.99994H11V8.99994C11 9.26516 11.1054 9.51951 11.2929 9.70705C11.4804 9.89458 11.7348 9.99994 12 9.99994H18V19.9999Z"
+                                                fill="white"
+                                              />
+                                            </svg>
+                                          </span>
+                                          <span className="text-elips">
+                                            {data.filename}
+                                          </span>
+                                        </div></td>
+                                <td>{data.docType?.name}</td>
+                                <td>
+                                  {data.status == "to_be_checked" ? (
+                                    <span className="checked badges">
+                                      {t("toBeCheckedLabel")}
+                                    </span>
+                                  ) : data.status == "verified" ? (
+                                    <span className="verified badges">
+                                      {t("verified")}
+                                    </span>
+                                  ) : (
+                                    <span className="incomplete badges">
+                                      {t("invalidLabel")}
+                                    </span>
+                                  )}
+                                </td>
+                                <td>
+                                  <Link
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      e.preventDefault();
+                                      HandleDownloadFile(data);
+                                    }}
+                                    className="download"
+                                    href="/user-management"
+                                    data-discover="true"
+                                    title="Télécharger"
+                                  >
+                                    <svg
+                                      width="24"
+                                      height="24"
+                                      viewBox="0 0 24 24"
+                                      fill="none"
+                                      xmlns="http://www.w3.org/2000/svg"
+                                    >
+                                      <path
+                                        d="M14 2H6C4.9 2 4.01 2.9 4.01 4L4 20C4 21.1 4.89 22 5.99 22H18C19.1 22 20 21.1 20 20V8L14 2ZM18 20H6V4H13V9H18V20Z"
+                                        fill="#00366B"
+                                      />
+                                      <path
+                                        d="M8 14L12 18L16 14"
+                                        stroke="#00366B"
+                                        stroke-width="1.5"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                      />
+                                      <path
+                                        d="M12 11V18"
+                                        stroke="#00366B"
+                                        stroke-width="1.5"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                      />
+                                    </svg>
+                                  </Link>
+                                  {/* {data.status !== "verified" && */}
+                                  <Link
+                                    className="delete"
+                                    data-discover="true"
+                                    title="Supprimer"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleShowDeleteModal();
+                                      setShowDocumentId(data.id);
+                                    }}
+                                  >
+                                    <svg
+                                      width="24"
+                                      height="24"
+                                      viewBox="0 0 24 24"
+                                      fill="none"
+                                      xmlns="http://www.w3.org/2000/svg"
+                                    >
+                                      <path
+                                        d="M16 9V19H8V9H16ZM14.5 3H9.5L8.5 4H5V6H19V4H15.5L14.5 3ZM18 7H6V19C6 20.1 6.9 21 8 21H16C17.1 21 18 20.1 18 19V7Z"
+                                        fill="#00366B"
+                                      />
+                                    </svg>
+                                  </Link>
+                                  {/* } */}
+                                </td>
+                              </tr>
+                            ))
+                          ) : (
+                            <tr style={{ textAlign: "center" }}>
+                              <td colSpan="3">{t("NorecordsfoundLabel")}</td>
+                            </tr>
+                          )}
+                        </tbody>
+                      </Table>
+                    </div>
+                    {totalSpeakerDocument > 10 && (
+                      <Paginations
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        onPageChange={handlePageChangeView}
+                      />
+                    )}
+                  </div>
+                )}
+              </Tab>
+              <Tab
+                eventKey="documentType"
+                title={`Documents manquants (${totalMissingDocument})`}
+              >
+                {flashMessage.message && (
+                  <div
+                    className={`alert ${
+                      flashMessage.type === "success"
+                        ? "alert-success"
+                        : "alert-danger"
+                    } text-center`}
+                    role="alert"
+                  >
+                    {flashMessage.message}
+                  </div>
+                )}
+                {isLoading ? (
+                  <Loading />
+                ) : (
+                  <div className="table-wrapper mt-16 p-0">
+                    <div className="table-wrap mt-24">
+                      <Table responsive hover>
+                        <thead>
+                          <tr>
+                            <th>Type de document</th>
+                            <th>Action</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {speakerDocumentTypeList?.length > 0 ? (
+                            speakerDocumentTypeList?.map((data) => (
+                              <tr>
+                                <td>{data.documentType.name}</td>
+                                <td>
+                                  <Link
+                                    onClick={() => {
+                                      handleMissingDocShow();
+                                      setMissingDocumentId(data.id);
+                                    }}
+                                    className="doc"
+                                    href="/user-management"
+                                    data-discover="true"
+                                    title="Ajouter un document manquants"
+                                  >
+                                    <svg
+                                      width="16"
+                                      height="20"
+                                      viewBox="0 0 16 20"
+                                      fill="none"
+                                      xmlns="http://www.w3.org/2000/svg"
+                                    >
+                                      <path
+                                        d="M9 9H7V12H4V14H7V17H9V14H12V12H9V9ZM10 0H2C0.9 0 0 0.9 0 2V18C0 19.1 0.89 20 1.99 20H14C15.1 20 16 19.1 16 18V6L10 0ZM14 18H2V2H9V7H14V18Z"
+                                        fill="black"
+                                      />
+                                    </svg>
+                                  </Link>
+                                </td>
+                              </tr>
+                            ))
+                          ) : (
+                            <tr style={{ textAlign: "center" }}>
+                              <td colSpan="3">{t("NorecordsfoundLabel")}</td>
+                            </tr>
+                          )}
+                        </tbody>
+                      </Table>
+                    </div>
+                  </div>
+                )}
+              </Tab>
+                      
+                    </Tabs>
+                  </div>
+                  </div>
+              </div>
+			   ) : (
+            <div className="table-wrapper mt-10 p-0">
+              <div class="d-md-flex align-items-center gap-2 justify-content-between">
+                <h2 class="m-md-0 mb-3">
+                  {/* Intervenants ({totalSpeaker}) */}
+                </h2>
+                <Form.Group
+                  className="relative"
+                  controlId="exampleForm.ControlInput1"
+                >
+                  <Form.Control
+                    type="search"
+                    placeholder="Rechercher"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    onKeyDown={handleKeyPress}
+                  />
+                  <div
+                    className="search-icon"
+                    style={{ cursor: "pointer" }}
+                    onClick={() => handleSearchChange(search, 1)}
+                  >
+                    <svg
+                      width="18"
+                      height="18"
+                      viewBox="0 0 18 18"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M12.7549 11.2549H11.9649L11.6849 10.9849C12.6649 9.84488 13.2549 8.36488 13.2549 6.75488C13.2549 3.16488 10.3449 0.254883 6.75488 0.254883C3.16488 0.254883 0.254883 3.16488 0.254883 6.75488C0.254883 10.3449 3.16488 13.2549 6.75488 13.2549C8.36488 13.2549 9.84488 12.6649 10.9849 11.6849L11.2549 11.9649V12.7549L16.2549 17.7449L17.7449 16.2549L12.7549 11.2549ZM6.75488 11.2549C4.26488 11.2549 2.25488 9.24488 2.25488 6.75488C2.25488 4.26488 4.26488 2.25488 6.75488 2.25488C9.24488 2.25488 11.2549 4.26488 11.2549 6.75488C11.2549 9.24488 9.24488 11.2549 6.75488 11.2549Z"
+                        fill="#998f90"
+                      />
+                    </svg>
+                  </div>
+                </Form.Group>
+              </div>
+              {isLoading ? (
+                <Loading />
+              ) : (
+                <div className="table-wrap mt-24">
+                  <Table responsive hover>
+                    <thead>
+                      <tr>
+                        {selectedSpeakerColumns.includes("N° de SIRET") && (
+                          <th>
+                            <div className="d-flex align-items-center">
+                              <span>N° de SIRET</span>
+                              <div>
+                                <Link
+                                  className={`sorting-icon ms-2`}
+                                  onClick={() =>
+                                    handleClickRotate("siren_number")
+                                  }
+                                >
+                                  {sort.value === "asc" && (
+                                    <svg
+                                      width="24"
+                                      height="24"
+                                      viewBox="0 0 24 24"
+                                      fill="none"
+                                      xmlns="http://www.w3.org/2000/svg"
+                                    >
+                                      <path
+                                        d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
+                                        fill="black"
+                                      />
+                                      <path
+                                        d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
+                                        fill="black"
+                                        fill-opacity="0.5"
+                                      />
+                                    </svg>
+                                  )}
+
+                                  {sort.value === "desc" && (
+                                    <svg
+                                      width="24"
+                                      height="24"
+                                      viewBox="0 0 24 24"
+                                      fill="none"
+                                      xmlns="http://www.w3.org/2000/svg"
+                                    >
+                                      <path
+                                        d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
+                                        fill="black"
+                                        fill-opacity="0.5"
+                                      />
+                                      <path
+                                        d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
+                                        fill="black"
+                                      />
+                                    </svg>
+                                  )}
+                                </Link>
+                              </div>
+                            </div>
+                          </th>
+                        )}
+                      
+                        {selectedSpeakerColumns.includes("Intervenant") && (
+                          <th>
+                            <div className="d-flex align-items-center">
+                              <span>Intervenant</span>
+                              <div>
+                                <Link
+                                  className={`sorting-icon ms-2`}
+                                  onClick={() =>
+                                    handleClickRotate("company_name")
+                                  }
+                                >
+                                  {sort.value === "asc" && (
+                                    <svg
+                                      width="24"
+                                      height="24"
+                                      viewBox="0 0 24 24"
+                                      fill="none"
+                                      xmlns="http://www.w3.org/2000/svg"
+                                    >
+                                      <path
+                                        d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
+                                        fill="black"
+                                      />
+                                      <path
+                                        d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
+                                        fill="black"
+                                        fill-opacity="0.5"
+                                      />
+                                    </svg>
+                                  )}
+
+                                  {sort.value === "desc" && (
+                                    <svg
+                                      width="24"
+                                      height="24"
+                                      viewBox="0 0 24 24"
+                                      fill="none"
+                                      xmlns="http://www.w3.org/2000/svg"
+                                    >
+                                      <path
+                                        d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
+                                        fill="black"
+                                        fill-opacity="0.5"
+                                      />
+                                      <path
+                                        d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
+                                        fill="black"
+                                      />
+                                    </svg>
+                                  )}
+                                </Link>
+                              </div>
+                            </div>
+                          </th>
+                        )}
+                        {selectedSpeakerColumns.includes("Dernière MaJ") && (
+                          <th>
+                            <div className="d-flex align-items-center">
+                              <span>Dernière MaJ</span>
+                              <div>
+                                <Link
+                                  className={`sorting-icon ms-2`}
+                                  onClick={() =>
+                                    handleClickRotate("updated_at")
+                                  }
+                                >
+                                  {sort.value === "asc" && (
+                                    <svg
+                                      width="24"
+                                      height="24"
+                                      viewBox="0 0 24 24"
+                                      fill="none"
+                                      xmlns="http://www.w3.org/2000/svg"
+                                    >
+                                      <path
+                                        d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
+                                        fill="black"
+                                      />
+                                      <path
+                                        d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
+                                        fill="black"
+                                        fill-opacity="0.5"
+                                      />
+                                    </svg>
+                                  )}
+
+                                  {sort.value === "desc" && (
+                                    <svg
+                                      width="24"
+                                      height="24"
+                                      viewBox="0 0 24 24"
+                                      fill="none"
+                                      xmlns="http://www.w3.org/2000/svg"
+                                    >
+                                      <path
+                                        d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
+                                        fill="black"
+                                        fill-opacity="0.5"
+                                      />
+                                      <path
+                                        d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
+                                        fill="black"
+                                      />
+                                    </svg>
+                                  )}
+                                </Link>
+                              </div>
+                            </div>
+                          </th>
+                        )}
+                          <th>Status</th>
+                        {selectedSpeakerColumns.includes("Doc. associés") && (
+                          <th>
+                            <div className="d-flex align-items-center">
+                              <span>Doc. associés</span>
+                              <div>
+                                <Link
+                                  className={`sorting-icon ms-2`}
+                                  onClick={() =>
+                                    handleClickRotate("user_document_count")
+                                  }
+                                >
+                                  {sort.value === "asc" && (
+                                    <svg
+                                      width="24"
+                                      height="24"
+                                      viewBox="0 0 24 24"
+                                      fill="none"
+                                      xmlns="http://www.w3.org/2000/svg"
+                                    >
+                                      <path
+                                        d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
+                                        fill="black"
+                                      />
+                                      <path
+                                        d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
+                                        fill="black"
+                                        fill-opacity="0.5"
+                                      />
+                                    </svg>
+                                  )}
+
+                                  {sort.value === "desc" && (
+                                    <svg
+                                      width="24"
+                                      height="24"
+                                      viewBox="0 0 24 24"
+                                      fill="none"
+                                      xmlns="http://www.w3.org/2000/svg"
+                                    >
+                                      <path
+                                        d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
+                                        fill="black"
+                                        fill-opacity="0.5"
+                                      />
+                                      <path
+                                        d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
+                                        fill="black"
+                                      />
+                                    </svg>
+                                  )}
+                                </Link>
+                              </div>
+                            </div>
+                          </th>
+                        )}
+                        {selectedSpeakerColumns.includes("Doc. Manquants") && (
+                          <th>
+                            <div className="d-flex align-items-center">
+                              <span>Doc. Manquants</span>
+                              <div>
+                                <Link
+                                  className={`sorting-icon ms-2`}
+                                  onClick={() =>
+                                    handleClickRotate("user_document_count")
+                                  }
+                                >
+                                  {sort.value === "asc" && (
+                                    <svg
+                                      width="24"
+                                      height="24"
+                                      viewBox="0 0 24 24"
+                                      fill="none"
+                                      xmlns="http://www.w3.org/2000/svg"
+                                    >
+                                      <path
+                                        d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
+                                        fill="black"
+                                      />
+                                      <path
+                                        d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
+                                        fill="black"
+                                        fill-opacity="0.5"
+                                      />
+                                    </svg>
+                                  )}
+
+                                  {sort.value === "desc" && (
+                                    <svg
+                                      width="24"
+                                      height="24"
+                                      viewBox="0 0 24 24"
+                                      fill="none"
+                                      xmlns="http://www.w3.org/2000/svg"
+                                    >
+                                      <path
+                                        d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
+                                        fill="black"
+                                        fill-opacity="0.5"
+                                      />
+                                      <path
+                                        d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
+                                        fill="black"
+                                      />
+                                    </svg>
+                                  )}
+                                </Link>
+                              </div>
+                            </div>
+                          </th>
+                        )}
+                        {selectedSpeakerColumns.includes("Actions") && (
+                          <th>Actions</th>
+                        )}
+                        <th style={{ textAlign: "right" }}>
+                          <Link onClick={handleAddSpeakerColShow}>
+                            <svg
+                              width="16"
+                              height="16"
+                              viewBox="0 0 14 14"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                d="M14 8H8V14H6V8H0V6H6V0H8V6H14V8Z"
+                                fill="black"
+                              />
+                            </svg>
+                          </Link>
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {speakerList?.length > 0 &&
+                      selectedSpeakerColumns.length > 0 ? (
+                        speakerList?.map((data) => (
+                          <tr onClick={() => setShowSpeakerInner(true)}>
+                            {selectedSpeakerColumns.includes("N° de SIRET") && (
+                              <td>{data.siren_number}</td>
+                            )}
+                            {selectedSpeakerColumns.includes("Intervenant") && (
+                              <td>
+                                <span className="text-elips">
+                                  {data.company_name}
+                                </span>
+                              </td>
+                            )}
+                            {selectedSpeakerColumns.includes(
+                              "Dernière MaJ"
+                            ) && <td>{data.updated_at}</td>}
+                            <td><span className="doc-status success"></span></td>
+                            {selectedSpeakerColumns.includes(
+                              "Doc. associés"
+                            ) && <td>{data.user_document_count}</td>}
+                            {selectedSpeakerColumns.includes(
+                              "Doc. Manquants"
+                            ) && <td>{data.missing_document_count}</td>}
+                            {selectedSpeakerColumns.includes("Actions") && (
+                              <td>
+                                <div class="action-btn">
+                                  <Link
+                                    // onClick={(e) => {
+                                    //   e.stopPropagation();
+                                    //   handleViewShowSpeaker();
+                                    //   setShowSpeakerId(data.id);
+                                    //   setTotalSpeakerDocument(
+                                    //     data.user_document_count
+                                    //   );
+                                    //   setTotalMissingDocument(
+                                    //     data.missing_document_count
+                                    //   );
+                                    // }}
+                                    onClick={() => setShowSpeakerInner(true)}
+                                    class="view"
+                                    href="/user-management"
+                                    data-discover="true"
+                                  >
+                                    <svg
+                                      width="24"
+                                      height="24"
+                                      viewBox="0 0 24 24"
+                                      fill="none"
+                                      xmlns="http://www.w3.org/2000/svg"
+                                    >
+                                      <path
+                                        d="M12 6.5C15.79 6.5 19.17 8.63 20.82 12C19.17 15.37 15.8 17.5 12 17.5C8.2 17.5 4.83 15.37 3.18 12C4.83 8.63 8.21 6.5 12 6.5ZM12 4.5C7 4.5 2.73 7.61 1 12C2.73 16.39 7 19.5 12 19.5C17 19.5 21.27 16.39 23 12C21.27 7.61 17 4.5 12 4.5ZM12 9.5C13.38 9.5 14.5 10.62 14.5 12C14.5 13.38 13.38 14.5 12 14.5C10.62 14.5 9.5 13.38 9.5 12C9.5 10.62 10.62 9.5 12 9.5ZM12 7.5C9.52 7.5 7.5 9.52 7.5 12C7.5 14.48 9.52 16.5 12 16.5C14.48 16.5 16.5 14.48 16.5 12C16.5 9.52 14.48 7.5 12 7.5Z"
+                                        fill="#00366B"
+                                      />
+                                    </svg>
+                                  </Link>
+                                  <Link
+                                    class="delete"
+                                    href="/user-management"
+                                    data-discover="true"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleShowDeleteSpeakerModal();
+                                      setShowSpeakerId(data.id);
+                                    }}
+                                  >
+                                    <svg
+                                      width="24"
+                                      height="24"
+                                      viewBox="0 0 24 24"
+                                      fill="none"
+                                      xmlns="http://www.w3.org/2000/svg"
+                                    >
+                                      <path
+                                        d="M16 9V19H8V9H16ZM14.5 3H9.5L8.5 4H5V6H19V4H15.5L14.5 3ZM18 7H6V19C6 20.1 6.9 21 8 21H16C17.1 21 18 20.1 18 19V7Z"
+                                        fill="#00366B"
+                                      />
+                                    </svg>
+                                  </Link>
+                                </div>
+                              </td>
+                            )}
+                            <td></td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr style={{ textAlign: "center" }}>
+                          <td colSpan="6">{t("NorecordsfoundLabel")}</td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </Table>
+                </div>
+              )}
+              {totalSpeaker > 10 && (
+                <Paginations
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={handlePageChange}
+                />
+              )}
+            </div>
+			    )}
+
+          </Tab>
+
+
 
           {/* History Tab */}
           <Tab eventKey="history" title="Historique">
@@ -2476,7 +3713,11 @@ const BrokerFileDetail = () => {
                     onChange={(e) => setSearch(e.target.value)}
                     onKeyDown={handleKeyPress}
                   />
-                  <div className="search-icon" style={{ cursor: "pointer" }} onClick={() => handleSearchChange(search, 1)}>
+                  <div
+                    className="search-icon"
+                    style={{ cursor: "pointer" }}
+                    onClick={() => handleSearchChange(search, 1)}
+                  >
                     <svg
                       width="18"
                       height="18"
@@ -2492,7 +3733,9 @@ const BrokerFileDetail = () => {
                   </div>
                 </Form.Group>
               </div>
-              {isLoading ? <Loading /> :
+              {isLoading ? (
+                <Loading />
+              ) : (
                 <div className="table-wrap mt-24">
                   <Table responsive hover>
                     <thead>
@@ -2506,7 +3749,9 @@ const BrokerFileDetail = () => {
                             >
                               <option value="">Type d'action</option>
                               <option value="Message">Message</option>
-                              <option value="Changement de statut">Changement de statut</option>
+                              <option value="Changement de statut">
+                                Changement de statut
+                              </option>
                               <option value="Transmission">Transmission</option>
                             </Form.Select>
                           </div>
@@ -2520,35 +3765,49 @@ const BrokerFileDetail = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {historyDocumentList?.length > 0 ?
+                      {historyDocumentList?.length > 0 ? (
                         historyDocumentList?.map((data) => (
                           <tr>
                             <td>{data.action_type || "-"}</td>
                             <td>{data.action_details || "-"}</td>
-                            <td>{data.transfer_by ? data.transfer_by.name : "-"}</td>
-                            <td>{data.user_document_file ? data.user_document_file.filename : "-"}</td>
-                            <td>{data.user_document_file ? data.user_document_file.document_type : "-"}</td>
-                            <td>{data.disability_reason ? data.disability_reason.reason : "-"}</td>
+                            <td>
+                              {data.transfer_by ? data.transfer_by.name : "-"}
+                            </td>
+                            <td>
+                              {data.user_document_file
+                                ? data.user_document_file.filename
+                                : "-"}
+                            </td>
+                            <td>
+                              {data.user_document_file
+                                ? data.user_document_file.document_type
+                                : "-"}
+                            </td>
+                            <td>
+                              {data.disability_reason
+                                ? data.disability_reason.reason
+                                : "-"}
+                            </td>
                             <td>{data.created_at || "-"}</td>
                           </tr>
                         ))
-                        : (
-                          <tr style={{ textAlign: "left" }}>
-                            <td colSpan={7}>{t("NorecordsfoundLabel")}</td>
-                          </tr>
-                        )}
+                      ) : (
+                        <tr style={{ textAlign: "left" }}>
+                          <td colSpan={7}>{t("NorecordsfoundLabel")}</td>
+                        </tr>
+                      )}
                     </tbody>
                   </Table>
                 </div>
-              }
+              )}
 
-              {totalHistoryRecords > 10 &&
+              {totalHistoryRecords > 10 && (
                 <Paginations
                   currentPage={currentPage}
                   totalPages={totalPages}
                   onPageChange={handlePageChange}
                 />
-              }
+              )}
             </div>
           </Tab>
         </Tabs>
@@ -2574,17 +3833,21 @@ const BrokerFileDetail = () => {
             <div className="step-1">
               <div className="div">
                 <div className="step-2">
-                  <h2>Remplacer un document <span>*</span></h2>
-                  {showReplace && <div className="replace-document mt-32">
-                    Document remplacé :{" "}
-                    <span>{showDocumentName}</span>
-                  </div>}
+                  <h2>
+                    Remplacer un document <span>*</span>
+                  </h2>
+                  {showReplace && (
+                    <div className="replace-document mt-32">
+                      Document remplacé : <span>{showDocumentName}</span>
+                    </div>
+                  )}
                   {flashMessageStoreDoc.message && (
                     <div
-                      className={`mt-3 alert ${flashMessageStoreDoc.type === "success"
-                        ? "alert-success"
-                        : "alert-danger"
-                        } text-center`}
+                      className={`mt-3 alert ${
+                        flashMessageStoreDoc.type === "success"
+                          ? "alert-success"
+                          : "alert-danger"
+                      } text-center`}
                       role="alert"
                     >
                       {flashMessageStoreDoc.message}
@@ -2619,10 +3882,13 @@ const BrokerFileDetail = () => {
                       </svg>
                       <p className="upload-text">
                         {t("DragyourdocumentsLabel")}{" "}
-                        <span className="browse-link">{t("browsemyfilesLabel")}</span>
+                        <span className="browse-link">
+                          {t("browsemyfilesLabel")}
+                        </span>
                       </p>
                       <span>
-                        {t("documentsAcceptedLabel")}: mot, exceller, pdf, PowerPoint
+                        {t("documentsAcceptedLabel")}: mot, exceller, pdf,
+                        PowerPoint
                       </span>
                       <Form.Control
                         type="file"
@@ -2670,15 +3936,25 @@ const BrokerFileDetail = () => {
         </Offcanvas>
 
         {/* Delete Document Confirmation Popup */}
-        <Modal className="final-modal" show={showDeleteModal} onHide={handleCloseDeleteModal}>
+        <Modal
+          className="final-modal"
+          show={showDeleteModal}
+          onHide={handleCloseDeleteModal}
+        >
           <Modal.Header closeButton>
-            <Modal.Title><h2>Confirmation</h2></Modal.Title>
+            <Modal.Title>
+              <h2>Confirmation</h2>
+            </Modal.Title>
           </Modal.Header>
           <Modal.Body>
             <p>Etes-vous sûr de vouloir supprimer le fichier?</p>
           </Modal.Body>
           <Modal.Footer>
-            <Button className="cancel-btn" variant="primary" onClick={handleCloseDeleteModal}>
+            <Button
+              className="cancel-btn"
+              variant="primary"
+              onClick={handleCloseDeleteModal}
+            >
               Annuler
             </Button>
             <Button variant="primary" onClick={HandleDeleteDocumentFile}>
@@ -2688,15 +3964,25 @@ const BrokerFileDetail = () => {
         </Modal>
 
         {/* Delete Speaker Confirmation Popup */}
-        <Modal className="final-modal" show={showDeleteSpeakerModal} onHide={handleCloseDeleteSpeakerModal}>
+        <Modal
+          className="final-modal"
+          show={showDeleteSpeakerModal}
+          onHide={handleCloseDeleteSpeakerModal}
+        >
           <Modal.Header closeButton>
-            <Modal.Title><h2>Confirmation</h2></Modal.Title>
+            <Modal.Title>
+              <h2>Confirmation</h2>
+            </Modal.Title>
           </Modal.Header>
           <Modal.Body>
             <p>Etes-vous sûr de vouloir supprimer le intervenants?</p>
           </Modal.Body>
           <Modal.Footer>
-            <Button className="cancel-btn" variant="primary" onClick={handleCloseDeleteSpeakerModal}>
+            <Button
+              className="cancel-btn"
+              variant="primary"
+              onClick={handleCloseDeleteSpeakerModal}
+            >
               Annuler
             </Button>
             <Button variant="primary" onClick={HandleDeleteSpeaker}>
@@ -2713,21 +3999,22 @@ const BrokerFileDetail = () => {
           onHide={handleDocClose}
         >
           <Offcanvas.Header closeButton>
-            <Offcanvas.Title>Ajouter un document
-            </Offcanvas.Title>
+            <Offcanvas.Title>Ajouter un document</Offcanvas.Title>
           </Offcanvas.Header>
           <Offcanvas.Body>
             <div className="step-1">
               <div className="div">
                 <div className="step-2">
-                  <h2>Ajouter un document <span>*</span>
+                  <h2>
+                    Ajouter un document <span>*</span>
                   </h2>
                   {flashMessageStoreDoc.message && (
                     <div
-                      className={`mt-3 alert ${flashMessageStoreDoc.type === "success"
-                        ? "alert-success"
-                        : "alert-danger"
-                        } text-center`}
+                      className={`mt-3 alert ${
+                        flashMessageStoreDoc.type === "success"
+                          ? "alert-success"
+                          : "alert-danger"
+                      } text-center`}
                       role="alert"
                     >
                       {flashMessageStoreDoc.message}
@@ -2762,10 +4049,13 @@ const BrokerFileDetail = () => {
                       </svg>
                       <p className="upload-text">
                         {t("DragyourdocumentsLabel")}{" "}
-                        <span className="browse-link">{t("browsemyfilesLabel")}</span>
+                        <span className="browse-link">
+                          {t("browsemyfilesLabel")}
+                        </span>
                       </p>
                       <span>
-                        {t("documentsAcceptedLabel")}: mot, exceller, pdf, PowerPoint
+                        {t("documentsAcceptedLabel")}: mot, exceller, pdf,
+                        PowerPoint
                       </span>
                       <Form.Control
                         type="file"
@@ -2803,7 +4093,13 @@ const BrokerFileDetail = () => {
             </div>
           </Offcanvas.Body>
           <div className="offcanvas-footer text-end">
-            <button className="btn btn-primary" disabled={!fileList.length} onClick={(e) => HandleAddDocument(e)}>Suivant</button>
+            <button
+              className="btn btn-primary"
+              disabled={!fileList.length}
+              onClick={(e) => HandleAddDocument(e)}
+            >
+              Suivant
+            </button>
           </div>
         </Offcanvas>
 
@@ -2819,29 +4115,44 @@ const BrokerFileDetail = () => {
           </Offcanvas.Header>
           <Offcanvas.Body>
             <div className="div">
-              <h2>{t("brokerlabel")}: {viewRowData?.user_document?.broker ? viewRowData?.user_document?.broker?.first_name + " " + viewRowData?.user_document?.broker?.last_name : ""}</h2>
+              <h2>
+                {t("brokerlabel")}:{" "}
+                {viewRowData?.user_document?.broker
+                  ? viewRowData?.user_document?.broker?.first_name +
+                    " " +
+                    viewRowData?.user_document?.broker?.last_name
+                  : ""}
+              </h2>
               <div className="table-wrapper mt-16 p-0">
                 <div className="table-wrap mt-24">
                   <Table responsive hover>
                     <thead>
                       <tr>
                         <th>{t("fileNameLabe")}</th>
-                        {activeTab !== "otherdocument" && <th> <span>{t("speakerLabel")} </span></th>}
+                        {activeTab !== "otherdocument" && (
+                          <th>
+                            {" "}
+                            <span>{t("speakerLabel")} </span>
+                          </th>
+                        )}
                         <th>{t("createdLabel")}</th>
                         <th>{t("status")}</th>
                       </tr>
                     </thead>
                     <tbody>
                       <tr>
-                        <td>
-                          {viewRowData?.filename}
-                        </td>
-                        {activeTab !== "otherdocument" && <td>
-                          {viewRowData?.speaker ? (viewRowData?.speaker?.company_name + (viewRowData?.speaker?.siren_number ? " - " + viewRowData?.speaker?.siren_number : "")) : ""}
-                        </td>}
-                        <td>
-                          {viewRowData?.created_at}
-                        </td>
+                        <td>{viewRowData?.filename}</td>
+                        {activeTab !== "otherdocument" && (
+                          <td>
+                            {viewRowData?.speaker
+                              ? viewRowData?.speaker?.company_name +
+                                (viewRowData?.speaker?.siren_number
+                                  ? " - " + viewRowData?.speaker?.siren_number
+                                  : "")
+                              : ""}
+                          </td>
+                        )}
+                        <td>{viewRowData?.created_at}</td>
                         <td>
                           {viewRowData?.status == "to_be_checked" ? (
                             <span className="checked badges">
@@ -2889,11 +4200,15 @@ const BrokerFileDetail = () => {
             <Form.Check
               id="select-all-checkbox"
               label="Sélectionner tout"
-              checked={Object.values(speakerModalColumns).every((value) => value)} // All true
+              checked={Object.values(speakerModalColumns).every(
+                (value) => value
+              )} // All true
               onChange={(e) => {
                 const isChecked = e.target.checked;
                 setSpeakerModalColumns((prev) =>
-                  Object.fromEntries(Object.keys(prev).map((key) => [key, isChecked]))
+                  Object.fromEntries(
+                    Object.keys(prev).map((key) => [key, isChecked])
+                  )
                 );
               }}
             />
@@ -2903,7 +4218,14 @@ const BrokerFileDetail = () => {
               <Form.Check
                 key={key}
                 id={`checkbox-${key}`}
-                label={<label style={{ cursor: "pointer" }} htmlFor={`checkbox-${key}`}>{t(key)}</label>}
+                label={
+                  <label
+                    style={{ cursor: "pointer" }}
+                    htmlFor={`checkbox-${key}`}
+                  >
+                    {t(key)}
+                  </label>
+                }
                 checked={speakerModalColumns[key]}
                 onChange={() => handleSpeakerCheckboxChange(key)}
               />
@@ -2927,11 +4249,15 @@ const BrokerFileDetail = () => {
             <Form.Check
               id="select-all-checkbox"
               label="Sélectionner tout"
-              checked={Object.values(otherDocModalColumns).every((value) => value)} // All true
+              checked={Object.values(otherDocModalColumns).every(
+                (value) => value
+              )} // All true
               onChange={(e) => {
                 const isChecked = e.target.checked;
                 setOtherDocModalColumns((prev) =>
-                  Object.fromEntries(Object.keys(prev).map((key) => [key, isChecked]))
+                  Object.fromEntries(
+                    Object.keys(prev).map((key) => [key, isChecked])
+                  )
                 );
               }}
             />
@@ -2941,7 +4267,14 @@ const BrokerFileDetail = () => {
               <Form.Check
                 key={key}
                 id={`checkbox-${key}`}
-                label={<label style={{ cursor: "pointer" }} htmlFor={`checkbox-${key}`}>{t(key)}</label>}
+                label={
+                  <label
+                    style={{ cursor: "pointer" }}
+                    htmlFor={`checkbox-${key}`}
+                  >
+                    {t(key)}
+                  </label>
+                }
                 checked={otherDocModalColumns[key]}
                 onChange={() => handleOtherCheckboxChange(key)}
               />
@@ -2960,7 +4293,9 @@ const BrokerFileDetail = () => {
             <Modal.Title>Raison invalide</Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            {isLoading ? <Loading /> :
+            {isLoading ? (
+              <Loading />
+            ) : (
               <div className="step-2">
                 {displayedInvalidResonList?.length > 0 ? (
                   <div
@@ -2969,7 +4304,7 @@ const BrokerFileDetail = () => {
                     style={{
                       maxHeight: "400px",
                       overflowY: "auto",
-                      scrollbarWidth: "thin"
+                      scrollbarWidth: "thin",
                     }}
                   >
                     <div style={{ height: "400px" }}>
@@ -2977,12 +4312,16 @@ const BrokerFileDetail = () => {
                         <Fragment>
                           <div className="note-box mb-3">
                             <div className="d-flex justify-content-between align-items-center top-part">
-                              <p className="m-0">{data.type == "note" ? "Note" : "Invalide"}</p>
-                              <p className="m-0 create-date">créé le {data.created_on}</p>
+                              <p className="m-0">
+                                {data.type == "note" ? "Note" : "Invalide"}
+                              </p>
+                              <p className="m-0 create-date">
+                                créé le {data.created_on}
+                              </p>
                             </div>
                             <div className="inner-box">
                               <div className="d-flex align-items-center mb-3">
-                                {data.type != "note" &&
+                                {data.type != "note" && (
                                   <div className="icon d-flex">
                                     <svg
                                       width="16"
@@ -2997,30 +4336,26 @@ const BrokerFileDetail = () => {
                                       ></path>
                                     </svg>
                                   </div>
-                                }
-                                <div className="file-names">{data.user_document_filename}</div>
+                                )}
+                                <div className="file-names">
+                                  {data.user_document_filename}
+                                </div>
                               </div>
-                              <p className="">
-                                {data.reason}
-                              </p>
+                              <p className="">{data.reason}</p>
                             </div>
                           </div>
                         </Fragment>
                       ))}
                     </div>
                   </div>
-                )
-                  :
-                  (
-                    <div>
-                      {t("NorecordsfoundLabel")}
-                    </div>
-                  )}
+                ) : (
+                  <div>{t("NorecordsfoundLabel")}</div>
+                )}
               </div>
-            }
+            )}
           </Modal.Body>
           <Modal.Footer>
-            <Button variant="secondary" onClick={handleInvalidReasonModalClose} >
+            <Button variant="secondary" onClick={handleInvalidReasonModalClose}>
               Fermer
             </Button>
           </Modal.Footer>
@@ -3045,10 +4380,11 @@ const BrokerFileDetail = () => {
               <Tab eventKey="speaker" title="Informations générales ">
                 {flashMessage.message && (
                   <div
-                    className={`alert ${flashMessage.type === "success"
-                      ? "alert-success"
-                      : "alert-danger"
-                      } text-center`}
+                    className={`alert ${
+                      flashMessage.type === "success"
+                        ? "alert-success"
+                        : "alert-danger"
+                    } text-center`}
                     role="alert"
                   >
                     {flashMessage.message}
@@ -3056,10 +4392,11 @@ const BrokerFileDetail = () => {
                 )}
                 {flashMessageStoreDoc.message && (
                   <div
-                    className={`mt-3 alert ${flashMessageStoreDoc.type === "success"
-                      ? "alert-success"
-                      : "alert-danger"
-                      } text-center`}
+                    className={`mt-3 alert ${
+                      flashMessageStoreDoc.type === "success"
+                        ? "alert-success"
+                        : "alert-danger"
+                    } text-center`}
                     role="alert"
                   >
                     {flashMessageStoreDoc.message}
@@ -3078,7 +4415,11 @@ const BrokerFileDetail = () => {
                       placeholder="SIRET"
                       name="siren_number"
                       disabled
-                      value={speakerDetail?.siren_number ? speakerDetail?.siren_number : "-"}
+                      value={
+                        speakerDetail?.siren_number
+                          ? speakerDetail?.siren_number
+                          : "-"
+                      }
                       onChange={(e) =>
                         setSpeakerDetail({
                           ...speakerDetail,
@@ -3096,7 +4437,11 @@ const BrokerFileDetail = () => {
                       defaultValue="Mark"
                       name="company_name"
                       disabled
-                      value={speakerDetail?.company_name ? speakerDetail?.company_name : "-"}
+                      value={
+                        speakerDetail?.company_name
+                          ? speakerDetail?.company_name
+                          : "-"
+                      }
                       onChange={(e) =>
                         setSpeakerDetail({
                           ...speakerDetail,
@@ -3113,7 +4458,9 @@ const BrokerFileDetail = () => {
                       placeholder="Adresse"
                       name="address"
                       disabled
-                      value={speakerDetail?.address ? speakerDetail?.address : "-"}
+                      value={
+                        speakerDetail?.address ? speakerDetail?.address : "-"
+                      }
                       onChange={(e) =>
                         setSpeakerDetail({
                           ...speakerDetail,
@@ -3133,7 +4480,11 @@ const BrokerFileDetail = () => {
                           placeholder="Code postal"
                           name="postcode"
                           disabled
-                          value={speakerDetail?.postcode ? speakerDetail?.postcode : "-"}
+                          value={
+                            speakerDetail?.postcode
+                              ? speakerDetail?.postcode
+                              : "-"
+                          }
                           onChange={(e) =>
                             setSpeakerDetail({
                               ...speakerDetail,
@@ -3153,7 +4504,9 @@ const BrokerFileDetail = () => {
                           placeholder="Ville"
                           name="city"
                           disabled
-                          value={speakerDetail?.city ? speakerDetail?.city : "-"}
+                          value={
+                            speakerDetail?.city ? speakerDetail?.city : "-"
+                          }
                           onChange={(e) =>
                             setSpeakerDetail({
                               ...speakerDetail,
@@ -3166,7 +4519,10 @@ const BrokerFileDetail = () => {
                   </Form>
                 )}
               </Tab>
-              <Tab eventKey="documents" title={`Documents (${totalSpeakerDocument})`}>
+              <Tab
+                eventKey="documents"
+                title={`Documents (${totalSpeakerDocument})`}
+              >
                 {isLoading ? (
                   <Loading />
                 ) : (
@@ -3287,13 +4643,17 @@ const BrokerFileDetail = () => {
                   </div>
                 )}
               </Tab>
-              <Tab eventKey="documentType" title={`Documents manquants (${totalMissingDocument})`}>
+              <Tab
+                eventKey="documentType"
+                title={`Documents manquants (${totalMissingDocument})`}
+              >
                 {flashMessage.message && (
                   <div
-                    className={`alert ${flashMessage.type === "success"
-                      ? "alert-success"
-                      : "alert-danger"
-                      } text-center`}
+                    className={`alert ${
+                      flashMessage.type === "success"
+                        ? "alert-success"
+                        : "alert-danger"
+                    } text-center`}
                     role="alert"
                   >
                     {flashMessage.message}
@@ -3327,8 +4687,17 @@ const BrokerFileDetail = () => {
                                     data-discover="true"
                                     title="Ajouter un document manquants"
                                   >
-                                    <svg width="16" height="20" viewBox="0 0 16 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                      <path d="M9 9H7V12H4V14H7V17H9V14H12V12H9V9ZM10 0H2C0.9 0 0 0.9 0 2V18C0 19.1 0.89 20 1.99 20H14C15.1 20 16 19.1 16 18V6L10 0ZM14 18H2V2H9V7H14V18Z" fill="black" />
+                                    <svg
+                                      width="16"
+                                      height="20"
+                                      viewBox="0 0 16 20"
+                                      fill="none"
+                                      xmlns="http://www.w3.org/2000/svg"
+                                    >
+                                      <path
+                                        d="M9 9H7V12H4V14H7V17H9V14H12V12H9V9ZM10 0H2C0.9 0 0 0.9 0 2V18C0 19.1 0.89 20 1.99 20H14C15.1 20 16 19.1 16 18V6L10 0ZM14 18H2V2H9V7H14V18Z"
+                                        fill="black"
+                                      />
                                     </svg>
                                   </Link>
                                 </td>
@@ -3351,7 +4720,11 @@ const BrokerFileDetail = () => {
       </div>
 
       {/* Send To Manager, Broker, file  */}
-      <Modal className='missing-doc-modal' show={showSendFileChange} onHide={() => setShowSendFileChange(true)}>
+      <Modal
+        className="missing-doc-modal"
+        show={showSendFileChange}
+        onHide={() => setShowSendFileChange(true)}
+      >
         <Modal.Header closeButton onHide={handleSendFileClose}>
           <Modal.Title>
             <h2>Confirmer</h2>

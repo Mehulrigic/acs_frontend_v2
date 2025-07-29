@@ -1917,9 +1917,9 @@ const ManagerFileDetail = () => {
             <h1 className="m-0 mb-md-0 mb-3">Dossier {showUserFolderName}</h1>
           </div>
           <div
-            className="detail-header"
-            style={{ display: "flex", justifyContent: "right" }}
+            className="detail-header new-update-header"
           >
+            <div className="d-flex align-items-center ms-auto top-part">
             <div style={{ marginRight: "20px" }} className="div">
               <Link onClick={toggleDetail} className="fold-unfold-link link-wrap">
                 {isVisible ? 'Fold Detail' : 'Unfold Detail'}
@@ -1963,7 +1963,7 @@ const ManagerFileDetail = () => {
             </Form.Select>
           </div>
 
-          <div className={`detail-header second-header ${isVisible ? 'show' : ''}`}>
+          <div className={`second-header ${isVisible ? 'show' : ''}`}>
             <div className="d-flex align-items-center check-status">
               <div className="d-flex align-items-center check-status">
                 <p className="m-0" style={{ paddingRight: "10px" }}>
@@ -1982,7 +1982,7 @@ const ManagerFileDetail = () => {
                 </div>
               </div>
 
-              <div className="d-flex flex-wrap gap-3">
+              <div className="grid-view">
 
                 <div className="d-flex align-items-center">
                   <p className="m-0">Statut : </p>
@@ -2036,6 +2036,7 @@ const ManagerFileDetail = () => {
             </div>
           </div>
         </div>
+      </div>
 
         <Tabs
           activeKey={activeTab}
@@ -2189,26 +2190,27 @@ const ManagerFileDetail = () => {
                           </td>
                         </tr>
                         <tr>
-                          <td>                            
+                          <td>
                             <div className="d-flex align-items-center">
-                            <span className="file-type-icon">
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="24"
-                                height="24"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                              >
-                                <path
-                                  d="M12.65 2.23994C12.4689 2.08503 12.2383 1.99992 12 1.99994H5C4.73478 1.99994 4.48043 2.1053 4.29289 2.29283C4.10536 2.48037 4 2.73472 4 2.99994V20.9999C4 21.2652 4.10536 21.5195 4.29289 21.7071C4.48043 21.8946 4.73478 21.9999 5 21.9999H19C19.2652 21.9999 19.5196 21.8946 19.7071 21.7071C19.8946 21.5195 20 21.2652 20 20.9999V8.99994C20 8.8555 19.9687 8.71277 19.9083 8.58157C19.8479 8.45038 19.7598 8.33383 19.65 8.23994L12.65 2.23994ZM13 5.16994L16.3 7.99994H13V5.16994ZM18 19.9999H6V3.99994H11V8.99994C11 9.26516 11.1054 9.51951 11.2929 9.70705C11.4804 9.89458 11.7348 9.99994 12 9.99994H18V19.9999Z"
-                                  fill="white"
-                                />
-                              </svg>
-                            </span>
-                            <span className="text-elips">
-                              General documents
-                            </span>
-                          </div></td>
+                              <span className="file-type-icon">
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  width="24"
+                                  height="24"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                >
+                                  <path
+                                    d="M12.65 2.23994C12.4689 2.08503 12.2383 1.99992 12 1.99994H5C4.73478 1.99994 4.48043 2.1053 4.29289 2.29283C4.10536 2.48037 4 2.73472 4 2.99994V20.9999C4 21.2652 4.10536 21.5195 4.29289 21.7071C4.48043 21.8946 4.73478 21.9999 5 21.9999H19C19.2652 21.9999 19.5196 21.8946 19.7071 21.7071C19.8946 21.5195 20 21.2652 20 20.9999V8.99994C20 8.8555 19.9687 8.71277 19.9083 8.58157C19.8479 8.45038 19.7598 8.33383 19.65 8.23994L12.65 2.23994ZM13 5.16994L16.3 7.99994H13V5.16994ZM18 19.9999H6V3.99994H11V8.99994C11 9.26516 11.1054 9.51951 11.2929 9.70705C11.4804 9.89458 11.7348 9.99994 12 9.99994H18V19.9999Z"
+                                    fill="white"
+                                  />
+                                </svg>
+                              </span>
+                              <span className="text-elips">
+                                General documents
+                              </span>
+                            </div>
+                          </td>
                           <td>2</td>
                           <td>
                             <span className="doc-status warning"></span>
@@ -2238,6 +2240,47 @@ const ManagerFileDetail = () => {
                           <td>
                             <span className="doc-status danger"></span>
                           </td>
+                        </tr>
+                      </tbody>
+                    </Table>
+                  </div>
+                </div>
+
+                <h2 className="mb-3 mt-3">Task</h2>
+                <div className="custom-grid-card">
+                  <h3>Coming Task - to be determined</h3>
+                  <div className="table-wrap mt-24">
+                    <Table responsive hover>
+                      <thead>
+                        <tr>
+                          <th>Name of Task</th>
+                          <th>Dead line</th>
+                          <th>Task description</th>
+                          <th>Name of responsible</th>
+                          <th>status</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>Task 1</td>
+                          <td>dead line</td>
+                          <td>Task description</td>
+                          <td>Name of responsible</td>
+                          <td><span class="checked badges">À vérifier</span></td>
+                        </tr>
+                        <tr>
+                          <td>Task 1</td>
+                          <td>dead line</td>
+                          <td>Task description</td>
+                          <td>Name of responsible</td>
+                          <td><span class="checked badges">À vérifier</span></td>
+                        </tr>
+                        <tr>
+                          <td>Task 1</td>
+                          <td>dead line</td>
+                          <td>Task description</td>
+                          <td>Name of responsible</td>
+                          <td><span class="checked badges">À vérifier</span></td>
                         </tr>
                       </tbody>
                     </Table>
@@ -2341,47 +2384,6 @@ const ManagerFileDetail = () => {
                       </div>
                     </div>
                     <button type="submit" class="btn-secondary btn btn-primary">See All</button>
-                  </div>
-
-                </div>
-                <h2 className="mb-3 mt-3">Task</h2>
-                <div className="custom-grid-card">
-                  <h3>Coming Task - to be determined</h3>
-                  <div className="table-wrap mt-24">
-                    <Table responsive hover>
-                      <thead>
-                        <tr>
-                          <th>Name of Task</th>
-                          <th>Dead line</th>
-                          <th>Task description</th>
-                          <th>Name of responsible</th>
-                          <th>status</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <td>Task 1</td>
-                          <td>dead line</td>
-                          <td>Task description</td>
-                          <td>Name of responsible</td>
-                          <td><span class="checked badges">À vérifier</span></td>
-                        </tr>
-                        <tr>
-                          <td>Task 1</td>
-                          <td>dead line</td>
-                          <td>Task description</td>
-                          <td>Name of responsible</td>
-                          <td><span class="checked badges">À vérifier</span></td>
-                        </tr>
-                        <tr>
-                          <td>Task 1</td>
-                          <td>dead line</td>
-                          <td>Task description</td>
-                          <td>Name of responsible</td>
-                          <td><span class="checked badges">À vérifier</span></td>
-                        </tr>
-                      </tbody>
-                    </Table>
                   </div>
                 </div>
               </div>
@@ -4174,8 +4176,8 @@ const ManagerFileDetail = () => {
             {/* screen 1 */}
             {showSepeakerInner ? (
               <div className="inner-tab-screen">
-                <div className="d-md-flex">
-                  <div className="me-0 me-md-4">
+                <div className="row">
+                  <div className="col-md-4">
                     {flashMessage.message && (
                       <div
                         className={`alert ${flashMessage.type === "success"
@@ -4340,7 +4342,7 @@ const ManagerFileDetail = () => {
                       </Form>
                     )}
                   </div>
-                  <div className="flex-fill">
+                  <div className="col-md-8 flex-fill">
                     <Tabs
                       onSelect={handleSubTabSelect}
                       defaultActiveKey="intervenants"
@@ -4369,25 +4371,27 @@ const ManagerFileDetail = () => {
                                   {showSpeakerDocument?.length > 0 ? (
                                     showSpeakerDocument?.map((data) => (
                                       <tr>
-                                        <div className="d-flex align-items-center">
-                                          <span className="file-type-icon">
-                                            <svg
-                                              xmlns="http://www.w3.org/2000/svg"
-                                              width="24"
-                                              height="24"
-                                              viewBox="0 0 24 24"
-                                              fill="none"
-                                            >
-                                              <path
-                                                d="M12.65 2.23994C12.4689 2.08503 12.2383 1.99992 12 1.99994H5C4.73478 1.99994 4.48043 2.1053 4.29289 2.29283C4.10536 2.48037 4 2.73472 4 2.99994V20.9999C4 21.2652 4.10536 21.5195 4.29289 21.7071C4.48043 21.8946 4.73478 21.9999 5 21.9999H19C19.2652 21.9999 19.5196 21.8946 19.7071 21.7071C19.8946 21.5195 20 21.2652 20 20.9999V8.99994C20 8.8555 19.9687 8.71277 19.9083 8.58157C19.8479 8.45038 19.7598 8.33383 19.65 8.23994L12.65 2.23994ZM13 5.16994L16.3 7.99994H13V5.16994ZM18 19.9999H6V3.99994H11V8.99994C11 9.26516 11.1054 9.51951 11.2929 9.70705C11.4804 9.89458 11.7348 9.99994 12 9.99994H18V19.9999Z"
-                                                fill="white"
-                                              />
-                                            </svg>
-                                          </span>
-                                          <span className="text-elips">
-                                            {data.filename}
-                                          </span>
-                                        </div>
+                                        <td>
+                                          <div className="d-flex align-items-center">
+                                            <span className="file-type-icon">
+                                              <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                width="24"
+                                                height="24"
+                                                viewBox="0 0 24 24"
+                                                fill="none"
+                                              >
+                                                <path
+                                                  d="M12.65 2.23994C12.4689 2.08503 12.2383 1.99992 12 1.99994H5C4.73478 1.99994 4.48043 2.1053 4.29289 2.29283C4.10536 2.48037 4 2.73472 4 2.99994V20.9999C4 21.2652 4.10536 21.5195 4.29289 21.7071C4.48043 21.8946 4.73478 21.9999 5 21.9999H19C19.2652 21.9999 19.5196 21.8946 19.7071 21.7071C19.8946 21.5195 20 21.2652 20 20.9999V8.99994C20 8.8555 19.9687 8.71277 19.9083 8.58157C19.8479 8.45038 19.7598 8.33383 19.65 8.23994L12.65 2.23994ZM13 5.16994L16.3 7.99994H13V5.16994ZM18 19.9999H6V3.99994H11V8.99994C11 9.26516 11.1054 9.51951 11.2929 9.70705C11.4804 9.89458 11.7348 9.99994 12 9.99994H18V19.9999Z"
+                                                  fill="white"
+                                                />
+                                              </svg>
+                                            </span>
+                                            <span className="text-elips">
+                                              {data.filename}
+                                            </span>
+                                          </div>
+                                        </td>
                                         <td>{data.docType?.name}</td>
                                         <td>
                                           {data.status == "to_be_checked" ? (
@@ -4655,7 +4659,7 @@ const ManagerFileDetail = () => {
                                 variant="primary"
                                 onClick={() => HandleGetDetails(SIRETNumber)}
                                 style={{
-                                  height: "62px",
+                                  height: "52px",
                                   borderTopLeftRadius: 0,
                                   borderBottomLeftRadius: 0,
                                 }}

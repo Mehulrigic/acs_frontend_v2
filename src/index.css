@@ -66,21 +66,21 @@ a {
 }
 h1 {
   font-weight: 600;
-  font-size: 32px;
+font-size: 28px;
   line-height: 100%;
   letter-spacing: 0px;
 }
 
 h2 {
   font-weight: 500;
-  font-size: 24px;
+  font-size: 21px;
   line-height: 100%;
   letter-spacing: 0px;
 }
 
 h3 {
   font-weight: 500;
-  font-size: 21px;
+  font-size: 19px;
   line-height: 100%;
   letter-spacing: 0px;
 }
@@ -176,8 +176,9 @@ input[type=date], input[type=email], input[type=number], input[type=password], i
   line-height: 26px;
   letter-spacing: 0px;
   border-radius: 18px;
-  min-height: 62px;
-      padding: 16px 24px;
+    min-height: 50px;
+    padding: 12px 24px;
+
 }
 textarea.form-control{
   min-height: 143px;
@@ -328,7 +329,7 @@ text-align: left;
     padding: 17px 16px;
 
 font-weight: 400;
-font-size: 16px;
+font-size: 14px;
 line-height: 100%;
 letter-spacing: 0px;
 
@@ -382,12 +383,12 @@ letter-spacing: 0px;
   box-shadow: none;
 }
 .table-wrap td span.badges{
-  border-radius: 60px;
-  color: var(--table-th-color);
-    font-size: 16px;
+    border-radius: 60px;
+    color: var(--table-th-color);
+    font-size: 14px;
     font-weight: 400;
     line-height: 21.86px;
-    padding: 9px 16px 9px 51px;
+    padding: 6px 16px 6px 51px;
     background-repeat: no-repeat;
     background-position: center left 18px;
     width: 100%;
@@ -443,7 +444,7 @@ letter-spacing: 0px;
     line-height: 100%;
     text-align: center;
     border: none;
-    padding: 22px 26px;
+    padding: 18px 26px;
     transition: all 0.4s ease;    min-width: 150px;
   }
   .btn.btn-primary:hover{
@@ -503,7 +504,7 @@ color: #76787B;
 }
 a.eye-icon {
   position: absolute;
-    top: 56px;
+    top: 47px;
   right: 10px;
 }
 a.eye-icon::after {
@@ -782,7 +783,7 @@ color: #212836;
     width: 35px;    border-radius: 14px;    margin-right: 10px;
 }
 
-.detail-header.second-header {
+.second-header {
   max-height: 0;
   opacity: 0;
   transform: translateY(-10px);
@@ -797,19 +798,88 @@ color: #212836;
 }
 
 /* When visible */
-.detail-header.second-header.show {
+.second-header.show {
   max-height: 500px; /* Set higher than your expected content height */
   opacity: 1;
   transform: translateY(0);
   padding: 15px;
   margin-bottom: 20px;
 }
-.detail-header.second-header > .check-status{
+.second-header > .check-status{
       flex-direction: column;
     gap: 20px;
     justify-content: start;
     align-items: start !important;
 }
+.insurers-dashboard .d-flex.align-items-center.check-status,
+.broker-dashboard .d-flex.align-items-center.check-status,
+.broker-dashboard .d-flex.align-items-center.check-status,
+.admin-dashboard .d-flex.align-items-center.check-status{
+    flex-direction: row;
+    align-items: center !important;
+    flex-wrap: wrap;
+}
+.broker-dashboard .timeline-dot {
+
+    border: 3px solid var(--broker-color);
+
+}
+.broker-dashboard .dashboard-tab span.file-type-icon {
+    background-color: var(--broker-color);
+}
+.broker-dashboard span.back-screen{
+      background-color: #fff4fa;
+}
+.broker-dashboard span.back-screen svg path{
+  fill: var(--broker-color);
+}
+.numeric-graph {
+    background-color: #FDFDFD;
+    border-radius: 24px;
+    padding: 30px;
+    display: inline-block;
+}
+.numeric-graph .graphic-line {
+    margin-left: 55px;
+}
+.numeric-graph p {
+    margin-bottom: 0;
+}
+.numeric-graph .incr-dec-data {
+    margin-top: 15px;    color: var(--primary-dark);
+}
+.second-header{
+    font-weight: normal;
+    font-size: 13px;
+}
+.detail-header.new-update-header {
+    display: flex;
+    flex-direction: column;      margin-bottom: 30px;    align-items: start;
+
+}
+.grid-view div {
+    flex: 0 0 45%;
+}
+.grid-view div p.m-0 {
+    flex: 1;
+}
+.grid-view div .status {
+    flex: 1;
+}
+.second-header{
+  width: 100%;
+}.grid-view {
+    width: 100%;column-count: 2;
+}
+.grid-view > div{
+  margin-bottom: 10px;
+}
+.grid-view > div .status{
+  text-align: center;
+}.second-header select.form-select {
+    font-size: 13px;
+}
+
 @media(max-width:1350px){
   .top-header > div:nth-child(2) {
     flex-wrap: wrap;
@@ -819,6 +889,23 @@ color: #212836;
 }
 }
 @media (max-width: 767px) {
+  .top-part select.form-select {
+    width: 100% !important;
+    display: block;
+}
+    .sm-fix {
+      justify-content: center;
+    }
+  .sm-fix svg{
+    flex: 0 0 20px;
+  }
+    .sm-fix span{
+    flex: 0 0 160px;
+  }
+  .insurers-dashboard .d-flex.align-items-center.check-status, .broker-dashboard .d-flex.align-items-center.check-status, .broker-dashboard .d-flex.align-items-center.check-status, .admin-dashboard .d-flex.align-items-center.check-status {
+/* 
+    gap: 0; */
+}
   .form-grid-2x2 {
 
     grid-template-columns: repeat(1, 1fr);
@@ -887,10 +974,19 @@ h6 {
 
 }
   .detail-header * {
-    width: 100% !important;
+    /* width: 100% !important;
     text-align: center !important;
-    margin: 0 0 5px 0;
+    margin: 0 0 5px 0; */
+        column-count: 1;
   }
+  .new-update-header .top-part{
+        flex-direction: column;
+        width: 100%;
+        gap: 10px;
+  }
+    .new-update-header .top-part select{
+      width: 100%;
+    }
   .form-row .form-col{
     padding: 0 10px;
     flex: 0 0 100%;
@@ -952,7 +1048,7 @@ h6 {
     max-width: 1200px;
 }
 .tab-content .table-wrap {
-  max-width: 950px;
+  max-width: 940px;
 }
 .sidebar-toggle .tab-content .table-wrap {
   max-width: 1190px;
@@ -979,4 +1075,22 @@ h6 {
 .custom-grid-card{
   padding: 20px;
 }
+}
+
+@media(min-width:767px){
+  .check-document-panel .side-by-side-panel{    justify-content: center;}
+.check-document-panel .side-by-side-panel .right-panel {
+    max-width: 680px;
+}
+.check-document-panel .side-by-side-panel .left-panel {
+    display: none;
+}
+.show-reader .check-document-panel .side-by-side-panel .left-panel {
+    display: block;
+}
+}
+@media (max-width: 1400px) {
+  .flex-1366-column {
+    flex-direction: column !important;
+  }
 }
