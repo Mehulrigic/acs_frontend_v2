@@ -35,7 +35,10 @@ const DashboardManagementService = {
   speaker_registered_document_file: (id) => apiClient.get(`/user/user_document/speaker/registered/document-file/count/${id}`),
   dashboard_last_five_event: (id, userData) => apiClient.post(`/user/user_document/dashboard/event/${id}`, userData),
   dashboard_last_three_note: (id, userData) => apiClient.post(`/user/user_document/dashboard/note/${id}`, userData),
-  export_folder: (id) => apiClient.get(`/user/user_document/export/folder/${id}`),
+  export_folder: (id, format) =>
+  apiClient.get(`/user/user_document/export/folder/${id}?format=${format}`, {
+    responseType: 'blob',
+  }),
 };
 
 export default DashboardManagementService;
