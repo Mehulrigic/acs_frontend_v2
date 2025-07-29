@@ -2126,7 +2126,6 @@ const ManagerFileDetail = () => {
               </div>
               </div>
 
-
               <div className="d-flex align-items-center">
               <p className="m-0">Nom du preneur assurance : </p>
               <div className="status">
@@ -4330,8 +4329,8 @@ const ManagerFileDetail = () => {
 
             {showSepeakerInner ? (
               <div className="inner-tab-screen">
-                <div className="d-md-flex">
-                  <div className="me-0 me-md-4">
+                <div className="row">
+                  <div className="col-md-4">
                     {flashMessage.message && (
                       <div
                         className={`alert ${
@@ -4498,7 +4497,7 @@ const ManagerFileDetail = () => {
                       </Form>
                     )}
                   </div>
-                  <div className="flex-fill">
+                  <div className="col-md-8 flex-fill">
                     <Tabs
                       onSelect={handleSubTabSelect}
                       defaultActiveKey="dddd"
@@ -4526,6 +4525,7 @@ const ManagerFileDetail = () => {
                                   {showSpeakerDocument?.length > 0 ? (
                                     showSpeakerDocument?.map((data) => (
                                       <tr>
+                                        <td>
                                         <div className="d-flex align-items-center">
                                           <span className="file-type-icon">
                                             <svg
@@ -4544,7 +4544,7 @@ const ManagerFileDetail = () => {
                                           <span className="text-elips">
                                             {data.filename}
                                           </span>
-                                        </div>
+                                        </div></td>
                                         <td>{data.docType?.name}</td>
                                         <td>
                                           {data.status == "to_be_checked" ? (
@@ -5228,19 +5228,20 @@ const ManagerFileDetail = () => {
                               <td>
                                 <div class="action-btn">
                                   <Link
-                                    // onClick={(e) => {
-                                    //   e.stopPropagation();
-                                    //   handleViewShowSpeaker();
-                                    //   setActiveSubTab("speaker");
-                                    //   setShowSpeakerId(data.id);
-                                    //   setTotalSpeakerDocument(
-                                    //     data.user_document_count
-                                    //   );
-                                    //   setTotalMissingDocument(
-                                    //     data.missing_document_count
-                                    //   );
-                                    // }}
-                                    onClick={() => setShowSpeakerInner(true)}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setShowSpeakerInner(true)
+                                      handleViewShowSpeaker();
+                                      setActiveSubTab("speaker");
+                                      setShowSpeakerId(data.id);
+                                      setTotalSpeakerDocument(
+                                        data.user_document_count
+                                      );
+                                      setTotalMissingDocument(
+                                        data.missing_document_count
+                                      );
+                                    }}
+                                    // onClick={() => setShowSpeakerInner(true)}
                                     class="view"
                                     href="/user-management"
                                     data-discover="true"

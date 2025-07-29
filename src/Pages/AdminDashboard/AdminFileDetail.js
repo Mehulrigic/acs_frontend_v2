@@ -1979,9 +1979,9 @@ const AdminFileDetail = () => {
             <h1 className="m-0 mb-md-0 mb-3">Dossier {showUserFolderName}</h1>
           </div>
           <div
-            className="detail-header"
-            style={{ display: "flex", justifyContent: "right" }}
+            className="detail-header new-update-header"
           >
+            <div className="d-flex align-items-center ms-auto top-part">
             <div style={{ marginRight: "20px" }} className="div">
               <Link
                 onClick={toggleDetail}
@@ -2026,9 +2026,10 @@ const AdminFileDetail = () => {
               <option value="transfer_to_broker">Transfert au Courtier</option>
               <option value="to_be_decided">A statuer</option>
             </Form.Select>
-          </div>
-          <div
-            className={`detail-header second-header ${isVisible ? "show" : ""}`}
+            </div>
+
+                      <div
+            className={`second-header ${isVisible ? "show" : ""}`}
           >
             <div className="d-flex align-items-center check-status">
               <div className="d-flex align-items-center check-status">
@@ -2047,7 +2048,9 @@ const AdminFileDetail = () => {
                   </Form.Select>
                 </div>
               </div>
-              <p className="m-0">Statut : </p>
+              <div className="grid-view">
+                <div className="d-flex align-items-center">
+                                <p className="m-0">Statut : </p>
               <div className="status">
                 {showUserDocumentData?.status === "to_be_checked"
                   ? t("toBeCheckedLabel")
@@ -2065,8 +2068,41 @@ const AdminFileDetail = () => {
                   ? "Mise en demeure"
                   : t("invalidLabel")}
               </div>
+                </div>
+                <div className="d-flex align-items-center">
+              <p className="m-0">DOC : </p>
+              <div className="status">
+                15/07/2025
+              </div>
+              </div>
+
+              <div className="d-flex align-items-center">
+
+              <p className="m-0">Date fin prévisionnelle : </p>
+              <div className="status">
+                27/07/2026
+              </div>
+              </div>
+
+              <div className="d-flex align-items-center">
+              <p className="m-0">Coût prévisionnel : </p>
+              <div className="status">
+                10 450 000€
+              </div>
+              </div>
+
+              <div className="d-flex align-items-center">
+              <p className="m-0">Nom du preneur assurance : </p>
+              <div className="status">
+                Taratata patata
+              </div>
+              </div>
+              </div>
+
             </div>
           </div>
+          </div>
+
         </div>
         <Tabs
           activeKey={activeTab}
@@ -4290,8 +4326,8 @@ const AdminFileDetail = () => {
           >
             {showSepeakerInner ? (
               <div className="inner-tab-screen">
-                <div className="d-md-flex">
-                  <div className="me-0 me-md-4">
+                <div className="row">
+                  <div className="col-md-4">
                     {flashMessage.message && (
                       <div
                         className={`alert ${
@@ -4457,7 +4493,7 @@ const AdminFileDetail = () => {
                       </Form>
                     )}
                   </div>
-                  <div className="flex-fill">
+                  <div className="col-md-8 flex-fill">
                     <Tabs
                       onSelect={handleSubTabSelect}
                       defaultActiveKey="documents"
@@ -4485,7 +4521,25 @@ const AdminFileDetail = () => {
                                   {showSpeakerDocument?.length > 0 ? (
                                     showSpeakerDocument?.map((data) => (
                                       <tr>
-                                        <td>{data.filename}</td>
+                                        <td><div className="d-flex align-items-center">
+                                          <span className="file-type-icon">
+                                            <svg
+                                              xmlns="http://www.w3.org/2000/svg"
+                                              width="24"
+                                              height="24"
+                                              viewBox="0 0 24 24"
+                                              fill="none"
+                                            >
+                                              <path
+                                                d="M12.65 2.23994C12.4689 2.08503 12.2383 1.99992 12 1.99994H5C4.73478 1.99994 4.48043 2.1053 4.29289 2.29283C4.10536 2.48037 4 2.73472 4 2.99994V20.9999C4 21.2652 4.10536 21.5195 4.29289 21.7071C4.48043 21.8946 4.73478 21.9999 5 21.9999H19C19.2652 21.9999 19.5196 21.8946 19.7071 21.7071C19.8946 21.5195 20 21.2652 20 20.9999V8.99994C20 8.8555 19.9687 8.71277 19.9083 8.58157C19.8479 8.45038 19.7598 8.33383 19.65 8.23994L12.65 2.23994ZM13 5.16994L16.3 7.99994H13V5.16994ZM18 19.9999H6V3.99994H11V8.99994C11 9.26516 11.1054 9.51951 11.2929 9.70705C11.4804 9.89458 11.7348 9.99994 12 9.99994H18V19.9999Z"
+                                                fill="white"
+                                              />
+                                            </svg>
+                                          </span>
+                                          <span className="text-elips">
+                                            {data.filename}
+                                          </span>
+                                        </div></td>
                                         <td>{data.docType?.name}</td>
                                         <td>
                                           {data.status == "to_be_checked" ? (

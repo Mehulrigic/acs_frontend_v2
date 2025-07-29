@@ -383,12 +383,12 @@ letter-spacing: 0px;
   box-shadow: none;
 }
 .table-wrap td span.badges{
-  border-radius: 60px;
-  color: var(--table-th-color);
-    font-size: 16px;
+    border-radius: 60px;
+    color: var(--table-th-color);
+    font-size: 14px;
     font-weight: 400;
     line-height: 21.86px;
-    padding: 9px 16px 9px 51px;
+    padding: 6px 16px 6px 51px;
     background-repeat: no-repeat;
     background-position: center left 18px;
     width: 100%;
@@ -889,6 +889,10 @@ color: #212836;
 }
 }
 @media (max-width: 767px) {
+  .top-part select.form-select {
+    width: 100% !important;
+    display: block;
+}
     .sm-fix {
       justify-content: center;
     }
@@ -899,8 +903,8 @@ color: #212836;
     flex: 0 0 160px;
   }
   .insurers-dashboard .d-flex.align-items-center.check-status, .broker-dashboard .d-flex.align-items-center.check-status, .broker-dashboard .d-flex.align-items-center.check-status, .admin-dashboard .d-flex.align-items-center.check-status {
-
-    gap: 0;
+/* 
+    gap: 0; */
 }
   .form-grid-2x2 {
 
@@ -1044,7 +1048,7 @@ h6 {
     max-width: 1200px;
 }
 .tab-content .table-wrap {
-  max-width: 950px;
+  max-width: 940px;
 }
 .sidebar-toggle .tab-content .table-wrap {
   max-width: 1190px;
@@ -1084,4 +1088,9 @@ h6 {
 .show-reader .check-document-panel .side-by-side-panel .left-panel {
     display: block;
 }
+}
+@media (max-width: 1400px) {
+  .flex-1366-column {
+    flex-direction: column !important;
+  }
 }
