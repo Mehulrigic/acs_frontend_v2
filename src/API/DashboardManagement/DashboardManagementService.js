@@ -29,6 +29,12 @@ const DashboardManagementService = {
   user_document: (userData) => apiClient.post("/user/user_document/index", userData),
   get_statistics: (userData) => apiClient.post("/user/dashboard/get-statistics", userData),
   delete_user_document: (id) => apiClient.get(`/user/user_document/delete-user-document/${id}`),
+
+  // Dashboard Tab
+  dashboard_registered_document_file: (id) => apiClient.get(`/user/user_document/registered/document-file/count/${id}`),
+  speaker_registered_document_file: (id) => apiClient.get(`/user/user_document/speaker/registered/document-file/count/${id}`),
+  dashboard_last_five_event: (id, userData) => apiClient.post(`/user/user_document/dashboard/event/${id}`, userData),
+  dashboard_last_three_note: (id, userData) => apiClient.post(`/user/user_document/dashboard/note/${id}`, userData),
 };
 
 export default DashboardManagementService;

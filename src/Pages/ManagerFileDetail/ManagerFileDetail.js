@@ -28,6 +28,7 @@ import "@cyntler/react-doc-viewer/dist/index.css";
 import SpeakerManagementService from "../../API/SpeakerManagement/SpeakerManagementService";
 import AddNote from "../../Components/AddNote/AddNote";
 import { BsPatchExclamation } from "react-icons/bs";
+import DashboardManagementService from "../../API/DashboardManagement/DashboardManagementService";
 
 const ManagerFileDetail = () => {
   const { t } = useTranslation();
@@ -254,6 +255,12 @@ const ManagerFileDetail = () => {
   const handleNoteShow = () => setShowNote(true);
   const handleNoteClose = () => setShowNote(false);
 
+  // Dashboard
+  const [dashboardDocumentFileList, setDashboardDocumentFileList] = useState([]);
+  const [speakerDocumentFileList, setSpeakerDocumentFileList] = useState([]);
+  const [lastFiveEventList, setLastFiveEventList] = useState([]);
+  const [lastThreeNoteList, setLastThreeNoteList] = useState([]);
+
   useEffect(() => {
     if (showNote) {
       GetDocumentFileNotesList(id, "");
@@ -305,6 +312,12 @@ const ManagerFileDetail = () => {
   }, [validateDocumnetFilter]);
 
   useEffect(() => {
+    if (activeTab === "dashboard") {
+      DashboardRegisteredDocument(id);
+      DashboardSpeakerRegisteredDocument(id);
+      DashboardLastFiveEvent(id);
+      DashboardLastThreeNote(id);
+    }
     if (activeTab === "information") {
       FolderDetail(id);
       SpeakerDropDownList("", 1);
@@ -1757,6 +1770,101 @@ const ManagerFileDetail = () => {
     { value: "1", label: "Importante" },
     { value: "0", label: "Général" },
   ];
+
+  // Dashboard tab Documents # of registered documents
+  const DashboardRegisteredDocument = async (id) => {
+    try {
+      const response = await DashboardManagementService.dashboard_registered_document_file(id);
+
+      if (response.data.status) {
+        setDashboardDocumentFileList(response.data.blocks);
+      } else {
+        setFlashMessage({
+          type: "error",
+          message: response.data.message || t("somethingWentWrong"),
+        });
+      }
+    } catch (error) {
+      setFlashMessage({
+        type: "error",
+        message: t("somethingWentWrong"),
+      });
+    }
+  };
+
+  const DashboardSpeakerRegisteredDocument = async (id) => {
+    try {
+      const response = await DashboardManagementService.speaker_registered_document_file(id);
+
+      if (response.data.status) {
+        setSpeakerDocumentFileList(response.data.overall_statistics);
+      } else {
+        setFlashMessage({
+          type: "error",
+          message: response.data.message || t("somethingWentWrong"),
+        });
+      }
+    } catch (error) {
+      setFlashMessage({
+        type: "error",
+        message: t("somethingWentWrong"),
+      });
+    }
+  };
+
+  const DashboardLastFiveEvent = async (id) => {
+    try {
+      var userData = {
+        user_document_id: "",
+        type: "",
+        is_important: "",
+        is_read: ""
+      }
+
+      const response = await DashboardManagementService.dashboard_last_five_event(id, userData);
+
+      if (response.data.status) {
+        setLastFiveEventList(response.data.data);
+      } else {
+        setFlashMessage({
+          type: "error",
+          message: response.data.message || t("somethingWentWrong"),
+        });
+      }
+    } catch (error) {
+      setFlashMessage({
+        type: "error",
+        message: t("somethingWentWrong"),
+      });
+    }
+  };
+
+  const DashboardLastThreeNote = async (id) => {
+    try {
+      var userData = {
+        action_type: "",
+        user_id: "",
+        start_date: "",
+        end_date: ""
+      }
+
+      const response = await DashboardManagementService.dashboard_last_three_note(id, userData);
+
+      if (response.data.status) {
+        setLastThreeNoteList(response.data.data);
+      } else {
+        setFlashMessage({
+          type: "error",
+          message: response.data.message || t("somethingWentWrong"),
+        });
+      }
+    } catch (error) {
+      setFlashMessage({
+        type: "error",
+        message: t("somethingWentWrong"),
+      });
+    }
+  };
 
   return (
     <Fragment>
