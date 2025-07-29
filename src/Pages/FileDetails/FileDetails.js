@@ -1734,311 +1734,46 @@ const FileDetails = () => {
 
           <div className="detail-header  new-update-header">
             <div className="d-flex justify-content-between w-100 align-items-center flex-1366-column">
-            <div className="d-flex gap-2 w-auto sm-fix">
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M11 7H13V9H11V7ZM11 11H13V17H11V11ZM12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20Z"
-                  fill="#00366B"
-                />
-              </svg>
-              <span>Dossier à vérifier</span>
-            </div>
-            <div className="d-sm-flex align-items-center gap-3 flex-wrap ms-sm-auto text-center">
-              <div style={{ marginRight: "0" }} className="my-1 my-md-0">
-                <Link
-                  onClick={toggleDetail}
-                  className="fold-unfold-link link-wrap"
+              <div className="d-flex gap-2 w-auto sm-fix">
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
                 >
-                  {isVisible ? "Fold Detail" : "Unfold Detail"}
-                </Link>
+                  <path
+                    d="M11 7H13V9H11V7ZM11 11H13V17H11V11ZM12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20Z"
+                    fill="#00366B"
+                  />
+                </svg>
+                <span>Dossier à vérifier</span>
               </div>
-              {/* Add document */}
-              <div className="add-document my-1 my-md-0">
-                <Link onClick={handleShow}>{t("addDocumentLabel")}</Link>
-                <Offcanvas
-                  className="add-folder-panel"
-                  placement={"end"}
-                  show={show}
-                  onHide={handleClose}
-                >
-                  <Offcanvas.Header closeButton>
-                    <Offcanvas.Title>{t("addDocumentLabel")}</Offcanvas.Title>
-                  </Offcanvas.Header>
-                  <Offcanvas.Body>
-                    {/* step 1 */}
+              <div className="d-sm-flex align-items-center gap-3 flex-wrap ms-sm-auto text-center">
+                {/* Add document */}
+                <div className="add-document my-1 my-md-0">
+                  <Link onClick={handleShow}>{t("addDocumentLabel")}</Link>
+                  <Offcanvas
+                    className="add-folder-panel"
+                    placement={"end"}
+                    show={show}
+                    onHide={handleClose}
+                  >
+                    <Offcanvas.Header closeButton>
+                      <Offcanvas.Title>{t("addDocumentLabel")}</Offcanvas.Title>
+                    </Offcanvas.Header>
+                    <Offcanvas.Body>
+                      {/* step 1 */}
 
-                    <div className="step-1">
-                      <div className="div">
-                        <div className="step-2">
-                          <h2>
-                            Ajouter un document au dossier <span>*</span>
-                          </h2>
-                          {flashMessage.message && (
-                            <div
-                              className={`mt-3 alert ${
-                                flashMessage.type === "success"
-                                  ? "alert-success"
-                                  : "alert-danger"
-                              } text-center`}
-                              role="alert"
-                            >
-                              {flashMessage.message}
-                            </div>
-                          )}
-                          <Form.Group
-                            controlId="formFile"
-                            className="file-upload-container mt-4"
-                          >
-                            <div
-                              className="custom-upload-box"
-                              onDragOver={(e) => e.preventDefault()}
-                              onDrop={(e) => {
-                                e.preventDefault();
-                                const files = e.dataTransfer.files;
-                                if (files.length) {
-                                  handleFileChange({ target: { files } });
-                                }
-                              }}
-                            >
-                              <svg
-                                width="48"
-                                height="32"
-                                viewBox="0 0 48 32"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                              >
-                                <path
-                                  d="M38.7 12.08C37.34 5.18 31.28 0 24 0C18.22 0 13.2 3.28 10.7 8.08C4.68 8.72 0 13.82 0 20C0 26.62 5.38 32 12 32H38C43.52 32 48 27.52 48 22C48 16.72 43.9 12.44 38.7 12.08ZM38 28H12C7.58 28 4 24.42 4 20C4 15.9 7.06 12.48 11.12 12.06L13.26 11.84L14.26 9.94C16.16 6.28 19.88 4 24 4C29.24 4 33.76 7.72 34.78 12.86L35.38 15.86L38.44 16.08C41.56 16.28 44 18.9 44 22C44 25.3 41.3 28 38 28ZM16 18H21.1V24H26.9V18H32L24 10L16 18Z"
-                                  fill="#00366B"
-                                />
-                              </svg>
-                              <p className="upload-text">
-                                {t("DragyourdocumentsLabel")}{" "}
-                                <span className="browse-link">
-                                  {t("browsemyfilesLabel")}
-                                </span>
-                              </p>
-                              <span>
-                                {t("documentsAcceptedLabel")}: mot, exceller,
-                                pdf, PowerPoint
-                              </span>
-                              <Form.Control
-                                type="file"
-                                className="file-input"
-                                multiple
-                                onChange={handleFileChange}
-                              />
-                            </div>
-                          </Form.Group>
-                          {fileList.length > 0 && (
-                            <div className="upload-file-list">
-                              {fileList.map((file, index) => (
-                                <div key={index} className="upload-file">
-                                  <span>{file.name}</span>
-
-                                  <Link onClick={() => handleRemoveFile(index)}>
-                                    <svg
-                                      width="14"
-                                      height="18"
-                                      viewBox="0 0 14 18"
-                                      fill="none"
-                                      xmlns="http://www.w3.org/2000/svg"
-                                    >
-                                      <path
-                                        d="M11 6V16H3V6H11ZM9.5 0H4.5L3.5 1H0V3H14V1H10.5L9.5 0ZM13 4H1V16C1 17.1 1.9 18 3 18H11C12.1 18 13 17.1 13 16V4Z"
-                                        fill="#e84455"
-                                      />
-                                    </svg>
-                                  </Link>
-                                </div>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </Offcanvas.Body>
-                  <div className="offcanvas-footer text-end">
-                    <button
-                      type="submit"
-                      className="btn btn-primary"
-                      disabled={documentUploading || !fileList.length > 0}
-                      onClick={HandleAddDocument}
-                    >
-                      {documentUploading ? "Suivant..." : "Suivant"}
-                    </button>
-                  </div>
-                </Offcanvas>
-              </div>
-
-              {/* Add note  */}
-              <div className="my-1 my-md-0">
-                <MissingDocument
-                  link={true}
-                  sort={sort}
-                  search={search}
-                  currentPage={currentPage}
-                  selectActionType={selectActionType}
-                  GetHistoryListDocument={GetHistoryListDocument}
-                />
-              </div>
-
-              <div className="my-1 my-md-0">
-                <Link className="link-wrap" onClick={handleNoteShow}>
-                  Voir les raisons
-                </Link>
-              </div>
-
-              <p className="m-0 my-1 my-md-0">Envoyer à : </p>
-              <div >
-                <Form.Select
-                  aria-label="Etat du chantier"
-                  style={{ minHeight: "45px", fontFamily: "Manrope" }}
-                  value={sendToFileStatus}
-                  onChange={(e) => handleSendFileShow(e.target.value)}
-                >
-                  <option value="" disabled selected>
-                    Envoyer à
-                  </option>
-                  <option value="transfer_to_manager">
-                    Transfert au Gestionnaire
-                  </option>
-                  <option value="transfer_to_broker">
-                    Transfert au Courtier
-                  </option>
-                  <option value="formal_notice">Mise en demeure</option>
-                </Form.Select>
-              </div>
-
-              {/* Check Document */}
-              <div className="check-document">
-                {/* Location ‘ Insurer ’ / Folders / In a folder Hide the link to check documents for the Insurer for the time being */}
-                {/* <Link onClick={handleCheckShow}>Vérifier le document</Link> */}
-                <Offcanvas
-                  className="add-folder-panel check-document-panel"
-                  placement={"end"}
-                  show={showCheck}
-                  onHide={() => handleCheckClose()}
-                >
-                  <Offcanvas.Header closeButton>
-                    <div className="doc-header">
-                      <p className="m-0">
-                        Vérification dossier {showUserDocumentData?.folder_name}
-                      </p>
-                      <div className="right-part">
-                        <p className="m-0">
-                          Dernière sauvegarde -{" "}
-                          {showUserDocumentData?.last_updated}
-                        </p>
-                        <Button onClick={handleShowFinalModal}>
-                          <svg
-                            width="18"
-                            height="14"
-                            viewBox="0 0 18 14"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path
-                              d="M5.8002 10.8998L1.6002 6.6998L0.200195 8.0998L5.8002 13.6998L17.8002 1.6998L16.4002 0.299805L5.8002 10.8998Z"
-                              fill="white"
-                            />
-                          </svg>
-                          Valider la vérification
-                        </Button>
-                      </div>
-                    </div>
-                  </Offcanvas.Header>
-                  <Offcanvas.Body>
-                    <div className="top-header d-md-flex justify-content-between align-items-center">
-                      <Form.Select
-                        className="mb-3 mb-lg-0"
-                        aria-label="statusSelectAria"
-                        value={selectDocumentId}
-                        onChange={(e) => handleDocChange(e)}
-                      >
-                        {showUserDocumentFileData?.length > 0 ? (
-                          showUserDocumentFileData?.map((doc) => (
-                            <option key={doc.id} value={doc.id}>
-                              {doc.filename}
-                            </option>
-                          ))
-                        ) : (
-                          <option value="">{t("NorecordsfoundLabel")}</option>
-                        )}
-                      </Form.Select>
-                      <MissingDocument
-                        link={false}
-                        sort={sort}
-                        search={search}
-                        currentPage={currentPage}
-                        selectActionType={selectActionType}
-                        GetHistoryListDocument={GetHistoryListDocument}
-                      />
-                    </div>
-
-                    <div className="side-by-side-panel">
-                      <div className="left-panel">
-                        <div className="inner-detail">
-                          <div className="header-part">
-                            <div className="div">
-                              <span>Attestation</span>Police{" "}
-                              {selectDocumentFileName ||
-                                t("NorecordsfoundLabel")}
-                            </div>
-                            <Dropdown>
-                              <Dropdown.Toggle
-                                variant="success"
-                                id="dropdown-basic"
-                              >
-                                <svg
-                                  width="24"
-                                  height="24"
-                                  viewBox="0 0 24 24"
-                                  fill="none"
-                                  xmlns="http://www.w3.org/2000/svg"
-                                >
-                                  <path
-                                    d="M12 8C13.1 8 14 7.1 14 6C14 4.9 13.1 4 12 4C10.9 4 10 4.9 10 6C10 7.1 10.9 8 12 8ZM12 10C10.9 10 10 10.9 10 12C10 13.1 10.9 14 12 14C13.1 14 14 13.1 14 12C14 10.9 13.1 10 12 10ZM12 16C10.9 16 10 16.9 10 18C10 19.1 10.9 20 12 20C13.1 20 14 19.1 14 18C14 16.9 13.1 16 12 16Z"
-                                    fill="white"
-                                  />
-                                </svg>
-                              </Dropdown.Toggle>
-
-                              <Dropdown.Menu>
-                                <Dropdown.Item
-                                  onClick={() => handleShowDeleteModal()}
-                                >
-                                  Supprimer
-                                </Dropdown.Item>
-                              </Dropdown.Menu>
-                            </Dropdown>
-                          </div>
-                          <div className="main-part">
-                            <div className="pdf-wrapper">
-                              <DocViewer
-                                style={{ height: "600px", width: "100%" }}
-                                documents={docs}
-                                pluginRenderers={DocViewerRenderers}
-                              />
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="right-panel">
-                        <div className="inner-detail">
-                          <div className="header-part">
-                            Vérification document
-                          </div>
-                          <div className="main-part">
+                      <div className="step-1">
+                        <div className="div">
+                          <div className="step-2">
+                            <h2>
+                              Ajouter un document au dossier <span>*</span>
+                            </h2>
                             {flashMessage.message && (
                               <div
-                                className={`alert ${
+                                className={`mt-3 alert ${
                                   flashMessage.type === "success"
                                     ? "alert-success"
                                     : "alert-danger"
@@ -2048,171 +1783,490 @@ const FileDetails = () => {
                                 {flashMessage.message}
                               </div>
                             )}
-                            <p className="mb-4">
-                              Compléter les informations relatives au document
-                              ci-contre.
-                            </p>
-                            <Form.Label>
-                              Statut du document <span>*</span>
-                            </Form.Label>
-                            <Form.Select
-                              className="mb-3"
-                              aria-label="statusSelectAria"
-                              value={editUserStatus} // Bind the value to editUserStatus
-                              onChange={(e) =>
-                                handleStatusChange(e.target.value)
-                              }
+                            <Form.Group
+                              controlId="formFile"
+                              className="file-upload-container mt-4"
                             >
-                              <option value="to_be_checked">
-                                {t("toBeCheckedLabel")}
-                              </option>
-                              <option value="verified">{t("verified")}</option>
-                              <option value="invalid">
-                                {t("invalidLabel")}
-                              </option>
-                            </Form.Select>
-                            <InvalidDocument
-                              showmodal={showmodal}
-                              handleModalClose={handleModalClose}
-                              selectDocumentId={selectDocumentId}
-                              selectDocumentFileName={selectDocumentFileName}
-                            />
+                              <div
+                                className="custom-upload-box"
+                                onDragOver={(e) => e.preventDefault()}
+                                onDrop={(e) => {
+                                  e.preventDefault();
+                                  const files = e.dataTransfer.files;
+                                  if (files.length) {
+                                    handleFileChange({ target: { files } });
+                                  }
+                                }}
+                              >
+                                <svg
+                                  width="48"
+                                  height="32"
+                                  viewBox="0 0 48 32"
+                                  fill="none"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                >
+                                  <path
+                                    d="M38.7 12.08C37.34 5.18 31.28 0 24 0C18.22 0 13.2 3.28 10.7 8.08C4.68 8.72 0 13.82 0 20C0 26.62 5.38 32 12 32H38C43.52 32 48 27.52 48 22C48 16.72 43.9 12.44 38.7 12.08ZM38 28H12C7.58 28 4 24.42 4 20C4 15.9 7.06 12.48 11.12 12.06L13.26 11.84L14.26 9.94C16.16 6.28 19.88 4 24 4C29.24 4 33.76 7.72 34.78 12.86L35.38 15.86L38.44 16.08C41.56 16.28 44 18.9 44 22C44 25.3 41.3 28 38 28ZM16 18H21.1V24H26.9V18H32L24 10L16 18Z"
+                                    fill="#00366B"
+                                  />
+                                </svg>
+                                <p className="upload-text">
+                                  {t("DragyourdocumentsLabel")}{" "}
+                                  <span className="browse-link">
+                                    {t("browsemyfilesLabel")}
+                                  </span>
+                                </p>
+                                <span>
+                                  {t("documentsAcceptedLabel")}: mot, exceller,
+                                  pdf, PowerPoint
+                                </span>
+                                <Form.Control
+                                  type="file"
+                                  className="file-input"
+                                  multiple
+                                  onChange={handleFileChange}
+                                />
+                              </div>
+                            </Form.Group>
+                            {fileList.length > 0 && (
+                              <div className="upload-file-list">
+                                {fileList.map((file, index) => (
+                                  <div key={index} className="upload-file">
+                                    <span>{file.name}</span>
 
-                            <Form.Label>
-                              Type de document <span>*</span>
-                            </Form.Label>
-                            <Form.Select
-                              aria-label="Choisir un type de document"
-                              value={selectDocumentType}
-                              onChange={handleDocumentTypeChange}
-                            >
-                              <option value="" disabled>
-                                Choisir un type de document
-                              </option>
-                              {documentTypeList?.length > 0 ? (
-                                documentTypeList?.map((doctype) => (
-                                  <option key={doctype.id} value={doctype.id}>
-                                    {doctype.name}
-                                  </option>
-                                ))
-                              ) : (
-                                <option value="">
-                                  {t("NorecordsfoundLabel")}
-                                </option>
-                              )}
-                            </Form.Select>
-                            {currentFileIndex <
-                            userDocumentFileDataChanges.length - 1 ? (
-                              <>
-                                <Button
-                                  className="mx-w-320 btn btn-primary mt-3"
-                                  onClick={(e) => handleSaveNext(e)}
-                                >
-                                  Enregistrer et Suivant
-                                </Button>
-                              </>
-                            ) : (
-                              <>
-                                <Button
-                                  className="mx-w-320 btn btn-primary mt-3"
-                                  onClick={(e) => handleSaveDocSingle(e)}
-                                >
-                                  Enregistrer
-                                </Button>
-                              </>
+                                    <Link
+                                      onClick={() => handleRemoveFile(index)}
+                                    >
+                                      <svg
+                                        width="14"
+                                        height="18"
+                                        viewBox="0 0 14 18"
+                                        fill="none"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                      >
+                                        <path
+                                          d="M11 6V16H3V6H11ZM9.5 0H4.5L3.5 1H0V3H14V1H10.5L9.5 0ZM13 4H1V16C1 17.1 1.9 18 3 18H11C12.1 18 13 17.1 13 16V4Z"
+                                          fill="#e84455"
+                                        />
+                                      </svg>
+                                    </Link>
+                                  </div>
+                                ))}
+                              </div>
                             )}
-                            <div className="d-lg-flex justify-content-between align-items-center mt-auto">
-                              <Link
-                                className="link-wrap d-block d-lg-inline"
-                                onClick={handlePrevious}
+                          </div>
+                        </div>
+                      </div>
+                    </Offcanvas.Body>
+                    <div className="offcanvas-footer text-end">
+                      <button
+                        type="submit"
+                        className="btn btn-primary"
+                        disabled={documentUploading || !fileList.length > 0}
+                        onClick={HandleAddDocument}
+                      >
+                        {documentUploading ? "Suivant..." : "Suivant"}
+                      </button>
+                    </div>
+                  </Offcanvas>
+                </div>
+
+                {/* Add note  */}
+                <div className="my-1 my-md-0">
+                  <MissingDocument
+                    link={true}
+                    sort={sort}
+                    search={search}
+                    currentPage={currentPage}
+                    selectActionType={selectActionType}
+                    GetHistoryListDocument={GetHistoryListDocument}
+                  />
+                </div>
+
+                <div className="my-1 my-md-0">
+                  <Link className="link-wrap" onClick={handleNoteShow}>
+                    Voir les raisons
+                  </Link>
+                </div>
+
+                <p className="m-0 my-1 my-md-0">Envoyer à : </p>
+                <div>
+                  <Form.Select
+                    aria-label="Etat du chantier"
+                    style={{ minHeight: "45px", fontFamily: "Manrope" }}
+                    value={sendToFileStatus}
+                    onChange={(e) => handleSendFileShow(e.target.value)}
+                  >
+                    <option value="" disabled selected>
+                      Envoyer à
+                    </option>
+                    <option value="transfer_to_manager">
+                      Transfert au Gestionnaire
+                    </option>
+                    <option value="transfer_to_broker">
+                      Transfert au Courtier
+                    </option>
+                    <option value="formal_notice">Mise en demeure</option>
+                  </Form.Select>
+                </div>
+
+                <div style={{ marginLeft: "0" }} className="my-1 my-md-0">
+                  <Link
+                    onClick={toggleDetail}
+                    className="fold-unfold-link link-wrap"
+                  >
+                    {isVisible ? (
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="50"
+                        height="50"
+                        viewBox="0 0 50 50"
+                        fill="none"
+                      >
+                        <path
+                          d="M25.0007 2.08325C20.4682 2.08325 16.0375 3.42729 12.2688 5.94541C8.50022 8.46352 5.56293 12.0426 3.82842 16.2301C2.09391 20.4176 1.64009 25.0253 2.52433 29.4707C3.40858 33.9161 5.59118 37.9995 8.79613 41.2044C12.0011 44.4094 16.0844 46.592 20.5298 47.4762C24.9752 48.3605 29.583 47.9067 33.7705 46.1722C37.958 44.4376 41.5371 41.5004 44.0552 37.7317C46.5733 33.9631 47.9173 29.5324 47.9173 24.9999C47.9102 18.9242 45.4934 13.0995 41.1973 8.8033C36.9011 4.50715 31.0763 2.09042 25.0007 2.08325ZM25.0007 43.7499C21.2923 43.7499 17.6671 42.6502 14.5837 40.59C11.5003 38.5297 9.09706 35.6013 7.67792 32.1752C6.25878 28.7491 5.88746 24.9791 6.61094 21.342C7.33441 17.7048 9.12017 14.3639 11.7424 11.7417C14.3646 9.11943 17.7056 7.33367 21.3427 6.61019C24.9799 5.88672 28.7499 6.25803 32.176 7.67718C35.6021 9.09632 38.5304 11.4996 40.5907 14.583C42.651 17.6664 43.7507 21.2915 43.7507 24.9999C43.7452 29.971 41.7679 34.737 38.2528 38.2521C34.7377 41.7672 29.9718 43.7444 25.0007 43.7499Z"
+                          fill="#464255"
+                        ></path>
+                        <path
+                          d="M33.334 22.9167H16.6673C16.1148 22.9167 15.5849 23.1362 15.1942 23.5269C14.8035 23.9176 14.584 24.4476 14.584 25.0001C14.584 25.5526 14.8035 26.0825 15.1942 26.4732C15.5849 26.8639 16.1148 27.0834 16.6673 27.0834H33.334C33.8865 27.0834 34.4164 26.8639 34.8071 26.4732C35.1978 26.0825 35.4173 25.5526 35.4173 25.0001C35.4173 24.4476 35.1978 23.9176 34.8071 23.5269C34.4164 23.1362 33.8865 22.9167 33.334 22.9167Z"
+                          fill="#464255"
+                        ></path>
+                      </svg>
+                    ) : (
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="50"
+                        height="50"
+                        viewBox="0 0 50 50"
+                        fill="none"
+                      >
+                        <path
+                          d="M25.0007 2.0835C20.4682 2.0835 16.0375 3.42753 12.2688 5.94565C8.50022 8.46377 5.56293 12.0429 3.82842 16.2303C2.09391 20.4178 1.64009 25.0256 2.52433 29.471C3.40858 33.9164 5.59118 37.9997 8.79613 41.2047C12.0011 44.4096 16.0844 46.5922 20.5298 47.4765C24.9752 48.3607 29.583 47.9069 33.7705 46.1724C37.958 44.4379 41.5371 41.5006 44.0552 37.732C46.5733 33.9634 47.9173 29.5326 47.9173 25.0002C47.9102 18.9245 45.4934 13.0997 41.1973 8.80355C36.9011 4.50739 31.0763 2.09066 25.0007 2.0835ZM25.0007 43.7502C21.2923 43.7502 17.6671 42.6505 14.5837 40.5902C11.5003 38.5299 9.09706 35.6016 7.67792 32.1755C6.25878 28.7494 5.88746 24.9794 6.61094 21.3422C7.33441 17.7051 9.12017 14.3641 11.7424 11.7419C14.3646 9.11968 17.7056 7.33391 21.3427 6.61044C24.9799 5.88697 28.7499 6.25828 32.176 7.67742C35.6021 9.09656 38.5304 11.4998 40.5907 14.5832C42.651 17.6666 43.7507 21.2918 43.7507 25.0002C43.7446 29.9711 41.7672 34.7367 38.2522 38.2517C34.7372 41.7667 29.9716 43.7441 25.0007 43.7502Z"
+                          fill="#464255"
+                        ></path>
+                        <path
+                          d="M33.334 22.9168H27.084V16.6668C27.084 16.1143 26.8645 15.5844 26.4738 15.1937C26.0831 14.803 25.5532 14.5835 25.0007 14.5835C24.4481 14.5835 23.9182 14.803 23.5275 15.1937C23.1368 15.5844 22.9173 16.1143 22.9173 16.6668V22.9168H16.6673C16.1148 22.9168 15.5849 23.1363 15.1942 23.527C14.8035 23.9177 14.584 24.4476 14.584 25.0002C14.584 25.5527 14.8035 26.0826 15.1942 26.4733C15.5849 26.864 16.1148 27.0835 16.6673 27.0835H22.9173V33.3335C22.9173 33.886 23.1368 34.4159 23.5275 34.8066C23.9182 35.1973 24.4481 35.4168 25.0007 35.4168C25.5532 35.4168 26.0831 35.1973 26.4738 34.8066C26.8645 34.4159 27.084 33.886 27.084 33.3335V27.0835H33.334C33.8865 27.0835 34.4164 26.864 34.8071 26.4733C35.1978 26.0826 35.4173 25.5527 35.4173 25.0002C35.4173 24.4476 35.1978 23.9177 34.8071 23.527C34.4164 23.1363 33.8865 22.9168 33.334 22.9168Z"
+                          fill="#464255"
+                        ></path>
+                      </svg>
+                    )}
+                  </Link>
+                </div>
+
+                {/* Check Document */}
+                <div className="check-document">
+                  {/* Location ‘ Insurer ’ / Folders / In a folder Hide the link to check documents for the Insurer for the time being */}
+                  {/* <Link onClick={handleCheckShow}>Vérifier le document</Link> */}
+                  <Offcanvas
+                    className="add-folder-panel check-document-panel"
+                    placement={"end"}
+                    show={showCheck}
+                    onHide={() => handleCheckClose()}
+                  >
+                    <Offcanvas.Header closeButton>
+                      <div className="doc-header">
+                        <p className="m-0">
+                          Vérification dossier{" "}
+                          {showUserDocumentData?.folder_name}
+                        </p>
+                        <div className="right-part">
+                          <p className="m-0">
+                            Dernière sauvegarde -{" "}
+                            {showUserDocumentData?.last_updated}
+                          </p>
+                          <Button onClick={handleShowFinalModal}>
+                            <svg
+                              width="18"
+                              height="14"
+                              viewBox="0 0 18 14"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                d="M5.8002 10.8998L1.6002 6.6998L0.200195 8.0998L5.8002 13.6998L17.8002 1.6998L16.4002 0.299805L5.8002 10.8998Z"
+                                fill="white"
+                              />
+                            </svg>
+                            Valider la vérification
+                          </Button>
+                        </div>
+                      </div>
+                    </Offcanvas.Header>
+                    <Offcanvas.Body>
+                      <div className="top-header d-md-flex justify-content-between align-items-center">
+                        <Form.Select
+                          className="mb-3 mb-lg-0"
+                          aria-label="statusSelectAria"
+                          value={selectDocumentId}
+                          onChange={(e) => handleDocChange(e)}
+                        >
+                          {showUserDocumentFileData?.length > 0 ? (
+                            showUserDocumentFileData?.map((doc) => (
+                              <option key={doc.id} value={doc.id}>
+                                {doc.filename}
+                              </option>
+                            ))
+                          ) : (
+                            <option value="">{t("NorecordsfoundLabel")}</option>
+                          )}
+                        </Form.Select>
+                        <MissingDocument
+                          link={false}
+                          sort={sort}
+                          search={search}
+                          currentPage={currentPage}
+                          selectActionType={selectActionType}
+                          GetHistoryListDocument={GetHistoryListDocument}
+                        />
+                      </div>
+
+                      <div className="side-by-side-panel">
+                        <div className="left-panel">
+                          <div className="inner-detail">
+                            <div className="header-part">
+                              <div className="div">
+                                <span>Attestation</span>Police{" "}
+                                {selectDocumentFileName ||
+                                  t("NorecordsfoundLabel")}
+                              </div>
+                              <Dropdown>
+                                <Dropdown.Toggle
+                                  variant="success"
+                                  id="dropdown-basic"
+                                >
+                                  <svg
+                                    width="24"
+                                    height="24"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                  >
+                                    <path
+                                      d="M12 8C13.1 8 14 7.1 14 6C14 4.9 13.1 4 12 4C10.9 4 10 4.9 10 6C10 7.1 10.9 8 12 8ZM12 10C10.9 10 10 10.9 10 12C10 13.1 10.9 14 12 14C13.1 14 14 13.1 14 12C14 10.9 13.1 10 12 10ZM12 16C10.9 16 10 16.9 10 18C10 19.1 10.9 20 12 20C13.1 20 14 19.1 14 18C14 16.9 13.1 16 12 16Z"
+                                      fill="white"
+                                    />
+                                  </svg>
+                                </Dropdown.Toggle>
+
+                                <Dropdown.Menu>
+                                  <Dropdown.Item
+                                    onClick={() => handleShowDeleteModal()}
+                                  >
+                                    Supprimer
+                                  </Dropdown.Item>
+                                </Dropdown.Menu>
+                              </Dropdown>
+                            </div>
+                            <div className="main-part">
+                              <div className="pdf-wrapper">
+                                <DocViewer
+                                  style={{ height: "600px", width: "100%" }}
+                                  documents={docs}
+                                  pluginRenderers={DocViewerRenderers}
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="right-panel">
+                          <div className="inner-detail">
+                            <div className="header-part">
+                              Vérification document
+                            </div>
+                            <div className="main-part">
+                              {flashMessage.message && (
+                                <div
+                                  className={`alert ${
+                                    flashMessage.type === "success"
+                                      ? "alert-success"
+                                      : "alert-danger"
+                                  } text-center`}
+                                  role="alert"
+                                >
+                                  {flashMessage.message}
+                                </div>
+                              )}
+                              <p className="mb-4">
+                                Compléter les informations relatives au document
+                                ci-contre.
+                              </p>
+                              <Form.Label>
+                                Statut du document <span>*</span>
+                              </Form.Label>
+                              <Form.Select
+                                className="mb-3"
+                                aria-label="statusSelectAria"
+                                value={editUserStatus} // Bind the value to editUserStatus
+                                onChange={(e) =>
+                                  handleStatusChange(e.target.value)
+                                }
                               >
-                                Document précédent
-                              </Link>
-                              <Link
-                                className="link-wrap d-block d-lg-inline"
-                                onClick={handleNext}
+                                <option value="to_be_checked">
+                                  {t("toBeCheckedLabel")}
+                                </option>
+                                <option value="verified">
+                                  {t("verified")}
+                                </option>
+                                <option value="invalid">
+                                  {t("invalidLabel")}
+                                </option>
+                              </Form.Select>
+                              <InvalidDocument
+                                showmodal={showmodal}
+                                handleModalClose={handleModalClose}
+                                selectDocumentId={selectDocumentId}
+                                selectDocumentFileName={selectDocumentFileName}
+                              />
+
+                              <Form.Label>
+                                Type de document <span>*</span>
+                              </Form.Label>
+                              <Form.Select
+                                aria-label="Choisir un type de document"
+                                value={selectDocumentType}
+                                onChange={handleDocumentTypeChange}
                               >
-                                Document suivant
-                              </Link>
+                                <option value="" disabled>
+                                  Choisir un type de document
+                                </option>
+                                {documentTypeList?.length > 0 ? (
+                                  documentTypeList?.map((doctype) => (
+                                    <option key={doctype.id} value={doctype.id}>
+                                      {doctype.name}
+                                    </option>
+                                  ))
+                                ) : (
+                                  <option value="">
+                                    {t("NorecordsfoundLabel")}
+                                  </option>
+                                )}
+                              </Form.Select>
+                              {currentFileIndex <
+                              userDocumentFileDataChanges.length - 1 ? (
+                                <>
+                                  <Button
+                                    className="mx-w-320 btn btn-primary mt-3"
+                                    onClick={(e) => handleSaveNext(e)}
+                                  >
+                                    Enregistrer et Suivant
+                                  </Button>
+                                </>
+                              ) : (
+                                <>
+                                  <Button
+                                    className="mx-w-320 btn btn-primary mt-3"
+                                    onClick={(e) => handleSaveDocSingle(e)}
+                                  >
+                                    Enregistrer
+                                  </Button>
+                                </>
+                              )}
+                              <div className="d-lg-flex justify-content-between align-items-center mt-auto">
+                                <Link
+                                  className="link-wrap d-block d-lg-inline"
+                                  onClick={handlePrevious}
+                                >
+                                  Document précédent
+                                </Link>
+                                <Link
+                                  className="link-wrap d-block d-lg-inline"
+                                  onClick={handleNext}
+                                >
+                                  Document suivant
+                                </Link>
+                              </div>
                             </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  </Offcanvas.Body>
-                </Offcanvas>
-              </div>
-            </div>
-            </div>
-                      <div
-            className={`second-header ${isVisible ? "show" : ""}`}
-          >
-            <div className="grid-view ">
-
-            <div className="d-flex align-items-center check-status">
-                <p className="m-0">Etat du chantier : </p>
-                <div className="status">
-                  {showUserDocumentData?.site_status === "on_site"
-                    ? "En cours de chantier"
-                    : "Fin de chantier"}
+                    </Offcanvas.Body>
+                  </Offcanvas>
                 </div>
-             </div>
-
-             <div className="d-flex align-items-center check-status">
-              <p className="m-0">Statut : </p>
-              <div className="status">
-                {showUserDocumentData?.status === "to_be_checked"
-                  ? t("toBeCheckedLabel")
-                  : showUserDocumentData?.status === "validated"
-                  ? t("validatedLabel")
-                  : showUserDocumentData?.status === "transfer_to_insurer"
-                  ? "Transfert à l'assureur"
-                  : showUserDocumentData?.status === "transfer_to_broker"
-                  ? "Transfert au Courtier"
-                  : showUserDocumentData?.status === "transfer_to_manager"
-                  ? "Transfert au Gestionnaire"
-                  : showUserDocumentData?.status === "to_be_decided"
-                  ? "A statuer"
-                  : showUserDocumentData?.status === "formal_notice"
-                  ? "Mise en demeure"
-                  : t("invalidLabel")}
-              
               </div>
             </div>
+            <div className={`second-header ${isVisible ? "show" : ""}`}>
 
-            <div className="d-flex align-items-center check-status">
-              <p className="m-0">DOC : </p>
-              <div className="status">
-                15/07/2025
+              <div className="d-flex align-items-center check-status justify-content-center justify-content-md-start">
+                   <div className="d-flex align-items-center check-status mb-4">
+                    <p className="m-0" style={{ paddingRight: "10px" }}>
+                                        Export As :{" "}
+                                      </p>
+                                      <div style={{ paddingRight: "10px" }}>
+                                        <Form.Select
+                                          aria-label="Export As"
+                                          style={{ minHeight: "45px", minWidth:"110px" }}
+                                        >
+                                          <option value="on_site">PDF</option>
+                                          <option value="end_of_site">Excel</option>
+                                        </Form.Select>
+                                      </div>
+                    </div>             
               </div>
+              <div className="grid-view ">
+                <div className="row mb-3 check-status">
+                  <div className="col-md-3 mb-3">
+                    <div className="d-flex align-items-start flex-column gap-2">
+                      <p className="m-0">Etat du chantier  </p>
+                      <div className="status">
+                        {showUserDocumentData?.site_status === "on_site"
+                          ? "En cours de chantier"
+                          : "Fin de chantier"}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="col-md-3">
+                    <div className="d-flex align-items-start flex-column gap-2">
+                      <p className="m-0">Statut  </p>
+                      <div className="status">
+                        {showUserDocumentData?.status === "to_be_checked"
+                          ? t("toBeCheckedLabel")
+                          : showUserDocumentData?.status === "validated"
+                          ? t("validatedLabel")
+                          : showUserDocumentData?.status ===
+                            "transfer_to_insurer"
+                          ? "Transfert à l'assureur"
+                          : showUserDocumentData?.status ===
+                            "transfer_to_broker"
+                          ? "Transfert au Courtier"
+                          : showUserDocumentData?.status ===
+                            "transfer_to_manager"
+                          ? "Transfert au Gestionnaire"
+                          : showUserDocumentData?.status === "to_be_decided"
+                          ? "A statuer"
+                          : showUserDocumentData?.status === "formal_notice"
+                          ? "Mise en demeure"
+                          : t("invalidLabel")}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="col-md-3">
+                    <div className="d-flex align-items-start flex-column gap-2">
+                      <p className="m-0">DOC  </p>
+                      <div className="status">15/07/2025</div>
+                    </div>
+                  </div>
+                  <div className="col-md-3">
+                    <div className="d-flex align-items-start flex-column gap-2">
+                      <p className="m-0">Date fin prévisionnelle  </p>
+                      <div className="status">27/07/2026</div>
+                    </div>
+                  </div>
+                  <div className="col-md-3">
+                    <div className="d-flex align-items-start flex-column gap-2">
+                      <p className="m-0">Coût prévisionnel  </p>
+                      <div className="status">10 450 000€</div>
+                    </div>
+                  </div>
+                  <div className="col-md-3">
+                    <div className="d-flex align-items-start flex-column gap-2">
+                      <p className="m-0">Nom du preneur assurance  </p>
+                      <div className="status">Taratata patata</div>
+                    </div>
+                  </div>
+                </div>
               </div>
-
-              <div className="d-flex align-items-center check-status">
-
-              <p className="m-0">Date fin prévisionnelle : </p>
-              <div className="status">
-                27/07/2026
-              </div>
-              </div>
-
-              <div className="d-flex align-items-center check-status">
-              <p className="m-0">Coût prévisionnel : </p>
-              <div className="status">
-                10 450 000€
-              </div>
-              </div>
-
-              <div className="d-flex align-items-center check-status">
-              <p className="m-0">Nom du preneur assurance : </p>
-              <div className="status">
-                Taratata patata
-              </div>
-              </div>
-
             </div>
           </div>
-          </div>
-
         </div>
         <Tabs
           activeKey={activeTab}
@@ -2426,7 +2480,7 @@ const FileDetails = () => {
                     </Table>
                   </div>
                 </div>
-                                <h2 className="mb-3 mt-3">Task</h2>
+                <h2 className="mb-3 mt-3">Task</h2>
                 <div className="custom-grid-card">
                   <h3>Coming Task - to be determined</h3>
                   <div className="table-wrap mt-24">
@@ -2554,7 +2608,10 @@ const FileDetails = () => {
                         </div>
                       </div>
                     </div>
-                    <button type="submit" className="btn-secondary btn btn-primary">
+                    <button
+                      type="submit"
+                      className="btn-secondary btn btn-primary"
+                    >
                       See All
                     </button>
                   </div>
@@ -2596,12 +2653,14 @@ const FileDetails = () => {
                         </div>
                       </div>
                     </div>
-                    <button type="submit" className="btn-secondary btn btn-primary">
+                    <button
+                      type="submit"
+                      className="btn-secondary btn btn-primary"
+                    >
                       See All
                     </button>
                   </div>
                 </div>
-
               </div>
             </div>
           </Tab>
@@ -3738,7 +3797,7 @@ const FileDetails = () => {
                       <Loading />
                     ) : (
                       <Form>
-                         <div className="d-block mb-2">
+                        <div className="d-block mb-2">
                           <span
                             className="back-screen"
                             onClick={() => setShowSpeakerInner(false)}
@@ -3903,25 +3962,27 @@ const FileDetails = () => {
                                   {showSpeakerDocument?.length > 0 ? (
                                     showSpeakerDocument?.map((data) => (
                                       <tr>
-                                        <td><div className="d-flex align-items-center">
-                                          <span className="file-type-icon">
-                                            <svg
-                                              xmlns="http://www.w3.org/2000/svg"
-                                              width="24"
-                                              height="24"
-                                              viewBox="0 0 24 24"
-                                              fill="none"
-                                            >
-                                              <path
-                                                d="M12.65 2.23994C12.4689 2.08503 12.2383 1.99992 12 1.99994H5C4.73478 1.99994 4.48043 2.1053 4.29289 2.29283C4.10536 2.48037 4 2.73472 4 2.99994V20.9999C4 21.2652 4.10536 21.5195 4.29289 21.7071C4.48043 21.8946 4.73478 21.9999 5 21.9999H19C19.2652 21.9999 19.5196 21.8946 19.7071 21.7071C19.8946 21.5195 20 21.2652 20 20.9999V8.99994C20 8.8555 19.9687 8.71277 19.9083 8.58157C19.8479 8.45038 19.7598 8.33383 19.65 8.23994L12.65 2.23994ZM13 5.16994L16.3 7.99994H13V5.16994ZM18 19.9999H6V3.99994H11V8.99994C11 9.26516 11.1054 9.51951 11.2929 9.70705C11.4804 9.89458 11.7348 9.99994 12 9.99994H18V19.9999Z"
-                                                fill="white"
-                                              />
-                                            </svg>
-                                          </span>
-                                          <span className="text-elips">
-                                            {data.filename}
-                                          </span>
-                                        </div></td>
+                                        <td>
+                                          <div className="d-flex align-items-center">
+                                            <span className="file-type-icon">
+                                              <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                width="24"
+                                                height="24"
+                                                viewBox="0 0 24 24"
+                                                fill="none"
+                                              >
+                                                <path
+                                                  d="M12.65 2.23994C12.4689 2.08503 12.2383 1.99992 12 1.99994H5C4.73478 1.99994 4.48043 2.1053 4.29289 2.29283C4.10536 2.48037 4 2.73472 4 2.99994V20.9999C4 21.2652 4.10536 21.5195 4.29289 21.7071C4.48043 21.8946 4.73478 21.9999 5 21.9999H19C19.2652 21.9999 19.5196 21.8946 19.7071 21.7071C19.8946 21.5195 20 21.2652 20 20.9999V8.99994C20 8.8555 19.9687 8.71277 19.9083 8.58157C19.8479 8.45038 19.7598 8.33383 19.65 8.23994L12.65 2.23994ZM13 5.16994L16.3 7.99994H13V5.16994ZM18 19.9999H6V3.99994H11V8.99994C11 9.26516 11.1054 9.51951 11.2929 9.70705C11.4804 9.89458 11.7348 9.99994 12 9.99994H18V19.9999Z"
+                                                  fill="white"
+                                                />
+                                              </svg>
+                                            </span>
+                                            <span className="text-elips">
+                                              {data.filename}
+                                            </span>
+                                          </div>
+                                        </td>
                                         <td>{data.docType?.name}</td>
                                         <td>
                                           {data.status == "to_be_checked" ? (
@@ -4478,7 +4539,7 @@ const FileDetails = () => {
                                 <td>
                                   <div className="action-btn">
                                     <Link
-                                    /*  onClick={(e) => {
+                                      /*  onClick={(e) => {
                                         e.stopPropagation();
                                         handleViewShowSpeaker();
                                         setShowSpeakerId(data.id);
@@ -4489,7 +4550,7 @@ const FileDetails = () => {
                                           data.missing_document_count
                                         );
                                       }}*/
-                                     onClick={() => setShowSpeakerInner(true)}
+                                      onClick={() => setShowSpeakerInner(true)}
                                       className="view"
                                       href="/user-management"
                                       data-discover="true"

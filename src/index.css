@@ -988,6 +988,19 @@ color: var(--bs-body-color);
 }
 }
 @media (max-width: 767px) {
+  .sm-select-full {
+    flex-direction: column !important;    width: 100%;
+    gap: 10px;
+}
+  .sm-select-full div{
+    width: 100%;
+  }
+  a.fold-unfold-link.link-wrap {
+    margin-right: 20px;
+}
+    .flex-1366-column {
+    flex-direction: column !important;
+  }
   ul.recharts-default-legend {
     top: -15px;
     position: relative;
@@ -1080,7 +1093,7 @@ h6 {
     /* width: 100% !important;
     text-align: center !important;
     margin: 0 0 5px 0; */
-        column-count: 1;
+
   }
   .new-update-header .top-part{
         flex-direction: column;
@@ -1197,7 +1210,8 @@ h6 {
     /* width: 81px; */
     height: 48px;
 }
-  .flex-1366-column {
+    .flex-1366-column {
     flex-direction: column !important;
   }
+
 }

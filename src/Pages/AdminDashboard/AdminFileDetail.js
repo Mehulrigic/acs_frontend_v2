@@ -1981,15 +1981,8 @@ const AdminFileDetail = () => {
           <div
             className="detail-header new-update-header"
           >
-            <div className="d-flex align-items-center ms-auto top-part">
-            <div style={{ marginRight: "20px" }} className="div">
-              <Link
-                onClick={toggleDetail}
-                className="fold-unfold-link link-wrap"
-              >
-                {isVisible ? "Fold Detail" : "Unfold Detail"}
-              </Link>
-            </div>
+            <div className="d-flex align-items-center ms-auto top-part justify-content-end">
+
             <div style={{ marginRight: "20px" }}>
               <MissingDocument
                 link={true}
@@ -2026,13 +2019,20 @@ const AdminFileDetail = () => {
               <option value="transfer_to_broker">Transfert au Courtier</option>
               <option value="to_be_decided">A statuer</option>
             </Form.Select>
+                                        <div style={{ marginLeft: "20px" }} className="div">
+                            <Link onClick={toggleDetail} className="fold-unfold-link link-wrap">
+                              {isVisible ? <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 50 50" fill="none"><path d="M25.0007 2.08325C20.4682 2.08325 16.0375 3.42729 12.2688 5.94541C8.50022 8.46352 5.56293 12.0426 3.82842 16.2301C2.09391 20.4176 1.64009 25.0253 2.52433 29.4707C3.40858 33.9161 5.59118 37.9995 8.79613 41.2044C12.0011 44.4094 16.0844 46.592 20.5298 47.4762C24.9752 48.3605 29.583 47.9067 33.7705 46.1722C37.958 44.4376 41.5371 41.5004 44.0552 37.7317C46.5733 33.9631 47.9173 29.5324 47.9173 24.9999C47.9102 18.9242 45.4934 13.0995 41.1973 8.8033C36.9011 4.50715 31.0763 2.09042 25.0007 2.08325ZM25.0007 43.7499C21.2923 43.7499 17.6671 42.6502 14.5837 40.59C11.5003 38.5297 9.09706 35.6013 7.67792 32.1752C6.25878 28.7491 5.88746 24.9791 6.61094 21.342C7.33441 17.7048 9.12017 14.3639 11.7424 11.7417C14.3646 9.11943 17.7056 7.33367 21.3427 6.61019C24.9799 5.88672 28.7499 6.25803 32.176 7.67718C35.6021 9.09632 38.5304 11.4996 40.5907 14.583C42.651 17.6664 43.7507 21.2915 43.7507 24.9999C43.7452 29.971 41.7679 34.737 38.2528 38.2521C34.7377 41.7672 29.9718 43.7444 25.0007 43.7499Z" fill="#464255"></path><path d="M33.334 22.9167H16.6673C16.1148 22.9167 15.5849 23.1362 15.1942 23.5269C14.8035 23.9176 14.584 24.4476 14.584 25.0001C14.584 25.5526 14.8035 26.0825 15.1942 26.4732C15.5849 26.8639 16.1148 27.0834 16.6673 27.0834H33.334C33.8865 27.0834 34.4164 26.8639 34.8071 26.4732C35.1978 26.0825 35.4173 25.5526 35.4173 25.0001C35.4173 24.4476 35.1978 23.9176 34.8071 23.5269C34.4164 23.1362 33.8865 22.9167 33.334 22.9167Z" fill="#464255"></path></svg> :
+                              <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 50 50" fill="none"><path d="M25.0007 2.0835C20.4682 2.0835 16.0375 3.42753 12.2688 5.94565C8.50022 8.46377 5.56293 12.0429 3.82842 16.2303C2.09391 20.4178 1.64009 25.0256 2.52433 29.471C3.40858 33.9164 5.59118 37.9997 8.79613 41.2047C12.0011 44.4096 16.0844 46.5922 20.5298 47.4765C24.9752 48.3607 29.583 47.9069 33.7705 46.1724C37.958 44.4379 41.5371 41.5006 44.0552 37.732C46.5733 33.9634 47.9173 29.5326 47.9173 25.0002C47.9102 18.9245 45.4934 13.0997 41.1973 8.80355C36.9011 4.50739 31.0763 2.09066 25.0007 2.0835ZM25.0007 43.7502C21.2923 43.7502 17.6671 42.6505 14.5837 40.5902C11.5003 38.5299 9.09706 35.6016 7.67792 32.1755C6.25878 28.7494 5.88746 24.9794 6.61094 21.3422C7.33441 17.7051 9.12017 14.3641 11.7424 11.7419C14.3646 9.11968 17.7056 7.33391 21.3427 6.61044C24.9799 5.88697 28.7499 6.25828 32.176 7.67742C35.6021 9.09656 38.5304 11.4998 40.5907 14.5832C42.651 17.6666 43.7507 21.2918 43.7507 25.0002C43.7446 29.9711 41.7672 34.7367 38.2522 38.2517C34.7372 41.7667 29.9716 43.7441 25.0007 43.7502Z" fill="#464255"></path><path d="M33.334 22.9168H27.084V16.6668C27.084 16.1143 26.8645 15.5844 26.4738 15.1937C26.0831 14.803 25.5532 14.5835 25.0007 14.5835C24.4481 14.5835 23.9182 14.803 23.5275 15.1937C23.1368 15.5844 22.9173 16.1143 22.9173 16.6668V22.9168H16.6673C16.1148 22.9168 15.5849 23.1363 15.1942 23.527C14.8035 23.9177 14.584 24.4476 14.584 25.0002C14.584 25.5527 14.8035 26.0826 15.1942 26.4733C15.5849 26.864 16.1148 27.0835 16.6673 27.0835H22.9173V33.3335C22.9173 33.886 23.1368 34.4159 23.5275 34.8066C23.9182 35.1973 24.4481 35.4168 25.0007 35.4168C25.5532 35.4168 26.0831 35.1973 26.4738 34.8066C26.8645 34.4159 27.084 33.886 27.084 33.3335V27.0835H33.334C33.8865 27.0835 34.4164 26.864 34.8071 26.4733C35.1978 26.0826 35.4173 25.5527 35.4173 25.0002C35.4173 24.4476 35.1978 23.9177 34.8071 23.527C34.4164 23.1363 33.8865 22.9168 33.334 22.9168Z" fill="#464255"></path></svg>
+                               }
+                            </Link>
+                          </div>
             </div>
 
                       <div
             className={`second-header ${isVisible ? "show" : ""}`}
           >
             <div className="d-flex align-items-center check-status">
-              <div className="d-flex align-items-center check-status">
+              <div className="d-flex align-items-center check-status sm-select-full">
                 <p className="m-0" style={{ paddingRight: "10px" }}>
                   Etat du chantier :{" "}
                 </p>
@@ -2047,9 +2047,23 @@ const AdminFileDetail = () => {
                     <option value="end_of_site">Fin de chantier</option>
                   </Form.Select>
                 </div>
+                                  <p className="m-0" style={{ paddingRight: "10px" }}>
+                                    Export As :{" "}
+                                  </p>
+                                  <div style={{ paddingRight: "10px" }}>
+                                    <Form.Select
+                                      aria-label="Export As"
+                                      style={{ minHeight: "45px", minWidth:"110px" }}
+                                    >
+                                      <option value="on_site">PDF</option>
+                                      <option value="end_of_site">Excel</option>
+                                    </Form.Select>
+                                  </div>
               </div>
-              <div className="grid-view">
-                <div className="d-flex align-items-center">
+              <div className="grid-view ">
+                <div className="row mb-3">
+                  <div className="col-md-3 mb-3">
+                                    <div className="d-flex align-items-start flex-column gap-2">
                                 <p className="m-0">Statut : </p>
               <div className="status">
                 {showUserDocumentData?.status === "to_be_checked"
@@ -2069,34 +2083,46 @@ const AdminFileDetail = () => {
                   : t("invalidLabel")}
               </div>
                 </div>
-                <div className="d-flex align-items-center">
+                    </div>       
+                    <div className="col-md-3 mb-3">
+                                      <div className="d-flex align-items-start flex-column gap-2">
               <p className="m-0">DOC : </p>
               <div className="status">
                 15/07/2025
               </div>
               </div>
-
-              <div className="d-flex align-items-center">
+                      </div>   
+                      <div className="col-md-3 mb-3">
+                                      <div className="d-flex align-items-start flex-column gap-2">
 
               <p className="m-0">Date fin prévisionnelle : </p>
               <div className="status">
                 27/07/2026
               </div>
               </div>
-
-              <div className="d-flex align-items-center">
+                        </div>    
+                        <div className="col-md-3 mb-3">
+              <div className="d-flex align-items-start flex-column gap-2">
               <p className="m-0">Coût prévisionnel : </p>
               <div className="status">
                 10 450 000€
               </div>
               </div>
-
-              <div className="d-flex align-items-center">
+                        </div>
+                        <div className="col-md-3 mb-3">
+              <div className="d-flex align-items-start flex-column gap-2">
               <p className="m-0">Nom du preneur assurance : </p>
               <div className="status">
                 Taratata patata
               </div>
               </div>
+                        </div>
+                </div>
+
+
+
+
+
               </div>
 
             </div>

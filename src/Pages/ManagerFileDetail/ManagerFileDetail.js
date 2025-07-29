@@ -1950,7 +1950,7 @@ const ManagerFileDetail = () => {
           <div
             className="detail-header new-update-header"
           >
-            <div className="d-flex align-items-center ms-auto top-part">
+            <div className="d-flex align-items-center ms-auto top-part justify-content-end">
 
               <div style={{ marginRight: "20px" }}>
                 <MissingDocument
@@ -1999,7 +1999,7 @@ const ManagerFileDetail = () => {
 
             <div className={`second-header ${isVisible ? 'show' : ''}`}>
               <div className="d-flex align-items-center check-status">
-                <div className="d-flex align-items-center check-status">
+                <div className="d-flex align-items-center check-status sm-select-full">
                   <p className="m-0" style={{ paddingRight: "10px" }}>
                     Etat du chantier :{" "}
                   </p>
