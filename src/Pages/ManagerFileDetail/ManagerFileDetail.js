@@ -1907,7 +1907,7 @@ const ManagerFileDetail = () => {
                 <div className="d-flex align-items-center">
                   <p className="m-0">Date fin prévisionnelle : </p>
                   <div className="status">
-                    27/07/2026
+                    {showUserDocumentData?.estimated_completion_date}
                   </div>
                 </div>
 
@@ -1921,7 +1921,7 @@ const ManagerFileDetail = () => {
                 <div className="d-flex align-items-center">
                   <p className="m-0">Nom du preneur assurance : </p>
                   <div className="status">
-                    Taratata patata
+                    {showUserDocumentData?.insurance_policyholder_name}
                   </div>
                 </div>
               </div>
