@@ -858,7 +858,7 @@ color: #212836;
     flex-direction: column;      margin-bottom: 30px;    align-items: start;
 
 }
-.grid-view div {
+/* .grid-view div {
     flex: 0 0 45%;
 }
 .grid-view div p.m-0 {
@@ -866,21 +866,24 @@ color: #212836;
 }
 .grid-view div .status {
     flex: 1;
-}
+} */
 .second-header{
   width: 100%;
 }.grid-view {
-    width: 100%;column-count: 2;
+    width: 100%;
 }
 .grid-view > div{
   margin-bottom: 10px;
 }
 .grid-view > div .status{
-  text-align: center;
+  text-align: center;width: 100%;    min-height: 31px;
 }.second-header select.form-select {
     font-size: 13px;
 }
-
+.grid-view p.m-0 {
+    width: 100%;
+    text-align: center;
+}
 .task-card {
     padding: 25px;
     background-color: #AB54DB;
@@ -971,6 +974,10 @@ color: var(--bs-body-color);
 .numeric-graph .graphic-line svg {
     /* width: 81px; */
     height: 60px;
+}
+.fold-unfold-link svg {
+    height: 30px;
+    width: 30px;
 }
 @media(max-width:1350px){
   .top-header > div:nth-child(2) {
