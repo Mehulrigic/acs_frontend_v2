@@ -888,6 +888,9 @@ color: #212836;
 }.second-header select.form-select {
     font-size: 13px;
 }
+.side-panel-container .link-section ul li a svg {
+    flex: 0 0 24px;
+}
 .grid-view p.m-0 {
     width: 100%;
    
