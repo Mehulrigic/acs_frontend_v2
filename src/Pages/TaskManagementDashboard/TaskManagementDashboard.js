@@ -152,9 +152,9 @@ const TaskManagementDashboard = () => {
 
             <div className="dashboard-main-content manager-dashboard" style={{ backgroundColor: rightPanelThemeColor }}>
                 <div className="top-header">
-                    <h4>Task Management</h4>
+                    <h4>{t("TaskManagementLabel")}</h4>
                     <div className="mt-3 d-flex justify-content-between align-items-center">
-                        <h1 className="m-0">Task Management</h1>
+                        <h1 className="m-0">{t("TaskManagementLabel")}</h1>
                         <AddNewTask
                             addTaskForm={addTaskForm}
                             setAddTaskForm={setAddTaskForm}
@@ -179,7 +179,7 @@ const TaskManagementDashboard = () => {
                                 >
                                     <Form.Control
                                         type="search"
-                                        placeholder={"Search..."}
+                                        placeholder={"Rechercher..."}
                                         value={search}
                                         onChange={(e) => setSearch(e.target.value)}
                                         onKeyDown={handleKeyPress}
@@ -210,7 +210,7 @@ const TaskManagementDashboard = () => {
                                         <tr style={{ textWrap: "nowrap" }}>
                                             <th>
                                                 <div className="d-flex align-items-center">
-                                                    <span>Title</span>
+                                                    <span>Titre</span>
                                                     <Link
                                                         className={`sorting-icon ms-2`}
                                                         onClick={() => handleClickRotate("title")}
@@ -262,11 +262,11 @@ const TaskManagementDashboard = () => {
                                                             value={taskStatus}
                                                             onChange={(e) => handleStatusChange(e.target.value)}
                                                         >
-                                                            <option value="">Status</option>
-                                                            <option value="pending">Pending</option>
-                                                            <option value="in_progress">In Progress</option>
-                                                            <option value="completed">Completed</option>
-                                                            <option value="cancel">Cancel</option>
+                                                            <option value="">{t("status")}</option>
+                                                            <option value="pending">En attente</option>
+                                                            <option value="in_progress">En cours</option>
+                                                            <option value="completed">Complété</option>
+                                                            <option value="cancel">Annuler</option>
                                                         </Form.Select>
                                                     </div>
                                                     <div>
@@ -299,10 +299,10 @@ const TaskManagementDashboard = () => {
                                                             value={taskPriority}
                                                             onChange={(e) => handlePriorityChange(e.target.value)}
                                                         >
-                                                            <option value="">Priority</option>
-                                                            <option value="low">Low</option>
-                                                            <option value="medium">Medium</option>
-                                                            <option value="high">High</option>
+                                                            <option value="">Priorité</option>
+                                                            <option value="low">Faible</option>
+                                                            <option value="medium">Moyen</option>
+                                                            <option value="high">Haut</option>
                                                         </Form.Select>
                                                     </div>
                                                     <div>
@@ -329,7 +329,7 @@ const TaskManagementDashboard = () => {
                                             </th>
                                             <th>
                                                 <div className="d-flex align-items-center">
-                                                    <span>Assigned By</span>
+                                                    <span>Attribué par</span>
                                                     <Link
                                                         className={`sorting-icon ms-2`}
                                                         onClick={() => handleClickRotate("assigned_by.name")}
@@ -352,7 +352,7 @@ const TaskManagementDashboard = () => {
                                             </th>
                                             <th>
                                                 <div className="d-flex align-items-center">
-                                                    <span>Assigned To</span>
+                                                    <span>Attribué à</span>
                                                     <Link
                                                         className={`sorting-icon ms-2`}
                                                         onClick={() => handleClickRotate("assigned_to.name")}
@@ -375,7 +375,7 @@ const TaskManagementDashboard = () => {
                                             </th>
                                             <th>
                                                 <div className="d-flex align-items-center">
-                                                    <span>Due Date</span>
+                                                    <span>Date d'échéance</span>
                                                     <Link
                                                         className={`sorting-icon ms-2`}
                                                         onClick={() => handleClickRotate("due_date")}

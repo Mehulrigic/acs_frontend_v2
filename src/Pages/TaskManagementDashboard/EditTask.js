@@ -6,8 +6,11 @@ import Select from "react-select";
 import DatePicker from 'react-datepicker';
 import { fr } from "date-fns/locale";
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 const EditTask = (props) => {
+  const { t } = useTranslation();
+
   const { editTaskFormShow, setEditTaskFormShow, search, sort, currentPage, taskStatusList, taskPriorityList, TaskList, taskId } = props;
 
   const [taskTitle, setTaskTitle] = useState("");
@@ -27,15 +30,15 @@ const EditTask = (props) => {
   const [flashMessage, setFlashMessage] = useState({ type: "", message: "" });
 
   const PriorityOptions = [
-    { value: "high", label: "High" },
-    { value: "medium", label: "Medium" },
-    { value: "low", label: "Low" }
+    { value: "high", label: "Haut" },
+    { value: "medium", label: "Moyen" },
+    { value: "low", label: "Faible" }
   ];
 
   const TaskStatusOptions = [
-    { value: "in_progress", label: "In Progress" },
-    { value: "pending", label: "Pending" },
-    { value: "cancelled", label: "Cancelled" }
+    { value: "in_progress", label: "En cours" },
+    { value: "pending", label: "En attente" },
+    { value: "cancelled", label: "Annulé" }
   ];
 
   useEffect(() => {
@@ -242,18 +245,18 @@ const EditTask = (props) => {
       {/* Edit Task */}
       <Modal show={editTaskFormShow} onHide={() => handleClose()} centered size="lg">
         <Modal.Header closeButton>
-          <Modal.Title>Edit Task</Modal.Title>
+          <Modal.Title>Modifier la tâche</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form onSubmit={TaskUpdate}>
             <div className="row">
               <div className="col-md-6 mb-3">
                 <Form.Group controlId="taskTitle">
-                  <Form.Label>Title <span>*</span></Form.Label>
+                  <Form.Label>Titre <span>*</span></Form.Label>
                   <Form.Control
                     type="text"
                     name="title"
-                    placeholder="Enter task title"
+                    placeholder="Entrez le titre de la tâche"
                     value={taskTitle}
                     onChange={(e) => setTaskTitle(e.target.value)}
                   />
@@ -262,10 +265,10 @@ const EditTask = (props) => {
 
               <div className="col-md-6 mb-3">
                 <Form.Group controlId="taskStatus">
-                  <Form.Label>Status <span>*</span></Form.Label>
+                  <Form.Label>{t("status")} <span>*</span></Form.Label>
                   <Select
                     options={TaskStatusOptions}
-                    value={taskStatus}
+                    value={taskStatus == "in_progress" ? "En cours" : taskStatus == "pending" ? "En attente" : taskStatus == "cancelled" ? "Annulé" : "" }
                     onChange={(selectedOption) => setTaskStatus(selectedOption)}
                     styles={{
                       container: (provided) => ({
@@ -277,7 +280,7 @@ const EditTask = (props) => {
                         width: '100%',
                       }),
                     }}
-                    placeholder={"Select Task Status"}
+                    placeholder={"Sélectionnez le statut de la tâche"}
                     isSearchable={true}
                   />
                 </Form.Group>
@@ -285,7 +288,7 @@ const EditTask = (props) => {
 
               <div className="col-md-6 mb-3">
                 <Form.Group controlId="taskPriority">
-                  <Form.Label>Priority <span>*</span></Form.Label>
+                  <Form.Label>Priorité <span>*</span></Form.Label>
                   <Select
                     options={PriorityOptions}
                     value={taskPriority}
@@ -300,7 +303,7 @@ const EditTask = (props) => {
                         width: '100%',
                       }),
                     }}
-                    placeholder={"Select Priority"}
+                    placeholder={"Sélectionnez la priorité"}
                     isSearchable={true}
                   />
                 </Form.Group>
@@ -308,7 +311,7 @@ const EditTask = (props) => {
 
               <div className="col-md-6 mb-3">
                 <Form.Group controlId="assignedTo">
-                  <Form.Label>Assigned To <span>*</span></Form.Label>
+                  <Form.Label>Attribué à <span>*</span></Form.Label>
                   <Select
                     options={userList}
                     value={assignedToUser}
@@ -323,7 +326,7 @@ const EditTask = (props) => {
                         width: '100%',
                       }),
                     }}
-                    placeholder={"Select user"}
+                    placeholder={"Sélectionner un utilisateur"}
                     isSearchable={true}
                   />
                 </Form.Group>
@@ -331,7 +334,7 @@ const EditTask = (props) => {
 
               <div className="col-md-6 mb-3">
                 <Form.Group controlId="assignedBy">
-                  <Form.Label>User Document</Form.Label>
+                  <Form.Label>Document utilisateur</Form.Label>
                   <Select
                     options={userDocumentList}
                     value={selectedFolder}
@@ -346,7 +349,7 @@ const EditTask = (props) => {
                         width: '100%',
                       }),
                     }}
-                    placeholder={"Select User Document"}
+                    placeholder={"Sélectionnez le document utilisateur"}
                     isSearchable={true}
                   />
                 </Form.Group>
@@ -354,7 +357,7 @@ const EditTask = (props) => {
 
               <div className="col-md-6 mb-3">
                 <Form.Group controlId="assignedBy">
-                  <Form.Label>User Document File</Form.Label>
+                  <Form.Label>Fichier de document utilisateur</Form.Label>
                   <Select
                     options={userDocumentFileList}
                     value={selectedFolderFile}
@@ -369,7 +372,7 @@ const EditTask = (props) => {
                         width: '100%',
                       }),
                     }}
-                    placeholder={"Select User Document File"}
+                    placeholder={"Sélectionnez le fichier de document utilisateur"}
                     isSearchable={true}
                   />
                 </Form.Group>
@@ -377,7 +380,7 @@ const EditTask = (props) => {
 
               <div className="col-md-6 mb-3">
                 <Form.Group controlId="assignedBy">
-                  <Form.Label>Due Date</Form.Label>
+                  <Form.Label>Date d'échéance</Form.Label>
                   <DatePicker
                     placeholderText={"dd/MM/yyyy"}
                     selected={dueDate ? getFormattedDate(dueDate) : null}
@@ -394,7 +397,7 @@ const EditTask = (props) => {
                     type="textarea"
                     style={{ width: "100%" }}
                     name="description"
-                    placeholder="Type here..."
+                    placeholder="Tapez ici..."
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                   />
@@ -405,10 +408,10 @@ const EditTask = (props) => {
         </Modal.Body>
         <Modal.Footer>
           <Button className="cancel-btn" variant="primary" onClick={() => handleClose()}>
-            Cancel
+            {t("cancelLabel")}
           </Button>
           <Button variant="primary" onClick={(e) => TaskUpdate(e)}>
-            Edit Task
+            Modifier la tâche
           </Button>
         </Modal.Footer>
       </Modal>

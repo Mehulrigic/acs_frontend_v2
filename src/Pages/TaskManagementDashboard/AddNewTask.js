@@ -5,8 +5,10 @@ import TaskManagementService from '../../API/TaskManagement/TaskManagementServic
 import Select from "react-select";
 import DatePicker from 'react-datepicker';
 import { fr } from "date-fns/locale";
+import { useTranslation } from 'react-i18next';
 
 const AddNewTask = (props) => {
+  const { t } = useTranslation();
   const { addTaskForm, setAddTaskForm, search, sort, currentPage, taskStatusList, taskPriorityList, TaskList, userId } = props;
 
   const [taskTitle, setTaskTitle] = useState("");
@@ -159,15 +161,15 @@ const AddNewTask = (props) => {
   };
 
   const PriorityOptions = [
-    { value: "high", label: "High" },
-    { value: "medium", label: "Medium" },
-    { value: "low", label: "Low" }
+    { value: "high", label: "Haut" },
+    { value: "medium", label: "Moyen" },
+    { value: "low", label: "Faible" }
   ];
 
   const TaskStatusOptions = [
-    { value: "in_progress", label: "In Progress" },
-    { value: "pending", label: "Pending" },
-    { value: "cancelled", label: "Cancelled" }
+    { value: "in_progress", label: "En cours" },
+    { value: "pending", label: "En attente" },
+    { value: "cancelled", label: "Annulé" }
   ];
 
   return (
@@ -184,24 +186,24 @@ const AddNewTask = (props) => {
         >
           <path d="M19 13H13V19H11V13H5V11H11V5H13V11H19V13Z" fill="white" />
         </svg>
-        Add New Task
+        Ajouter une nouvelle tâche
       </button>
 
       {/* Add Task */}
       <Modal show={addTaskForm} onHide={() => handleClose()} centered size="lg">
         <Modal.Header closeButton>
-          <Modal.Title>Add New Task</Modal.Title>
+          <Modal.Title>Ajouter une nouvelle tâche</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form onSubmit={TaskCreate}>
             <div className="row">
               <div className="col-md-6 mb-3">
                 <Form.Group controlId="taskTitle">
-                  <Form.Label>Title <span>*</span></Form.Label>
+                  <Form.Label>Titre <span>*</span></Form.Label>
                   <Form.Control
                     type="text"
                     name="title"
-                    placeholder="Enter task title"
+                    placeholder="Entrez le titre de la tâche"
                     value={taskTitle}
                     onChange={(e) => setTaskTitle(e.target.value)}
                   />
@@ -210,7 +212,7 @@ const AddNewTask = (props) => {
 
               <div className="col-md-6 mb-3">
                 <Form.Group controlId="taskStatus">
-                  <Form.Label>Status <span>*</span></Form.Label>
+                  <Form.Label>{t("status")} <span>*</span></Form.Label>
                   <Select
                     options={TaskStatusOptions}
                     value={taskStatus}
@@ -225,7 +227,7 @@ const AddNewTask = (props) => {
                         width: '100%',
                       }),
                     }}
-                    placeholder={"Select Task Status"}
+                    placeholder={"Sélectionnez le statut de la tâche"}
                     isSearchable={true}
                   />
                 </Form.Group>
@@ -233,7 +235,7 @@ const AddNewTask = (props) => {
 
               <div className="col-md-6 mb-3">
                 <Form.Group controlId="taskPriority">
-                  <Form.Label>Priority <span>*</span></Form.Label>
+                  <Form.Label>Priorité <span>*</span></Form.Label>
                   <Select
                     options={PriorityOptions}
                     value={taskPriority}
@@ -248,7 +250,7 @@ const AddNewTask = (props) => {
                         width: '100%',
                       }),
                     }}
-                    placeholder={"Select Priority"}
+                    placeholder={"Sélectionnez la priorité"}
                     isSearchable={true}
                   />
                 </Form.Group>
@@ -256,7 +258,7 @@ const AddNewTask = (props) => {
 
               <div className="col-md-6 mb-3">
                 <Form.Group controlId="assignedTo">
-                  <Form.Label>Assigned To <span>*</span></Form.Label>
+                  <Form.Label>Attribué à <span>*</span></Form.Label>
                   <Select
                     options={userList}
                     value={assignedUser}
@@ -271,7 +273,7 @@ const AddNewTask = (props) => {
                         width: '100%',
                       }),
                     }}
-                    placeholder={"Select User"}
+                    placeholder={"Sélectionner un utilisateur"}
                     isSearchable={true}
                   />
                 </Form.Group>
@@ -279,7 +281,7 @@ const AddNewTask = (props) => {
 
               <div className="col-md-6 mb-3">
                 <Form.Group controlId="assignedBy">
-                  <Form.Label>User Document</Form.Label>
+                  <Form.Label>Document utilisateur</Form.Label>
                   <Select
                     options={userDocumentList}
                     value={selectedFolder}
@@ -294,7 +296,7 @@ const AddNewTask = (props) => {
                         width: '100%',
                       }),
                     }}
-                    placeholder={"Select User Document"}
+                    placeholder={"Sélectionnez le document utilisateur"}
                     isSearchable={true}
                   />
                 </Form.Group>
@@ -302,7 +304,7 @@ const AddNewTask = (props) => {
 
               <div className="col-md-6 mb-3">
                 <Form.Group controlId="assignedBy">
-                  <Form.Label>User Document File</Form.Label>
+                  <Form.Label>Fichier de document utilisateur</Form.Label>
                   <Select
                     options={userDocumentFileList}
                     value={selectedFolderFile}
@@ -317,7 +319,7 @@ const AddNewTask = (props) => {
                         width: '100%',
                       }),
                     }}
-                    placeholder={"Select User Document File"}
+                    placeholder={"Sélectionnez le fichier de document utilisateur"}
                     isSearchable={true}
                   />
                 </Form.Group>
@@ -325,7 +327,7 @@ const AddNewTask = (props) => {
 
               <div className="col-md-6 mb-3">
                 <Form.Group controlId="assignedBy">
-                  <Form.Label>Due Date</Form.Label>
+                  <Form.Label>Date d'échéance</Form.Label>
                   {/* <Form.Control
                     type="date"
                     name="due_date"
@@ -359,7 +361,7 @@ const AddNewTask = (props) => {
                     type="textarea"
                     style={{ width: "100%" }}
                     name="description"
-                    placeholder="Type here..."
+                    placeholder="Tapez ici..."
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                   />
@@ -370,10 +372,10 @@ const AddNewTask = (props) => {
         </Modal.Body>
         <Modal.Footer>
           <Button className="cancel-btn" variant="primary" onClick={() => handleClose()}>
-            Cancel
+            {t("cancelLabel")}
           </Button>
           <Button variant="primary" onClick={(e) => TaskCreate(e)}>
-            Add Task
+            Ajouter une tâche
           </Button>
         </Modal.Footer>
       </Modal>

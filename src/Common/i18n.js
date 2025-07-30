@@ -120,6 +120,7 @@ const resources = {
             removeScreenshotLabel: "Remove screenshot",
             submitBugReportLabel: "Send Bug Report",
             cancelLabel: "Cancel",
+            TaskManagementLabel: "Task Management"
         }
     },
     fr: {
@@ -240,6 +241,7 @@ const resources = {
             removeScreenshotLabel: "Supprimer la capture d'écran",
             submitBugReportLabel: "Envoyer un rapport de bug",
             cancelLabel: "Annuler",
+            TaskManagementLabel: "Gestion des tâches"
         }
     }
 };
