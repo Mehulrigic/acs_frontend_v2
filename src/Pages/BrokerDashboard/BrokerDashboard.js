@@ -704,6 +704,8 @@ const BrokerDashboard = () => {
                       currentPage={currentPage}
                       totalPages={totalPages}
                       onPageChange={handlePageChange}
+                      itemsPerPage={10}
+                      totalItems={totalRecords}
                     />
                   }
                 </div>
@@ -1111,6 +1113,8 @@ const BrokerDashboard = () => {
                       currentPage={currentPage}
                       totalPages={totalPages}
                       onPageChange={handlePageChange}
+                      itemsPerPage={10}
+                      totalItems={totalRecords}
                     />
                   }
                 </div>
@@ -1518,6 +1522,8 @@ const BrokerDashboard = () => {
                       currentPage={currentPage}
                       totalPages={totalPages}
                       onPageChange={handlePageChange}
+                      itemsPerPage={10}
+                      totalItems={totalRecords}
                     />
                   }
                 </div>

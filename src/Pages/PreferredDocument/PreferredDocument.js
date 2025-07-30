@@ -22,6 +22,7 @@ const PreferredDocument = () => {
   const [selectDocumentType, setSelectDocumentType] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [totalRecords, setTotalRecords] = useState(0);
   const [rightPanelThemeColor, setRightPanelThemeColor] = useState("");
   const [logoImageShow, setLogoImageShow] = useState("");
   const [formShow, setFormShow] = useState(false);
@@ -66,6 +67,7 @@ const PreferredDocument = () => {
         setPreferredDocumentList(response.data.PreferredDocument.data);
         setCurrentPage(response.data.user.meta.current_page);
         setTotalPages(response.data.user.meta.last_page);
+        setTotalRecords(response.data.user.meta.total);
       }
     } catch (error) {
       console.log(error);
@@ -267,11 +269,15 @@ const PreferredDocument = () => {
               </tbody>
             </Table>
           </div>
-          <Paginations
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={handlePageChange}
-          />
+          {totalRecords > 10 && (
+            <Paginations
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+              itemsPerPage={10}
+              totalItems={totalRecords}
+            />
+          )}
         </div>
       </div>
 

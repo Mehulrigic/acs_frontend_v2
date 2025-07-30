@@ -2813,6 +2813,8 @@ const BrokerFileDetail = () => {
                       currentPage={currentPage}
                       totalPages={totalPages}
                       onPageChange={handlePageChange}
+                      itemsPerPage={10}
+                      totalItems={totalRecordOther}
                     />
                   )}
                 </div>
@@ -3115,6 +3117,8 @@ const BrokerFileDetail = () => {
                       currentPage={currentPage}
                       totalPages={totalPages}
                       onPageChange={handlePageChange}
+                      itemsPerPage={10}
+                      totalItems={totalMissingRecords}
                     />
                   )}
                 </div>
@@ -3443,6 +3447,8 @@ const BrokerFileDetail = () => {
                                 currentPage={currentPage}
                                 totalPages={totalPages}
                                 onPageChange={handlePageChangeView}
+                                itemsPerPage={10}
+                                totalItems={totalSpeakerDocument}
                               />
                             )}
                           </div>
@@ -3974,6 +3980,8 @@ const BrokerFileDetail = () => {
                     currentPage={currentPage}
                     totalPages={totalPages}
                     onPageChange={handlePageChange}
+                    itemsPerPage={10}
+                    totalItems={totalSpeaker}
                   />
                 )}
               </div>
@@ -4089,6 +4097,8 @@ const BrokerFileDetail = () => {
                   currentPage={currentPage}
                   totalPages={totalPages}
                   onPageChange={handlePageChange}
+                  itemsPerPage={10}
+                  totalItems={totalHistoryRecords}
                 />
               )}
             </div>
@@ -4921,6 +4931,8 @@ const BrokerFileDetail = () => {
                         currentPage={currentPage}
                         totalPages={totalPages}
                         onPageChange={handlePageChangeView}
+                        itemsPerPage={10}
+                        totalItems={totalSpeakerDocument}
                       />
                     )}
                   </div>

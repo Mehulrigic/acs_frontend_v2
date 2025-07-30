@@ -2608,7 +2608,7 @@ const ManagerFileDetail = () => {
                             </tr>
                           ))) : (
                             <tr style={{ textAlign: "center" }}>
-                              <td colSpan="5">{t("NorecordsfoundLabel")}</td>
+                              <td colSpan="6">{t("NorecordsfoundLabel")}</td>
                             </tr>
                           )}
                       </tbody>

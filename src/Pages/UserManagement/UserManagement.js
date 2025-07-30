@@ -501,6 +501,8 @@ const UserManagement = () => {
                 currentPage={currentPage}
                 totalPages={totalPages}
                 onPageChange={handlePageChange}
+                itemsPerPage={10}
+                totalItems={totalRecords}
               />
             }
           </Tab>
@@ -703,6 +705,8 @@ const UserManagement = () => {
                 currentPage={currentPage}
                 totalPages={totalPages}
                 onPageChange={handlePageChange}
+                itemsPerPage={10}
+                totalItems={totalRecords}
               />
             }
           </Tab>
@@ -881,6 +885,8 @@ const UserManagement = () => {
                 currentPage={currentPage}
                 totalPages={totalPages}
                 onPageChange={handlePageChange}
+                itemsPerPage={10}
+                totalItems={totalRecords}
               />
             }
           </Tab>

@@ -482,6 +482,8 @@ const DocumentType = () => {
               currentPage={currentPage}
               totalPages={totalPages}
               onPageChange={handlePageChange}
+              itemsPerPage={10}
+              totalItems={totalRecord}
             />
           }
         </div>
