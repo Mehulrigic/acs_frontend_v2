@@ -270,8 +270,10 @@ const AdminFileDetail = () => {
   const [fileType, setFileType] = useState("");
   const [exportDocumentOpen, setExportDocumentOpen] = useState(false);
   const handleExportDocumentShow = (type) => {
-    setFileType(type);
-    setExportDocumentOpen(true);
+    if(type){
+      setFileType(type);
+      setExportDocumentOpen(true);
+    }
   };
   const handleExportDocumentClose = () => setExportDocumentOpen(false);
 
@@ -2496,7 +2498,7 @@ const AdminFileDetail = () => {
                         )}
 
                     </div>
-                    <button className="btn-secondary btn btn-primary" onClick={() => setActiveTab("history")}>See All</button>
+                    <button className="btn-secondary btn btn-primary" onClick={() => setActiveTab("history")}>Tout voir</button>
                   </div>
                   <div className="last-msg-card">
                     3 derniers messages importants non lus
@@ -2516,7 +2518,7 @@ const AdminFileDetail = () => {
                           </div>
                         )}
                     </div>
-                    <button className="btn-secondary btn btn-primary" onClick={handleNoteShow}>See All</button>
+                    <button className="btn-secondary btn btn-primary" onClick={handleNoteShow}>Tout voir</button>
                   </div>
                 </div>
               </div>

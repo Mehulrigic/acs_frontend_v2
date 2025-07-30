@@ -748,7 +748,9 @@ position: absolute;
 }
 .last-event-card .react-datepicker-wrapper input {
     width: auto;
-    height: 43px;    width: 140px;min-height: 43px;
+    height: 43px;    
+    /* width: 140px; */
+    min-height: 43px;
 }
 .last-event-card .react-datepicker-wrapper input[type=text]::-webkit-input-placeholder{
 color: #212836;
