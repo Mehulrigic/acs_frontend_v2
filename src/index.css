@@ -803,7 +803,9 @@ color: #212836;
   opacity: 1;
   transform: translateY(0);
   padding: 15px;
-  margin-bottom: 20px;
+}
+.dropdown-part select.form-select {
+    width: 100% !important;
 }
 .second-header > .check-status{
       flex-direction: column;
@@ -876,13 +878,13 @@ color: #212836;
   margin-bottom: 10px;
 }
 .grid-view > div .status{
-  text-align: center;width: 100%;    min-height: 31px;
+ width: 100%;    min-height: 31px;
 }.second-header select.form-select {
     font-size: 13px;
 }
 .grid-view p.m-0 {
     width: 100%;
-    text-align: center;
+   
 }
 .task-card {
     padding: 25px;
@@ -988,6 +990,10 @@ color: var(--bs-body-color);
 }
 }
 @media (max-width: 767px) {
+  .second-header.show {
+    max-height: 500px;
+    overflow: scroll;
+}
   .sm-select-full {
     flex-direction: column !important;    width: 100%;
     gap: 10px;
@@ -996,7 +1002,10 @@ color: var(--bs-body-color);
     width: 100%;
   }
   a.fold-unfold-link.link-wrap {
-    margin-right: 20px;
+    /* margin-right: 20px; */
+}
+.dropdown-part select.form-select {
+ margin-bottom: 10px;
 }
     .flex-1366-column {
     flex-direction: column !important;
