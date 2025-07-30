@@ -81,7 +81,7 @@ const AddNote = (props) => {
                         <h2>Ajouter une note<span>*</span></h2>
 
                         <div className="replace-document mt-32 ">
-                            <div className="icon d-flex align-items-center">
+                            {selectDocumentFileName && <div className="icon d-flex align-items-center">
                                 <svg
                                     width="16"
                                     height="16"
@@ -95,7 +95,7 @@ const AddNote = (props) => {
                                     ></path>
                                 </svg>
                                 <span>{selectDocumentFileName}</span>
-                            </div>
+                            </div>}
                         </div>
                         <Form>
                             {flashMessage.message && (

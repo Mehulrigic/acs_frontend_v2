@@ -1680,6 +1680,16 @@ const FileDetails = () => {
     { value: "0", label: "Général" },
   ];
 
+  const handleNoteAddOrShow = (seletedValue) => {
+    if(seletedValue == "add_note") {
+      setShowAddNoteModal(true);
+    } else if (seletedValue == "view_note") {
+      handleNoteShow();
+    } else {
+      return;
+    }
+  };
+
   return (
     <Fragment>
       <style>
@@ -2209,14 +2219,10 @@ const FileDetails = () => {
                   </div>
                   <div className="col-md-3">
                     <label class="form-label">Ajouter une note</label>
-                    <Form.Select name="Ajouter">
-                      <option value="">Ajouter une note</option>
-                    </Form.Select>
-                  </div>
-                  <div className="col-md-3">
-                    <label class="form-label">Voir les raisons</label>
-                    <Form.Select name="Ajouter">
-                      <option value="">Voir les raisons</option>
+                    <Form.Select name="Ajouter" onChange={(e) => handleNoteAddOrShow(e.target.value)}>
+                      <option value="">Sélectionner...</option>
+                      <option value="add_note">Ajouter une note</option>
+                      <option value="view_note">Voir les raisons</option>
                     </Form.Select>
                   </div>
                   <div className="col-md-3">

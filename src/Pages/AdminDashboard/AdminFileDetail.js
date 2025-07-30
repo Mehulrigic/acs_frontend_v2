@@ -290,6 +290,16 @@ const AdminFileDetail = () => {
   };
   const handleExportDocumentClose = () => setExportDocumentOpen(false);
 
+  const handleNoteAddOrShow = (seletedValue) => {
+    if(seletedValue == "add_note") {
+      setShowAddNoteModal(true);
+    } else if (seletedValue == "view_note") {
+      handleNoteShow();
+    } else {
+      return;
+    }
+  };
+
   useEffect(() => {
     if (showNote) {
       GetDocumentFileNotesList(id, "");
@@ -2083,7 +2093,7 @@ const AdminFileDetail = () => {
           <div className="detail-header new-update-header">
             <div className="d-flex align-items-center justify-content-between w-100">
               <div className="left-part">
-                <h2 className="mb-0">Dossier Detail</h2>
+                <h2 className="mb-0">Dossier Détail</h2>
               </div>
               <div className="right-part">
                 <div style={{ marginLeft: "20px" }} className="div">
@@ -2224,23 +2234,17 @@ const AdminFileDetail = () => {
                       onChange={(e) => handleExportDocumentShow(e.target.value)}
                       defaultValue=""
                     >
-                      <option value="" disabled hidden>
-                        Sélectionner...
-                      </option>
+                      <option value="">Sélectionner...</option>
                       <option value="pdf">PDF</option>
                       <option value="excel">Exceller</option>
                     </Form.Select>
                   </div>
                   <div className="col-md-3">
-                    <label class="form-label">Ajouter une note</label>
-                    <Form.Select name="Ajouter">
-                      <option value="">Ajouter une note</option>
-                    </Form.Select>
-                  </div>
-                  <div className="col-md-3">
-                    <label class="form-label">Voir les raisons</label>
-                    <Form.Select name="Ajouter">
-                      <option value="">Voir les raisons</option>
+                    <label class="form-label">Note</label>
+                    <Form.Select name="Ajouter" onChange={(e) => handleNoteAddOrShow(e.target.value)}>
+                      <option value="">Sélectionner...</option>
+                      <option value="add_note">Ajouter une note</option>
+                      <option value="view_note">Voir les raisons</option>
                     </Form.Select>
                   </div>
                   <div className="col-md-3">

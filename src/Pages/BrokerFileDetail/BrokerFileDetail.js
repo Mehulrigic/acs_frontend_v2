@@ -308,6 +308,16 @@ const BrokerFileDetail = () => {
     }
   }, [showNote]);
 
+  const handleNoteAddOrShow = (seletedValue) => {
+    if(seletedValue == "add_note") {
+      setShowAddNoteModal(true);
+    } else if (seletedValue == "view_note") {
+      handleNoteShow();
+    } else {
+      return;
+    }
+  };
+
   const handleActionTypeChange = (e) => {
     const selectedValue = e.target.value;
     setSelectActionType(selectedValue);
@@ -1572,6 +1582,142 @@ const BrokerFileDetail = () => {
                   </Form.Select>
                 </div>
               </div> */}
+              {/* View Note List */}
+              <Offcanvas
+                className="add-folder-panel broker-add-panel"
+                placement={"end"}
+                show={showNote}
+                onHide={handleNoteClose}
+              >
+                <Offcanvas.Header closeButton>
+                  <Offcanvas.Title>Dossier incomplet</Offcanvas.Title>
+                </Offcanvas.Header>
+                <Offcanvas.Body
+                  style={{ overflow: "hidden", maxHeight: "80vh" }}
+                >
+                  <div className="step-1">
+                    <div className="div">
+                      <div className="step-2">
+                        <h2>Liste de notes</h2>
+                        <Select
+                          options={NotesOptions}
+                          onChange={(selectedOption) =>
+                            GetDocumentFileNotesList(
+                              id,
+                              selectedOption?.value
+                            )
+                          }
+                          styles={{
+                            container: (provided) => ({
+                              ...provided,
+                              width: "50%",
+                            }),
+                            menu: (provided) => ({
+                              ...provided,
+                              width: "100%",
+                            }),
+                          }}
+                          placeholder={"Sélectionnez le type de note"}
+                          isSearchable={true}
+                          className={isNoteLoading ? "mb-5" : ""}
+                        />
+
+                        {isNoteLoading ? (
+                          <Loading />
+                        ) : displayedRecordsNote?.length > 0 ? (
+                          <div
+                            ref={scrollRef}
+                            className="scroll-container mt-3"
+                            onScroll={handleScrollNote}
+                            style={{
+                              maxHeight: "calc(100vh - 300px)",
+                              overflowY: "auto",
+                              paddingRight: "5px",
+                              scrollbarWidth: "thin",
+                            }}
+                          >
+                            {displayedRecordsNote?.map((data) => (
+                              <Fragment key={data.id}>
+                                <div className="note-box mb-3">
+                                  <div className="d-flex justify-content-between align-items-center top-part">
+                                    <p className="m-0">
+                                      {data.type == "note"
+                                        ? "Note"
+                                        : "Invalide"}
+                                    </p>
+                                    <div className="d-flex align-items-center gap-2">
+                                      {data.is_important == 1 && (
+                                        <BsPatchExclamation
+                                          style={{
+                                            color: "red",
+                                            fontSize: "1.0rem",
+                                            cursor: "pointer",
+                                          }}
+                                          title="Remarque importante"
+                                        />
+                                      )}
+                                      <p className="m-0 create-date">
+                                        créé le {data.created_on}
+                                      </p>
+                                    </div>
+                                  </div>
+                                  <div className="inner-box">
+                                    {data.type == "note" &&
+                                      data.user_document_filename && (
+                                        <div className="d-flex align-items-center mb-3">
+                                          <div className="icon d-flex">
+                                            <svg
+                                              width="16"
+                                              height="16"
+                                              viewBox="0 0 8 14"
+                                              fill="none"
+                                              xmlns="http://www.w3.org/2000/svg"
+                                            >
+                                              <path
+                                                d="M6.42457 3.36368V10.3334C6.42457 11.6728 5.33972 12.7576 4.00033 12.7576C2.66093 12.7576 1.57608 11.6728 1.57608 10.3334V2.75762C1.57608 1.92125 2.25487 1.24246 3.09123 1.24246C3.9276 1.24246 4.60639 1.92125 4.60639 2.75762V9.12125C4.60639 9.45459 4.33366 9.72731 4.00033 9.72731C3.66699 9.72731 3.39426 9.45459 3.39426 9.12125V3.36368H2.48517V9.12125C2.48517 9.95762 3.16396 10.6364 4.00033 10.6364C4.83669 10.6364 5.51548 9.95762 5.51548 9.12125V2.75762C5.51548 1.41822 4.43063 0.333374 3.09123 0.333374C1.75184 0.333374 0.666992 1.41822 0.666992 2.75762V10.3334C0.666992 12.1758 2.1579 13.6667 4.00033 13.6667C5.84275 13.6667 7.33366 12.1758 7.33366 10.3334V3.36368H6.42457Z"
+                                                fill="#683191"
+                                              ></path>
+                                            </svg>
+                                          </div>
+                                          <span className="file-names">
+                                            {data.user_document_filename}
+                                          </span>
+                                        </div>
+                                      )}
+
+                                    {data.added_by && (
+                                      <p
+                                        className="position-absolute"
+                                        style={{
+                                          bottom: "5px",
+                                          right: "10px",
+                                          fontSize: "0.875rem",
+                                          color: "#999",
+                                          margin: 0,
+                                        }}
+                                      >
+                                        —{" "}
+                                        {`${data.added_by?.first_name ?? ""
+                                          } ${data.added_by?.last_name ?? ""
+                                          }`}
+                                      </p>
+                                    )}
+                                    <p className="">{data.reason}</p>
+                                  </div>
+                                </div>
+                              </Fragment>
+                            ))}
+                          </div>
+                        ) : (
+                          <div className="mt-3">
+                            {t("NorecordsfoundLabel")}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </Offcanvas.Body>
+              </Offcanvas>
             </div>
             <div className={`second-header ${isVisible ? "show" : ""}`}>
               <div className="dropdown-part">
@@ -1597,14 +1743,10 @@ const BrokerFileDetail = () => {
                   </div>
                   <div className="col-md-3">
                     <label class="form-label">Ajouter une note</label>
-                    <Form.Select name="Ajouter">
-                      <option value="">Ajouter une note</option>
-                    </Form.Select>
-                  </div>
-                  <div className="col-md-3">
-                    <label class="form-label">Voir les raisons</label>
-                    <Form.Select name="Ajouter">
-                      <option value="">Voir les raisons</option>
+                    <Form.Select name="Ajouter" onChange={(e) => handleNoteAddOrShow(e.target.value)}>
+                      <option value="">Sélectionner...</option>
+                      <option value="add_note">Ajouter une note</option>
+                      <option value="view_note">Voir les raisons</option>
                     </Form.Select>
                   </div>
                   <div className="col-md-3">
