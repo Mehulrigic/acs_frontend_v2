@@ -32,8 +32,8 @@ const TaskManagementService = {
     task_update: (id, userData) => apiClient.post(`/user/task/update/${id}`, userData),
     task_delete: (id) => apiClient.get(`/user/task/delete/${id}`),
     task_assignable_users: () => apiClient.get("/user/task/assignable-users"),
-    user_document_list: (id) => apiClient.get(`/user/task/documents/${id}`),
-    user_document_file_list: (id) => apiClient.get(`/user/task/documents/files/${id}`),
+    user_document_list: (id) => apiClient.get(`/user/task/user-document-folders/${id}`),
+    user_document_file_list: (id) => apiClient.get(`/user/task/user-document-files/${id}`),
 };
 
 export default TaskManagementService;

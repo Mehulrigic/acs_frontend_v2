@@ -26,6 +26,7 @@ import AdminFileDetail from "./Pages/AdminDashboard/AdminFileDetail";
 import { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import LogicalBlock from "./Pages/LogicalBlock/LogicalBlock";
+import TaskManagementDashboard from "./Pages/TaskManagementDashboard/TaskManagementDashboard";
 
 const App = () => { 
   return (
@@ -50,6 +51,10 @@ const App = () => {
             <Route
               path="my-account"
               element={<ProtectedRoute element={<MyAccount />} />}
+            />
+            <Route
+              path="taskmanagement-dashboard"
+              element={<ProtectedRoute element={<TaskManagementDashboard />} />}
             />
 
             {/* Admin */}
