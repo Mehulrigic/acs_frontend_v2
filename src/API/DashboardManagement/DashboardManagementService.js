@@ -39,6 +39,7 @@ const DashboardManagementService = {
   apiClient.get(`/user/user_document/export/folder/${id}?format=${format}`, {
     responseType: 'blob',
   }),
+  event_history_users: (id) => apiClient.get(`/user/user_document/history/users/${id}`),
 };
 
 export default DashboardManagementService;

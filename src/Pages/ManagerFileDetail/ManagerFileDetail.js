@@ -272,6 +272,7 @@ const ManagerFileDetail = () => {
   const [speakerDocumentFileList, setSpeakerDocumentFileList] = useState(null);
   const [lastFiveEventList, setLastFiveEventList] = useState([]);
   const [lastThreeNoteList, setLastThreeNoteList] = useState([]);
+  const [eventHistoryUserList, setEventHistoryUserList] = useState([]);
 
   const [taskListData, setTaskListData] = useState([]);
   const [taskStatus, setTaskStatus] = useState("");
@@ -344,6 +345,7 @@ const ManagerFileDetail = () => {
     if (activeTab === "dashboard") {
       DashboardRegisteredDocument(id);
       DashboardSpeakerRegisteredDocument(id);
+      EventUserList(id);
       DashboardLastFiveEvent(id);
       DashboardLastThreeNote(id);
       TaskList(search, sort, currentPage, taskStatus, taskPriority);
@@ -1904,8 +1906,8 @@ const ManagerFileDetail = () => {
   const DashboardLastThreeNote = async (id) => {
     try {
       var userData = {
-        action_type: "",
-        user_id: "",
+        action_type: selectedType ?? "",
+        user_id: selectedUser ?? "",
         start_date: "",
         end_date: "",
       };
@@ -1925,6 +1927,24 @@ const ManagerFileDetail = () => {
         });
       }
     } catch (error) {
+      setFlashMessage({
+        type: "error",
+        message: t("somethingWentWrong"),
+      });
+    }
+  };
+
+  const EventUserList = async (id) => {
+    setIsLoading(true);
+    try {
+      const response = await DashboardManagementService.event_history_users(id);
+
+      if (response.data.status) {
+        setIsLoading(false);
+        setEventHistoryUserList(response.data.user.data);
+      }
+    } catch (error) {
+      setIsLoading(false);
       setFlashMessage({
         type: "error",
         message: t("somethingWentWrong"),
@@ -2547,41 +2567,58 @@ const ManagerFileDetail = () => {
                           <th>Nom de la tâche</th>
                           <th>Date limite</th>
                           <th>Description de la tâche</th>
-                          <th>Nom du responsable</th>
+                          <th>Attribué par</th>
+                          <th>Attribué à</th>
                           <th>{t("status")}</th>
                         </tr>
                       </thead>
                       <tbody>
-                        <tr>
-                          <td>Task 1</td>
-                          <td>dead line</td>
-                          <td>Task description</td>
-                          <td>Name of responsible</td>
-                          <td>
-                            <span className="checked badges">À vérifier</span>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>Task 1</td>
-                          <td>dead line</td>
-                          <td>Task description</td>
-                          <td>Name of responsible</td>
-                          <td>
-                            <span className="checked badges">À vérifier</span>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>Task 1</td>
-                          <td>dead line</td>
-                          <td>Task description</td>
-                          <td>Name of responsible</td>
-                          <td>
-                            <span className="checked badges">À vérifier</span>
-                          </td>
-                        </tr>
+                        {taskListData?.length > 0 ? (
+                          taskListData?.map((data) => (
+                            <tr>
+                              <td>
+                                <span className="text-elips">{data.title}</span>
+                              </td>
+                              <td>{data.due_date}</td>
+                              <td>
+                                <span className="text-elips">{data.description}</span>
+                              </td>
+                              <td>{(data.assigned_by?.first_name || "") + " " + (data.assigned_by?.last_name || "")}</td>
+                              <td>{(data.assigned_to?.first_name || "") + " " + (data.assigned_to?.last_name || "")}</td>
+                              <td>
+                                {/* {data.status == "to_be_checked" ? (
+                                  <span className="checked badges">
+                                    {t("toBeCheckedLabel")}
+                                  </span>
+                                ) : data.status == "verified" ? (
+                                  <span className="verified badges">
+                                    {t("verified")}
+                                  </span>
+                                ) : (
+                                  <span className="incomplete badges">
+                                    {t("invalidLabel")}
+                                  </span>
+                                )} */}
+                                <span className="checked badges">{data.status}</span>
+                              </td>
+                            </tr>
+                          ))) : (
+                            <tr style={{ textAlign: "center" }}>
+                              <td colSpan="5">{t("NorecordsfoundLabel")}</td>
+                            </tr>
+                          )}
                       </tbody>
                     </Table>
                   </div>
+                  {totalTaskRecords > 10 && (
+                    <Paginations
+                      currentPage={currentTaskPage}
+                      totalPages={totalTaskPages}
+                      onPageChange={handlePageChange}
+                      itemsPerPage={10}
+                      totalItems={totalTaskRecords}
+                    />
+                  )}
                 </div>
               </div>
 
@@ -2608,8 +2645,9 @@ const ManagerFileDetail = () => {
                         onChange={(e) => setSelectedUser(e.target.value)}
                       >
                         <option value="">Sélectionnez un utilisateur</option>
-                        <option value="user1">User 1</option>
-                        <option value="user2">User 2</option>
+                        {eventHistoryUserList?.map((data, index) => (
+                          <option key={index} value={data.id}>{(data?.first_name || "") + " " + (data?.last_name || "")}</option>
+                        ))}
                       </select>
 
                       {/* Date Filter */}

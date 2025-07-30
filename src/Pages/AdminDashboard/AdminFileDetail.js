@@ -13,7 +13,7 @@ import Dropdown from "react-bootstrap/Dropdown";
 import ProgressBar from "react-bootstrap/ProgressBar";
 import DatePicker from "react-datepicker";
 import { fr } from "date-fns/locale";
-import { parse, format } from 'date-fns';
+import { parse, format } from "date-fns";
 import logo from "../../acs-logo.png";
 import { useTranslation } from "react-i18next";
 import AcsManagerFileService from "../../API/AcsManager/AcsManagerFileService";
@@ -29,6 +29,7 @@ import SpeakerManagementService from "../../API/SpeakerManagement/SpeakerManagem
 import AddNote from "../../Components/AddNote/AddNote";
 import { BsPatchExclamation } from "react-icons/bs";
 import DashboardManagementService from "../../API/DashboardManagement/DashboardManagementService";
+import TaskManagementService from "../../API/TaskManagement/TaskManagementService";
 
 const AdminFileDetail = () => {
   const { t } = useTranslation();
@@ -42,9 +43,9 @@ const AdminFileDetail = () => {
     e.preventDefault();
     setIsVisible(!isVisible);
   };
-  const [selectedType, setSelectedType] = useState('');
+  const [selectedType, setSelectedType] = useState("");
   const [selectedDate, setSelectedDate] = useState(null);
-  const [selectedUser, setSelectedUser] = useState('');
+  const [selectedUser, setSelectedUser] = useState("");
   const [showReader, setShowReader] = useState(false);
 
   const toggleReader = () => {
@@ -70,7 +71,8 @@ const AdminFileDetail = () => {
   const [showSpeakerId, setShowSpeakerId] = useState("");
   const [showDocumentId, setShowDocumentId] = useState("");
   const [showFinalModal, setShowFinalModal] = useState(false);
-  const [showUserDocumentAfterDeleteFile, setShowUserDocumentAfterDeleteFile] = useState(false);
+  const [showUserDocumentAfterDeleteFile, setShowUserDocumentAfterDeleteFile] =
+    useState(false);
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const handleCloseDeleteModal = () => setShowDeleteModal(false);
@@ -139,8 +141,8 @@ const AdminFileDetail = () => {
     {
       activeTab: "dashboard",
       activeDocumentTab: "document",
-      activeSubTab: "documents"
-    }
+      activeSubTab: "documents",
+    },
   ]);
   const [totalSpeakerDocument, setTotalSpeakerDocument] = useState(0);
   const [totalMissingDocument, setTotalMissingDocument] = useState(0);
@@ -154,6 +156,7 @@ const AdminFileDetail = () => {
     fileNameLabe: true,
     speakerLabel: true,
     "Type de document": true,
+    "GED status": true,
     status: true,
     Actions: true,
   });
@@ -262,10 +265,20 @@ const AdminFileDetail = () => {
   const handleNoteClose = () => setShowNote(false);
 
   // Dashboard
-  const [dashboardDocumentFileList, setDashboardDocumentFileList] = useState([]);
+  const [dashboardDocumentFileList, setDashboardDocumentFileList] = useState(
+    []
+  );
   const [speakerDocumentFileList, setSpeakerDocumentFileList] = useState(null);
   const [lastFiveEventList, setLastFiveEventList] = useState([]);
   const [lastThreeNoteList, setLastThreeNoteList] = useState([]);
+  const [eventHistoryUserList, setEventHistoryUserList] = useState([]);
+
+  const [taskListData, setTaskListData] = useState([]);
+  const [taskStatus, setTaskStatus] = useState("");
+  const [taskPriority, setTaskPriority] = useState("");
+  const [currentTaskPage, setCurrentTaskPage] = useState(1);
+  const [totalTaskPages, setTotalTaskPages] = useState(1);
+  const [totalTaskRecords, setTotalTaskRecords] = useState(0);
 
   const [fileType, setFileType] = useState("");
   const [exportDocumentOpen, setExportDocumentOpen] = useState(false);
@@ -331,8 +344,10 @@ const AdminFileDetail = () => {
     if (activeTab === "dashboard") {
       DashboardRegisteredDocument(id);
       DashboardSpeakerRegisteredDocument(id);
+      EventUserList(id);
       DashboardLastFiveEvent(id);
       DashboardLastThreeNote(id);
+      TaskList(search, sort, currentPage, taskStatus, taskPriority);
     }
     if (activeTab === "information") {
       FolderDetail(id);
@@ -633,14 +648,20 @@ const AdminFileDetail = () => {
         setShowUserCompanyName(response.data.documents.company_name);
         setTotalMissingRecords(response.data.documents.total_missing_doc);
         setTotalSpeakerRecords(response.data.documents.total_speakers);
-        setTotalPaperRecords(response.data.documents.user_document_files?.length);
+        setTotalPaperRecords(
+          response.data.documents.user_document_files?.length
+        );
         setStartDate(response.data.documents.start_date);
         setEndDate(response.data.documents.complete_date);
 
-        setPolicyholderName(response.data.documents.insurance_policyholder_name);
+        setPolicyholderName(
+          response.data.documents.insurance_policyholder_name
+        );
         setEstimatedSiteCost(response.data.documents.estimated_site_cost);
         setEstimatedStartDate(response.data.documents.estimated_start_date);
-        setEstimatedCompletionDate(response.data.documents.estimated_completion_date);
+        setEstimatedCompletionDate(
+          response.data.documents.estimated_completion_date
+        );
         setFinaldSiteCost(response.data.documents.final_site_cost);
         setFinalStartDate(response.data.documents.final_start_date);
         setFinalCompletionDate(response.data.documents.final_completion_date);
@@ -653,7 +674,9 @@ const AdminFileDetail = () => {
         } else {
           setSendToFileStatus("");
         }
-        setShowUserDocumentFileData(response.data.documents.user_document_files);
+        setShowUserDocumentFileData(
+          response.data.documents.user_document_files
+        );
         setUserDocumentFileDataChanges(fileDataChanges);
         setShowDocumentId(fileDataChanges[0].id);
         if (showCheck && showDeleteModal) {
@@ -1519,18 +1542,21 @@ const AdminFileDetail = () => {
     };
   };
 
-
   const handleBack = () => {
     setHistory((prevHistory) => {
       const newHistory = [...prevHistory];
       const rawEntry = newHistory.pop();
       const previousTab = safeHistoryEntry(rawEntry);
 
-      const hasValidTab = previousTab.activeTab || previousTab.activeDocumentTab || previousTab.activeSubTab;
+      const hasValidTab =
+        previousTab.activeTab ||
+        previousTab.activeDocumentTab ||
+        previousTab.activeSubTab;
 
       if (hasValidTab) {
         if (previousTab.activeTab) setActiveTab(previousTab.activeTab);
-        if (previousTab.activeDocumentTab) setActiveDocumentTab(previousTab.activeDocumentTab);
+        if (previousTab.activeDocumentTab)
+          setActiveDocumentTab(previousTab.activeDocumentTab);
         if (previousTab.activeSubTab) setActiveSubTab(previousTab.activeSubTab);
         return newHistory;
       } else {
@@ -1805,7 +1831,8 @@ const AdminFileDetail = () => {
   // Dashboard tab Documents # of registered documents
   const DashboardRegisteredDocument = async (id) => {
     try {
-      const response = await DashboardManagementService.dashboard_registered_document_file(id);
+      const response =
+        await DashboardManagementService.dashboard_registered_document_file(id);
 
       if (response.data.status) {
         setDashboardDocumentFileList(response.data.blocks);
@@ -1825,7 +1852,8 @@ const AdminFileDetail = () => {
 
   const DashboardSpeakerRegisteredDocument = async (id) => {
     try {
-      const response = await DashboardManagementService.speaker_registered_document_file(id);
+      const response =
+        await DashboardManagementService.speaker_registered_document_file(id);
 
       if (response.data.status) {
         setSpeakerDocumentFileList(response.data.overall_statistics);
@@ -1849,10 +1877,14 @@ const AdminFileDetail = () => {
         user_document_id: "",
         type: "",
         is_important: "",
-        is_read: ""
-      }
+        is_read: "",
+      };
 
-      const response = await DashboardManagementService.dashboard_last_five_event(id, userData);
+      const response =
+        await DashboardManagementService.dashboard_last_five_event(
+          id,
+          userData
+        );
 
       if (response.data.status) {
         setLastFiveEventList(response.data.data);
@@ -1873,13 +1905,17 @@ const AdminFileDetail = () => {
   const DashboardLastThreeNote = async (id) => {
     try {
       var userData = {
-        action_type: "",
-        user_id: "",
+        action_type: selectedType ?? "",
+        user_id: selectedUser ?? "",
         start_date: "",
-        end_date: ""
-      }
+        end_date: "",
+      };
 
-      const response = await DashboardManagementService.dashboard_last_three_note(id, userData);
+      const response =
+        await DashboardManagementService.dashboard_last_three_note(
+          id,
+          userData
+        );
 
       if (response.data.status) {
         setLastThreeNoteList(response.data.data);
@@ -1897,18 +1933,43 @@ const AdminFileDetail = () => {
     }
   };
 
+  const EventUserList = async (id) => {
+    setIsLoading(true);
+    try {
+      const response = await DashboardManagementService.event_history_users(id);
+
+      if (response.data.status) {
+        setIsLoading(false);
+        setEventHistoryUserList(response.data.user.data);
+      }
+    } catch (error) {
+      setIsLoading(false);
+      setFlashMessage({
+        type: "error",
+        message: t("somethingWentWrong"),
+      });
+    }
+  };
+
   const formatCreatedAt = (dateStr) => {
     try {
-      const parsedDate = parse(dateStr, 'dd/MM/yyyy', new Date());
-      return format(parsedDate, 'MMMM do, hh:mm a');
+      const parsedDate = parse(dateStr, "dd/MM/yyyy", new Date());
+      return format(parsedDate, "MMMM do, hh:mm a");
     } catch (e) {
       return dateStr;
     }
   };
 
-  const ExportDocumentFile = async (id, format = "pdf", onFinish = () => { }) => {
+  const ExportDocumentFile = async (
+    id,
+    format = "pdf",
+    onFinish = () => {}
+  ) => {
     try {
-      const response = await DashboardManagementService.export_folder(id, format);
+      const response = await DashboardManagementService.export_folder(
+        id,
+        format
+      );
       const blob = response.data;
 
       const extension = format === "pdf" ? "pdf" : "xlsx";
@@ -1929,7 +1990,39 @@ const AdminFileDetail = () => {
       onFinish();
     } catch (error) {
       console.error("Export failed", error);
-      setFlashMessage?.({
+      setFlashMessage({
+        type: "error",
+        message: t("somethingWentWrong"),
+      });
+    }
+  };
+
+  const TaskList = async (search, sort, page = 1, status, priority) => {
+    setIsLoading(true);
+    try {
+      var userData = {
+        search: search ?? "",
+        sort: {
+          key: sort.key,
+          value: sort.value
+        },
+        page,
+        status: status ?? "",
+        priority: priority ?? ""
+      };
+
+      const response = await TaskManagementService.task_index(userData);
+
+      if (response.data.status) {
+        setIsLoading(false);
+        setTaskListData(response.data.task.data);
+        setCurrentTaskPage(response.data.task.meta.current_page);
+        setTotalTaskPages(response.data.task.meta.last_page);
+        setTotalTaskRecords(response.data.task.meta.total);
+      }
+    } catch (error) {
+      setIsLoading(false);
+      setFlashMessage({
         type: "error",
         message: t("somethingWentWrong"),
       });
@@ -1940,17 +2033,18 @@ const AdminFileDetail = () => {
     <Fragment>
       <style>
         {" "}
-        {` button.btn.btn-primary  { background-color: ${localStorage.getItem("button_color")
-          ? JSON.parse(localStorage.getItem("button_color"))
-          : "#e84455"
-          } !Important};`}{" "}
+        {` button.btn.btn-primary  { background-color: ${
+          localStorage.getItem("button_color")
+            ? JSON.parse(localStorage.getItem("button_color"))
+            : "#e84455"
+        } !Important};`}{" "}
       </style>
 
       <SidePanel
         sidebarLogo={
           logoImageShow == "" ||
-            logoImageShow == null ||
-            logoImageShow == undefined
+          logoImageShow == null ||
+          logoImageShow == undefined
             ? logo
             : `${process.env.REACT_APP_IMAGE_URL}/${logoImageShow}`
         }
@@ -1986,21 +2080,54 @@ const AdminFileDetail = () => {
           <div className="mt-3 d-md-flex justify-content-between align-items-center">
             <h1 className="m-0 mb-md-0 mb-3">Dossier {showUserFolderName}</h1>
           </div>
-          <div
-            className="detail-header new-update-header"
-          >
+          <div className="detail-header new-update-header">
             <div className="d-flex align-items-center justify-content-between w-100">
               <div className="left-part">
-                  <h2 className="mb-0">Dossier Detail</h2> 
+                <h2 className="mb-0">Dossier Detail</h2>
               </div>
               <div className="right-part">
-              <div style={{ marginLeft: "20px" }} className="div">
-                <Link onClick={toggleDetail} className="fold-unfold-link link-wrap">
-                  {isVisible ? <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 50 50" fill="none"><path d="M25.0007 2.08325C20.4682 2.08325 16.0375 3.42729 12.2688 5.94541C8.50022 8.46352 5.56293 12.0426 3.82842 16.2301C2.09391 20.4176 1.64009 25.0253 2.52433 29.4707C3.40858 33.9161 5.59118 37.9995 8.79613 41.2044C12.0011 44.4094 16.0844 46.592 20.5298 47.4762C24.9752 48.3605 29.583 47.9067 33.7705 46.1722C37.958 44.4376 41.5371 41.5004 44.0552 37.7317C46.5733 33.9631 47.9173 29.5324 47.9173 24.9999C47.9102 18.9242 45.4934 13.0995 41.1973 8.8033C36.9011 4.50715 31.0763 2.09042 25.0007 2.08325ZM25.0007 43.7499C21.2923 43.7499 17.6671 42.6502 14.5837 40.59C11.5003 38.5297 9.09706 35.6013 7.67792 32.1752C6.25878 28.7491 5.88746 24.9791 6.61094 21.342C7.33441 17.7048 9.12017 14.3639 11.7424 11.7417C14.3646 9.11943 17.7056 7.33367 21.3427 6.61019C24.9799 5.88672 28.7499 6.25803 32.176 7.67718C35.6021 9.09632 38.5304 11.4996 40.5907 14.583C42.651 17.6664 43.7507 21.2915 43.7507 24.9999C43.7452 29.971 41.7679 34.737 38.2528 38.2521C34.7377 41.7672 29.9718 43.7444 25.0007 43.7499Z" fill="#464255"></path><path d="M33.334 22.9167H16.6673C16.1148 22.9167 15.5849 23.1362 15.1942 23.5269C14.8035 23.9176 14.584 24.4476 14.584 25.0001C14.584 25.5526 14.8035 26.0825 15.1942 26.4732C15.5849 26.8639 16.1148 27.0834 16.6673 27.0834H33.334C33.8865 27.0834 34.4164 26.8639 34.8071 26.4732C35.1978 26.0825 35.4173 25.5526 35.4173 25.0001C35.4173 24.4476 35.1978 23.9176 34.8071 23.5269C34.4164 23.1362 33.8865 22.9167 33.334 22.9167Z" fill="#464255"></path></svg> :
-                    <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 50 50" fill="none"><path d="M25.0007 2.0835C20.4682 2.0835 16.0375 3.42753 12.2688 5.94565C8.50022 8.46377 5.56293 12.0429 3.82842 16.2303C2.09391 20.4178 1.64009 25.0256 2.52433 29.471C3.40858 33.9164 5.59118 37.9997 8.79613 41.2047C12.0011 44.4096 16.0844 46.5922 20.5298 47.4765C24.9752 48.3607 29.583 47.9069 33.7705 46.1724C37.958 44.4379 41.5371 41.5006 44.0552 37.732C46.5733 33.9634 47.9173 29.5326 47.9173 25.0002C47.9102 18.9245 45.4934 13.0997 41.1973 8.80355C36.9011 4.50739 31.0763 2.09066 25.0007 2.0835ZM25.0007 43.7502C21.2923 43.7502 17.6671 42.6505 14.5837 40.5902C11.5003 38.5299 9.09706 35.6016 7.67792 32.1755C6.25878 28.7494 5.88746 24.9794 6.61094 21.3422C7.33441 17.7051 9.12017 14.3641 11.7424 11.7419C14.3646 9.11968 17.7056 7.33391 21.3427 6.61044C24.9799 5.88697 28.7499 6.25828 32.176 7.67742C35.6021 9.09656 38.5304 11.4998 40.5907 14.5832C42.651 17.6666 43.7507 21.2918 43.7507 25.0002C43.7446 29.9711 41.7672 34.7367 38.2522 38.2517C34.7372 41.7667 29.9716 43.7441 25.0007 43.7502Z" fill="#464255"></path><path d="M33.334 22.9168H27.084V16.6668C27.084 16.1143 26.8645 15.5844 26.4738 15.1937C26.0831 14.803 25.5532 14.5835 25.0007 14.5835C24.4481 14.5835 23.9182 14.803 23.5275 15.1937C23.1368 15.5844 22.9173 16.1143 22.9173 16.6668V22.9168H16.6673C16.1148 22.9168 15.5849 23.1363 15.1942 23.527C14.8035 23.9177 14.584 24.4476 14.584 25.0002C14.584 25.5527 14.8035 26.0826 15.1942 26.4733C15.5849 26.864 16.1148 27.0835 16.6673 27.0835H22.9173V33.3335C22.9173 33.886 23.1368 34.4159 23.5275 34.8066C23.9182 35.1973 24.4481 35.4168 25.0007 35.4168C25.5532 35.4168 26.0831 35.1973 26.4738 34.8066C26.8645 34.4159 27.084 33.886 27.084 33.3335V27.0835H33.334C33.8865 27.0835 34.4164 26.864 34.8071 26.4733C35.1978 26.0826 35.4173 25.5527 35.4173 25.0002C35.4173 24.4476 35.1978 23.9177 34.8071 23.527C34.4164 23.1363 33.8865 22.9168 33.334 22.9168Z" fill="#464255"></path></svg>
-                  }
-                </Link>
-              </div>
+                <div style={{ marginLeft: "20px" }} className="div">
+                  <Link
+                    onClick={toggleDetail}
+                    className="fold-unfold-link link-wrap"
+                  >
+                    {isVisible ? (
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="50"
+                        height="50"
+                        viewBox="0 0 50 50"
+                        fill="none"
+                      >
+                        <path
+                          d="M25.0007 2.08325C20.4682 2.08325 16.0375 3.42729 12.2688 5.94541C8.50022 8.46352 5.56293 12.0426 3.82842 16.2301C2.09391 20.4176 1.64009 25.0253 2.52433 29.4707C3.40858 33.9161 5.59118 37.9995 8.79613 41.2044C12.0011 44.4094 16.0844 46.592 20.5298 47.4762C24.9752 48.3605 29.583 47.9067 33.7705 46.1722C37.958 44.4376 41.5371 41.5004 44.0552 37.7317C46.5733 33.9631 47.9173 29.5324 47.9173 24.9999C47.9102 18.9242 45.4934 13.0995 41.1973 8.8033C36.9011 4.50715 31.0763 2.09042 25.0007 2.08325ZM25.0007 43.7499C21.2923 43.7499 17.6671 42.6502 14.5837 40.59C11.5003 38.5297 9.09706 35.6013 7.67792 32.1752C6.25878 28.7491 5.88746 24.9791 6.61094 21.342C7.33441 17.7048 9.12017 14.3639 11.7424 11.7417C14.3646 9.11943 17.7056 7.33367 21.3427 6.61019C24.9799 5.88672 28.7499 6.25803 32.176 7.67718C35.6021 9.09632 38.5304 11.4996 40.5907 14.583C42.651 17.6664 43.7507 21.2915 43.7507 24.9999C43.7452 29.971 41.7679 34.737 38.2528 38.2521C34.7377 41.7672 29.9718 43.7444 25.0007 43.7499Z"
+                          fill="#464255"
+                        ></path>
+                        <path
+                          d="M33.334 22.9167H16.6673C16.1148 22.9167 15.5849 23.1362 15.1942 23.5269C14.8035 23.9176 14.584 24.4476 14.584 25.0001C14.584 25.5526 14.8035 26.0825 15.1942 26.4732C15.5849 26.8639 16.1148 27.0834 16.6673 27.0834H33.334C33.8865 27.0834 34.4164 26.8639 34.8071 26.4732C35.1978 26.0825 35.4173 25.5526 35.4173 25.0001C35.4173 24.4476 35.1978 23.9176 34.8071 23.5269C34.4164 23.1362 33.8865 22.9167 33.334 22.9167Z"
+                          fill="#464255"
+                        ></path>
+                      </svg>
+                    ) : (
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="50"
+                        height="50"
+                        viewBox="0 0 50 50"
+                        fill="none"
+                      >
+                        <path
+                          d="M25.0007 2.0835C20.4682 2.0835 16.0375 3.42753 12.2688 5.94565C8.50022 8.46377 5.56293 12.0429 3.82842 16.2303C2.09391 20.4178 1.64009 25.0256 2.52433 29.471C3.40858 33.9164 5.59118 37.9997 8.79613 41.2047C12.0011 44.4096 16.0844 46.5922 20.5298 47.4765C24.9752 48.3607 29.583 47.9069 33.7705 46.1724C37.958 44.4379 41.5371 41.5006 44.0552 37.732C46.5733 33.9634 47.9173 29.5326 47.9173 25.0002C47.9102 18.9245 45.4934 13.0997 41.1973 8.80355C36.9011 4.50739 31.0763 2.09066 25.0007 2.0835ZM25.0007 43.7502C21.2923 43.7502 17.6671 42.6505 14.5837 40.5902C11.5003 38.5299 9.09706 35.6016 7.67792 32.1755C6.25878 28.7494 5.88746 24.9794 6.61094 21.3422C7.33441 17.7051 9.12017 14.3641 11.7424 11.7419C14.3646 9.11968 17.7056 7.33391 21.3427 6.61044C24.9799 5.88697 28.7499 6.25828 32.176 7.67742C35.6021 9.09656 38.5304 11.4998 40.5907 14.5832C42.651 17.6666 43.7507 21.2918 43.7507 25.0002C43.7446 29.9711 41.7672 34.7367 38.2522 38.2517C34.7372 41.7667 29.9716 43.7441 25.0007 43.7502Z"
+                          fill="#464255"
+                        ></path>
+                        <path
+                          d="M33.334 22.9168H27.084V16.6668C27.084 16.1143 26.8645 15.5844 26.4738 15.1937C26.0831 14.803 25.5532 14.5835 25.0007 14.5835C24.4481 14.5835 23.9182 14.803 23.5275 15.1937C23.1368 15.5844 22.9173 16.1143 22.9173 16.6668V22.9168H16.6673C16.1148 22.9168 15.5849 23.1363 15.1942 23.527C14.8035 23.9177 14.584 24.4476 14.584 25.0002C14.584 25.5527 14.8035 26.0826 15.1942 26.4733C15.5849 26.864 16.1148 27.0835 16.6673 27.0835H22.9173V33.3335C22.9173 33.886 23.1368 34.4159 23.5275 34.8066C23.9182 35.1973 24.4481 35.4168 25.0007 35.4168C25.5532 35.4168 26.0831 35.1973 26.4738 34.8066C26.8645 34.4159 27.084 33.886 27.084 33.3335V27.0835H33.334C33.8865 27.0835 34.4164 26.864 34.8071 26.4733C35.1978 26.0826 35.4173 25.5527 35.4173 25.0002C35.4173 24.4476 35.1978 23.9177 34.8071 23.527C34.4164 23.1363 33.8865 22.9168 33.334 22.9168Z"
+                          fill="#464255"
+                        ></path>
+                      </svg>
+                    )}
+                  </Link>
+                </div>
               </div>
               {/* <div style={{ marginRight: "20px" }}>
                 <MissingDocument
@@ -2038,74 +2165,110 @@ const AdminFileDetail = () => {
                 <option value="transfer_to_broker">Transfert au Courtier</option>
                 <option value="to_be_decided">A statuer</option>
               </Form.Select> */}
-
             </div>
 
-            <div className={`second-header ${isVisible ? 'show' : ''}`}>
-              <div className="dropdown-part"> 
-                <div className="row mb-3">
-                  <div className="col-md-3">
-                      <label class="form-label">Etat du chantier</label>
-                      <Form.Select
+            <div className={`second-header ${isVisible ? "show" : ""}`}>
+              {/* <div className="">
+                  <p className="m-0" style={{ paddingRight: "10px" }}>
+                    Etat du chantier :{" "}
+                  </p>
+                  <div style={{ paddingRight: "10px" }}>
+                    <Form.Select
                       aria-label="Etat du chantier"
                       style={{ minHeight: "45px" }}
                       value={editUserSiteStatus}
                       onChange={(e) => handleSiteStatusChange(e.target.value)}
-                       >
+                    >
                       <option value="on_site">En cours de chantier</option>
                       <option value="end_of_site">Fin de chantier</option>
-                      </Form.Select>
+                    </Form.Select>
                   </div>
-                  <div className="col-md-3">
-                      <label class="form-label">Exporter sous</label>
-                      <Form.Select
+
+                  <p className="m-0" style={{ paddingRight: "10px" }}>
+                    Exporter sous :{" "}
+                  </p>
+                  <div style={{ paddingRight: "10px" }}>
+                    <Form.Select
                       aria-label="Export As"
                       style={{ minHeight: "45px", minWidth: "110px" }}
                       onChange={(e) => handleExportDocumentShow(e.target.value)}
                       defaultValue=""
-                      >
-                      <option value="" disabled hidden>Sélectionner...</option>
+                    >
+                      <option value="">Sélectionner...</option>
                       <option value="pdf">PDF</option>
                       <option value="excel">Exceller</option>
-                      </Form.Select>
+                    </Form.Select>
+
+                  </div>
+                </div> */}
+
+              <div className="dropdown-part">
+                <div className="row mb-3">
+                  <div className="col-md-3">
+                    <label class="form-label">Etat du chantier</label>
+                    <Form.Select
+                      aria-label="Etat du chantier"
+                      style={{ minHeight: "45px" }}
+                      value={editUserSiteStatus}
+                      onChange={(e) => handleSiteStatusChange(e.target.value)}
+                    >
+                      <option value="on_site">En cours de chantier</option>
+                      <option value="end_of_site">Fin de chantier</option>
+                    </Form.Select>
+                  </div>
+                  <div className="col-md-3">
+                    <label class="form-label">Exporter sous</label>
+                    <Form.Select
+                      aria-label="Export As"
+                      style={{ minHeight: "45px", minWidth: "110px" }}
+                      onChange={(e) => handleExportDocumentShow(e.target.value)}
+                      defaultValue=""
+                    >
+                      <option value="" disabled hidden>
+                        Sélectionner...
+                      </option>
+                      <option value="pdf">PDF</option>
+                      <option value="excel">Exceller</option>
+                    </Form.Select>
                   </div>
                   <div className="col-md-3">
                     <label class="form-label">Ajouter une note</label>
-                    <Form.Select
-                      name="Ajouter"
-                    >
-                    <option value="">Ajouter une note</option>
+                    <Form.Select name="Ajouter">
+                      <option value="">Ajouter une note</option>
                     </Form.Select>
                   </div>
                   <div className="col-md-3">
-                                        <label class="form-label">Voir les raisons</label>
-                    <Form.Select
-                      name="Ajouter"
-                    >
-                    <option value="">Voir les raisons</option>
+                    <label class="form-label">Voir les raisons</label>
+                    <Form.Select name="Ajouter">
+                      <option value="">Voir les raisons</option>
                     </Form.Select>
                   </div>
                   <div className="col-md-3">
-                    <label class="form-label"> Envoyer à </label>
-                                  <Form.Select
-                aria-label="Etat du chantier"
-                className="form-select"
-                style={{ minHeight: "45px", width: "25%", fontFamily: "Manrope" }}
-                value={sendToFileStatus}
-                onChange={(e) => handleSendFileShow(e.target.value)}
-              >
-                <option value="" disabled selected>
-                  Envoyer à
-                </option>
-                <option value="transfer_to_insurer">
-                  Transfert à l'assureur
-                </option>
-                <option value="transfer_to_broker">Transfert au Courtier</option>
-                <option value="to_be_decided">A statuer</option>
-              </Form.Select>
+                    <label class="form-label">Envoyer à</label>
+                    <Form.Select
+                      aria-label="Etat du chantier"
+                      className="form-select"
+                      style={{
+                        minHeight: "45px",
+                        width: "25%",
+                        fontFamily: "Manrope",
+                      }}
+                      value={sendToFileStatus}
+                      onChange={(e) => handleSendFileShow(e.target.value)}
+                    >
+                      <option value="" disabled selected>
+                        Envoyer à
+                      </option>
+                      <option value="transfer_to_insurer">
+                        Transfert à l'assureur
+                      </option>
+                      <option value="transfer_to_broker">
+                        Transfert au Courtier
+                      </option>
+                      <option value="to_be_decided">A statuer</option>
+                    </Form.Select>
                   </div>
                 </div>
-
                 <div className="grid-view check-status">
                   <div className="row mb-0">
                     <div className="col-md-3 mb-3">
@@ -2115,32 +2278,30 @@ const AdminFileDetail = () => {
                           {showUserDocumentData?.status === "to_be_checked"
                             ? t("toBeCheckedLabel")
                             : showUserDocumentData?.status === "validated"
-                              ? t("validatedLabel")
-                              : showUserDocumentData?.status === "transfer_to_insurer"
-                                ? "Transfert à l'assureur"
-                                : showUserDocumentData?.status === "transfer_to_broker"
-                                  ? "Transfert au Courtier"
-                                  : showUserDocumentData?.status === "transfer_to_manager"
-                                    ? "Transfert au Gestionnaire"
-                                    : showUserDocumentData?.status === "to_be_decided"
-                                      ? "A statuer"
-                                      : showUserDocumentData?.status === "formal_notice"
-                                        ? "Mise en demeure"
-                                        : t("invalidLabel")}
+                            ? t("validatedLabel")
+                            : showUserDocumentData?.status === "transfer_to_insurer"
+                            ? "Transfert à l'assureur"
+                            : showUserDocumentData?.status === "transfer_to_broker"
+                            ? "Transfert au Courtier"
+                            : showUserDocumentData?.status === "transfer_to_manager"
+                            ? "Transfert au Gestionnaire"
+                            : showUserDocumentData?.status === "to_be_decided"
+                            ? "A statuer"
+                            : showUserDocumentData?.status === "formal_notice"
+                            ? "Mise en demeure" : t("invalidLabel")
+                          }
                         </div>
                       </div>
                     </div>
                     <div className="col-md-3 mb-3">
                       <div className="d-flex align-items-start flex-column gap-2">
                         <p className="m-0">DOC </p>
-                        <div className="status">
-                          15/07/2025
-                        </div>
+                        <div className="status">15/07/2025</div>
                       </div>
                     </div>
                     <div className="col-md-3 mb-3">
                       <div className="d-flex align-items-start flex-column gap-2">
-                        <p className="m-0">Date fin prévisionnelle  </p>
+                        <p className="m-0">Date fin prévisionnelle </p>
                         <div className="status">
                           {showUserDocumentData?.estimated_completion_date}
                         </div>
@@ -2149,9 +2310,7 @@ const AdminFileDetail = () => {
                     <div className="col-md-3 mb-3">
                       <div className="d-flex align-items-start flex-column gap-2">
                         <p className="m-0">Coût prévisionnel </p>
-                        <div className="status">
-                          10 450 000€
-                        </div>
+                        <div className="status">10 450 000€</div>
                       </div>
                     </div>
                     <div className="col-md-3 mb-2">
@@ -2163,17 +2322,6 @@ const AdminFileDetail = () => {
                       </div>
                     </div>
                   </div>
-
-
-
-
-
-
-
-
-
-
-
                 </div>
               </div>
             </div>
@@ -2188,7 +2336,11 @@ const AdminFileDetail = () => {
           className=""
         >
           {/* Dashboard Tab */}
-          <Tab className="dashboard-tab" eventKey="dashboard" title="Tableau de bord">
+          <Tab
+            className="dashboard-tab"
+            eventKey="dashboard"
+            title="Tableau de bord"
+          >
             {isLoading && (
               <div className="loading-overlay">
                 <Loading />
@@ -2209,7 +2361,7 @@ const AdminFileDetail = () => {
                         </tr>
                       </thead>
                       <tbody>
-                        {dashboardDocumentFileList?.length > 0 ?
+                        {dashboardDocumentFileList?.length > 0 ? (
                           dashboardDocumentFileList?.map((data) => (
                             <tr>
                               <td>
@@ -2235,11 +2387,12 @@ const AdminFileDetail = () => {
                               </td>
                               <td>{`${data.registered}/${data.expected}`}</td>
                             </tr>
-                          )) : (
-                            <tr style={{ textAlign: "center" }}>
-                              <td colSpan="2">{t("NorecordsfoundLabel")}</td>
-                            </tr>
-                          )}
+                          ))
+                        ) : (
+                          <tr style={{ textAlign: "center" }}>
+                            <td colSpan="2">{t("NorecordsfoundLabel")}</td>
+                          </tr>
+                        )}
                       </tbody>
                     </Table>
                   </div>
@@ -2256,7 +2409,7 @@ const AdminFileDetail = () => {
                         </tr>
                       </thead>
                       <tbody>
-                        {speakerDocumentFileList ?
+                        {speakerDocumentFileList ? (
                           <>
                             <tr>
                               <td>
@@ -2276,11 +2429,13 @@ const AdminFileDetail = () => {
                                     </svg>
                                   </span>
                                   <span className="text-elips">
-                                    Total Invalid Files
+                                    Nombre total de fichiers invalides
                                   </span>
                                 </div>
                               </td>
-                              <td>{speakerDocumentFileList?.total_invalid_files}</td>
+                              <td>
+                                {speakerDocumentFileList?.total_invalid_files}
+                              </td>
                             </tr>
                             <tr>
                               <td>
@@ -2300,11 +2455,13 @@ const AdminFileDetail = () => {
                                     </svg>
                                   </span>
                                   <span className="text-elips">
-                                    Total Missing Files
+                                    Nombre total de fichiers manquants
                                   </span>
                                 </div>
                               </td>
-                              <td>{speakerDocumentFileList?.total_missing_files}</td>
+                              <td>
+                                {speakerDocumentFileList?.total_missing_files}
+                              </td>
                             </tr>
                             <tr>
                               <td>
@@ -2324,11 +2481,15 @@ const AdminFileDetail = () => {
                                     </svg>
                                   </span>
                                   <span className="text-elips">
-                                    Total Speakers Attached
+                                    Nombre total d'intervenants connectés
                                   </span>
                                 </div>
                               </td>
-                              <td>{speakerDocumentFileList?.total_speakers_attached}</td>
+                              <td>
+                                {
+                                  speakerDocumentFileList?.total_speakers_attached
+                                }
+                              </td>
                             </tr>
                             <tr>
                               <td>
@@ -2348,11 +2509,15 @@ const AdminFileDetail = () => {
                                     </svg>
                                   </span>
                                   <span className="text-elips">
-                                    Total To Be Validated Files
+                                    Nombre total de fichiers à valider
                                   </span>
                                 </div>
                               </td>
-                              <td>{speakerDocumentFileList?.total_to_be_validated_files}</td>
+                              <td>
+                                {
+                                  speakerDocumentFileList?.total_to_be_validated_files
+                                }
+                              </td>
                             </tr>
                             <tr>
                               <td>
@@ -2372,65 +2537,90 @@ const AdminFileDetail = () => {
                                     </svg>
                                   </span>
                                   <span className="text-elips">
-                                    Total Validated Files
+                                    Nombre total de fichiers validés
                                   </span>
                                 </div>
                               </td>
-                              <td>{speakerDocumentFileList?.total_validated_files}</td>
+                              <td>
+                                {speakerDocumentFileList?.total_validated_files}
+                              </td>
                             </tr>
                           </>
-                          : (
-                            <tr style={{ textAlign: "center" }}>
-                              <td colSpan="2">{t("NorecordsfoundLabel")}</td>
-                            </tr>
-                          )
-                        }
+                        ) : (
+                          <tr style={{ textAlign: "center" }}>
+                            <td colSpan="2">{t("NorecordsfoundLabel")}</td>
+                          </tr>
+                        )}
                       </tbody>
                     </Table>
                   </div>
                 </div>
 
-                <h2 className="mb-3 mt-3">Task</h2>
+                <h2 className="mb-3 mt-3">Tâche</h2>
                 <div className="custom-grid-card">
-                  <h3>Coming Task - to be determined</h3>
+                  <h3>Tâche à venir - à déterminer</h3>
                   <div className="table-wrap mt-24">
                     <Table responsive hover>
                       <thead>
                         <tr>
-                          <th>Name of Task</th>
-                          <th>Dead line</th>
-                          <th>Task description</th>
-                          <th>Name of responsible</th>
-                          <th>status</th>
+                          <th>Nom de la tâche</th>
+                          <th>Date limite</th>
+                          <th>Description de la tâche</th>
+                          <th>Attribué par</th>
+                          <th>Attribué à</th>
+                          <th>{t("status")}</th>
                         </tr>
                       </thead>
                       <tbody>
-                        <tr>
-                          <td>Task 1</td>
-                          <td>dead line</td>
-                          <td>Task description</td>
-                          <td>Name of responsible</td>
-                          <td><span className="checked badges">À vérifier</span></td>
-                        </tr>
-                        <tr>
-                          <td>Task 1</td>
-                          <td>dead line</td>
-                          <td>Task description</td>
-                          <td>Name of responsible</td>
-                          <td><span className="checked badges">À vérifier</span></td>
-                        </tr>
-                        <tr>
-                          <td>Task 1</td>
-                          <td>dead line</td>
-                          <td>Task description</td>
-                          <td>Name of responsible</td>
-                          <td><span className="checked badges">À vérifier</span></td>
-                        </tr>
+                        {taskListData?.length > 0 ? (
+                          taskListData?.map((data) => (
+                            <tr>
+                              <td>
+                                <span className="text-elips">{data.title}</span>
+                              </td>
+                              <td>{data.due_date}</td>
+                              <td>
+                                <span className="text-elips">{data.description}</span>
+                              </td>
+                              <td>{(data.assigned_by?.first_name || "") + " " + (data.assigned_by?.last_name || "")}</td>
+                              <td>{(data.assigned_to?.first_name || "") + " " + (data.assigned_to?.last_name || "")}</td>
+                              <td>
+                                {/* {data.status == "to_be_checked" ? (
+                                  <span className="checked badges">
+                                    {t("toBeCheckedLabel")}
+                                  </span>
+                                ) : data.status == "verified" ? (
+                                  <span className="verified badges">
+                                    {t("verified")}
+                                  </span>
+                                ) : (
+                                  <span className="incomplete badges">
+                                    {t("invalidLabel")}
+                                  </span>
+                                )} */}
+                                <span className="checked badges">{data.status}</span>
+                              </td>
+                            </tr>
+                          ))) : (
+                            <tr style={{ textAlign: "center" }}>
+                              <td colSpan="5">{t("NorecordsfoundLabel")}</td>
+                            </tr>
+                          )}
                       </tbody>
                     </Table>
                   </div>
+                  {totalTaskRecords > 10 && (
+                    <Paginations
+                      currentPage={currentTaskPage}
+                      totalPages={totalTaskPages}
+                      onPageChange={handlePageChange}
+                      itemsPerPage={10}
+                      totalItems={totalTaskRecords}
+                    />
+                  )}
                 </div>
               </div>
+
               <div className="col-md-5">
                 <h2 className="mb-3">Événements</h2>
                 <div className="custom-grid-card">
@@ -2442,8 +2632,8 @@ const AdminFileDetail = () => {
                         value={selectedType}
                         onChange={(e) => setSelectedType(e.target.value)}
                       >
-                        <option value="">Select Type</option>
-                        <option value="notes">Notes</option>
+                        <option value="">Sélectionnez le type</option>
+                        <option value="notes">Remarques</option>
                         <option value="action">Action</option>
                       </select>
 
@@ -2453,57 +2643,67 @@ const AdminFileDetail = () => {
                         value={selectedUser}
                         onChange={(e) => setSelectedUser(e.target.value)}
                       >
-                        <option value="">Select User</option>
-                        <option value="user1">User 1</option>
-                        <option value="user2">User 2</option>
+                        <option value="">Sélectionnez un utilisateur</option>
+                        {eventHistoryUserList?.map((data, index) => (
+                          <option key={index} value={data.id}>{(data?.first_name || "") + " " + (data?.last_name || "")}</option>
+                        ))}
                       </select>
 
                       {/* Date Filter */}
                       <DatePicker
-                        selected={selectedDate}
-                        onChange={(date) => setSelectedDate(date)}
-                        className="form-control"
-                        placeholderText="Select Date"
+                        placeholderText="Sélectionnez une date"
+                        selected={selectedDate ? getFormattedDate(selectedDate) : null}
+                        onChange={(date) => setSelectedDate(formatDate(date))}
                         dateFormat="dd/MM/yyyy"
+                        locale={fr}
                       />
                     </div>
                     <span>5 derniers événements</span>
                     <div className="timeline">
-                      {lastFiveEventList?.length > 0 ?
+                      {lastFiveEventList?.length > 0 ? (
                         lastFiveEventList?.map((data) => {
-                          const [beforeColon, afterColon] = data.action_details.split(":").map(s => s.trim());
+                          const [beforeColon, afterColon] = data.action_details
+                            .split(":")
+                            .map((s) => s.trim());
                           return (
                             <div className="timeline-item">
                               <div className="timeline-dot"></div>
                               <div className="timeline-content">
                                 <h5>{formatCreatedAt(data.created_at)}</h5>
                                 <p>
-                                  {beforeColon ?
+                                  {beforeColon ? (
                                     <>
-                                      <strong>{beforeColon} :-</strong> {afterColon}
+                                      <strong>{beforeColon} :-</strong>{" "}
+                                      {afterColon}
                                     </>
-                                    :
+                                  ) : (
                                     <>
-                                      <strong>{data.action_type} :-</strong> {data.action_details}
+                                      <strong>{data.action_type} :-</strong>{" "}
+                                      {data.action_details}
                                     </>
-                                  }
+                                  )}
                                 </p>
                               </div>
                             </div>
                           );
-                        }) : (
-                          <div className="timeline-item">
-                            {t("NorecordsfoundLabel")}
-                          </div>
-                        )}
-
+                        })
+                      ) : (
+                        <div className="timeline-item">
+                          {t("NorecordsfoundLabel")}
+                        </div>
+                      )}
                     </div>
-                    <button className="btn-secondary btn btn-primary" onClick={() => setActiveTab("history")}>Tout voir</button>
+                    <button
+                      className="btn-secondary btn btn-primary"
+                      onClick={() => setActiveTab("history")}
+                    >
+                      Tout voir
+                    </button>
                   </div>
                   <div className="last-msg-card">
                     3 derniers messages importants non lus
                     <div className="timeline">
-                      {lastThreeNoteList?.length > 0 ?
+                      {lastThreeNoteList?.length > 0 ? (
                         lastThreeNoteList?.map((data) => (
                           <div className="timeline-item">
                             <div className="timeline-dot"></div>
@@ -2512,13 +2712,19 @@ const AdminFileDetail = () => {
                               <p>{data.reason}</p>
                             </div>
                           </div>
-                        )) : (
-                          <div className="timeline-item">
-                            {t("NorecordsfoundLabel")}
-                          </div>
-                        )}
+                        ))
+                      ) : (
+                        <div className="timeline-item">
+                          {t("NorecordsfoundLabel")}
+                        </div>
+                      )}
                     </div>
-                    <button className="btn-secondary btn btn-primary" onClick={handleNoteShow}>Tout voir</button>
+                    <button
+                      className="btn-secondary btn btn-primary"
+                      onClick={handleNoteShow}
+                    >
+                      Tout voir
+                    </button>
                   </div>
                 </div>
               </div>
@@ -2535,10 +2741,11 @@ const AdminFileDetail = () => {
             <Form className="mt-24 " onSubmit={UpdateFolderInfo}>
               {flashMessage.message && (
                 <div
-                  className={`mt-3 mx-w-320 alert ${flashMessage.type === "success"
-                    ? "alert-success"
-                    : "alert-danger"
-                    } text-center`}
+                  className={`mt-3 mx-w-320 alert ${
+                    flashMessage.type === "success"
+                      ? "alert-success"
+                      : "alert-danger"
+                  } text-center`}
                   role="alert"
                 >
                   {flashMessage.message}
@@ -2583,9 +2790,7 @@ const AdminFileDetail = () => {
                     </Form.Label>
                     <DatePicker
                       placeholderText="Selectionner une date"
-                      selected={
-                        startDate4 ? getFormattedDate(startDate4) : null
-                      }
+                      selected={startDate4 ? getFormattedDate(startDate4) : null}
                       onChange={(date) => setStartDate4(formatDate(date))}
                       dateFormat="dd/MM/yyyy"
                       locale={fr}
@@ -2616,8 +2821,8 @@ const AdminFileDetail = () => {
                         showUserDocumentData?.broker?.first_name
                           ? showUserDocumentData?.broker?.first_name
                           : "" + "" + showUserDocumentData?.broker?.last_name
-                            ? showUserDocumentData?.broker?.last_name
-                            : ""
+                          ? showUserDocumentData?.broker?.last_name
+                          : ""
                       }
                     />
                   </Form.Group>
@@ -2773,13 +2978,22 @@ const AdminFileDetail = () => {
           </Tab>
 
           {/* Documents Tab */}
-          <Tab className="update-inside-tab" eventKey="document" title="Documents">
+          <Tab
+            className="update-inside-tab"
+            eventKey="document"
+            title="Documents"
+          >
             {isLoading && (
               <div className="loading-overlay">
                 <Loading />
               </div>
             )}
-            <Tabs defaultActiveKey="document" className="mt-0 mb-0 " activeKey={activeDocumentTab} onSelect={handleSelectDocument}>
+            <Tabs
+              defaultActiveKey="document"
+              className="mt-0 mb-0 "
+              activeKey={activeDocumentTab}
+              onSelect={handleSelectDocument}
+            >
               {/* Paper Tab */}
               <Tab
                 eventKey="document"
@@ -2864,7 +3078,7 @@ const AdminFileDetail = () => {
                                   }}
                                 >
                                   {showUserDocumentFileData &&
-                                    showUserDocumentFileData.length > 0 ? (
+                                  showUserDocumentFileData.length > 0 ? (
                                     showUserDocumentFileData.map((doc) => (
                                       <option key={doc.id} value={doc.id}>
                                         {doc.filename}
@@ -2883,10 +3097,11 @@ const AdminFileDetail = () => {
                                 style={{ marginTop: "4px" }}
                               >
                                 <button
-                                  className={`filter-btn ${validateDocumnetFilter === ""
-                                    ? "active"
-                                    : ""
-                                    }`}
+                                  className={`filter-btn ${
+                                    validateDocumnetFilter === ""
+                                      ? "active"
+                                      : ""
+                                  }`}
                                   onClick={() => setValidateDocumnetFilter("")}
                                   style={{
                                     border: `2px solid ${buttonColor}`,
@@ -2903,10 +3118,11 @@ const AdminFileDetail = () => {
                                   Tous
                                 </button>
                                 <button
-                                  className={`filter-btn ${validateDocumnetFilter === "to_be_checked"
-                                    ? "active"
-                                    : ""
-                                    }`}
+                                  className={`filter-btn ${
+                                    validateDocumnetFilter === "to_be_checked"
+                                      ? "active"
+                                      : ""
+                                  }`}
                                   onClick={() =>
                                     setValidateDocumnetFilter("to_be_checked")
                                   }
@@ -2925,10 +3141,11 @@ const AdminFileDetail = () => {
                                   {t("toBeCheckedLabel")}
                                 </button>
                                 <button
-                                  className={`filter-btn ${validateDocumnetFilter === "invalid"
-                                    ? "active"
-                                    : ""
-                                    }`}
+                                  className={`filter-btn ${
+                                    validateDocumnetFilter === "invalid"
+                                      ? "active"
+                                      : ""
+                                  }`}
                                   onClick={() =>
                                     setValidateDocumnetFilter("invalid")
                                   }
@@ -3030,10 +3247,11 @@ const AdminFileDetail = () => {
                                       <div className="main-part">
                                         {flashMessage.message && (
                                           <div
-                                            className={`alert ${flashMessage.type === "success"
-                                              ? "alert-success"
-                                              : "alert-danger"
-                                              } text-center`}
+                                            className={`alert ${
+                                              flashMessage.type === "success"
+                                                ? "alert-success"
+                                                : "alert-danger"
+                                            } text-center`}
                                             role="alert"
                                           >
                                             {flashMessage.message}
@@ -3157,7 +3375,7 @@ const AdminFileDetail = () => {
                                         </div>
 
                                         {currentFileIndex <
-                                          userDocumentFileDataChanges.length -
+                                        userDocumentFileDataChanges.length -
                                           1 ? (
                                           <>
                                             <Button
@@ -3253,7 +3471,11 @@ const AdminFileDetail = () => {
                                               type="text"
                                               placeholder="Nom et prénom du demandeur"
                                               value={showUserCompanyName}
-                                              onChange={(e) => setShowUserCompanyName(e.target.value)}
+                                              onChange={(e) =>
+                                                setShowUserCompanyName(
+                                                  e.target.value
+                                                )
+                                              }
                                             />
                                           </Form.Group>
 
@@ -3416,120 +3638,199 @@ const AdminFileDetail = () => {
                             {selectedSpeakerColumns.includes(
                               "fileNameLabe"
                             ) && (
-                                <th>
-                                  <div className="d-flex align-items-center">
-                                    <span>Nom du fichier</span>
-                                    <div>
-                                      <Link
-                                        className={`sorting-icon ms-2`}
-                                        onClick={() =>
-                                          handleClickRotate("filename")
-                                        }
-                                      >
-                                        {sort.value === "asc" && (
-                                          <svg
-                                            width="24"
-                                            height="24"
-                                            viewBox="0 0 24 24"
-                                            fill="none"
-                                            xmlns="http://www.w3.org/2000/svg"
-                                          >
-                                            <path
-                                              d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
-                                              fill="black"
-                                            />
-                                            <path
-                                              d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
-                                              fill="black"
-                                              fillOpacity="0.5"
-                                            />
-                                          </svg>
-                                        )}
+                              <th>
+                                <div className="d-flex align-items-center">
+                                  <span>Nom du fichier</span>
+                                  <div>
+                                    <Link
+                                      className={`sorting-icon ms-2`}
+                                      onClick={() =>
+                                        handleClickRotate("filename")
+                                      }
+                                    >
+                                      {sort.value === "asc" && (
+                                        <svg
+                                          width="24"
+                                          height="24"
+                                          viewBox="0 0 24 24"
+                                          fill="none"
+                                          xmlns="http://www.w3.org/2000/svg"
+                                        >
+                                          <path
+                                            d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
+                                            fill="black"
+                                          />
+                                          <path
+                                            d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
+                                            fill="black"
+                                            fillOpacity="0.5"
+                                          />
+                                        </svg>
+                                      )}
 
-                                        {sort.value === "desc" && (
-                                          <svg
-                                            width="24"
-                                            height="24"
-                                            viewBox="0 0 24 24"
-                                            fill="none"
-                                            xmlns="http://www.w3.org/2000/svg"
-                                          >
-                                            <path
-                                              d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
-                                              fill="black"
-                                              fillOpacity="0.5"
-                                            />
-                                            <path
-                                              d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
-                                              fill="black"
-                                            />
-                                          </svg>
-                                        )}
-                                      </Link>
-                                    </div>
+                                      {sort.value === "desc" && (
+                                        <svg
+                                          width="24"
+                                          height="24"
+                                          viewBox="0 0 24 24"
+                                          fill="none"
+                                          xmlns="http://www.w3.org/2000/svg"
+                                        >
+                                          <path
+                                            d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
+                                            fill="black"
+                                            fillOpacity="0.5"
+                                          />
+                                          <path
+                                            d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
+                                            fill="black"
+                                          />
+                                        </svg>
+                                      )}
+                                    </Link>
                                   </div>
-                                </th>
-                              )}
+                                </div>
+                              </th>
+                            )}
                             {selectedSpeakerColumns.includes(
                               "speakerLabel"
                             ) && (
-                                <th className="select-drop elips-dropdown">
-                                  <div className="d-flex align-items-center">
-                                    <div>
-                                      <Form.Select
-                                        aria-label="statusSelectAria"
-                                        value={selectSpeakerId}
-                                        onChange={handleTableSpeakerChange}
-                                      >
-                                        <option value="">
-                                          {t("speakerLabel")}
-                                        </option>
-                                        {speakerDropDownList?.length > 0 ? (
-                                          speakerDropDownList?.map((speaker) => (
-                                            <option
-                                              key={speaker.id}
-                                              value={speaker.id}
-                                            >
-                                              {speaker.company_name +
-                                                " - " +
-                                                speaker.siren_number}
-                                            </option>
-                                          ))
-                                        ) : (
-                                          <option value="">
-                                            {t("NorecordsfoundLabel")}
-                                          </option>
-                                        )}
-                                      </Form.Select>
-                                    </div>
-                                    <div>
-                                      <Link
-                                        className={`sorting-icon ms-2`}
-                                        onClick={() =>
-                                          handleClickRotate(
-                                            "speaker.company_name"
-                                          )
-                                        }
-                                      >
-                                        {sort.value === "asc" && (
-                                          <svg
-                                            width="24"
-                                            height="24"
-                                            viewBox="0 0 24 24"
-                                            fill="none"
-                                            xmlns="http://www.w3.org/2000/svg"
+                              <th className="select-drop elips-dropdown">
+                                <div className="d-flex align-items-center">
+                                  <div>
+                                    <Form.Select
+                                      aria-label="statusSelectAria"
+                                      value={selectSpeakerId}
+                                      onChange={handleTableSpeakerChange}
+                                    >
+                                      <option value="">
+                                        {t("speakerLabel")}
+                                      </option>
+                                      {speakerDropDownList?.length > 0 ? (
+                                        speakerDropDownList?.map((speaker) => (
+                                          <option
+                                            key={speaker.id}
+                                            value={speaker.id}
                                           >
-                                            <path
-                                              d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
-                                              fill="black"
-                                            />
-                                            <path
-                                              d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
-                                              fill="black"
-                                              fillOpacity="0.5"
-                                            />
-                                          </svg>
-                                        )}
+                                            {speaker.company_name +
+                                              " - " +
+                                              speaker.siren_number}
+                                          </option>
+                                        ))
+                                      ) : (
+                                        <option value="">
+                                          {t("NorecordsfoundLabel")}
+                                        </option>
+                                      )}
+                                    </Form.Select>
+                                  </div>
+                                  <div>
+                                    <Link
+                                      className={`sorting-icon ms-2`}
+                                      onClick={() =>
+                                        handleClickRotate(
+                                          "speaker.company_name"
+                                        )
+                                      }
+                                    >
+                                      {sort.value === "asc" && (
+                                        <svg
+                                          width="24"
+                                          height="24"
+                                          viewBox="0 0 24 24"
+                                          fill="none"
+                                          xmlns="http://www.w3.org/2000/svg"
+                                        >
+                                          <path
+                                            d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
+                                            fill="black"
+                                          />
+                                          <path
+                                            d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
+                                            fill="black"
+                                            fillOpacity="0.5"
+                                          />
+                                        </svg>
+                                      )}
+
+                                      {sort.value === "desc" && (
+                                        <svg
+                                          width="24"
+                                          height="24"
+                                          viewBox="0 0 24 24"
+                                          fill="none"
+                                          xmlns="http://www.w3.org/2000/svg"
+                                        >
+                                          <path
+                                            d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
+                                            fill="black"
+                                            fillOpacity="0.5"
+                                          />
+                                          <path
+                                            d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
+                                            fill="black"
+                                          />
+                                        </svg>
+                                      )}
+                                    </Link>
+                                  </div>
+                                </div>
+                              </th>
+                            )}
+                            {selectedSpeakerColumns.includes(
+                              "Type de document"
+                            ) && (
+                              <th className="select-drop elips-dropdown">
+                                <div className="d-flex align-items-center">
+                                  <div>
+                                    <Form.Select
+                                      aria-label="Choisir un type de document"
+                                      value={selectDocumentType}
+                                      onChange={handleDocumentTypeChange}
+                                    >
+                                      <option value="">Type de document</option>
+                                      {documentTypeList?.length > 0 ? (
+                                        documentTypeList?.map((doctype) => (
+                                          <option
+                                            key={doctype.id}
+                                            value={doctype.id}
+                                          >
+                                            {doctype.name}
+                                          </option>
+                                        ))
+                                      ) : (
+                                        <option value="">
+                                          {t("NorecordsfoundLabel")}
+                                        </option>
+                                      )}
+                                    </Form.Select>
+                                  </div>
+                                  <div>
+                                    <Link
+                                      className={`sorting-icon ms-2`}
+                                      onClick={() =>
+                                        handleClickRotate("docType.name")
+                                      }
+                                    >
+                                      {sort.value === "asc" && (
+                                        <svg
+                                          width="24"
+                                          height="24"
+                                          viewBox="0 0 24 24"
+                                          fill="none"
+                                          xmlns="http://www.w3.org/2000/svg"
+                                        >
+                                          <path
+                                            d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
+                                            fill="black"
+                                          />
+                                          <path
+                                            d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
+                                            fill="black"
+                                            fillOpacity="0.5"
+                                          />
+                                        </svg>
+                                      )}
 
                                         {sort.value === "desc" && (
                                           <svg
@@ -3556,18 +3857,18 @@ const AdminFileDetail = () => {
                                 </th>
                               )}
                             {selectedSpeakerColumns.includes(
-                              "Type de document"
+                              "GED status"
                             ) && (
                                 <th className="select-drop elips-dropdown">
                                   <div className="d-flex align-items-center">
                                     <div>
                                       <Form.Select
                                         aria-label="Choisir un type de document"
-                                        value={selectDocumentType}
-                                        onChange={handleDocumentTypeChange}
+                                        // value={selectDocumentType}
+                                        // onChange={handleDocumentTypeChange}
                                       >
-                                        <option value="">Type de document</option>
-                                        {documentTypeList?.length > 0 ? (
+                                        <option value="">GED status</option>
+                                        {/* {documentTypeList?.length > 0 ? (
                                           documentTypeList?.map((doctype) => (
                                             <option
                                               key={doctype.id}
@@ -3580,14 +3881,14 @@ const AdminFileDetail = () => {
                                           <option value="">
                                             {t("NorecordsfoundLabel")}
                                           </option>
-                                        )}
+                                        )} */}
                                       </Form.Select>
                                     </div>
                                     <div>
                                       <Link
                                         className={`sorting-icon ms-2`}
                                         onClick={() =>
-                                          handleClickRotate("docType.name")
+                                          handleClickRotate("GED_status")
                                         }
                                       >
                                         {sort.value === "asc" && (
@@ -3610,30 +3911,30 @@ const AdminFileDetail = () => {
                                           </svg>
                                         )}
 
-                                        {sort.value === "desc" && (
-                                          <svg
-                                            width="24"
-                                            height="24"
-                                            viewBox="0 0 24 24"
-                                            fill="none"
-                                            xmlns="http://www.w3.org/2000/svg"
-                                          >
-                                            <path
-                                              d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
-                                              fill="black"
-                                              fillOpacity="0.5"
-                                            />
-                                            <path
-                                              d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
-                                              fill="black"
-                                            />
-                                          </svg>
-                                        )}
-                                      </Link>
-                                    </div>
+                                      {sort.value === "desc" && (
+                                        <svg
+                                          width="24"
+                                          height="24"
+                                          viewBox="0 0 24 24"
+                                          fill="none"
+                                          xmlns="http://www.w3.org/2000/svg"
+                                        >
+                                          <path
+                                            d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
+                                            fill="black"
+                                            fillOpacity="0.5"
+                                          />
+                                          <path
+                                            d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
+                                            fill="black"
+                                          />
+                                        </svg>
+                                      )}
+                                    </Link>
                                   </div>
-                                </th>
-                              )}
+                                </div>
+                              </th>
+                            )}
                             {selectedSpeakerColumns.includes("status") && (
                               <th className="select-drop elips-dropdown">
                                 <div className="d-flex align-items-center">
@@ -3731,48 +4032,51 @@ const AdminFileDetail = () => {
                         </thead>
                         <tbody>
                           {paperList?.length > 0 &&
-                            selectedSpeakerColumns?.length > 0 ? (
+                          selectedSpeakerColumns?.length > 0 ? (
                             paperList?.map((data) => (
                               <tr>
                                 {selectedSpeakerColumns.includes(
                                   "fileNameLabe"
                                 ) && (
-                                    <td>
-                                      <div className="d-flex align-items-center">
-                                        <span className="file-type-icon">
-                                          <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            width="24"
-                                            height="24"
-                                            viewBox="0 0 24 24"
-                                            fill="none"
-                                          >
-                                            <path
-                                              d="M12.65 2.23994C12.4689 2.08503 12.2383 1.99992 12 1.99994H5C4.73478 1.99994 4.48043 2.1053 4.29289 2.29283C4.10536 2.48037 4 2.73472 4 2.99994V20.9999C4 21.2652 4.10536 21.5195 4.29289 21.7071C4.48043 21.8946 4.73478 21.9999 5 21.9999H19C19.2652 21.9999 19.5196 21.8946 19.7071 21.7071C19.8946 21.5195 20 21.2652 20 20.9999V8.99994C20 8.8555 19.9687 8.71277 19.9083 8.58157C19.8479 8.45038 19.7598 8.33383 19.65 8.23994L12.65 2.23994ZM13 5.16994L16.3 7.99994H13V5.16994ZM18 19.9999H6V3.99994H11V8.99994C11 9.26516 11.1054 9.51951 11.2929 9.70705C11.4804 9.89458 11.7348 9.99994 12 9.99994H18V19.9999Z"
-                                              fill="white"
-                                            />
-                                          </svg>
-                                        </span>
-                                        <span className="text-elips">
-                                          {data.file_name}
-                                        </span>
-                                      </div>
-                                    </td>
-                                  )}
+                                  <td>
+                                    <div className="d-flex align-items-center">
+                                      <span className="file-type-icon">
+                                        <svg
+                                          xmlns="http://www.w3.org/2000/svg"
+                                          width="24"
+                                          height="24"
+                                          viewBox="0 0 24 24"
+                                          fill="none"
+                                        >
+                                          <path
+                                            d="M12.65 2.23994C12.4689 2.08503 12.2383 1.99992 12 1.99994H5C4.73478 1.99994 4.48043 2.1053 4.29289 2.29283C4.10536 2.48037 4 2.73472 4 2.99994V20.9999C4 21.2652 4.10536 21.5195 4.29289 21.7071C4.48043 21.8946 4.73478 21.9999 5 21.9999H19C19.2652 21.9999 19.5196 21.8946 19.7071 21.7071C19.8946 21.5195 20 21.2652 20 20.9999V8.99994C20 8.8555 19.9687 8.71277 19.9083 8.58157C19.8479 8.45038 19.7598 8.33383 19.65 8.23994L12.65 2.23994ZM13 5.16994L16.3 7.99994H13V5.16994ZM18 19.9999H6V3.99994H11V8.99994C11 9.26516 11.1054 9.51951 11.2929 9.70705C11.4804 9.89458 11.7348 9.99994 12 9.99994H18V19.9999Z"
+                                            fill="white"
+                                          />
+                                        </svg>
+                                      </span>
+                                      <span className="text-elips">
+                                        {data.file_name}
+                                      </span>
+                                    </div>
+                                  </td>
+                                )}
                                 {selectedSpeakerColumns.includes(
                                   "speakerLabel"
                                 ) && (
-                                    <td>
-                                      {data.speaker
-                                        ? data.speaker?.company_name +
+                                  <td>
+                                    {data.speaker
+                                      ? data.speaker?.company_name +
                                         " - " +
                                         data.speaker?.siren_number
-                                        : "-"}
-                                    </td>
-                                  )}
+                                      : "-"}
+                                  </td>
+                                )}
                                 {selectedSpeakerColumns.includes(
                                   "Type de document"
                                 ) && <td>{data.docType.name}</td>}
+                                {selectedSpeakerColumns.includes(
+                                  "GED status"
+                                ) && <td>{data.GED_status}</td>}
                                 {selectedSpeakerColumns.includes("status") && (
                                   <td>
                                     {data.status == "to_be_checked" ? (
@@ -4000,10 +4304,11 @@ const AdminFileDetail = () => {
                                 </h2>
                                 {flashMessageStoreDoc.message && (
                                   <div
-                                    className={`mt-3 alert ${flashMessageStoreDoc.type === "success"
-                                      ? "alert-success"
-                                      : "alert-danger"
-                                      } text-center`}
+                                    className={`mt-3 alert ${
+                                      flashMessageStoreDoc.type === "success"
+                                        ? "alert-success"
+                                        : "alert-danger"
+                                    } text-center`}
                                     role="alert"
                                   >
                                     {flashMessageStoreDoc.message}
@@ -4159,6 +4464,59 @@ const AdminFileDetail = () => {
                             </th>
                             <th>
                               <div className="d-flex align-items-center">
+                                <span>Bloc logique</span>
+                                <div>
+                                  <Link
+                                    className={`sorting-icon ms-2`}
+                                    onClick={() =>
+                                      handleClickRotate("logical_block.name")
+                                    }
+                                  >
+                                    {sort.value === "asc" && (
+                                      <svg
+                                        width="24"
+                                        height="24"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                      >
+                                        <path
+                                          d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
+                                          fill="black"
+                                        />
+                                        <path
+                                          d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
+                                          fill="black"
+                                          fillOpacity="0.5"
+                                        />
+                                      </svg>
+                                    )}
+
+                                    {sort.value === "desc" && (
+                                      <svg
+                                        width="24"
+                                        height="24"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                      >
+                                        <path
+                                          d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
+                                          fill="black"
+                                          fillOpacity="0.5"
+                                        />
+                                        <path
+                                          d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
+                                          fill="black"
+                                        />
+                                      </svg>
+                                    )}
+                                  </Link>
+                                </div>
+                              </div>
+                            </th>
+                            <th>
+                              <div className="d-flex align-items-center">
                                 <span>Intervenant</span>
                                 <div>
                                   <Link
@@ -4233,6 +4591,7 @@ const AdminFileDetail = () => {
                             missingDocumentList?.map((data) => (
                               <tr>
                                 <td>{data.documentType.name}</td>
+                                <td>{data.logical_block.name}</td>
                                 <td className="bold-font">
                                   {data.speaker.company_name != ""
                                     ? data.speaker.company_name
@@ -4315,10 +4674,11 @@ const AdminFileDetail = () => {
                   <div className="col-md-4">
                     {flashMessage.message && (
                       <div
-                        className={`alert ${flashMessage.type === "success"
-                          ? "alert-success"
-                          : "alert-danger"
-                          } text-center`}
+                        className={`alert ${
+                          flashMessage.type === "success"
+                            ? "alert-success"
+                            : "alert-danger"
+                        } text-center`}
                         role="alert"
                       >
                         {flashMessage.message}
@@ -4326,10 +4686,11 @@ const AdminFileDetail = () => {
                     )}
                     {flashMessageStoreDoc.message && (
                       <div
-                        className={`mt-3 alert ${flashMessageStoreDoc.type === "success"
-                          ? "alert-success"
-                          : "alert-danger"
-                          } text-center`}
+                        className={`mt-3 alert ${
+                          flashMessageStoreDoc.type === "success"
+                            ? "alert-success"
+                            : "alert-danger"
+                        } text-center`}
                         role="alert"
                       >
                         {flashMessageStoreDoc.message}
@@ -4638,10 +4999,11 @@ const AdminFileDetail = () => {
                       >
                         {flashMessage.message && (
                           <div
-                            className={`alert ${flashMessage.type === "success"
-                              ? "alert-success"
-                              : "alert-danger"
-                              } text-center`}
+                            className={`alert ${
+                              flashMessage.type === "success"
+                                ? "alert-success"
+                                : "alert-danger"
+                            } text-center`}
                             role="alert"
                           >
                             {flashMessage.message}
@@ -4764,10 +5126,11 @@ const AdminFileDetail = () => {
                           <h2>Nouvel intervenant</h2>
                           {flashMessage.message && (
                             <div
-                              className={`alert ${flashMessage.type === "success"
-                                ? "alert-success"
-                                : "alert-danger"
-                                } text-center`}
+                              className={`alert ${
+                                flashMessage.type === "success"
+                                  ? "alert-success"
+                                  : "alert-danger"
+                              } text-center`}
                               role="alert"
                             >
                               {flashMessage.message}
@@ -5216,8 +5579,12 @@ const AdminFileDetail = () => {
                                       SpeakerDetail(data.id);
                                       setActiveSubTab("documents");
                                       setShowSpeakerId(data.id);
-                                      setTotalSpeakerDocument(data.user_document_count);
-                                      setTotalMissingDocument(data.missing_document_count);
+                                      setTotalSpeakerDocument(
+                                        data.user_document_count
+                                      );
+                                      setTotalMissingDocument(
+                                        data.missing_document_count
+                                      );
                                     }}
                                     className="view"
                                     href="/user-management"
@@ -5445,8 +5812,8 @@ const AdminFileDetail = () => {
                           <td>
                             {fileDetail?.speaker
                               ? fileDetail?.speaker?.company_name +
-                              " - " +
-                              fileDetail?.speaker?.siren_number
+                                " - " +
+                                fileDetail?.speaker?.siren_number
                               : "-"}
                           </td>
 
@@ -5847,8 +6214,9 @@ const AdminFileDetail = () => {
                                 }}
                               >
                                 —{" "}
-                                {`${data.added_by?.first_name ?? ""} ${data.added_by?.last_name ?? ""
-                                  }`}
+                                {`${data.added_by?.first_name ?? ""} ${
+                                  data.added_by?.last_name ?? ""
+                                }`}
                               </p>
                             )}
 
@@ -5880,14 +6248,19 @@ const AdminFileDetail = () => {
         </Modal.Header>
         <Modal.Body>
           <span className="complete-process">
-            Êtes-vous sûr de vouloir télécharger les documents {fileType == "pdf" ? "PDF" : fileType == "excel" ? "Exceller" : ""}?
+            Êtes-vous sûr de vouloir télécharger les documents{" "}
+            {fileType == "pdf" ? "PDF" : fileType == "excel" ? "Exceller" : ""}?
           </span>
         </Modal.Body>
         <Modal.Footer>
           <div className="text-end">
             <Button
               variant="primary"
-              onClick={() => ExportDocumentFile(id, fileType, () => setExportDocumentOpen(false))}
+              onClick={() =>
+                ExportDocumentFile(id, fileType, () =>
+                  setExportDocumentOpen(false)
+                )
+              }
             >
               {t("confirmbtnLabel")}
             </Button>
