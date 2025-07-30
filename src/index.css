@@ -880,7 +880,11 @@ color: #212836;
   margin-bottom: 10px;
 }
 .grid-view > div .status{
- width: 100%;    min-height: 31px;
+ width: 100%;       min-height: 45px;
+    vertical-align: middle;
+    display: inline-flex
+;
+    align-items: center;border-radius: 18px;
 }.second-header select.form-select {
     font-size: 13px;
 }
