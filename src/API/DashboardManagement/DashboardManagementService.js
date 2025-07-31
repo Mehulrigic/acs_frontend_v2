@@ -34,7 +34,7 @@ const DashboardManagementService = {
   dashboard_registered_document_file: (id) => apiClient.get(`/user/user_document/registered/document-file/count/${id}`),
   speaker_registered_document_file: (id) => apiClient.get(`/user/user_document/speaker/registered/document-file/count/${id}`),
   dashboard_last_five_event: (id, userData) => apiClient.post(`/user/user_document/dashboard/event/${id}`, userData),
-  dashboard_last_three_note: (id, userData) => apiClient.post(`/user/user_document/dashboard/note/${id}`, userData),
+  dashboard_last_three_note: (id) => apiClient.post(`/user/user_document/dashboard/note/${id}`),
   export_folder: (id, format) =>
   apiClient.get(`/user/user_document/export/folder/${id}?format=${format}`, {
     responseType: 'blob',

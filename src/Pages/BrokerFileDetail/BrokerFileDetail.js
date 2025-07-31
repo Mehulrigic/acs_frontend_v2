@@ -2617,10 +2617,15 @@ const BrokerFileDetail = () => {
                           selectedOtherDocColumns?.length > 0 ? (
                             showOtherDocument?.map((data) => (
                               <tr
-                                onClick={() =>
-                                  data.status === "invalid" &&
-                                  handleInvalidReason(data.id)
-                                }
+                                style={{
+                                  cursor:
+                                    data.status === "invalid" && "pointer",
+                                }}
+                                onClick={(e) => {
+                                  if (data.status === "invalid" && !e.target.closest(".action-btn")) {
+                                    handleInvalidReason(data.id);
+                                  }
+                                }}
                               >
                                 {selectedOtherDocColumns.includes(
                                   "fileNameLabe"

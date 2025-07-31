@@ -7,19 +7,15 @@ import { useState } from "react";
 import Tabs from "react-bootstrap/Tabs";
 import Tab from "react-bootstrap/Tab";
 import { Button, Form, Offcanvas } from "react-bootstrap";
-import Dropdown from "react-bootstrap/Dropdown";
-import MissingDocument from "../../Components/MissingDocument/MissingDocument";
 import FilePageService from "../../API/FilePage/FilePageService";
 import { useTranslation } from "react-i18next";
 import AddFolderPanelService from "../../API/AddFolderPanel/AddFolderPanelService";
 import DatePicker from "react-datepicker";
 import { fr } from "date-fns/locale";
-import InvalidDocument from "../../Components/InvalidDocument/InvalidDocument";
 import Modal from "react-bootstrap/Modal";
 import Paginations from "../../Components/Paginations/Paginations";
 import logo from "../../ass-logo.png";
 import Loading from "../../Common/Loading";
-import DocViewer, { DocViewerRenderers } from "@cyntler/react-doc-viewer";
 import "@cyntler/react-doc-viewer/dist/index.css";
 import AcsManagerFileService from "../../API/AcsManager/AcsManagerFileService";
 import AddNote from "../../Components/AddNote/AddNote";
@@ -30,6 +26,11 @@ import DashboardManagementService from "../../API/DashboardManagement/DashboardM
 import TaskManagementService from "../../API/TaskManagement/TaskManagementService";
 
 const FileDetails = () => {
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+  const { id } = useParams();
+  const scrollRef = useRef(null);
+
   const [showSepeakerInner, setShowSpeakerInner] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
 
@@ -40,27 +41,6 @@ const FileDetails = () => {
   const [selectedType, setSelectedType] = useState("");
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedUser, setSelectedUser] = useState("");
-  const [showReader, setShowReader] = useState(false);
-
-  const toggleReader = () => {
-    setShowReader((prev) => {
-      const newState = !prev;
-
-      // Toggle class on body
-      if (newState) {
-        document.body.classList.add("show-reader");
-      } else {
-        document.body.classList.remove("show-reader");
-      }
-
-      return newState;
-    });
-  };
-
-  const { t } = useTranslation();
-  const navigate = useNavigate();
-  const { id } = useParams();
-  const scrollRef = useRef(null);
 
   const [isLoading, setIsLoading] = useState(false);
   const [isSpeakerLoading, setIsSpeakerLoading] = useState(false);
@@ -88,7 +68,6 @@ const FileDetails = () => {
   const [speakerDetail, setSpeakerDetail] = useState();
   const [historyDocumentList, setHistoryDocumentList] = useState([]);
   const [totalHistoryRecords, setTotalHistoryRecords] = useState(0);
-  const [markIsReadCount, setMarkIsReadCount] = useState(0);
   const [totalMissingRecords, setTotalMissingRecords] = useState(0);
   const [missingDocumentList, setMissingDocumentList] = useState([]);
   const [showUserDocumentFileData, setShowUserDocumentFileData] = useState([]);
@@ -187,36 +166,6 @@ const FileDetails = () => {
   const handleAddOtherColClose = () => setShowAddOtherCol(false);
   const handleAddOtherColShow = () => setShowAddOtherCol(true);
 
-  const [showFinalModal, setShowFinalModal] = useState(false);
-  const handleShowFinalModal = () => setShowFinalModal(true);
-  const handleCloseFinalModal = () => {
-    setShowFinalModal(false);
-    if (activeTab === "contactinfo") {
-      ShowUserDocumentData(id);
-      BrokerList();
-    }
-    if (activeTab === "speakerdocument") {
-      SpeakerList(id, sort, search, currentPage);
-    }
-    if (activeTab === "otherdocument") {
-      ShowOtherDocument(
-        id,
-        sort,
-        currentPage,
-        editUserStatus,
-        selectDocumentType
-      );
-      SpeakerDropDownList("", 1);
-      DocumentTypeList();
-    }
-    if (activeTab === "missingdocument") {
-      GetMissingDocumentList(id, sort, currentPage);
-    }
-    if (activeTab === "history") {
-      GetHistoryListDocument(id, sort, search, currentPage, selectActionType);
-    }
-  };
-
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const handleShowDeleteModal = () => setShowDeleteModal(true);
   const handleCloseDeleteModal = () => setShowDeleteModal(false);
@@ -226,32 +175,6 @@ const FileDetails = () => {
   const handleCloseDeleteSpeakerModal = () => setShowDeleteSpeakerModal(false);
 
   const [showViewSpeaker, setShowViewSpeaker] = useState(false);
-  const handleViewShowSpeaker = () => setShowViewSpeaker(true);
-  const handleViewCloseSpeaker = () => {
-    setActiveSubTab("speaker");
-    setActiveTab(activeTab);
-    setShowViewSpeaker(false);
-    if (activeTab === "otherdocument") {
-      ShowOtherDocument(
-        id,
-        sort,
-        currentPage,
-        editUserStatus,
-        selectDocumentType
-      );
-      SpeakerDropDownList("", 1);
-      DocumentTypeList();
-    }
-    if (activeTab === "speakerdocument") {
-      SpeakerList(id, sort, search, currentPage);
-    }
-    if (activeTab === "missingdocument") {
-      GetMissingDocumentList(id, sort, currentPage);
-    }
-    if (activeTab === "history") {
-      GetHistoryListDocument(id, sort, search, currentPage, selectActionType);
-    }
-  };
 
   const [showmodal, setShowmodal] = useState(false);
   const handleModalShow = () => setShowmodal(true);
@@ -265,6 +188,14 @@ const FileDetails = () => {
     setShow(false);
     setDocumentUploading(false);
     setFileList([]);
+    if (activeTab === "dashboard") {
+      DashboardRegisteredDocument(id);
+      DashboardSpeakerRegisteredDocument(id);
+      EventUserList(id);
+      DashboardLastFiveEvent(id);
+      DashboardLastThreeNote(id);
+      TaskList(search, sort, currentPage, taskStatus, taskPriority);
+    }
     if (activeTab === "contactinfo") {
       ShowUserDocumentData(id);
       BrokerList();
@@ -273,18 +204,13 @@ const FileDetails = () => {
       SpeakerList(id, sort, search, currentPage);
     }
     if (activeTab === "otherdocument") {
-      ShowOtherDocument(
-        id,
-        sort,
-        currentPage,
-        editUserStatus,
-        selectDocumentType
-      );
-      SpeakerDropDownList("", 1);
-      DocumentTypeList();
-    }
-    if (activeTab === "missingdocument") {
-      GetMissingDocumentList(id, sort, currentPage);
+      if (activeDocumentTab === "missingdocument") {
+        GetMissingDocumentList(id, sort, currentPage);
+      } else {
+        ShowOtherDocument(id, sort, currentPage, editUserStatus, selectDocumentType);
+        SpeakerDropDownList("", 1);
+        DocumentTypeList();
+      }
     }
     if (activeTab === "history") {
       GetHistoryListDocument(id, sort, search, currentPage, selectActionType);
@@ -330,6 +256,16 @@ const FileDetails = () => {
   const [currentTaskPage, setCurrentTaskPage] = useState(1);
   const [totalTaskPages, setTotalTaskPages] = useState(1);
   const [totalTaskRecords, setTotalTaskRecords] = useState(0);
+
+  const [fileType, setFileType] = useState("");
+  const [exportDocumentOpen, setExportDocumentOpen] = useState(false);
+  const handleExportDocumentShow = (type) => {
+    if (type) {
+      setFileType(type);
+      setExportDocumentOpen(true);
+    }
+  };
+  const handleExportDocumentClose = () => setExportDocumentOpen(false);
 
   useEffect(() => {
     if (showNote) {
@@ -396,12 +332,12 @@ const FileDetails = () => {
       }
     }
     if (activeTab === "speakerdocument") {
-        SpeakerList(id, sort, search, 1);
+      SpeakerList(id, sort, search, 1);
     }
     if (activeTab === "history") {
       GetHistoryListDocument(id, sort, search, currentPage, selectActionType);
     }
-  }, [activeTab, activeDocumentTab, sort]);
+  }, [activeTab, activeDocumentTab, sort, selectedType, selectedDate, selectedUser]);
 
   useEffect(() => {
     if (showViewSpeaker && activeTab === "speakerdocument") {
@@ -428,6 +364,14 @@ const FileDetails = () => {
     setSelectDocumentType("");
     setCurrentFileIndex(0);
     setFileList([]);
+    if (activeTab === "dashboard") {
+      DashboardRegisteredDocument(id);
+      DashboardSpeakerRegisteredDocument(id);
+      EventUserList(id);
+      DashboardLastFiveEvent(id);
+      DashboardLastThreeNote(id);
+      TaskList(search, sort, currentPage, taskStatus, taskPriority);
+    }
     if (activeTab === "contactinfo") {
       ShowUserDocumentData(id);
       BrokerList();
@@ -436,12 +380,13 @@ const FileDetails = () => {
       SpeakerList(id, sort, search, currentPage);
     }
     if (activeTab === "otherdocument") {
-      ShowOtherDocument(id, sort, currentPage, "", "");
-      SpeakerDropDownList("", 1);
-      DocumentTypeList();
-    }
-    if (activeTab === "missingdocument") {
-      GetMissingDocumentList(id, sort, currentPage);
+      if (activeDocumentTab === "missingdocument") {
+        GetMissingDocumentList(id, sort, currentPage);
+      } else {
+        ShowOtherDocument(id, sort, currentPage, "", "");
+        SpeakerDropDownList("", 1);
+        DocumentTypeList();
+      }
     }
     if (activeTab === "history") {
       GetHistoryListDocument(id, sort, search, currentPage, selectActionType);
@@ -450,16 +395,20 @@ const FileDetails = () => {
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
+    if (activeTab === "dashboard") {
+      TaskList(search, sort, page, taskStatus, taskPriority);
+    }
     if (activeTab === "otherdocument") {
-      ShowOtherDocument(id, sort, page, editUserStatus, selectDocumentType);
-      SpeakerDropDownList("", 1);
-      DocumentTypeList();
+      if (activeDocumentTab === "missingdocument") { 
+        GetMissingDocumentList(id, sort, page);
+      } else {
+        ShowOtherDocument(id, sort, page, editUserStatus, selectDocumentType);
+        SpeakerDropDownList("", 1);
+        DocumentTypeList();
+      }
     }
     if (activeTab === "speakerdocument") {
       SpeakerList(id, sort, search, page);
-    }
-    if (activeTab === "missingdocument") {
-      GetMissingDocumentList(id, sort, page);
     }
     if (activeTab === "history") {
       GetHistoryListDocument(id, sort, search, page, selectActionType);
@@ -778,9 +727,13 @@ const FileDetails = () => {
           }
         }
         if (activeTab === "otherdocument") {
-          ShowOtherDocument(id, sort, 1, editUserStatus, selectDocumentType);
-          SpeakerDropDownList("", 1);
-          DocumentTypeList();
+          if (activeDocumentTab === "missingdocument") {
+            GetMissingDocumentList(id, sort, 1);
+          } else {
+            ShowOtherDocument(id, sort, 1, editUserStatus, selectDocumentType);
+            SpeakerDropDownList("", 1);
+            DocumentTypeList();
+          }
         }
       }
     } catch (error) {
@@ -934,7 +887,6 @@ const FileDetails = () => {
       if (response.data.status) {
         setIsLoading(false);
         ShowUserDocumentData(id);
-        handleCloseFinalModal();
         setShowCheck(false);
         setActiveTab(activeTab);
       } else {
@@ -1074,15 +1026,13 @@ const FileDetails = () => {
         });
 
         if (activeTab === "otherdocument") {
-          ShowOtherDocument(
-            id,
-            sort,
-            currentPage,
-            editUserStatus,
-            selectDocumentType
-          );
-          SpeakerDropDownList("", 1);
-          DocumentTypeList();
+          if (activeDocumentTab === "missingdocument") { 
+            GetMissingDocumentList(id, sort, currentPage);
+          } else {
+            ShowOtherDocument(id, sort, currentPage, editUserStatus, selectDocumentType);
+            SpeakerDropDownList("", 1);
+            DocumentTypeList();
+          }
         }
       } else {
         setDocumentUploading(false);
@@ -1199,7 +1149,7 @@ const FileDetails = () => {
 
   const handleSelect = (key) => {
     setHistory((prevHistory) => [
-      ...prevHistory, 
+      ...prevHistory,
       { activeTab, activeDocumentTab, activeSubTab }
     ]);
     setSearch("");
@@ -1660,14 +1610,19 @@ const FileDetails = () => {
   };
 
   const handleAddNoteModalOpen = (docId, docName) => {
-    setSelectedAddNoteDocId(docId);
-    setSelectedAddNoteDocName(docName);
-    setShowAddNoteModal(true);
+    if (docId && docName) {
+      setSelectedAddNoteDocId(docId);
+      setSelectedAddNoteDocName(docName);
+      setShowAddNoteModal(true);
+    } else {
+      setSelectedAddNoteDocId(null);
+      setSelectedAddNoteDocName("");
+      setShowAddNoteModal(true);
+    }
   };
 
   const handleAddNoteModalClose = () => {
     setShowAddNoteModal(false);
-    setSelectDocumentFileName("");
   };
 
   const NotesOptions = [
@@ -1677,8 +1632,8 @@ const FileDetails = () => {
   ];
 
   const handleNoteAddOrShow = (seletedValue) => {
-    if(seletedValue == "add_note") {
-      setShowAddNoteModal(true);
+    if (seletedValue == "add_note") {
+      handleAddNoteModalOpen();
     } else if (seletedValue == "view_note") {
       handleNoteShow();
     } else {
@@ -1731,10 +1686,9 @@ const FileDetails = () => {
   const DashboardLastFiveEvent = async (id) => {
     try {
       var userData = {
-        user_document_id: "",
-        type: "",
-        is_important: "",
-        is_read: "",
+        user_id: selectedUser,
+        action_type: selectedType,
+        date: selectedDate
       };
 
       const response =
@@ -1761,18 +1715,7 @@ const FileDetails = () => {
 
   const DashboardLastThreeNote = async (id) => {
     try {
-      var userData = {
-        action_type: selectedType ?? "",
-        user_id: selectedUser ?? "",
-        start_date: "",
-        end_date: "",
-      };
-
-      const response =
-        await DashboardManagementService.dashboard_last_three_note(
-          id,
-          userData
-        );
+      const response = await DashboardManagementService.dashboard_last_three_note(id);
 
       if (response.data.status) {
         setLastThreeNoteList(response.data.data);
@@ -1820,7 +1763,7 @@ const FileDetails = () => {
   const ExportDocumentFile = async (
     id,
     format = "pdf",
-    onFinish = () => {}
+    onFinish = () => { }
   ) => {
     try {
       const response = await DashboardManagementService.export_folder(
@@ -1890,18 +1833,17 @@ const FileDetails = () => {
     <Fragment>
       <style>
         {" "}
-        {` button.btn.btn-primary  { background-color: ${
-          localStorage.getItem("button_color")
+        {` button.btn.btn-primary  { background-color: ${localStorage.getItem("button_color")
             ? JSON.parse(localStorage.getItem("button_color"))
             : "#e84455"
-        } !Important};`}{" "}
+          } !Important};`}{" "}
       </style>
 
       <SidePanel
         sidebarLogo={
           logoImageShow == "" ||
-          logoImageShow == null ||
-          logoImageShow == undefined
+            logoImageShow == null ||
+            logoImageShow == undefined
             ? logo
             : `${process.env.REACT_APP_IMAGE_URL}/${logoImageShow}`
         }
@@ -1942,19 +1884,19 @@ const FileDetails = () => {
             <div className="d-flex align-items-center justify-content-between w-100">
               <div className="left-part">
                 <div className="d-flex gap-2 align-items-center">
-                                  <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M11 7H13V9H11V7ZM11 11H13V17H11V11ZM12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20Z"
-                    fill="#00366B"
-                  />
-                </svg>
-                <span>Dossier à vérifier</span>
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M11 7H13V9H11V7ZM11 11H13V17H11V11ZM12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20Z"
+                      fill="#00366B"
+                    />
+                  </svg>
+                  <span>Dossier à vérifier</span>
                 </div>
 
               </div>
@@ -2002,397 +1944,6 @@ const FileDetails = () => {
                   </Link>
                 </div>
               </div>
-{/* 
-              <div className="d-sm-flex align-items-center gap-3 flex-wrap ms-sm-auto text-center">
-                
-                <div className="add-document my-1 my-md-0">
-                  <Link onClick={handleShow}>{t("addDocumentLabel")}</Link>
-                  <Offcanvas
-                    className="add-folder-panel"
-                    placement={"end"}
-                    show={show}
-                    onHide={handleClose}
-                  >
-                    <Offcanvas.Header closeButton>
-                      <Offcanvas.Title>{t("addDocumentLabel")}</Offcanvas.Title>
-                    </Offcanvas.Header>
-                    <Offcanvas.Body>
-             
-
-                      <div className="step-1">
-                        <div className="div">
-                          <div className="step-2">
-                            <h2>
-                              Ajouter un document au dossier <span>*</span>
-                            </h2>
-                            {flashMessage.message && (
-                              <div
-                                className={`mt-3 alert ${
-                                  flashMessage.type === "success"
-                                    ? "alert-success"
-                                    : "alert-danger"
-                                } text-center`}
-                                role="alert"
-                              >
-                                {flashMessage.message}
-                              </div>
-                            )}
-                            <Form.Group
-                              controlId="formFile"
-                              className="file-upload-container mt-4"
-                            >
-                              <div
-                                className="custom-upload-box"
-                                onDragOver={(e) => e.preventDefault()}
-                                onDrop={(e) => {
-                                  e.preventDefault();
-                                  const files = e.dataTransfer.files;
-                                  if (files.length) {
-                                    handleFileChange({ target: { files } });
-                                  }
-                                }}
-                              >
-                                <svg
-                                  width="48"
-                                  height="32"
-                                  viewBox="0 0 48 32"
-                                  fill="none"
-                                  xmlns="http://www.w3.org/2000/svg"
-                                >
-                                  <path
-                                    d="M38.7 12.08C37.34 5.18 31.28 0 24 0C18.22 0 13.2 3.28 10.7 8.08C4.68 8.72 0 13.82 0 20C0 26.62 5.38 32 12 32H38C43.52 32 48 27.52 48 22C48 16.72 43.9 12.44 38.7 12.08ZM38 28H12C7.58 28 4 24.42 4 20C4 15.9 7.06 12.48 11.12 12.06L13.26 11.84L14.26 9.94C16.16 6.28 19.88 4 24 4C29.24 4 33.76 7.72 34.78 12.86L35.38 15.86L38.44 16.08C41.56 16.28 44 18.9 44 22C44 25.3 41.3 28 38 28ZM16 18H21.1V24H26.9V18H32L24 10L16 18Z"
-                                    fill="#00366B"
-                                  />
-                                </svg>
-                                <p className="upload-text">
-                                  {t("DragyourdocumentsLabel")}{" "}
-                                  <span className="browse-link">
-                                    {t("browsemyfilesLabel")}
-                                  </span>
-                                </p>
-                                <span>
-                                  {t("documentsAcceptedLabel")}: mot, exceller,
-                                  pdf, PowerPoint
-                                </span>
-                                <Form.Control
-                                  type="file"
-                                  className="file-input"
-                                  multiple
-                                  onChange={handleFileChange}
-                                />
-                              </div>
-                            </Form.Group>
-                            {fileList.length > 0 && (
-                              <div className="upload-file-list">
-                                {fileList.map((file, index) => (
-                                  <div key={index} className="upload-file">
-                                    <span>{file.name}</span>
-
-                                    <Link
-                                      onClick={() => handleRemoveFile(index)}
-                                    >
-                                      <svg
-                                        width="14"
-                                        height="18"
-                                        viewBox="0 0 14 18"
-                                        fill="none"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                      >
-                                        <path
-                                          d="M11 6V16H3V6H11ZM9.5 0H4.5L3.5 1H0V3H14V1H10.5L9.5 0ZM13 4H1V16C1 17.1 1.9 18 3 18H11C12.1 18 13 17.1 13 16V4Z"
-                                          fill="#e84455"
-                                        />
-                                      </svg>
-                                    </Link>
-                                  </div>
-                                ))}
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    </Offcanvas.Body>
-                    <div className="offcanvas-footer text-end">
-                      <button
-                        type="submit"
-                        className="btn btn-primary"
-                        disabled={documentUploading || !fileList.length > 0}
-                        onClick={HandleAddDocument}
-                      >
-                        {documentUploading ? "Suivant..." : "Suivant"}
-                      </button>
-                    </div>
-                  </Offcanvas>
-                </div>
-
-
-                <div className="my-1 my-md-0">
-                  <MissingDocument
-                    link={true}
-                    sort={sort}
-                    search={search}
-                    currentPage={currentPage}
-                    selectActionType={selectActionType}
-                    GetHistoryListDocument={GetHistoryListDocument}
-                  />
-                </div>
-
-                <div className="my-1 my-md-0">
-                  <Link className="link-wrap" onClick={handleNoteShow}>
-                    Voir les raisons
-                  </Link>
-                </div>
-
-                <p className="m-0 my-1 my-md-0">Envoyer à : </p>
-                <div>
-                  <Form.Select
-                    aria-label="Etat du chantier"
-                    style={{ minHeight: "45px", fontFamily: "Manrope" }}
-                    value={sendToFileStatus}
-                    onChange={(e) => handleSendFileShow(e.target.value)}
-                  >
-                    <option value="" disabled selected>
-                      Envoyer à
-                    </option>
-                    <option value="transfer_to_manager">
-                      Transfert au Gestionnaire
-                    </option>
-                    <option value="transfer_to_broker">
-                      Transfert au Courtier
-                    </option>
-                    <option value="formal_notice">Mise en demeure</option>
-                  </Form.Select>
-                </div>
-
-
-                <div className="check-document">
-
-                  <Offcanvas
-                    className="add-folder-panel check-document-panel"
-                    placement={"end"}
-                    show={showCheck}
-                    onHide={() => handleCheckClose()}
-                  >
-                    <Offcanvas.Header closeButton>
-                      <div className="doc-header">
-                        <p className="m-0">
-                          Vérification dossier{" "}
-                          {showUserDocumentData?.folder_name}
-                        </p>
-                        <div className="right-part">
-                          <p className="m-0">
-                            Dernière sauvegarde -{" "}
-                            {showUserDocumentData?.last_updated}
-                          </p>
-                          <Button onClick={handleShowFinalModal}>
-                            <svg
-                              width="18"
-                              height="14"
-                              viewBox="0 0 18 14"
-                              fill="none"
-                              xmlns="http://www.w3.org/2000/svg"
-                            >
-                              <path
-                                d="M5.8002 10.8998L1.6002 6.6998L0.200195 8.0998L5.8002 13.6998L17.8002 1.6998L16.4002 0.299805L5.8002 10.8998Z"
-                                fill="white"
-                              />
-                            </svg>
-                            Valider la vérification
-                          </Button>
-                        </div>
-                      </div>
-                    </Offcanvas.Header>
-                    <Offcanvas.Body>
-                      <div className="top-header d-md-flex justify-content-between align-items-center">
-                        <Form.Select
-                          className="mb-3 mb-lg-0"
-                          aria-label="statusSelectAria"
-                          value={selectDocumentId}
-                          onChange={(e) => handleDocChange(e)}
-                        >
-                          {showUserDocumentFileData?.length > 0 ? (
-                            showUserDocumentFileData?.map((doc) => (
-                              <option key={doc.id} value={doc.id}>
-                                {doc.filename}
-                              </option>
-                            ))
-                          ) : (
-                            <option value="">{t("NorecordsfoundLabel")}</option>
-                          )}
-                        </Form.Select>
-                        <MissingDocument
-                          link={false}
-                          sort={sort}
-                          search={search}
-                          currentPage={currentPage}
-                          selectActionType={selectActionType}
-                          GetHistoryListDocument={GetHistoryListDocument}
-                        />
-                      </div>
-
-                      <div className="side-by-side-panel">
-                        <div className="left-panel">
-                          <div className="inner-detail">
-                            <div className="header-part">
-                              <div className="div">
-                                <span>Attestation</span>Police{" "}
-                                {selectDocumentFileName ||
-                                  t("NorecordsfoundLabel")}
-                              </div>
-                              <Dropdown>
-                                <Dropdown.Toggle
-                                  variant="success"
-                                  id="dropdown-basic"
-                                >
-                                  <svg
-                                    width="24"
-                                    height="24"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                  >
-                                    <path
-                                      d="M12 8C13.1 8 14 7.1 14 6C14 4.9 13.1 4 12 4C10.9 4 10 4.9 10 6C10 7.1 10.9 8 12 8ZM12 10C10.9 10 10 10.9 10 12C10 13.1 10.9 14 12 14C13.1 14 14 13.1 14 12C14 10.9 13.1 10 12 10ZM12 16C10.9 16 10 16.9 10 18C10 19.1 10.9 20 12 20C13.1 20 14 19.1 14 18C14 16.9 13.1 16 12 16Z"
-                                      fill="white"
-                                    />
-                                  </svg>
-                                </Dropdown.Toggle>
-
-                                <Dropdown.Menu>
-                                  <Dropdown.Item
-                                    onClick={() => handleShowDeleteModal()}
-                                  >
-                                    Supprimer
-                                  </Dropdown.Item>
-                                </Dropdown.Menu>
-                              </Dropdown>
-                            </div>
-                            <div className="main-part">
-                              <div className="pdf-wrapper">
-                                <DocViewer
-                                  style={{ height: "600px", width: "100%" }}
-                                  documents={docs}
-                                  pluginRenderers={DocViewerRenderers}
-                                />
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="right-panel">
-                          <div className="inner-detail">
-                            <div className="header-part">
-                              Vérification document
-                            </div>
-                            <div className="main-part">
-                              {flashMessage.message && (
-                                <div
-                                  className={`alert ${
-                                    flashMessage.type === "success"
-                                      ? "alert-success"
-                                      : "alert-danger"
-                                  } text-center`}
-                                  role="alert"
-                                >
-                                  {flashMessage.message}
-                                </div>
-                              )}
-                              <p className="mb-4">
-                                Compléter les informations relatives au document
-                                ci-contre.
-                              </p>
-                              <Form.Label>
-                                Statut du document <span>*</span>
-                              </Form.Label>
-                              <Form.Select
-                                className="mb-3"
-                                aria-label="statusSelectAria"
-                                value={editUserStatus} // Bind the value to editUserStatus
-                                onChange={(e) =>
-                                  handleStatusChange(e.target.value)
-                                }
-                              >
-                                <option value="to_be_checked">
-                                  {t("toBeCheckedLabel")}
-                                </option>
-                                <option value="verified">
-                                  {t("verified")}
-                                </option>
-                                <option value="invalid">
-                                  {t("invalidLabel")}
-                                </option>
-                              </Form.Select>
-                              <InvalidDocument
-                                showmodal={showmodal}
-                                handleModalClose={handleModalClose}
-                                selectDocumentId={selectDocumentId}
-                                selectDocumentFileName={selectDocumentFileName}
-                              />
-
-                              <Form.Label>
-                                Type de document <span>*</span>
-                              </Form.Label>
-                              <Form.Select
-                                aria-label="Choisir un type de document"
-                                value={selectDocumentType}
-                                onChange={handleDocumentTypeChange}
-                              >
-                                <option value="" disabled>
-                                  Choisir un type de document
-                                </option>
-                                {documentTypeList?.length > 0 ? (
-                                  documentTypeList?.map((doctype) => (
-                                    <option key={doctype.id} value={doctype.id}>
-                                      {doctype.name}
-                                    </option>
-                                  ))
-                                ) : (
-                                  <option value="">
-                                    {t("NorecordsfoundLabel")}
-                                  </option>
-                                )}
-                              </Form.Select>
-                              {currentFileIndex <
-                              userDocumentFileDataChanges.length - 1 ? (
-                                <>
-                                  <Button
-                                    className="mx-w-320 btn btn-primary mt-3"
-                                    onClick={(e) => handleSaveNext(e)}
-                                  >
-                                    Enregistrer et Suivant
-                                  </Button>
-                                </>
-                              ) : (
-                                <>
-                                  <Button
-                                    className="mx-w-320 btn btn-primary mt-3"
-                                    onClick={(e) => handleSaveDocSingle(e)}
-                                  >
-                                    Enregistrer
-                                  </Button>
-                                </>
-                              )}
-                              <div className="d-lg-flex justify-content-between align-items-center mt-auto">
-                                <Link
-                                  className="link-wrap d-block d-lg-inline"
-                                  onClick={handlePrevious}
-                                >
-                                  Document précédent
-                                </Link>
-                                <Link
-                                  className="link-wrap d-block d-lg-inline"
-                                  onClick={handleNext}
-                                >
-                                  Document suivant
-                                </Link>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </Offcanvas.Body>
-                  </Offcanvas>
-                </div>
-              </div> */}
             </div>
             <div className={`second-header ${isVisible ? "show" : ""}`}>
               <div className="dropdown-part">
@@ -2402,15 +1953,24 @@ const FileDetails = () => {
                     <Form.Select
                       aria-label="Export As"
                       style={{ minHeight: "45px", minWidth: "110px" }}
+                      onChange={(e) => handleExportDocumentShow(e.target.value)}
+                      defaultValue=""
                     >
-                      <option value="on_site">PDF</option>
-                      <option value="end_of_site">Excel</option>
+                      <option value="">Sélectionner...</option>
+                      <option value="pdf">PDF</option>
+                      <option value="excel">Exceller</option>
                     </Form.Select>
                   </div>
                   <div className="col-md-3">
-                    <label class="form-label">Ajouter un Document</label>
-                    <Form.Select name="Ajouter">
-                      <option value="">Ajouter un Document</option>
+                    <label class="form-label">{t("addDocumentLabel")}</label>
+                    <Form.Select name="Ajouter" onChange={(e) => {
+                      if (e.target.value == "adddocument") {
+                        handleShow();
+                      }
+                    }}
+                    >
+                      <option value="">Sélectionner...</option>
+                      <option value="adddocument">{t("addDocumentLabel")}</option>
                     </Form.Select>
                   </div>
                   <div className="col-md-3">
@@ -2462,14 +2022,11 @@ const FileDetails = () => {
                             ? t("toBeCheckedLabel")
                             : showUserDocumentData?.status === "validated"
                             ? t("validatedLabel")
-                            : showUserDocumentData?.status ===
-                              "transfer_to_insurer"
+                            : showUserDocumentData?.status === "transfer_to_insurer"
                             ? "Transfert à l'assureur"
-                            : showUserDocumentData?.status ===
-                              "transfer_to_broker"
+                            : showUserDocumentData?.status === "transfer_to_broker"
                             ? "Transfert au Courtier"
-                            : showUserDocumentData?.status ===
-                              "transfer_to_manager"
+                            : showUserDocumentData?.status === "transfer_to_manager"
                             ? "Transfert au Gestionnaire"
                             : showUserDocumentData?.status === "to_be_decided"
                             ? "A statuer"
@@ -2482,25 +2039,25 @@ const FileDetails = () => {
                     <div className="col-md-3 mb-3">
                       <div className="d-flex align-items-start flex-column gap-2">
                         <p className="m-0">DOC </p>
-                        <div className="status">15/07/2025</div>
+                        <div className="status">{showUserDocumentData?.created_at}</div>
                       </div>
                     </div>
                     <div className="col-md-3 mb-3">
                       <div className="d-flex align-items-start flex-column gap-2">
                         <p className="m-0">Date fin prévisionnelle </p>
-                        <div className="status">27/07/2026</div>
+                        <div className="status">{showUserDocumentData?.estimated_completion_date || ""}</div>
                       </div>
                     </div>
                     <div className="col-md-3 mb-3">
                       <div className="d-flex align-items-start flex-column gap-2">
                         <p className="m-0">Coût prévisionnel </p>
-                        <div className="status">10 450 000€</div>
+                        <div className="status">{showUserDocumentData?.estimated_site_cost || ""}</div>
                       </div>
                     </div>
                     <div className="col-md-3 mb-3">
                       <div className="d-flex align-items-start flex-column gap-2">
                         <p className="m-0">Nom du preneur assurance </p>
-                        <div className="status">Taratata patata</div>
+                        <div className="status">{showUserDocumentData?.insurance_policyholder_name || ""}</div>
                       </div>
                     </div>
                   </div>
@@ -2909,18 +2466,16 @@ const FileDetails = () => {
 
           {/* Information Tab */}
           <Tab eventKey="contactinfo" title="Information dossier">
-            {/* <h2>Informations dossier</h2> */}
             {isLoading ? (
               <Loading />
             ) : (
               <Form className="mt-24 " onSubmit={UpdateFolderInfo}>
                 {flashMessage.message && (
                   <div
-                    className={`mt-3 mx-w-320 alert ${
-                      flashMessage.type === "success"
+                    className={`mt-3 mx-w-320 alert ${flashMessage.type === "success"
                         ? "alert-success"
                         : "alert-danger"
-                    } text-center`}
+                      } text-center`}
                     role="alert"
                   >
                     {flashMessage.message}
@@ -2939,7 +2494,7 @@ const FileDetails = () => {
                         type="text"
                         placeholder="N° de dossier"
                         value={showUserFolderName}
-                        onChange={(e) =>setShowUserFolderName(e.target.value)}
+                        onChange={(e) => setShowUserFolderName(e.target.value)}
                       />
                     </Form.Group>
 
@@ -3093,8 +2648,8 @@ const FileDetails = () => {
                     </Form.Group>
                   </div>
                 </div>
-                <Button 
-                  className="btn-secondary" 
+                <Button
+                  className="btn-secondary"
                   type="submit"
                   onClick={(e) => UpdateFolderInfo(e)}
                 >
@@ -3121,8 +2676,8 @@ const FileDetails = () => {
                 <Loading />
               </div>
             )}
-            <Tabs 
-              defaultActiveKey="otherdocument" 
+            <Tabs
+              defaultActiveKey="otherdocument"
               className="mt-0 mb-0 "
               activeKey={activeDocumentTab}
               onSelect={handleSelectDocument}
@@ -3133,9 +2688,7 @@ const FileDetails = () => {
                 title={`Documents (${totalRecordOther || 0})`}
               >
                 <div className="table-wrapper mt-16 p-0">
-                  <div className="d-md-flex align-items-center gap-2 justify-content-between">
-                    {/* <h2 className="m-md-0 mb-3">Documents ({totalRecordOther})</h2> */}
-                  </div>
+                  <div className="d-md-flex align-items-center gap-2 justify-content-between"></div>
                   {isLoading ? (
                     <Loading />
                   ) : (
@@ -3146,222 +2699,222 @@ const FileDetails = () => {
                             {selectedOtherDocColumns.includes(
                               "fileNameLabe"
                             ) && (
-                              <th>
-                                <div className="d-flex align-items-center">
-                                  <span>{t("fileNameLabe")}</span>
-                                  <Link
-                                    className={`sorting-icon ms-2`}
-                                    onClick={() =>
-                                      handleClickRotate("filename")
-                                    }
-                                  >
-                                    {sort.value === "asc" && (
-                                      <svg
-                                        width="24"
-                                        height="24"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                      >
-                                        <path
-                                          d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
-                                          fill="black"
-                                        />
-                                        <path
-                                          d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
-                                          fill="black"
-                                          fillOpacity="0.5"
-                                        />
-                                      </svg>
-                                    )}
+                                <th>
+                                  <div className="d-flex align-items-center">
+                                    <span>{t("fileNameLabe")}</span>
+                                    <Link
+                                      className={`sorting-icon ms-2`}
+                                      onClick={() =>
+                                        handleClickRotate("filename")
+                                      }
+                                    >
+                                      {sort.value === "asc" && (
+                                        <svg
+                                          width="24"
+                                          height="24"
+                                          viewBox="0 0 24 24"
+                                          fill="none"
+                                          xmlns="http://www.w3.org/2000/svg"
+                                        >
+                                          <path
+                                            d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
+                                            fill="black"
+                                          />
+                                          <path
+                                            d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
+                                            fill="black"
+                                            fillOpacity="0.5"
+                                          />
+                                        </svg>
+                                      )}
 
-                                    {sort.value === "desc" && (
-                                      <svg
-                                        width="24"
-                                        height="24"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                      >
-                                        <path
-                                          d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
-                                          fill="black"
-                                          fillOpacity="0.5"
-                                        />
-                                        <path
-                                          d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
-                                          fill="black"
-                                        />
-                                      </svg>
-                                    )}
-                                  </Link>
-                                </div>
-                              </th>
-                            )}
+                                      {sort.value === "desc" && (
+                                        <svg
+                                          width="24"
+                                          height="24"
+                                          viewBox="0 0 24 24"
+                                          fill="none"
+                                          xmlns="http://www.w3.org/2000/svg"
+                                        >
+                                          <path
+                                            d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
+                                            fill="black"
+                                            fillOpacity="0.5"
+                                          />
+                                          <path
+                                            d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
+                                            fill="black"
+                                          />
+                                        </svg>
+                                      )}
+                                    </Link>
+                                  </div>
+                                </th>
+                              )}
                             {selectedOtherDocColumns.includes(
                               "speakerLabel"
                             ) && (
-                              <th className="select-drop elips-dropdown">
-                                <div className="d-flex align-items-center">
-                                  <div>
-                                    <Form.Select
-                                      aria-label="statusSelectAria"
-                                      value={selectSpeakerId}
-                                      onChange={handleTableSpeakerChange}
-                                    >
-                                      <option value="">
-                                        {t("speakerLabel")}
-                                      </option>
-                                      {speakerDropDownList?.length > 0 ? (
-                                        speakerDropDownList?.map((speaker) => (
-                                          <option
-                                            key={speaker.id}
-                                            value={speaker.id}
-                                          >
-                                            {speaker.company_name +
-                                              " - " +
-                                              speaker.siren_number}
-                                          </option>
-                                        ))
-                                      ) : (
+                                <th className="select-drop elips-dropdown">
+                                  <div className="d-flex align-items-center">
+                                    <div>
+                                      <Form.Select
+                                        aria-label="statusSelectAria"
+                                        value={selectSpeakerId}
+                                        onChange={handleTableSpeakerChange}
+                                      >
                                         <option value="">
-                                          {t("NorecordsfoundLabel")}
+                                          {t("speakerLabel")}
                                         </option>
-                                      )}
-                                    </Form.Select>
-                                  </div>
-                                  <div>
-                                    <Link
-                                      className={`sorting-icon ms-2`}
-                                      onClick={() =>
-                                        handleClickRotate(
-                                          "speaker.company_name"
-                                        )
-                                      }
-                                    >
-                                      {sort.value === "asc" && (
-                                        <svg
-                                          width="24"
-                                          height="24"
-                                          viewBox="0 0 24 24"
-                                          fill="none"
-                                          xmlns="http://www.w3.org/2000/svg"
-                                        >
-                                          <path
-                                            d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
-                                            fill="black"
-                                          />
-                                          <path
-                                            d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
-                                            fill="black"
-                                            fillOpacity="0.5"
-                                          />
-                                        </svg>
-                                      )}
+                                        {speakerDropDownList?.length > 0 ? (
+                                          speakerDropDownList?.map((speaker) => (
+                                            <option
+                                              key={speaker.id}
+                                              value={speaker.id}
+                                            >
+                                              {speaker.company_name +
+                                                " - " +
+                                                speaker.siren_number}
+                                            </option>
+                                          ))
+                                        ) : (
+                                          <option value="">
+                                            {t("NorecordsfoundLabel")}
+                                          </option>
+                                        )}
+                                      </Form.Select>
+                                    </div>
+                                    <div>
+                                      <Link
+                                        className={`sorting-icon ms-2`}
+                                        onClick={() =>
+                                          handleClickRotate(
+                                            "speaker.company_name"
+                                          )
+                                        }
+                                      >
+                                        {sort.value === "asc" && (
+                                          <svg
+                                            width="24"
+                                            height="24"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                          >
+                                            <path
+                                              d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
+                                              fill="black"
+                                            />
+                                            <path
+                                              d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
+                                              fill="black"
+                                              fillOpacity="0.5"
+                                            />
+                                          </svg>
+                                        )}
 
-                                      {sort.value === "desc" && (
-                                        <svg
-                                          width="24"
-                                          height="24"
-                                          viewBox="0 0 24 24"
-                                          fill="none"
-                                          xmlns="http://www.w3.org/2000/svg"
-                                        >
-                                          <path
-                                            d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
-                                            fill="black"
-                                            fillOpacity="0.5"
-                                          />
-                                          <path
-                                            d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
-                                            fill="black"
-                                          />
-                                        </svg>
-                                      )}
-                                    </Link>
+                                        {sort.value === "desc" && (
+                                          <svg
+                                            width="24"
+                                            height="24"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                          >
+                                            <path
+                                              d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
+                                              fill="black"
+                                              fillOpacity="0.5"
+                                            />
+                                            <path
+                                              d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
+                                              fill="black"
+                                            />
+                                          </svg>
+                                        )}
+                                      </Link>
+                                    </div>
                                   </div>
-                                </div>
-                              </th>
-                            )}
+                                </th>
+                              )}
                             {selectedOtherDocColumns.includes(
                               "Type de document"
                             ) && (
-                              <th className="select-drop elips-dropdown">
-                                <div className="d-flex align-items-center">
-                                  <div>
-                                    <Form.Select
-                                      aria-label="Choisir un type de document"
-                                      value={selectDocumentType}
-                                      onChange={handleDocumentTypeChange}
-                                    >
-                                      <option value="">Type de document</option>
-                                      {documentTypeList?.length > 0 ? (
-                                        documentTypeList?.map((doctype) => (
-                                          <option
-                                            key={doctype.id}
-                                            value={doctype.id}
-                                          >
-                                            {doctype.name}
+                                <th className="select-drop elips-dropdown">
+                                  <div className="d-flex align-items-center">
+                                    <div>
+                                      <Form.Select
+                                        aria-label="Choisir un type de document"
+                                        value={selectDocumentType}
+                                        onChange={handleDocumentTypeChange}
+                                      >
+                                        <option value="">Type de document</option>
+                                        {documentTypeList?.length > 0 ? (
+                                          documentTypeList?.map((doctype) => (
+                                            <option
+                                              key={doctype.id}
+                                              value={doctype.id}
+                                            >
+                                              {doctype.name}
+                                            </option>
+                                          ))
+                                        ) : (
+                                          <option value="">
+                                            {t("NorecordsfoundLabel")}
                                           </option>
-                                        ))
-                                      ) : (
-                                        <option value="">
-                                          {t("NorecordsfoundLabel")}
-                                        </option>
-                                      )}
-                                    </Form.Select>
-                                  </div>
-                                  <div>
-                                    <Link
-                                      className={`sorting-icon ms-2`}
-                                      onClick={() =>
-                                        handleClickRotate("docType.name")
-                                      }
-                                    >
-                                      {sort.value === "asc" && (
-                                        <svg
-                                          width="24"
-                                          height="24"
-                                          viewBox="0 0 24 24"
-                                          fill="none"
-                                          xmlns="http://www.w3.org/2000/svg"
-                                        >
-                                          <path
-                                            d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
-                                            fill="black"
-                                          />
-                                          <path
-                                            d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
-                                            fill="black"
-                                            fillOpacity="0.5"
-                                          />
-                                        </svg>
-                                      )}
+                                        )}
+                                      </Form.Select>
+                                    </div>
+                                    <div>
+                                      <Link
+                                        className={`sorting-icon ms-2`}
+                                        onClick={() =>
+                                          handleClickRotate("docType.name")
+                                        }
+                                      >
+                                        {sort.value === "asc" && (
+                                          <svg
+                                            width="24"
+                                            height="24"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                          >
+                                            <path
+                                              d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
+                                              fill="black"
+                                            />
+                                            <path
+                                              d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
+                                              fill="black"
+                                              fillOpacity="0.5"
+                                            />
+                                          </svg>
+                                        )}
 
-                                      {sort.value === "desc" && (
-                                        <svg
-                                          width="24"
-                                          height="24"
-                                          viewBox="0 0 24 24"
-                                          fill="none"
-                                          xmlns="http://www.w3.org/2000/svg"
-                                        >
-                                          <path
-                                            d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
-                                            fill="black"
-                                            fillOpacity="0.5"
-                                          />
-                                          <path
-                                            d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
-                                            fill="black"
-                                          />
-                                        </svg>
-                                      )}
-                                    </Link>
+                                        {sort.value === "desc" && (
+                                          <svg
+                                            width="24"
+                                            height="24"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                          >
+                                            <path
+                                              d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
+                                              fill="black"
+                                              fillOpacity="0.5"
+                                            />
+                                            <path
+                                              d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
+                                              fill="black"
+                                            />
+                                          </svg>
+                                        )}
+                                      </Link>
+                                    </div>
                                   </div>
-                                </div>
-                              </th>
-                            )}
+                                </th>
+                              )}
                             {selectedOtherDocColumns.includes("status") && (
                               <th className="select-drop elips-dropdown">
                                 <div className="d-flex align-items-center">
@@ -3459,38 +3012,39 @@ const FileDetails = () => {
                         </thead>
                         <tbody>
                           {showOtherDocument?.length > 0 &&
-                          selectedOtherDocColumns?.length > 0 ? (
+                            selectedOtherDocColumns?.length > 0 ? (
                             showOtherDocument?.map((data) => (
                               <tr
                                 style={{
                                   cursor:
                                     data.status === "invalid" && "pointer",
                                 }}
-                                onClick={() =>
-                                  data.status === "invalid" &&
-                                  handleInvalidReason(data.id)
-                                }
+                                onClick={(e) => {
+                                  if (data.status === "invalid" && !e.target.closest(".action-btn")) {
+                                    handleInvalidReason(data.id);
+                                  }
+                                }}
                               >
                                 {selectedOtherDocColumns.includes(
                                   "fileNameLabe"
                                 ) && (
-                                  <td>
-                                    <span className="text-elips">
-                                      {data.filename}
-                                    </span>
-                                  </td>
-                                )}
+                                    <td>
+                                      <span className="text-elips">
+                                        {data.filename}
+                                      </span>
+                                    </td>
+                                  )}
                                 {selectedOtherDocColumns.includes(
                                   "speakerLabel"
                                 ) && (
-                                  <td>
-                                    {data.speaker
-                                      ? data.speaker?.company_name +
+                                    <td>
+                                      {data.speaker
+                                        ? data.speaker?.company_name +
                                         " - " +
                                         data.speaker?.siren_number
-                                      : "-"}
-                                  </td>
-                                )}
+                                        : "-"}
+                                    </td>
+                                  )}
                                 {selectedOtherDocColumns.includes(
                                   "Type de document"
                                 ) && <td>{data.docType.name}</td>}
@@ -3514,180 +3068,178 @@ const FileDetails = () => {
                                 {selectedOtherDocColumns.includes(
                                   "Actions"
                                 ) && (
-                                  <td>
-                                    <div className="action-btn">
-                                      <Link
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          handleViewShow();
-                                          setViewRowData(data);
-                                        }}
-                                        className="view"
-                                        href="/user-management"
-                                        data-discover="true"
-                                        title="Voir"
-                                      >
-                                        <svg
-                                          width="24"
-                                          height="24"
-                                          viewBox="0 0 24 24"
-                                          fill="none"
-                                          xmlns="http://www.w3.org/2000/svg"
+                                    <td>
+                                      <div className="action-btn">
+                                        <Link
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleViewShow();
+                                            setViewRowData(data);
+                                          }}
+                                          className="view"
+                                          href="/user-management"
+                                          data-discover="true"
+                                          title="Voir"
                                         >
-                                          <path
-                                            d="M12 6.5C15.79 6.5 19.17 8.63 20.82 12C19.17 15.37 15.8 17.5 12 17.5C8.2 17.5 4.83 15.37 3.18 12C4.83 8.63 8.21 6.5 12 6.5ZM12 4.5C7 4.5 2.73 7.61 1 12C2.73 16.39 7 19.5 12 19.5C17 19.5 21.27 16.39 23 12C21.27 7.61 17 4.5 12 4.5ZM12 9.5C13.38 9.5 14.5 10.62 14.5 12C14.5 13.38 13.38 14.5 12 14.5C10.62 14.5 9.5 13.38 9.5 12C9.5 10.62 10.62 9.5 12 9.5ZM12 7.5C9.52 7.5 7.5 9.52 7.5 12C7.5 14.48 9.52 16.5 12 16.5C14.48 16.5 16.5 14.48 16.5 12C16.5 9.52 14.48 7.5 12 7.5Z"
-                                            fill="#00366B"
-                                          />
-                                        </svg>
-                                      </Link>
-                                      <Link
-                                        className="addnote"
-                                        href="/user-management"
-                                        data-discover="true"
-                                        onClick={() =>
-                                          handleAddNoteModalOpen(
-                                            data.id,
-                                            data.filename
-                                          )
-                                        }
-                                      >
-                                        <svg
-                                          width="24"
-                                          height="24"
-                                          viewBox="0 0 24 24"
-                                          fill="none"
-                                          xmlns="http://www.w3.org/2000/svg"
+                                          <svg
+                                            width="24"
+                                            height="24"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                          >
+                                            <path
+                                              d="M12 6.5C15.79 6.5 19.17 8.63 20.82 12C19.17 15.37 15.8 17.5 12 17.5C8.2 17.5 4.83 15.37 3.18 12C4.83 8.63 8.21 6.5 12 6.5ZM12 4.5C7 4.5 2.73 7.61 1 12C2.73 16.39 7 19.5 12 19.5C17 19.5 21.27 16.39 23 12C21.27 7.61 17 4.5 12 4.5ZM12 9.5C13.38 9.5 14.5 10.62 14.5 12C14.5 13.38 13.38 14.5 12 14.5C10.62 14.5 9.5 13.38 9.5 12C9.5 10.62 10.62 9.5 12 9.5ZM12 7.5C9.52 7.5 7.5 9.52 7.5 12C7.5 14.48 9.52 16.5 12 16.5C14.48 16.5 16.5 14.48 16.5 12C16.5 9.52 14.48 7.5 12 7.5Z"
+                                              fill="#00366B"
+                                            />
+                                          </svg>
+                                        </Link>
+                                        <Link
+                                          className="addnote"
+                                          href="/user-management"
+                                          data-discover="true"
+                                          onClick={() =>
+                                            handleAddNoteModalOpen(
+                                              data.id,
+                                              data.filename
+                                            )
+                                          }
                                         >
-                                          <rect
-                                            x="4"
-                                            y="3"
-                                            width="16"
-                                            height="18"
-                                            rx="2"
-                                            stroke="#00366B"
-                                            stroke-width="2"
-                                          />
-                                          <line
-                                            x1="8"
-                                            y1="7"
-                                            x2="16"
-                                            y2="7"
-                                            stroke="#00366B"
-                                            stroke-width="2"
-                                            stroke-linecap="round"
-                                          />
-                                          <line
-                                            x1="8"
-                                            y1="11"
-                                            x2="16"
-                                            y2="11"
-                                            stroke="#00366B"
-                                            stroke-width="2"
-                                            stroke-linecap="round"
-                                          />
-                                          <line
-                                            x1="8"
-                                            y1="15"
-                                            x2="13"
-                                            y2="15"
-                                            stroke="#00366B"
-                                            stroke-width="2"
-                                            stroke-linecap="round"
-                                          />
-                                        </svg>
-                                      </Link>
-                                      <Link
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          e.preventDefault();
-                                          HandleDownloadFile(data);
-                                        }}
-                                        className="download"
-                                        href="/user-management"
-                                        data-discover="true"
-                                        title="Télécharger"
-                                      >
-                                        <svg
-                                          width="24"
-                                          height="24"
-                                          viewBox="0 0 24 24"
-                                          fill="none"
-                                          xmlns="http://www.w3.org/2000/svg"
+                                          <svg
+                                            width="24"
+                                            height="24"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                          >
+                                            <rect
+                                              x="4"
+                                              y="3"
+                                              width="16"
+                                              height="18"
+                                              rx="2"
+                                              stroke="#00366B"
+                                              stroke-width="2"
+                                            />
+                                            <line
+                                              x1="8"
+                                              y1="7"
+                                              x2="16"
+                                              y2="7"
+                                              stroke="#00366B"
+                                              stroke-width="2"
+                                              stroke-linecap="round"
+                                            />
+                                            <line
+                                              x1="8"
+                                              y1="11"
+                                              x2="16"
+                                              y2="11"
+                                              stroke="#00366B"
+                                              stroke-width="2"
+                                              stroke-linecap="round"
+                                            />
+                                            <line
+                                              x1="8"
+                                              y1="15"
+                                              x2="13"
+                                              y2="15"
+                                              stroke="#00366B"
+                                              stroke-width="2"
+                                              stroke-linecap="round"
+                                            />
+                                          </svg>
+                                        </Link>
+                                        <Link
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            e.preventDefault();
+                                            HandleDownloadFile(data);
+                                          }}
+                                          className="download"
+                                          href="/user-management"
+                                          data-discover="true"
+                                          title="Télécharger"
                                         >
-                                          <path
-                                            d="M14 2H6C4.9 2 4.01 2.9 4.01 4L4 20C4 21.1 4.89 22 5.99 22H18C19.1 22 20 21.1 20 20V8L14 2ZM18 20H6V4H13V9H18V20Z"
-                                            fill="#00366B"
-                                          />
-                                          <path
-                                            d="M8 14L12 18L16 14"
-                                            stroke="#00366B"
-                                            stroke-width="1.5"
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                          />
-                                          <path
-                                            d="M12 11V18"
-                                            stroke="#00366B"
-                                            stroke-width="1.5"
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                          />
-                                        </svg>
-                                      </Link>
-                                      {/* {data.status !== "verified" && */}
-                                      <Link
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          handleReplaceShow();
-                                          setShowDocumentId(data.id);
-                                          setShowDocumentName(data.filename);
-                                        }}
-                                        className="doc"
-                                        href="/user-management"
-                                        data-discover="true"
-                                        title="Téléverser"
-                                      >
-                                        <svg
-                                          width="24"
-                                          height="24"
-                                          viewBox="0 0 24 24"
-                                          fill="none"
-                                          xmlns="http://www.w3.org/2000/svg"
+                                          <svg
+                                            width="24"
+                                            height="24"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                          >
+                                            <path
+                                              d="M14 2H6C4.9 2 4.01 2.9 4.01 4L4 20C4 21.1 4.89 22 5.99 22H18C19.1 22 20 21.1 20 20V8L14 2ZM18 20H6V4H13V9H18V20Z"
+                                              fill="#00366B"
+                                            />
+                                            <path
+                                              d="M8 14L12 18L16 14"
+                                              stroke="#00366B"
+                                              stroke-width="1.5"
+                                              stroke-linecap="round"
+                                              stroke-linejoin="round"
+                                            />
+                                            <path
+                                              d="M12 11V18"
+                                              stroke="#00366B"
+                                              stroke-width="1.5"
+                                              stroke-linecap="round"
+                                              stroke-linejoin="round"
+                                            />
+                                          </svg>
+                                        </Link>
+                                        <Link
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleReplaceShow();
+                                            setShowDocumentId(data.id);
+                                            setShowDocumentName(data.filename);
+                                          }}
+                                          className="doc"
+                                          href="/user-management"
+                                          data-discover="true"
+                                          title="Téléverser"
                                         >
-                                          <path
-                                            d="M14 2H6C4.9 2 4.01 2.9 4.01 4L4 20C4 21.1 4.89 22 5.99 22H18C19.1 22 20 21.1 20 20V8L14 2ZM18 20H6V4H13V9H18V20ZM8 15.01L9.41 16.42L11 14.84V19H13V14.84L14.59 16.43L16 15.01L12.01 11L8 15.01Z"
-                                            fill="#00366B"
-                                          />
-                                        </svg>
-                                      </Link>
-                                      {/* } */}
-                                      <Link
-                                        className="delete"
-                                        href="/user-management"
-                                        data-discover="true"
-                                        title="Supprimer"
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          handleShowDeleteModal();
-                                          setShowDocumentId(data.id);
-                                        }}
-                                      >
-                                        <svg
-                                          width="24"
-                                          height="24"
-                                          viewBox="0 0 24 24"
-                                          fill="none"
-                                          xmlns="http://www.w3.org/2000/svg"
+                                          <svg
+                                            width="24"
+                                            height="24"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                          >
+                                            <path
+                                              d="M14 2H6C4.9 2 4.01 2.9 4.01 4L4 20C4 21.1 4.89 22 5.99 22H18C19.1 22 20 21.1 20 20V8L14 2ZM18 20H6V4H13V9H18V20ZM8 15.01L9.41 16.42L11 14.84V19H13V14.84L14.59 16.43L16 15.01L12.01 11L8 15.01Z"
+                                              fill="#00366B"
+                                            />
+                                          </svg>
+                                        </Link>
+                                        <Link
+                                          className="delete"
+                                          href="/user-management"
+                                          data-discover="true"
+                                          title="Supprimer"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleShowDeleteModal();
+                                            setShowDocumentId(data.id);
+                                          }}
                                         >
-                                          <path
-                                            d="M16 9V19H8V9H16ZM14.5 3H9.5L8.5 4H5V6H19V4H15.5L14.5 3ZM18 7H6V19C6 20.1 6.9 21 8 21H16C17.1 21 18 20.1 18 19V7Z"
-                                            fill="#00366B"
-                                          />
-                                        </svg>
-                                      </Link>
-                                    </div>
-                                  </td>
-                                )}
+                                          <svg
+                                            width="24"
+                                            height="24"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                          >
+                                            <path
+                                              d="M16 9V19H8V9H16ZM14.5 3H9.5L8.5 4H5V6H19V4H15.5L14.5 3ZM18 7H6V19C6 20.1 6.9 21 8 21H16C17.1 21 18 20.1 18 19V7Z"
+                                              fill="#00366B"
+                                            />
+                                          </svg>
+                                        </Link>
+                                      </div>
+                                    </td>
+                                  )}
                                 <td></td>
                               </tr>
                             ))
@@ -3719,7 +3271,6 @@ const FileDetails = () => {
               >
                 <div className="table-wrapper mt-16 p-0">
                   <div className="d-md-flex align-items-center gap-2 justify-content-between">
-                    {/* <h2 className="m-md-0 mb-3">Documents manquants ({totalMissingRecords})</h2> */}
                     <div className="">
                       <Offcanvas
                         className="add-folder-panel"
@@ -3741,11 +3292,10 @@ const FileDetails = () => {
                                 </h2>
                                 {flashMessageStoreDoc.message && (
                                   <div
-                                    className={`mt-3 alert ${
-                                      flashMessageStoreDoc.type === "success"
+                                    className={`mt-3 alert ${flashMessageStoreDoc.type === "success"
                                         ? "alert-success"
                                         : "alert-danger"
-                                    } text-center`}
+                                      } text-center`}
                                     role="alert"
                                   >
                                     {flashMessageStoreDoc.message}
@@ -4029,11 +3579,10 @@ const FileDetails = () => {
                   <div className="col-md-4">
                     {flashMessage.message && (
                       <div
-                        className={`alert ${
-                          flashMessage.type === "success"
+                        className={`alert ${flashMessage.type === "success"
                             ? "alert-success"
                             : "alert-danger"
-                        } text-center`}
+                          } text-center`}
                         role="alert"
                       >
                         {flashMessage.message}
@@ -4041,11 +3590,10 @@ const FileDetails = () => {
                     )}
                     {flashMessageStoreDoc.message && (
                       <div
-                        className={`mt-3 alert ${
-                          flashMessageStoreDoc.type === "success"
+                        className={`mt-3 alert ${flashMessageStoreDoc.type === "success"
                             ? "alert-success"
                             : "alert-danger"
-                        } text-center`}
+                          } text-center`}
                         role="alert"
                       >
                         {flashMessageStoreDoc.message}
@@ -4297,7 +3845,6 @@ const FileDetails = () => {
                                               />
                                             </svg>
                                           </Link>
-                                          {/* {data.status !== "verified" && */}
                                           <Link
                                             className="delete"
                                             data-discover="true"
@@ -4321,7 +3868,6 @@ const FileDetails = () => {
                                               />
                                             </svg>
                                           </Link>
-                                          {/* } */}
                                         </td>
                                       </tr>
                                     ))
@@ -4353,11 +3899,10 @@ const FileDetails = () => {
                       >
                         {flashMessage.message && (
                           <div
-                            className={`alert ${
-                              flashMessage.type === "success"
+                            className={`alert ${flashMessage.type === "success"
                                 ? "alert-success"
                                 : "alert-danger"
-                            } text-center`}
+                              } text-center`}
                             role="alert"
                           >
                             {flashMessage.message}
@@ -4692,60 +4237,60 @@ const FileDetails = () => {
                           {selectedSpeakerColumns.includes(
                             "Doc. Manquants"
                           ) && (
-                            <th>
-                              <div className="d-flex align-items-center">
-                                <span>Doc. Manquants</span>
-                                <div>
-                                  <Link
-                                    className={`sorting-icon ms-2`}
-                                    onClick={() =>
-                                      handleClickRotate("user_document_count")
-                                    }
-                                  >
-                                    {sort.value === "asc" && (
-                                      <svg
-                                        width="24"
-                                        height="24"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                      >
-                                        <path
-                                          d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
-                                          fill="black"
-                                        />
-                                        <path
-                                          d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
-                                          fill="black"
-                                          fillOpacity="0.5"
-                                        />
-                                      </svg>
-                                    )}
+                              <th>
+                                <div className="d-flex align-items-center">
+                                  <span>Doc. Manquants</span>
+                                  <div>
+                                    <Link
+                                      className={`sorting-icon ms-2`}
+                                      onClick={() =>
+                                        handleClickRotate("user_document_count")
+                                      }
+                                    >
+                                      {sort.value === "asc" && (
+                                        <svg
+                                          width="24"
+                                          height="24"
+                                          viewBox="0 0 24 24"
+                                          fill="none"
+                                          xmlns="http://www.w3.org/2000/svg"
+                                        >
+                                          <path
+                                            d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
+                                            fill="black"
+                                          />
+                                          <path
+                                            d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
+                                            fill="black"
+                                            fillOpacity="0.5"
+                                          />
+                                        </svg>
+                                      )}
 
-                                    {sort.value === "desc" && (
-                                      <svg
-                                        width="24"
-                                        height="24"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                      >
-                                        <path
-                                          d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
-                                          fill="black"
-                                          fillOpacity="0.5"
-                                        />
-                                        <path
-                                          d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
-                                          fill="black"
-                                        />
-                                      </svg>
-                                    )}
-                                  </Link>
+                                      {sort.value === "desc" && (
+                                        <svg
+                                          width="24"
+                                          height="24"
+                                          viewBox="0 0 24 24"
+                                          fill="none"
+                                          xmlns="http://www.w3.org/2000/svg"
+                                        >
+                                          <path
+                                            d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
+                                            fill="black"
+                                            fillOpacity="0.5"
+                                          />
+                                          <path
+                                            d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
+                                            fill="black"
+                                          />
+                                        </svg>
+                                      )}
+                                    </Link>
+                                  </div>
                                 </div>
-                              </div>
-                            </th>
-                          )}
+                              </th>
+                            )}
                           {selectedSpeakerColumns.includes("Actions") && (
                             <th>Actions</th>
                           )}
@@ -4769,7 +4314,7 @@ const FileDetails = () => {
                       </thead>
                       <tbody>
                         {speakerList?.length > 0 &&
-                        selectedSpeakerColumns.length > 0 ? (
+                          selectedSpeakerColumns.length > 0 ? (
                           speakerList?.map((data) => (
                             <tr>
                               {selectedSpeakerColumns.includes(
@@ -4778,12 +4323,12 @@ const FileDetails = () => {
                               {selectedSpeakerColumns.includes(
                                 "Intervenant"
                               ) && (
-                                <td>
-                                  <span className="text-elips">
-                                    {data.company_name}
-                                  </span>
-                                </td>
-                              )}
+                                  <td>
+                                    <span className="text-elips">
+                                      {data.company_name}
+                                    </span>
+                                  </td>
+                                )}
                               {selectedSpeakerColumns.includes(
                                 "Dernière MaJ"
                               ) && <td>{data.updated_at}</td>}
@@ -4800,9 +4345,9 @@ const FileDetails = () => {
                                 <td>
                                   <div className="action-btn">
                                     <Link
-                                        onClick={(e) => {
+                                      onClick={(e) => {
                                         e.stopPropagation();
-                                        handleViewShowSpeaker();
+                                        setShowViewSpeaker(true);
                                         setShowSpeakerId(data.id);
                                         SpeakerDetail(data.id);
                                         setTotalSpeakerDocument(data.user_document_count);
@@ -4881,7 +4426,6 @@ const FileDetails = () => {
           <Tab eventKey="history" title="Historique">
             <div className="table-wrapper mt-16 p-0">
               <div className="d-md-flex align-items-center gap-2 justify-content-between">
-                {/* <h2 className="m-md-0 mb-3">Documents manquants ({totalMissingRecords})</h2> */}
                 <div className=""></div>
                 <Form.Group
                   className="relative"
@@ -5003,6 +4547,121 @@ const FileDetails = () => {
         selectDocumentFileName={selectedAddNoteDocName}
       />
 
+      {/* Add Document */}
+      <Offcanvas
+        className="add-folder-panel"
+        placement={"end"}
+        show={show}
+        onHide={handleClose}
+      >
+        <Offcanvas.Header closeButton>
+          <Offcanvas.Title>{t("addDocumentLabel")}</Offcanvas.Title>
+        </Offcanvas.Header>
+        <Offcanvas.Body>
+          <div className="step-1">
+            <div className="div">
+              <div className="step-2">
+                <h2>
+                  Ajouter un document au dossier <span>*</span>
+                </h2>
+                {flashMessage.message && (
+                  <div
+                    className={`mt-3 alert ${flashMessage.type === "success"
+                      ? "alert-success"
+                      : "alert-danger"
+                      } text-center`}
+                    role="alert"
+                  >
+                    {flashMessage.message}
+                  </div>
+                )}
+                <Form.Group
+                  controlId="formFile"
+                  className="file-upload-container mt-4"
+                >
+                  <div
+                    className="custom-upload-box"
+                    onDragOver={(e) => e.preventDefault()}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      const files = e.dataTransfer.files;
+                      if (files.length) {
+                        handleFileChange({ target: { files } });
+                      }
+                    }}
+                  >
+                    <svg
+                      width="48"
+                      height="32"
+                      viewBox="0 0 48 32"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M38.7 12.08C37.34 5.18 31.28 0 24 0C18.22 0 13.2 3.28 10.7 8.08C4.68 8.72 0 13.82 0 20C0 26.62 5.38 32 12 32H38C43.52 32 48 27.52 48 22C48 16.72 43.9 12.44 38.7 12.08ZM38 28H12C7.58 28 4 24.42 4 20C4 15.9 7.06 12.48 11.12 12.06L13.26 11.84L14.26 9.94C16.16 6.28 19.88 4 24 4C29.24 4 33.76 7.72 34.78 12.86L35.38 15.86L38.44 16.08C41.56 16.28 44 18.9 44 22C44 25.3 41.3 28 38 28ZM16 18H21.1V24H26.9V18H32L24 10L16 18Z"
+                        fill="#00366B"
+                      />
+                    </svg>
+                    <p className="upload-text">
+                      {t("DragyourdocumentsLabel")}{" "}
+                      <span className="browse-link">
+                        {t("browsemyfilesLabel")}
+                      </span>
+                    </p>
+                    <span>
+                      {t("documentsAcceptedLabel")}: mot, exceller,
+                      pdf, PowerPoint
+                    </span>
+                    <Form.Control
+                      type="file"
+                      className="file-input"
+                      multiple
+                      onChange={handleFileChange}
+                    />
+                  </div>
+                </Form.Group>
+                {fileList.length > 0 && (
+                  <div className="upload-file-list">
+                    {fileList.map((file, index) => (
+                      <div key={index} className="upload-file">
+                        <span>{file.name}</span>
+
+                        <Link
+                          onClick={() => handleRemoveFile(index)}
+                        >
+                          <svg
+                            width="14"
+                            height="18"
+                            viewBox="0 0 14 18"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              d="M11 6V16H3V6H11ZM9.5 0H4.5L3.5 1H0V3H14V1H10.5L9.5 0ZM13 4H1V16C1 17.1 1.9 18 3 18H11C12.1 18 13 17.1 13 16V4Z"
+                              fill="#e84455"
+                            />
+                          </svg>
+                        </Link>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </Offcanvas.Body>
+        <div className="offcanvas-footer text-end">
+          <button
+            type="submit"
+            className="btn btn-primary"
+            disabled={documentUploading || !fileList.length > 0}
+            onClick={HandleAddDocument}
+          >
+            {documentUploading ? "Suivant..." : "Suivant"}
+          </button>
+        </div>
+      </Offcanvas>
+
       {/* Update Speaker Documents */}
       <Offcanvas
         className="add-folder-panel"
@@ -5027,11 +4686,10 @@ const FileDetails = () => {
                 )}
                 {flashMessageStoreDoc.message && (
                   <div
-                    className={`mt-3 alert ${
-                      flashMessageStoreDoc.type === "success"
+                    className={`mt-3 alert ${flashMessageStoreDoc.type === "success"
                         ? "alert-success"
                         : "alert-danger"
-                    } text-center`}
+                      } text-center`}
                     role="alert"
                   >
                     {flashMessageStoreDoc.message}
@@ -5135,8 +4793,8 @@ const FileDetails = () => {
               {t("brokerlabel")}:{" "}
               {viewRowData?.user_document?.broker
                 ? viewRowData?.user_document?.broker?.first_name +
-                  " " +
-                  viewRowData?.user_document?.broker?.last_name
+                " " +
+                viewRowData?.user_document?.broker?.last_name
                 : "Sans"}
             </h2>
             <div className="table-wrapper mt-16 p-0">
@@ -5178,9 +4836,9 @@ const FileDetails = () => {
                         <td>
                           {viewRowData?.speaker
                             ? viewRowData?.speaker?.company_name +
-                              (viewRowData?.speaker?.siren_number
-                                ? " - " + viewRowData?.speaker?.siren_number
-                                : "")
+                            (viewRowData?.speaker?.siren_number
+                              ? " - " + viewRowData?.speaker?.siren_number
+                              : "")
                             : ""}
                         </td>
                       )}
@@ -5232,49 +4890,6 @@ const FileDetails = () => {
           </div>
         </Offcanvas.Body>
       </Offcanvas>
-
-      {/* Validation Document Confirmation Popup */}
-      <Modal
-        className="final-modal"
-        show={showFinalModal}
-        onHide={handleCloseFinalModal}
-      >
-        <Modal.Header closeButton>
-          <Modal.Title>Transmettre dossier</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <h2 className="mb-3">Finalisation du dossier {showUserFolderName}</h2>
-          <p>
-            En finalisant le dossier, vous garantissez avoir effectuer les
-            informations suivantes:
-          </p>
-          <ul>
-            <li>Renseigner tous les champs obligatoires</li>
-            <li>Renseigner un maximum de champs optionnels</li>
-            <li>Vérifier la validité de chaque document</li>
-            <li>
-              Vérifier la présence de tous les documents nécessaires au
-              traitement du dossier
-            </li>
-          </ul>
-          <p className="mb-5">
-            Après confirmation, les éléments du dossier seront envoyés au
-            système d'information ACTURIS.
-          </p>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button
-            className="cancel-btn"
-            variant="primary"
-            onClick={handleCloseFinalModal}
-          >
-            Annuler
-          </Button>
-          <Button variant="primary" onClick={ValidateDocumentFile}>
-            Confirmer et finalizer
-          </Button>
-        </Modal.Footer>
-      </Modal>
 
       {/* Delete Document Confirmation Popup */}
       <Modal
@@ -5398,7 +5013,7 @@ const FileDetails = () => {
           </div>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={handleInvalidReasonModalClose}>
+          <Button className="cancel-btn" variant="primary" onClick={handleInvalidReasonModalClose}>
             Fermer
           </Button>
         </Modal.Footer>
@@ -5633,9 +5248,8 @@ const FileDetails = () => {
                                 }}
                               >
                                 —{" "}
-                                {`${data.added_by?.first_name ?? ""} ${
-                                  data.added_by?.last_name ?? ""
-                                }`}
+                                {`${data.added_by?.first_name ?? ""} ${data.added_by?.last_name ?? ""
+                                  }`}
                               </p>
                             )}
 
@@ -5653,6 +5267,39 @@ const FileDetails = () => {
           </div>
         </Offcanvas.Body>
       </Offcanvas>
+
+      {/* Export Popup */}
+      <Modal
+        className="missing-doc-modal"
+        show={exportDocumentOpen}
+        onHide={() => setExportDocumentOpen(true)}
+      >
+        <Modal.Header closeButton onHide={handleExportDocumentClose}>
+          <Modal.Title>
+            <h2>Confirmer</h2>
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <span className="complete-process">
+            Êtes-vous sûr de vouloir télécharger les documents{" "}
+            {fileType == "pdf" ? "PDF" : fileType == "excel" ? "Exceller" : ""}?
+          </span>
+        </Modal.Body>
+        <Modal.Footer>
+          <div className="text-end">
+            <Button
+              variant="primary"
+              onClick={() =>
+                ExportDocumentFile(id, fileType, () =>
+                  setExportDocumentOpen(false)
+                )
+              }
+            >
+              {t("confirmbtnLabel")}
+            </Button>
+          </div>
+        </Modal.Footer>
+      </Modal>
     </Fragment>
   );
 };

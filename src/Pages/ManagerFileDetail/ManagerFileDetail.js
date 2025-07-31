@@ -293,7 +293,7 @@ const ManagerFileDetail = () => {
 
   const handleNoteAddOrShow = (seletedValue) => {
     if(seletedValue == "add_note") {
-      setShowAddNoteModal(true);
+      handleAddNoteModalOpen();
     } else if (seletedValue == "view_note") {
       handleNoteShow();
     } else {
@@ -1641,8 +1641,10 @@ const ManagerFileDetail = () => {
   };
 
   const handleSiteStatusChange = (status) => {
-    setEditUserSiteStatus(status);
-    handleSiteStatusChangeShow();
+    if(status){
+      setEditUserSiteStatus(status);
+      handleSiteStatusChangeShow();
+    }
   };
 
   const HandleSiteStatusUpdate = async () => {
@@ -1810,9 +1812,15 @@ const ManagerFileDetail = () => {
   };
 
   const handleAddNoteModalOpen = (docId, docName) => {
-    setSelectedAddNoteDocId(docId);
-    setSelectedAddNoteDocName(docName);
-    setShowAddNoteModal(true);
+    if (docId && docName) { 
+      setSelectedAddNoteDocId(docId);
+      setSelectedAddNoteDocName(docName);
+      setShowAddNoteModal(true);
+    } else {
+      setSelectedAddNoteDocId(null);
+      setSelectedAddNoteDocName("");
+      setShowAddNoteModal(true);
+    }
   };
 
   const handleAddNoteModalClose = () => {
@@ -2223,6 +2231,7 @@ const ManagerFileDetail = () => {
                       value={editUserSiteStatus}
                       onChange={(e) => handleSiteStatusChange(e.target.value)}
                     >
+                      <option value="">Sélectionner...</option>
                       <option value="on_site">En cours de chantier</option>
                       <option value="end_of_site">Fin de chantier</option>
                     </Form.Select>
@@ -2301,28 +2310,28 @@ const ManagerFileDetail = () => {
                     <div className="col-md-3 mb-3">
                       <div className="d-flex align-items-start flex-column gap-2">
                         <p className="m-0">DOC </p>
-                        <div className="status">15/07/2025</div>
+                        <div className="status">{showUserDocumentData?.created_at || ""}</div>
                       </div>
                     </div>
                     <div className="col-md-3 mb-3">
                       <div className="d-flex align-items-start flex-column gap-2">
                         <p className="m-0">Date fin prévisionnelle </p>
                         <div className="status">
-                          {showUserDocumentData?.estimated_completion_date}
+                          {showUserDocumentData?.estimated_completion_date || ""}
                         </div>
                       </div>
                     </div>
                     <div className="col-md-3 mb-3">
                       <div className="d-flex align-items-start flex-column gap-2">
                         <p className="m-0">Coût prévisionnel </p>
-                        <div className="status">10 450 000€</div>
+                        <div className="status">{showUserDocumentData?.estimated_site_cost || ""}</div>
                       </div>
                     </div>
                     <div className="col-md-3 mb-2">
                       <div className="d-flex align-items-start flex-column gap-2">
                         <p className="m-0">Nom du preneur assurance </p>
                         <div className="status">
-                          {showUserDocumentData?.insurance_policyholder_name}
+                          {showUserDocumentData?.insurance_policyholder_name || ""}
                         </div>
                       </div>
                     </div>
