@@ -63,15 +63,22 @@ const FileDetails = () => {
   const scrollRef = useRef(null);
 
   const [isLoading, setIsLoading] = useState(false);
+  const [isSpeakerLoading, setIsSpeakerLoading] = useState(false);
   const [isNoteLoading, setIsNoteLoading] = useState(false);
   const [currentFileIndex, setCurrentFileIndex] = useState(0);
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [activeTab, setActiveTab] = useState("dashboard");
-  const [activeDocumentTab, setActiveDocumentTab] = useState("document");
-  const [activeSubTab, setActiveSubTab] = useState("speaker");
+  const [activeDocumentTab, setActiveDocumentTab] = useState("otherdocument");
+  const [activeSubTab, setActiveSubTab] = useState("documents");
   const [showSpeakerId, setShowSpeakerId] = useState("");
-  const [history, setHistory] = useState([]);
+  const [history, setHistory] = useState([
+    {
+      activeTab: "dashboard",
+      activeDocumentTab: "otherdocument",
+      activeSubTab: "documents",
+    },
+  ]);
   const [showUserDocumentData, setShowUserDocumentData] = useState([]);
   const [showUserFolderName, setShowUserFolderName] = useState("");
   const [showOtherDocument, setShowOtherDocument] = useState([]);
@@ -111,7 +118,6 @@ const FileDetails = () => {
   const [selectDocumentId, setSelectDocumentId] = useState("");
   const [selectDocumentFileName, setSelectDocumentFileName] = useState("");
   const [missingDocumentId, setMissingDocumentId] = useState("");
-  const [showUserDocumentDataId, setShowUserDocumentDataId] = useState("");
   const [showDocumentId, setShowDocumentId] = useState("");
   const [showDocumentName, setShowDocumentName] = useState("");
   const [brokerList, setBrokerList] = useState([]);
@@ -187,7 +193,6 @@ const FileDetails = () => {
     setShowFinalModal(false);
     if (activeTab === "contactinfo") {
       ShowUserDocumentData(id);
-      setShowUserDocumentDataId(id);
       BrokerList();
     }
     if (activeTab === "speakerdocument") {
@@ -262,7 +267,6 @@ const FileDetails = () => {
     setFileList([]);
     if (activeTab === "contactinfo") {
       ShowUserDocumentData(id);
-      setShowUserDocumentDataId(id);
       BrokerList();
     }
     if (activeTab === "speakerdocument") {
@@ -360,11 +364,10 @@ const FileDetails = () => {
     const token = localStorage.getItem("authToken");
     if (token && userRole.includes("Assureur")) {
       const logo_image = JSON.parse(localStorage.getItem("logo_image"));
-      const right_panel_color = JSON.parse(
-        localStorage.getItem("right_panel_color")
-      );
+      const right_panel_color = JSON.parse(localStorage.getItem("right_panel_color"));
       setRightPanelThemeColor(right_panel_color);
       setLogoImageShow(logo_image);
+      ShowUserDocumentData(id);
     } else {
       navigate("/");
     }
@@ -381,19 +384,19 @@ const FileDetails = () => {
     }
     if (activeTab === "contactinfo") {
       ShowUserDocumentData(id);
-      setShowUserDocumentDataId(id);
       BrokerList();
     }
-    if (activeTab === "speakerdocument") {
-      SpeakerList(id, sort, search, 1);
-    }
     if (activeTab === "otherdocument") {
-      ShowOtherDocument(id, sort, 1, editUserStatus, selectDocumentType);
-      SpeakerDropDownList("", 1);
-      DocumentTypeList();
+      if (activeDocumentTab === "missingdocument") {
+        GetMissingDocumentList(id, sort, 1);
+      } else {
+        ShowOtherDocument(id, sort, 1, editUserStatus, selectDocumentType);
+        SpeakerDropDownList("", 1);
+        DocumentTypeList();
+      }
     }
-    if (activeTab === "missingdocument") {
-      GetMissingDocumentList(id, sort, 1);
+    if (activeTab === "speakerdocument") {
+        SpeakerList(id, sort, search, 1);
     }
     if (activeTab === "history") {
       GetHistoryListDocument(id, sort, search, currentPage, selectActionType);
@@ -401,26 +404,15 @@ const FileDetails = () => {
   }, [activeTab, activeDocumentTab, sort]);
 
   useEffect(() => {
-    if (showViewSpeaker) {
-      if (activeSubTab === "speaker") {
-        SpeakerDetail(showSpeakerId);
-      }
+    if (showViewSpeaker && activeTab === "speakerdocument") {
       if (activeSubTab === "documents") {
-        ShowSpeakerDocument(
-          id,
-          sort,
-          search,
-          currentPage,
-          editUserStatus,
-          selectDocumentType,
-          showSpeakerId
-        );
+        ShowSpeakerDocument(id, sort, search, currentPage, editUserStatus, selectDocumentType, showSpeakerId);
       }
       if (activeSubTab === "documentType") {
         SpeakerDocumentTypeList(id, showSpeakerId);
       }
     }
-  }, [showViewSpeaker, activeSubTab]);
+  }, [activeTab, showViewSpeaker, activeSubTab]);
 
   const [showCheck, setShowCheck] = useState(false);
   const handleCheckShow = () => {
@@ -438,7 +430,6 @@ const FileDetails = () => {
     setFileList([]);
     if (activeTab === "contactinfo") {
       ShowUserDocumentData(id);
-      setShowUserDocumentDataId(id);
       BrokerList();
     }
     if (activeTab === "speakerdocument") {
@@ -723,19 +714,23 @@ const FileDetails = () => {
 
   const SpeakerDetail = async (showSpeakerId) => {
     setIsLoading(true);
+    setIsSpeakerLoading(true);
     try {
       const response = await AcsManagerFileService.speakerdetail(showSpeakerId);
       if (response.data.status) {
         setIsLoading(false);
+        setIsSpeakerLoading(false);
         setSpeakerDetail(response.data);
       } else {
         setIsLoading(false);
+        setIsSpeakerLoading(false);
         setFlashMessage({
           type: "error",
           message: response.data.message || t("somethingWentWrong"),
         });
       }
     } catch (error) {
+      setIsSpeakerLoading(false);
       setIsLoading(false);
       setFlashMessage({
         type: "error",
@@ -1203,22 +1198,70 @@ const FileDetails = () => {
   };
 
   const handleSelect = (key) => {
-    setHistory((prevHistory) => [...prevHistory, activeTab]);
+    setHistory((prevHistory) => [
+      ...prevHistory, 
+      { activeTab, activeDocumentTab, activeSubTab }
+    ]);
     setSearch("");
     setActiveTab(key);
   };
 
+  const handleSelectDocument = (key) => {
+    setHistory((prevHistory) => [
+      ...prevHistory,
+      { activeTab, activeDocumentTab, activeSubTab },
+    ]);
+    setActiveDocumentTab(key);
+  };
+
   const handleSubTabSelect = (key) => {
+    setHistory((prevHistory) => [
+      ...prevHistory,
+      { activeTab, activeDocumentTab, activeSubTab },
+    ]);
     setActiveSubTab(key);
+  };
+
+  const safeHistoryEntry = (entry) => {
+    if (!entry) {
+      return {
+        activeTab: null,
+        activeDocumentTab: null,
+        activeSubTab: null,
+      };
+    }
+
+    if (typeof entry === "string") {
+      return {
+        activeTab: entry,
+        activeDocumentTab: null,
+        activeSubTab: null,
+      };
+    }
+
+    return {
+      activeTab: entry.activeTab || null,
+      activeDocumentTab: entry.activeDocumentTab || null,
+      activeSubTab: entry.activeSubTab || null,
+    };
   };
 
   const handleBack = () => {
     setHistory((prevHistory) => {
       const newHistory = [...prevHistory];
-      const previousTab = newHistory.pop();
+      const rawEntry = newHistory.pop();
+      const previousTab = safeHistoryEntry(rawEntry);
 
-      if (previousTab) {
-        setActiveTab(previousTab);
+      const hasValidTab =
+        previousTab.activeTab ||
+        previousTab.activeDocumentTab ||
+        previousTab.activeSubTab;
+
+      if (hasValidTab) {
+        if (previousTab.activeTab) setActiveTab(previousTab.activeTab);
+        if (previousTab.activeDocumentTab)
+          setActiveDocumentTab(previousTab.activeDocumentTab);
+        if (previousTab.activeSubTab) setActiveSubTab(previousTab.activeSubTab);
         return newHistory;
       } else {
         navigate("/insurers-file");
@@ -3070,7 +3113,7 @@ const FileDetails = () => {
           {/* Documents Tab */}
           <Tab
             className="update-inside-tab"
-            eventKey="documents"
+            eventKey="otherdocument"
             title="Documents"
           >
             {isLoading && (
@@ -3078,9 +3121,15 @@ const FileDetails = () => {
                 <Loading />
               </div>
             )}
-            <Tabs defaultActiveKey="documentdddd" className="mt-0 mb-0 ">
+            <Tabs 
+              defaultActiveKey="otherdocument" 
+              className="mt-0 mb-0 "
+              activeKey={activeDocumentTab}
+              onSelect={handleSelectDocument}
+            >
+              {/* Other Tab */}
               <Tab
-                eventKey="documentdddd"
+                eventKey="otherdocument"
                 title={`Documents (${totalRecordOther || 0})`}
               >
                 <div className="table-wrapper mt-16 p-0">
@@ -3662,6 +3711,8 @@ const FileDetails = () => {
                   )}
                 </div>
               </Tab>
+
+              {/* Missing Document Tab */}
               <Tab
                 eventKey="missingdocument"
                 title={`Documents manquants (${totalMissingRecords || 0})`}
@@ -4000,7 +4051,7 @@ const FileDetails = () => {
                         {flashMessageStoreDoc.message}
                       </div>
                     )}
-                    {isLoading ? (
+                    {isSpeakerLoading ? (
                       <Loading />
                     ) : (
                       <Form>
@@ -4144,10 +4195,10 @@ const FileDetails = () => {
                   <div className="col-md-8 flex-fill">
                     <Tabs
                       onSelect={handleSubTabSelect}
-                      defaultActiveKey="documents"
+                      defaultActiveKey="speakerdocument"
+                      activeKey={activeSubTab}
                       id="uncontrolled-tab-example"
                     >
-                      {/* Other Tab */}
                       <Tab
                         eventKey="documents"
                         title={`Documents (${totalSpeakerDocument})`}
@@ -4296,8 +4347,6 @@ const FileDetails = () => {
                           </div>
                         )}
                       </Tab>
-
-                      {/* Missing Document Tab */}
                       <Tab
                         eventKey="documentType"
                         title={`Documents manquants (${totalMissingDocument})`}
@@ -4722,7 +4771,7 @@ const FileDetails = () => {
                         {speakerList?.length > 0 &&
                         selectedSpeakerColumns.length > 0 ? (
                           speakerList?.map((data) => (
-                            <tr onClick={() => setShowSpeakerInner(true)}>
+                            <tr>
                               {selectedSpeakerColumns.includes(
                                 "N° de SIRET"
                               ) && <td>{data.siren_number}</td>}
@@ -4751,18 +4800,15 @@ const FileDetails = () => {
                                 <td>
                                   <div className="action-btn">
                                     <Link
-                                      /*  onClick={(e) => {
+                                        onClick={(e) => {
                                         e.stopPropagation();
                                         handleViewShowSpeaker();
                                         setShowSpeakerId(data.id);
-                                        setTotalSpeakerDocument(
-                                          data.user_document_count
-                                        );
-                                        setTotalMissingDocument(
-                                          data.missing_document_count
-                                        );
-                                      }}*/
-                                      onClick={() => setShowSpeakerInner(true)}
+                                        SpeakerDetail(data.id);
+                                        setTotalSpeakerDocument(data.user_document_count);
+                                        setTotalMissingDocument(data.missing_document_count);
+                                        setShowSpeakerInner(true);
+                                      }}
                                       className="view"
                                       href="/user-management"
                                       data-discover="true"
@@ -5357,363 +5403,6 @@ const FileDetails = () => {
           </Button>
         </Modal.Footer>
       </Modal>
-
-      {/* View Speaker Pop Up Design */}
-      <Offcanvas
-        className="add-folder-panel"
-        placement={"end"}
-        show={showViewSpeaker}
-        onHide={handleViewCloseSpeaker}
-      >
-        <Offcanvas.Header className="" closeButton>
-          <Offcanvas.Title>Détail intervenant</Offcanvas.Title>
-        </Offcanvas.Header>
-        <Offcanvas.Body>
-          <Tabs
-            activeKey={activeSubTab}
-            onSelect={handleSubTabSelect}
-            id="uncontrolled-tab-example"
-          >
-            <Tab eventKey="speaker" title="Informations générales ">
-              {flashMessage.message && (
-                <div
-                  className={`alert ${
-                    flashMessage.type === "success"
-                      ? "alert-success"
-                      : "alert-danger"
-                  } text-center`}
-                  role="alert"
-                >
-                  {flashMessage.message}
-                </div>
-              )}
-              {flashMessageStoreDoc.message && (
-                <div
-                  className={`mt-3 alert ${
-                    flashMessageStoreDoc.type === "success"
-                      ? "alert-success"
-                      : "alert-danger"
-                  } text-center`}
-                  role="alert"
-                >
-                  {flashMessageStoreDoc.message}
-                </div>
-              )}
-              {isLoading ? (
-                <Loading />
-              ) : (
-                <Form>
-                  <Form.Label>
-                    N° de SIRET <span>*</span>
-                  </Form.Label>
-                  <Form.Control
-                    className="mb-3"
-                    type="text"
-                    placeholder="SIRET"
-                    name="siren_number"
-                    disabled
-                    value={
-                      speakerDetail?.siren_number
-                        ? speakerDetail?.siren_number
-                        : "-"
-                    }
-                    onChange={(e) =>
-                      setSpeakerDetail({
-                        ...speakerDetail,
-                        siren_number: e.target.value,
-                      })
-                    }
-                  />
-                  <Form.Label>
-                    Nom société <span>*</span>
-                  </Form.Label>
-                  <Form.Control
-                    className="mb-3"
-                    type="text"
-                    placeholder="Nom société"
-                    defaultValue="Mark"
-                    name="company_name"
-                    disabled
-                    value={
-                      speakerDetail?.company_name
-                        ? speakerDetail?.company_name
-                        : "-"
-                    }
-                    onChange={(e) =>
-                      setSpeakerDetail({
-                        ...speakerDetail,
-                        company_name: e.target.value,
-                      })
-                    }
-                  />
-                  <Form.Label>
-                    Adresse <span>*</span>
-                  </Form.Label>
-                  <Form.Control
-                    className="mb-3"
-                    type="text"
-                    placeholder="Adresse"
-                    name="address"
-                    disabled
-                    value={
-                      speakerDetail?.address ? speakerDetail?.address : "-"
-                    }
-                    onChange={(e) =>
-                      setSpeakerDetail({
-                        ...speakerDetail,
-                        address: e.target.value,
-                      })
-                    }
-                  />
-
-                  <div className="d-md-flex align-items-center side-col">
-                    <Form.Group className="post-code" controlId="postcode">
-                      <Form.Label>
-                        Code postal <span>*</span>
-                      </Form.Label>
-                      <Form.Control
-                        className="mb-3"
-                        type="text"
-                        placeholder="Code postal"
-                        name="postcode"
-                        disabled
-                        value={
-                          speakerDetail?.postcode
-                            ? speakerDetail?.postcode
-                            : "-"
-                        }
-                        onChange={(e) =>
-                          setSpeakerDetail({
-                            ...speakerDetail,
-                            postcode: e.target.value,
-                          })
-                        }
-                      />
-                    </Form.Group>
-
-                    <Form.Group className="" controlId="city">
-                      <Form.Label>
-                        Ville <span>*</span>
-                      </Form.Label>
-                      <Form.Control
-                        className="mb-3"
-                        type="text"
-                        placeholder="Ville"
-                        name="city"
-                        disabled
-                        value={speakerDetail?.city ? speakerDetail?.city : "-"}
-                        onChange={(e) =>
-                          setSpeakerDetail({
-                            ...speakerDetail,
-                            city: e.target.value,
-                          })
-                        }
-                      />
-                    </Form.Group>
-                  </div>
-                </Form>
-              )}
-            </Tab>
-            <Tab
-              eventKey="documents"
-              title={`Documents (${totalSpeakerDocument})`}
-            >
-              {isLoading ? (
-                <Loading />
-              ) : (
-                <div className="table-wrapper mt-16 p-0">
-                  <div className="table-wrap mt-24">
-                    <Table responsive hover>
-                      <thead>
-                        <tr>
-                          <th>Nom du fichier</th>
-                          <th>Type de document</th>
-                          <th>Statut</th>
-                          <th>Actions</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {showSpeakerDocument?.length > 0 ? (
-                          showSpeakerDocument?.map((data) => (
-                            <tr>
-                              <td>{data.filename}</td>
-                              <td>{data.docType?.name}</td>
-                              <td>
-                                {data.status == "to_be_checked" ? (
-                                  <span className="checked badges">
-                                    {t("toBeCheckedLabel")}
-                                  </span>
-                                ) : data.status == "verified" ? (
-                                  <span className="verified badges">
-                                    {t("verified")}
-                                  </span>
-                                ) : (
-                                  <span className="incomplete badges">
-                                    {t("invalidLabel")}
-                                  </span>
-                                )}
-                              </td>
-                              <td>
-                                <Link
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    e.preventDefault();
-                                    HandleDownloadFile(data);
-                                  }}
-                                  className="download"
-                                  href="/user-management"
-                                  data-discover="true"
-                                  title="Télécharger"
-                                >
-                                  <svg
-                                    width="24"
-                                    height="24"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                  >
-                                    <path
-                                      d="M14 2H6C4.9 2 4.01 2.9 4.01 4L4 20C4 21.1 4.89 22 5.99 22H18C19.1 22 20 21.1 20 20V8L14 2ZM18 20H6V4H13V9H18V20Z"
-                                      fill="#00366B"
-                                    />
-                                    <path
-                                      d="M8 14L12 18L16 14"
-                                      stroke="#00366B"
-                                      stroke-width="1.5"
-                                      stroke-linecap="round"
-                                      stroke-linejoin="round"
-                                    />
-                                    <path
-                                      d="M12 11V18"
-                                      stroke="#00366B"
-                                      stroke-width="1.5"
-                                      stroke-linecap="round"
-                                      stroke-linejoin="round"
-                                    />
-                                  </svg>
-                                </Link>
-                                {/* {data.status !== "verified" && */}
-                                <Link
-                                  className="delete"
-                                  data-discover="true"
-                                  title="Supprimer"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleShowDeleteModal();
-                                    setShowDocumentId(data.id);
-                                  }}
-                                >
-                                  <svg
-                                    width="24"
-                                    height="24"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                  >
-                                    <path
-                                      d="M16 9V19H8V9H16ZM14.5 3H9.5L8.5 4H5V6H19V4H15.5L14.5 3ZM18 7H6V19C6 20.1 6.9 21 8 21H16C17.1 21 18 20.1 18 19V7Z"
-                                      fill="#00366B"
-                                    />
-                                  </svg>
-                                </Link>
-                                {/* } */}
-                              </td>
-                            </tr>
-                          ))
-                        ) : (
-                          <tr style={{ textAlign: "center" }}>
-                            <td colSpan="4">{t("NorecordsfoundLabel")}</td>
-                          </tr>
-                        )}
-                      </tbody>
-                    </Table>
-                  </div>
-                  {totalSpeakerDocument > 10 && (
-                    <Paginations
-                      currentPage={currentPage}
-                      totalPages={totalPages}
-                      onPageChange={handlePageChangeView}
-                      itemsPerPage={10}
-                      totalItems={totalSpeakerDocument}
-                    />
-                  )}
-                </div>
-              )}
-            </Tab>
-            <Tab
-              eventKey="documentType"
-              title={`Documents manquants (${totalMissingDocument})`}
-            >
-              {flashMessage.message && (
-                <div
-                  className={`alert ${
-                    flashMessage.type === "success"
-                      ? "alert-success"
-                      : "alert-danger"
-                  } text-center`}
-                  role="alert"
-                >
-                  {flashMessage.message}
-                </div>
-              )}
-              {isLoading ? (
-                <Loading />
-              ) : (
-                <div className="table-wrapper mt-16 p-0">
-                  <div className="table-wrap mt-24">
-                    <Table responsive hover>
-                      <thead>
-                        <tr>
-                          <th>Type de document</th>
-                          <th>Action</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {speakerDocumentTypeList?.length > 0 ? (
-                          speakerDocumentTypeList?.map((data) => (
-                            <tr>
-                              <td>{data.documentType.name}</td>
-                              <td>
-                                <Link
-                                  onClick={() => {
-                                    handleMissingDocShow();
-                                    setMissingDocumentId(data.id);
-                                  }}
-                                  className="doc"
-                                  href="/user-management"
-                                  data-discover="true"
-                                  title="Ajouter un document manquants"
-                                >
-                                  <svg
-                                    width="16"
-                                    height="20"
-                                    viewBox="0 0 16 20"
-                                    fill="none"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                  >
-                                    <path
-                                      d="M9 9H7V12H4V14H7V17H9V14H12V12H9V9ZM10 0H2C0.9 0 0 0.9 0 2V18C0 19.1 0.89 20 1.99 20H14C15.1 20 16 19.1 16 18V6L10 0ZM14 18H2V2H9V7H14V18Z"
-                                      fill="black"
-                                    />
-                                  </svg>
-                                </Link>
-                              </td>
-                            </tr>
-                          ))
-                        ) : (
-                          <tr style={{ textAlign: "center" }}>
-                            <td colSpan="3">{t("NorecordsfoundLabel")}</td>
-                          </tr>
-                        )}
-                      </tbody>
-                    </Table>
-                  </div>
-                </div>
-              )}
-            </Tab>
-          </Tabs>
-        </Offcanvas.Body>
-      </Offcanvas>
 
       {/* Speaker Add Col Modal */}
       <Modal show={showAddSpeakerCol} onHide={handleAddSpeakerColClose}>
