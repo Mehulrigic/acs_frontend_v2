@@ -17,11 +17,19 @@ import Loading from "../../Common/Loading";
 import AcsManagerFileService from "../../API/AcsManager/AcsManagerFileService";
 import AddNote from "../../Components/AddNote/AddNote";
 import Select from "react-select";
-import MissingDocument from "../../Components/MissingDocument/MissingDocument";
 import { BsPatchExclamation } from "react-icons/bs";
 import DatePicker from "react-datepicker";
+import DashboardManagementService from "../../API/DashboardManagement/DashboardManagementService";
+import TaskManagementService from "../../API/TaskManagement/TaskManagementService";
+import { parse, format } from "date-fns";
+import { fr } from "date-fns/locale";
+
 const BrokerFileDetail = () => {
-  const [showSepeakerInner, setShowSpeakerInner] = useState(false);
+  const { t } = useTranslation();
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const scrollRef = useRef(null);
+
   const [isVisible, setIsVisible] = useState(false);
 
   const toggleDetail = (e) => {
@@ -31,45 +39,29 @@ const BrokerFileDetail = () => {
   const [selectedType, setSelectedType] = useState("");
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedUser, setSelectedUser] = useState("");
-  const [showReader, setShowReader] = useState(false);
-
-  const toggleReader = () => {
-    setShowReader((prev) => {
-      const newState = !prev;
-
-      // Toggle class on body
-      if (newState) {
-        document.body.classList.add("show-reader");
-      } else {
-        document.body.classList.remove("show-reader");
-      }
-
-      return newState;
-    });
-  };
-
-  const { t } = useTranslation();
-  const { id } = useParams();
-  const navigate = useNavigate();
-  const scrollRef = useRef(null);
-
   const [isLoading, setIsLoading] = useState(false);
+  const [isSpeakerLoading, setIsSpeakerLoading] = useState(false);
   const [isNoteLoading, setIsNoteLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("dashboard");
-  const [activeSubTab, setActiveSubTab] = useState("speaker");
-  const [history, setHistory] = useState([]);
+  const [activeDocumentTab, setActiveDocumentTab] = useState("otherdocument");
+  const [activeSubTab, setActiveSubTab] = useState("documents");
+  const [history, setHistory] = useState([
+    {
+      activeTab: "dashboard",
+      activeDocumentTab: "otherdocument",
+      activeSubTab: "documents",
+    },
+  ]);
   const [documentTypeList, setDocumentTypeList] = useState([]);
   const [selectSpeakerId, setSelectSpeakerId] = useState("");
   const [selectDocumentType, setSelectDocumentType] = useState("");
   const [editUserStatus, setEditUserStatus] = useState("");
   const [showUserDocumentData, setShowUserDocumentData] = useState([]);
   const [showSpeakerDocument, setShowSpeakerDocument] = useState([]);
-  // const [markIsReadCount, setMarkIsReadCount] = useState(0);
   const [historyDocumentList, setHistoryDocumentList] = useState([]);
   const [invalidReasonNoteList, setInvalidReasonNoteList] = useState([]);
   const [invalidReasonList, setInvalidReasonList] = useState([]);
   const [missingDocumentList, setMissingDocumentList] = useState([]);
-  // const [recordsToShow, setRecordsToShow] = useState(2);
   const [missingDocumentId, setMissingDocumentId] = useState("");
   const [recordsToShowNote, setRecordsToShowNote] = useState(3);
   const [invalidRecordsToShowNOte, setInvalidRecordsToShowNote] = useState(3);
@@ -79,7 +71,6 @@ const BrokerFileDetail = () => {
     type: "",
     message: "",
   });
-  // const [showUserDocumentDataId, setShowUserDocumentDataId] = useState("");
   const [fileList, setFileList] = useState([]);
   const [showDocumentId, setShowDocumentId] = useState("");
   const [showDocumentName, setShowDocumentName] = useState("");
@@ -186,37 +177,56 @@ const BrokerFileDetail = () => {
   };
   const handleSendFileClose = () => setShowSendFileChange(false);
 
-  const [showViewSpeaker, setShowViewSpeaker] = useState(false);
-  const handleViewShowSpeaker = () => setShowViewSpeaker(true);
-  const handleViewCloseSpeaker = () => {
-    setActiveSubTab("speaker");
-    setActiveTab(activeTab);
-    setShowViewSpeaker(false);
-    if (activeTab === "otherdocument") {
-      ShowOtherDocument(
-        id,
-        sort,
-        currentPage,
-        editUserStatus,
-        selectDocumentType
-      );
-      SpeakerDropDownList("", 1);
-      DocumentTypeList();
-    }
-    if (activeTab === "speakerdocument") {
-      SpeakerList(id, sort, search, currentPage);
-    }
-    if (activeTab === "missingdocument") {
-      GetMissingDocumentList(id, sort, currentPage);
-    }
-    if (activeTab === "history") {
-      GetHistoryListDocument(id, sort, search, currentPage, selectActionType);
-    }
-  };
+  const [showSepeakerInner, setShowSpeakerInner] = useState(false);
+  const handleViewShowSpeaker = () => setShowSpeakerInner(true);
+  // const handleViewCloseSpeaker = () => {
+  //   setActiveSubTab("speaker");
+  //   setActiveTab(activeTab);
+  //   setShowSpeakerInner(false);
+  //   if (activeTab === "otherdocument") {
+  //     if (activeDocumentTab === "missingdocument") {
+  //       GetMissingDocumentList(id, sort, currentPage);
+  //     } else {
+  //       ShowOtherDocument(id, sort, currentPage, editUserStatus, selectDocumentType);
+  //       SpeakerDropDownList("", 1);
+  //       DocumentTypeList();
+  //     }
+  //   }
+  //   if (activeTab === "speakerdocument") {
+  //     SpeakerList(id, sort, search, currentPage);
+  //   }
+  //   if (activeTab === "history") {
+  //     GetHistoryListDocument(id, sort, search, currentPage, selectActionType);
+  //   }
+  // };
 
   const [showAddNoteModal, setShowAddNoteModal] = useState(false);
   const [selectedAddNoteDocId, setSelectedAddNoteDocId] = useState(null);
   const [selectedAddNoteDocName, setSelectedAddNoteDocName] = useState("");
+
+  // File Dashboard
+  const [dashboardDocumentFileList, setDashboardDocumentFileList] = useState([]);
+  const [speakerDocumentFileList, setSpeakerDocumentFileList] = useState(null);
+  const [lastFiveEventList, setLastFiveEventList] = useState([]);
+  const [lastThreeNoteList, setLastThreeNoteList] = useState([]);
+  const [eventHistoryUserList, setEventHistoryUserList] = useState([]);
+
+  const [taskListData, setTaskListData] = useState([]);
+  const [taskStatus, setTaskStatus] = useState("");
+  const [taskPriority, setTaskPriority] = useState("");
+  const [currentTaskPage, setCurrentTaskPage] = useState(1);
+  const [totalTaskPages, setTotalTaskPages] = useState(1);
+  const [totalTaskRecords, setTotalTaskRecords] = useState(0);
+
+  const [fileType, setFileType] = useState("");
+  const [exportDocumentOpen, setExportDocumentOpen] = useState(false);
+  const handleExportDocumentShow = (type) => {
+    if (type) {
+      setFileType(type);
+      setExportDocumentOpen(true);
+    }
+  };
+  const handleExportDocumentClose = () => setExportDocumentOpen(false);
 
   useEffect(() => {
     if (flashMessage.message) {
@@ -251,40 +261,39 @@ const BrokerFileDetail = () => {
       setRightPanelThemeColor(right_panel_color);
       setLogoImageShow(logo_image);
       ShowUserDocumentData(id);
-      // setShowUserDocumentDataId(id);
     } else {
       navigate("/");
     }
   }, []);
 
   useEffect(() => {
+    if (activeTab === "dashboard") {
+      DashboardRegisteredDocument(id);
+      DashboardSpeakerRegisteredDocument(id);
+      EventUserList(id);
+      DashboardLastFiveEvent(id);
+      DashboardLastThreeNote(id);
+      TaskList(search, sort, currentPage, taskStatus, taskPriority);
+    }
     if (activeTab === "otherdocument") {
-      ShowOtherDocument(
-        id,
-        sort,
-        currentPage,
-        editUserStatus,
-        selectDocumentType
-      );
-      SpeakerDropDownList("", 1);
-      DocumentTypeList();
+      if (activeDocumentTab === "missingdocument") {
+        GetMissingDocumentList(id, sort, currentPage);
+      } else {
+        ShowOtherDocument(id, sort, currentPage, editUserStatus, selectDocumentType);
+        SpeakerDropDownList("", 1);
+        DocumentTypeList();
+      }
     }
     if (activeTab === "speakerdocument") {
       SpeakerList(id, sort, search, currentPage);
     }
-    if (activeTab === "missingdocument") {
-      GetMissingDocumentList(id, sort, currentPage);
-    }
     if (activeTab === "history") {
       GetHistoryListDocument(id, sort, search, currentPage, selectActionType);
     }
-  }, [activeTab, sort]);
+  }, [activeTab, activeDocumentTab, sort, selectedType, selectedDate, selectedUser]);
 
   useEffect(() => {
-    if (showViewSpeaker) {
-      if (activeSubTab === "speaker") {
-        SpeakerDetail(showSpeakerId);
-      }
+    if (showSepeakerInner && activeTab === "speakerdocument") {
       if (activeSubTab === "documents") {
         ShowSpeakerDocument(
           id,
@@ -300,23 +309,13 @@ const BrokerFileDetail = () => {
         SpeakerDocumentTypeList(id, showSpeakerId);
       }
     }
-  }, [showViewSpeaker, activeSubTab]);
+  }, [activeTab, showSepeakerInner, activeSubTab]);
 
   useEffect(() => {
     if (showNote) {
       GetDocumentFileNotesList(id, "");
     }
   }, [showNote]);
-
-  const handleNoteAddOrShow = (seletedValue) => {
-    if(seletedValue == "add_note") {
-      setShowAddNoteModal(true);
-    } else if (seletedValue == "view_note") {
-      handleNoteShow();
-    } else {
-      return;
-    }
-  };
 
   const handleActionTypeChange = (e) => {
     const selectedValue = e.target.value;
@@ -494,8 +493,6 @@ const BrokerFileDetail = () => {
 
       if (response.data.status) {
         setIsLoading(false);
-        // const markIsRead = response.data.history.data.filter((data) => data.is_read == 0);
-        // setMarkIsReadCount(markIsRead.length);
         setHistoryDocumentList(response.data.history.data);
         setCurrentPage(response.data.history.meta.current_page);
         setTotalPages(response.data.history.meta.last_page);
@@ -556,34 +553,6 @@ const BrokerFileDetail = () => {
     }
   };
 
-  // const MarkHistoryAsReadDocument = async (id) => {
-  //   setIsLoading(true);
-  //   try {
-  //     const response = await FilePageService.mark_history_as_read(id);
-  //     if (response.data.status) {
-  //       setIsLoading(false);
-  //       GetHistoryListDocument(showUserDocumentDataId);
-  //     }
-  //   } catch (error) {
-  //     setIsLoading(false);
-  //     console.log(error);
-  //   }
-  // };
-
-  // const MarkHistoryAsReadAllDocument = async (id) => {
-  //   setIsLoading(true);
-  //   try {
-  //     const response = await FilePageService.mark_history_all_as_read(id);
-  //     if (response.data.status) {
-  //       setIsLoading(false);
-  //       GetHistoryListDocument(id);
-  //     }
-  //   } catch (error) {
-  //     setIsLoading(false);
-  //     console.log(error);
-  //   }
-  // };
-
   const SpeakerDocumentTypeList = async (folderId, speakerId) => {
     setIsLoading(true);
     try {
@@ -614,13 +583,16 @@ const BrokerFileDetail = () => {
 
   const SpeakerDetail = async (showSpeakerId) => {
     setIsLoading(true);
+    setIsSpeakerLoading(true);
     try {
       const response = await AcsManagerFileService.speakerdetail(showSpeakerId);
       if (response.data.status) {
         setIsLoading(false);
+        setIsSpeakerLoading(false);
         setSpeakerDetail(response.data);
       } else {
         setIsLoading(false);
+        setIsSpeakerLoading(false);
         setFlashMessage({
           type: "error",
           message: response.data.message || t("somethingWentWrong"),
@@ -628,6 +600,7 @@ const BrokerFileDetail = () => {
       }
     } catch (error) {
       setIsLoading(false);
+      setIsSpeakerLoading(false);
       setFlashMessage({
         type: "error",
         message: t("somethingWentWrong"),
@@ -685,21 +658,69 @@ const BrokerFileDetail = () => {
   };
 
   const handleSelect = (key) => {
-    setHistory((prevHistory) => [...prevHistory, activeTab]);
+    setHistory((prevHistory) => [
+      ...prevHistory,
+      { activeTab, activeDocumentTab, activeSubTab }
+    ]);
     setActiveTab(key);
   };
 
+  const handleSelectDocument = (key) => {
+    setHistory((prevHistory) => [
+      ...prevHistory,
+      { activeTab, activeDocumentTab, activeSubTab },
+    ]);
+    setActiveDocumentTab(key);
+  };
+
   const handleSubTabSelect = (key) => {
+    setHistory((prevHistory) => [
+      ...prevHistory,
+      { activeTab, activeDocumentTab, activeSubTab },
+    ]);
     setActiveSubTab(key);
+  };
+
+  const safeHistoryEntry = (entry) => {
+    if (!entry) {
+      return {
+        activeTab: null,
+        activeDocumentTab: null,
+        activeSubTab: null,
+      };
+    }
+
+    if (typeof entry === "string") {
+      return {
+        activeTab: entry,
+        activeDocumentTab: null,
+        activeSubTab: null,
+      };
+    }
+
+    return {
+      activeTab: entry.activeTab || null,
+      activeDocumentTab: entry.activeDocumentTab || null,
+      activeSubTab: entry.activeSubTab || null,
+    };
   };
 
   const handleBack = () => {
     setHistory((prevHistory) => {
       const newHistory = [...prevHistory];
-      const previousTab = newHistory.pop();
+      const rawEntry = newHistory.pop();
+      const previousTab = safeHistoryEntry(rawEntry);
 
-      if (previousTab) {
-        setActiveTab(previousTab);
+      const hasValidTab =
+        previousTab.activeTab ||
+        previousTab.activeDocumentTab ||
+        previousTab.activeSubTab;
+
+      if (hasValidTab) {
+        if (previousTab.activeTab) setActiveTab(previousTab.activeTab);
+        if (previousTab.activeDocumentTab)
+          setActiveDocumentTab(previousTab.activeDocumentTab);
+        if (previousTab.activeSubTab) setActiveSubTab(previousTab.activeSubTab);
         return newHistory;
       } else {
         navigate("/courtier-files");
@@ -743,18 +764,13 @@ const BrokerFileDetail = () => {
         });
 
         if (activeTab === "otherdocument") {
-          ShowOtherDocument(
-            id,
-            sort,
-            currentPage,
-            editUserStatus,
-            selectDocumentType
-          );
-          SpeakerDropDownList("", 1);
-          DocumentTypeList();
-        }
-        if (activeTab === "missingdocument") {
-          GetMissingDocumentList(id, sort, currentPage);
+          if (activeDocumentTab === "missingdocument") {
+            GetMissingDocumentList(id, sort, currentPage);
+          } else {
+            ShowOtherDocument(id, sort, currentPage, editUserStatus, selectDocumentType);
+            SpeakerDropDownList("", 1);
+            DocumentTypeList();
+          }
         }
       } else {
         setFlashMessageStoreDoc({
@@ -800,15 +816,13 @@ const BrokerFileDetail = () => {
         });
 
         if (activeTab === "otherdocument") {
-          ShowOtherDocument(
-            id,
-            sort,
-            currentPage,
-            editUserStatus,
-            selectDocumentType
-          );
-          SpeakerDropDownList("", 1);
-          DocumentTypeList();
+          if (activeDocumentTab === "missingdocument") {
+            GetMissingDocumentList(id, sort, currentPage);
+          } else {
+            ShowOtherDocument(id, sort, currentPage, editUserStatus, selectDocumentType);
+            SpeakerDropDownList("", 1);
+            DocumentTypeList();
+          }
         }
       } else {
         setDocumentUploading(false);
@@ -825,54 +839,6 @@ const BrokerFileDetail = () => {
       });
     }
   };
-
-  // const AddMissingDocument = async (e) => {
-  //   e.preventDefault();
-  //   try {
-  //     const documents = [];
-
-  //     if (fileList?.length) {
-  //       documents.push(...fileList);
-  //     }
-
-  //     var userData = {
-  //       speaker_id: showSpeakerId,
-  //       missing_document_id: missingDocumentId,
-  //       documents: documents
-  //     }
-
-  //     const response = await FilePageService.add_missing_document(id, userData);
-  //     if (response.data.status) {
-  //       setFileList([]);
-  //       setFlashMessageStoreDoc({
-  //         type: "success",
-  //         message: response.data.message || t("somethingWentWrong"),
-  //       });
-
-  //       if (activeTab === "speakerdocument") {
-  //         if (activeSubTab === "documentType") {
-  //           SpeakerDocumentTypeList(id, showSpeakerId);
-  //         } else {
-  //           SpeakerList(id, sort, search, currentPage);
-  //         }
-  //       }
-  //       if (activeTab === "missingdocument") {
-  //         GetMissingDocumentList(id, sort, currentPage);
-  //       }
-  //       ShowUserDocumentData(id);
-  //     } else {
-  //       setFlashMessageStoreDoc({
-  //         type: "error",
-  //         message: response.data.message || t("somethingWentWrong"),
-  //       });
-  //     }
-  //   } catch (error) {
-  //     setFlashMessageStoreDoc({
-  //       type: "error",
-  //       message: t("somethingWentWrong"),
-  //     });
-  //   }
-  // };
 
   const AddMissingDocument = async (e) => {
     e.preventDefault();
@@ -958,9 +924,13 @@ const BrokerFileDetail = () => {
           }
         }
         if (activeTab === "otherdocument") {
-          ShowOtherDocument(id, sort, 1, editUserStatus, selectDocumentType);
-          SpeakerDropDownList("", 1);
-          DocumentTypeList();
+          if (activeDocumentTab === "missingdocument") {
+            GetMissingDocumentList(id, sort, currentPage);
+          } else {
+            ShowOtherDocument(id, sort, 1, editUserStatus, selectDocumentType);
+            SpeakerDropDownList("", 1);
+            DocumentTypeList();
+          }
         }
       }
     } catch (error) {
@@ -1064,12 +1034,13 @@ const BrokerFileDetail = () => {
       SpeakerList(id, sort, search, page);
     }
     if (activeTab === "otherdocument") {
-      ShowOtherDocument(id, sort, page, editUserStatus, selectDocumentType);
-      SpeakerDropDownList("", 1);
-      DocumentTypeList();
-    }
-    if (activeTab === "missingdocument") {
-      GetMissingDocumentList(id, sort, page);
+      if (activeDocumentTab === "missingdocument") {
+        GetMissingDocumentList(id, sort, page);
+      } else {
+        ShowOtherDocument(id, sort, page, editUserStatus, selectDocumentType);
+        SpeakerDropDownList("", 1);
+        DocumentTypeList();
+      }
     }
     if (activeTab === "history") {
       GetHistoryListDocument(id, sort, search, page, selectActionType);
@@ -1090,13 +1061,6 @@ const BrokerFileDetail = () => {
       );
     }
   };
-
-  // const handleScroll = (e) => {
-  //   const { scrollTop, scrollHeight, clientHeight } = e.target;
-  //   if (scrollTop + clientHeight >= scrollHeight - 5) {
-  //     setRecordsToShow((prev) => Math.min(prev + 2, historyDocumentList.length));
-  //   }
-  // };
 
   const handleScrollNote = (e) => {
     const { scrollTop, scrollHeight, clientHeight } = e.target;
@@ -1286,6 +1250,221 @@ const BrokerFileDetail = () => {
     { value: "0", label: "Général" },
   ];
 
+  const handleNoteAddOrShow = (seletedValue) => {
+    if (seletedValue == "add_note") {
+      handleAddNoteModalOpen();
+    } else if (seletedValue == "view_note") {
+      handleNoteShow();
+    } else {
+      return;
+    }
+  };
+
+  const DashboardRegisteredDocument = async (id) => {
+    try {
+      const response =
+        await DashboardManagementService.dashboard_registered_document_file(id);
+
+      if (response.data.status) {
+        setDashboardDocumentFileList(response.data.blocks);
+      } else {
+        setFlashMessage({
+          type: "error",
+          message: response.data.message || t("somethingWentWrong"),
+        });
+      }
+    } catch (error) {
+      setFlashMessage({
+        type: "error",
+        message: t("somethingWentWrong"),
+      });
+    }
+  };
+
+  const DashboardSpeakerRegisteredDocument = async (id) => {
+    try {
+      const response =
+        await DashboardManagementService.speaker_registered_document_file(id);
+
+      if (response.data.status) {
+        setSpeakerDocumentFileList(response.data.overall_statistics);
+      } else {
+        setFlashMessage({
+          type: "error",
+          message: response.data.message || t("somethingWentWrong"),
+        });
+      }
+    } catch (error) {
+      setFlashMessage({
+        type: "error",
+        message: t("somethingWentWrong"),
+      });
+    }
+  };
+
+  const DashboardLastFiveEvent = async (id) => {
+    try {
+      var userData = {
+        user_id: selectedUser,
+        action_type: selectedType,
+        date: selectedDate
+      };
+
+      const response =
+        await DashboardManagementService.dashboard_last_five_event(
+          id,
+          userData
+        );
+
+      if (response.data.status) {
+        setLastFiveEventList(response.data.data);
+      } else {
+        setFlashMessage({
+          type: "error",
+          message: response.data.message || t("somethingWentWrong"),
+        });
+      }
+    } catch (error) {
+      setFlashMessage({
+        type: "error",
+        message: t("somethingWentWrong"),
+      });
+    }
+  };
+
+  const DashboardLastThreeNote = async (id) => {
+    try {
+      const response = await DashboardManagementService.dashboard_last_three_note(id);
+
+      if (response.data.status) {
+        setLastThreeNoteList(response.data.data);
+      } else {
+        setFlashMessage({
+          type: "error",
+          message: response.data.message || t("somethingWentWrong"),
+        });
+      }
+    } catch (error) {
+      setFlashMessage({
+        type: "error",
+        message: t("somethingWentWrong"),
+      });
+    }
+  };
+
+  const EventUserList = async (id) => {
+    setIsLoading(true);
+    try {
+      const response = await DashboardManagementService.event_history_users(id);
+
+      if (response.data.status) {
+        setIsLoading(false);
+        setEventHistoryUserList(response.data.user.data);
+      }
+    } catch (error) {
+      setIsLoading(false);
+      setFlashMessage({
+        type: "error",
+        message: t("somethingWentWrong"),
+      });
+    }
+  };
+
+  const formatCreatedAt = (dateStr) => {
+    try {
+      const parsedDate = parse(dateStr, "dd/MM/yyyy", new Date());
+      return format(parsedDate, "MMMM do, hh:mm a");
+    } catch (e) {
+      return dateStr;
+    }
+  };
+
+  const ExportDocumentFile = async (
+    id,
+    format = "pdf",
+    onFinish = () => { }
+  ) => {
+    try {
+      const response = await DashboardManagementService.export_folder(
+        id,
+        format
+      );
+      const blob = response.data;
+
+      const extension = format === "pdf" ? "pdf" : "xlsx";
+      const filename = `${showUserFolderName}.${extension}`;
+
+      const url = window.URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.style.display = "none";
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+
+      window.URL.revokeObjectURL(url);
+
+      onFinish();
+    } catch (error) {
+      console.error("Export failed", error);
+      setFlashMessage({
+        type: "error",
+        message: t("somethingWentWrong"),
+      });
+    }
+  };
+
+  const TaskList = async (search, sort, page = 1, status, priority) => {
+    setIsLoading(true);
+    try {
+      var userData = {
+        search: search ?? "",
+        sort: {
+          key: sort.key,
+          value: sort.value
+        },
+        page,
+        status: status ?? "",
+        priority: priority ?? ""
+      };
+
+      const response = await TaskManagementService.task_index(userData);
+
+      if (response.data.status) {
+        setIsLoading(false);
+        setTaskListData(response.data.task.data);
+        setCurrentTaskPage(response.data.task.meta.current_page);
+        setTotalTaskPages(response.data.task.meta.last_page);
+        setTotalTaskRecords(response.data.task.meta.total);
+      }
+    } catch (error) {
+      setIsLoading(false);
+      setFlashMessage({
+        type: "error",
+        message: t("somethingWentWrong"),
+      });
+    }
+  };
+
+  const formatDate = (dateString) => {
+    if (dateString) {
+      const date = new Date(dateString);
+      const day = String(date.getDate()).padStart(2, "0");
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const year = date.getFullYear();
+      return `${day}/${month}/${year}`;
+    } else {
+      return "";
+    }
+  };
+
+  const getFormattedDate = (dateString) => {
+    const [day, month, year] = dateString.split("/");
+    return new Date(`${month}/${day}/${year}`);
+  };
+
   return (
     <Fragment>
       <style>
@@ -1407,338 +1586,22 @@ const BrokerFileDetail = () => {
                   </Link>
                 </div>
               </div>
-
-              {/* <div className="d-sm-flex align-items-center gap-3 flex-wrap ms-sm-auto text-center">
-                <div className="my-1 my-md-0" style={{ marginRight: "20px" }}>
-                  <MissingDocument
-                    link={true}
-                    sort={sort}
-                    search={search}
-                    currentPage={currentPage}
-                    selectActionType={selectActionType}
-                    GetHistoryListDocument={GetHistoryListDocument}
-                  />
-                </div>
-                <div className="add-document my-1 my-md-0">
-                  <Link className="link-wrap" onClick={handleNoteShow}>
-                    Voir les raisons
-                  </Link>
-                  <Offcanvas
-                    className="add-folder-panel broker-add-panel"
-                    placement={"end"}
-                    show={showNote}
-                    onHide={handleNoteClose}
-                  >
-                    <Offcanvas.Header closeButton>
-                      <Offcanvas.Title>Dossier incomplet</Offcanvas.Title>
-                    </Offcanvas.Header>
-                    <Offcanvas.Body
-                      style={{ overflow: "hidden", maxHeight: "80vh" }}
-                    >
-                      <div className="step-1">
-                        <div className="div">
-                          <div className="step-2">
-                            <h2>Liste de notes</h2>
-                            <Select
-                              options={NotesOptions}
-                              onChange={(selectedOption) =>
-                                GetDocumentFileNotesList(
-                                  id,
-                                  selectedOption?.value
-                                )
-                              }
-                              styles={{
-                                container: (provided) => ({
-                                  ...provided,
-                                  width: "50%",
-                                }),
-                                menu: (provided) => ({
-                                  ...provided,
-                                  width: "100%",
-                                }),
-                              }}
-                              placeholder={"Sélectionnez le type de note"}
-                              isSearchable={true}
-                              className={isNoteLoading ? "mb-5" : ""}
-                            />
-
-                            {isNoteLoading ? (
-                              <Loading />
-                            ) : displayedRecordsNote?.length > 0 ? (
-                              <div
-                                ref={scrollRef}
-                                className="scroll-container mt-3"
-                                onScroll={handleScrollNote}
-                                style={{
-                                  maxHeight: "calc(100vh - 300px)",
-                                  overflowY: "auto",
-                                  paddingRight: "5px",
-                                  scrollbarWidth: "thin",
-                                }}
-                              >
-                                {displayedRecordsNote?.map((data) => (
-                                  <Fragment key={data.id}>
-                                    <div className="note-box mb-3">
-                                      <div className="d-flex justify-content-between align-items-center top-part">
-                                        <p className="m-0">
-                                          {data.type == "note"
-                                            ? "Note"
-                                            : "Invalide"}
-                                        </p>
-                                        <div className="d-flex align-items-center gap-2">
-                                          {data.is_important == 1 && (
-                                            <BsPatchExclamation
-                                              style={{
-                                                color: "red",
-                                                fontSize: "1.0rem",
-                                                cursor: "pointer",
-                                              }}
-                                              title="Remarque importante"
-                                            />
-                                          )}
-                                          <p className="m-0 create-date">
-                                            créé le {data.created_on}
-                                          </p>
-                                        </div>
-                                      </div>
-                                      <div className="inner-box">
-                                        {data.type == "note" &&
-                                          data.user_document_filename && (
-                                            <div className="d-flex align-items-center mb-3">
-                                              <div className="icon d-flex">
-                                                <svg
-                                                  width="16"
-                                                  height="16"
-                                                  viewBox="0 0 8 14"
-                                                  fill="none"
-                                                  xmlns="http://www.w3.org/2000/svg"
-                                                >
-                                                  <path
-                                                    d="M6.42457 3.36368V10.3334C6.42457 11.6728 5.33972 12.7576 4.00033 12.7576C2.66093 12.7576 1.57608 11.6728 1.57608 10.3334V2.75762C1.57608 1.92125 2.25487 1.24246 3.09123 1.24246C3.9276 1.24246 4.60639 1.92125 4.60639 2.75762V9.12125C4.60639 9.45459 4.33366 9.72731 4.00033 9.72731C3.66699 9.72731 3.39426 9.45459 3.39426 9.12125V3.36368H2.48517V9.12125C2.48517 9.95762 3.16396 10.6364 4.00033 10.6364C4.83669 10.6364 5.51548 9.95762 5.51548 9.12125V2.75762C5.51548 1.41822 4.43063 0.333374 3.09123 0.333374C1.75184 0.333374 0.666992 1.41822 0.666992 2.75762V10.3334C0.666992 12.1758 2.1579 13.6667 4.00033 13.6667C5.84275 13.6667 7.33366 12.1758 7.33366 10.3334V3.36368H6.42457Z"
-                                                    fill="#683191"
-                                                  ></path>
-                                                </svg>
-                                              </div>
-                                              <span className="file-names">
-                                                {data.user_document_filename}
-                                              </span>
-                                            </div>
-                                          )}
-
-                                        {data.added_by && (
-                                          <p
-                                            className="position-absolute"
-                                            style={{
-                                              bottom: "5px",
-                                              right: "10px",
-                                              fontSize: "0.875rem",
-                                              color: "#999",
-                                              margin: 0,
-                                            }}
-                                          >
-                                            —{" "}
-                                            {`${
-                                              data.added_by?.first_name ?? ""
-                                            } ${
-                                              data.added_by?.last_name ?? ""
-                                            }`}
-                                          </p>
-                                        )}
-                                        <p className="">{data.reason}</p>
-                                      </div>
-                                    </div>
-                                  </Fragment>
-                                ))}
-                              </div>
-                            ) : (
-                              <div className="mt-3">
-                                {t("NorecordsfoundLabel")}
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    </Offcanvas.Body>
-                  </Offcanvas>
-                </div>
-
-                <p className="m-0 my-1 my-md-0">Envoyer à : </p>
-                <div>
-                  <Form.Select
-                    aria-label="Etat du chantier"
-                    style={{ minHeight: "45px", fontFamily: "Manrope" }}
-                    value={sendToFileStatus}
-                    onChange={(e) => handleSendFileShow(e.target.value)}
-                  >
-                    <option value="" disabled selected>
-                      Envoyer à
-                    </option>
-                    <option value="transfer_to_insurer">
-                      Transfert à l'assureur
-                    </option>
-                    <option value="transfer_to_manager">
-                      Transfert au Gestionnaire
-                    </option>
-                  </Form.Select>
-                </div>
-              </div> */}
-              {/* View Note List */}
-              <Offcanvas
-                className="add-folder-panel broker-add-panel"
-                placement={"end"}
-                show={showNote}
-                onHide={handleNoteClose}
-              >
-                <Offcanvas.Header closeButton>
-                  <Offcanvas.Title>Dossier incomplet</Offcanvas.Title>
-                </Offcanvas.Header>
-                <Offcanvas.Body
-                  style={{ overflow: "hidden", maxHeight: "80vh" }}
-                >
-                  <div className="step-1">
-                    <div className="div">
-                      <div className="step-2">
-                        <h2>Liste de notes</h2>
-                        <Select
-                          options={NotesOptions}
-                          onChange={(selectedOption) =>
-                            GetDocumentFileNotesList(
-                              id,
-                              selectedOption?.value
-                            )
-                          }
-                          styles={{
-                            container: (provided) => ({
-                              ...provided,
-                              width: "50%",
-                            }),
-                            menu: (provided) => ({
-                              ...provided,
-                              width: "100%",
-                            }),
-                          }}
-                          placeholder={"Sélectionnez le type de note"}
-                          isSearchable={true}
-                          className={isNoteLoading ? "mb-5" : ""}
-                        />
-
-                        {isNoteLoading ? (
-                          <Loading />
-                        ) : displayedRecordsNote?.length > 0 ? (
-                          <div
-                            ref={scrollRef}
-                            className="scroll-container mt-3"
-                            onScroll={handleScrollNote}
-                            style={{
-                              maxHeight: "calc(100vh - 300px)",
-                              overflowY: "auto",
-                              paddingRight: "5px",
-                              scrollbarWidth: "thin",
-                            }}
-                          >
-                            {displayedRecordsNote?.map((data) => (
-                              <Fragment key={data.id}>
-                                <div className="note-box mb-3">
-                                  <div className="d-flex justify-content-between align-items-center top-part">
-                                    <p className="m-0">
-                                      {data.type == "note"
-                                        ? "Note"
-                                        : "Invalide"}
-                                    </p>
-                                    <div className="d-flex align-items-center gap-2">
-                                      {data.is_important == 1 && (
-                                        <BsPatchExclamation
-                                          style={{
-                                            color: "red",
-                                            fontSize: "1.0rem",
-                                            cursor: "pointer",
-                                          }}
-                                          title="Remarque importante"
-                                        />
-                                      )}
-                                      <p className="m-0 create-date">
-                                        créé le {data.created_on}
-                                      </p>
-                                    </div>
-                                  </div>
-                                  <div className="inner-box">
-                                    {data.type == "note" &&
-                                      data.user_document_filename && (
-                                        <div className="d-flex align-items-center mb-3">
-                                          <div className="icon d-flex">
-                                            <svg
-                                              width="16"
-                                              height="16"
-                                              viewBox="0 0 8 14"
-                                              fill="none"
-                                              xmlns="http://www.w3.org/2000/svg"
-                                            >
-                                              <path
-                                                d="M6.42457 3.36368V10.3334C6.42457 11.6728 5.33972 12.7576 4.00033 12.7576C2.66093 12.7576 1.57608 11.6728 1.57608 10.3334V2.75762C1.57608 1.92125 2.25487 1.24246 3.09123 1.24246C3.9276 1.24246 4.60639 1.92125 4.60639 2.75762V9.12125C4.60639 9.45459 4.33366 9.72731 4.00033 9.72731C3.66699 9.72731 3.39426 9.45459 3.39426 9.12125V3.36368H2.48517V9.12125C2.48517 9.95762 3.16396 10.6364 4.00033 10.6364C4.83669 10.6364 5.51548 9.95762 5.51548 9.12125V2.75762C5.51548 1.41822 4.43063 0.333374 3.09123 0.333374C1.75184 0.333374 0.666992 1.41822 0.666992 2.75762V10.3334C0.666992 12.1758 2.1579 13.6667 4.00033 13.6667C5.84275 13.6667 7.33366 12.1758 7.33366 10.3334V3.36368H6.42457Z"
-                                                fill="#683191"
-                                              ></path>
-                                            </svg>
-                                          </div>
-                                          <span className="file-names">
-                                            {data.user_document_filename}
-                                          </span>
-                                        </div>
-                                      )}
-
-                                    {data.added_by && (
-                                      <p
-                                        className="position-absolute"
-                                        style={{
-                                          bottom: "5px",
-                                          right: "10px",
-                                          fontSize: "0.875rem",
-                                          color: "#999",
-                                          margin: 0,
-                                        }}
-                                      >
-                                        —{" "}
-                                        {`${data.added_by?.first_name ?? ""
-                                          } ${data.added_by?.last_name ?? ""
-                                          }`}
-                                      </p>
-                                    )}
-                                    <p className="">{data.reason}</p>
-                                  </div>
-                                </div>
-                              </Fragment>
-                            ))}
-                          </div>
-                        ) : (
-                          <div className="mt-3">
-                            {t("NorecordsfoundLabel")}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </Offcanvas.Body>
-              </Offcanvas>
             </div>
+
             <div className={`second-header ${isVisible ? "show" : ""}`}>
               <div className="dropdown-part">
                 <div className="row mb-3">
                   <div className="col-md-3">
-                    <label class="form-label">Etat du chantier</label>
-                                        <Form.Select
-                      aria-label="Etat du chantier"
-                      style={{ minHeight: "45px", fontFamily: "Manrope" }}
-                      value={sendToFileStatus}
-                      onChange={(e) => handleSendFileShow(e.target.value)}
+                    <label class="form-label">Export As</label>
+                    <Form.Select
+                      aria-label="Export As"
+                      style={{ minHeight: "45px", minWidth: "110px" }}
+                      onChange={(e) => handleExportDocumentShow(e.target.value)}
+                      defaultValue=""
                     >
-                      <option value="" disabled selected>
-                        Envoyer à
-                      </option>
-                      <option value="transfer_to_insurer">
-                        Transfert à l'assureur
-                      </option>
-                      <option value="transfer_to_manager">
-                        Transfert au Gestionnaire
-                      </option>
+                      <option value="">Sélectionner...</option>
+                      <option value="pdf">PDF</option>
+                      <option value="excel">Exceller</option>
                     </Form.Select>
                   </div>
                   <div className="col-md-3">
@@ -1768,16 +1631,6 @@ const BrokerFileDetail = () => {
                       </option>
                     </Form.Select>
                   </div>
-                  <div className="col-md-3">
-                     <label class="form-label">Export As</label>
-                                           <Form.Select
-                        aria-label="Export As"
-                        style={{ minHeight: "45px", minWidth: "110px" }}
-                      >
-                        <option value="on_site">PDF</option>
-                        <option value="end_of_site">Excel</option>
-                      </Form.Select>
-                  </div>
                 </div>
 
                 <div className="grid-view">
@@ -1801,14 +1654,11 @@ const BrokerFileDetail = () => {
                             ? t("toBeCheckedLabel")
                             : showUserDocumentData?.status === "validated"
                             ? t("validatedLabel")
-                            : showUserDocumentData?.status ===
-                              "transfer_to_insurer"
+                            : showUserDocumentData?.status === "transfer_to_insurer"
                             ? "Transfert à l'assureur"
-                            : showUserDocumentData?.status ===
-                              "transfer_to_broker"
+                            : showUserDocumentData?.status === "transfer_to_broker"
                             ? "Transfert au Courtier"
-                            : showUserDocumentData?.status ===
-                              "transfer_to_manager"
+                            : showUserDocumentData?.status === "transfer_to_manager"
                             ? "Transfert au Gestionnaire"
                             : showUserDocumentData?.status === "to_be_decided"
                             ? "A statuer"
@@ -1821,26 +1671,26 @@ const BrokerFileDetail = () => {
                     <div className="col-md-3 mb-3">
                       <div className="d-flex align-items-start flex-column gap-2">
                         <p className="m-0">DOC </p>
-                        <div className="status">15/07/2025</div>
+                        <div className="status">{showUserDocumentData?.created_at || "-"}</div>
                       </div>
                     </div>
 
                     <div className="col-md-3 mb-3">
                       <div className="d-flex align-items-start flex-column gap-2">
                         <p className="m-0">Date fin prévisionnelle </p>
-                        <div className="status">27/07/2026</div>
+                        <div className="status">{showUserDocumentData?.estimated_completion_date || "-"}</div>
                       </div>
                     </div>
                     <div className="col-md-3 mb-3">
                       <div className="d-flex align-items-start flex-column gap-2">
                         <p className="m-0">Coût prévisionnel </p>
-                        <div className="status">10 450 000€</div>
+                        <div className="status">{showUserDocumentData?.estimated_site_cost || "-"}</div>
                       </div>
                     </div>
                     <div className="col-md-3 mb-3">
                       <div className="d-flex align-items-start flex-column gap-2">
                         <p className="m-0">Nom du preneur assurance </p>
-                        <div className="status">Taratata patata</div>
+                        <div className="status">{showUserDocumentData?.insurance_policyholder_name || "-"}</div>
                       </div>
                     </div>
                   </div>
@@ -1856,7 +1706,6 @@ const BrokerFileDetail = () => {
           className=""
         >
           {/* Dashboard  Tab */}
-
           <Tab className="dashboard-tab" eventKey="dashboard" title="Dashboard">
             {isLoading && (
               <div className="loading-overlay">
@@ -1866,251 +1715,280 @@ const BrokerFileDetail = () => {
 
             <div className="row">
               <div className="col-md-7">
-                <h2 className="mb-3">Detailed Information</h2>
+                <h2 className="mb-3">Informations détaillées</h2>
                 <div className="custom-grid-card">
-                  <h3>Documents # of registered documents</h3>
+                  <h3>Documents enregistrés</h3>
                   <div className="table-wrap mt-24">
                     <Table responsive hover>
                       <thead>
                         <tr>
-                          <th>Name of document</th>
-                          <th>Number of document</th>
-                          <th>Status</th>
+                          <th>Nom du bloc logique</th>
+                          <th>Nombre de blocs logiques</th>
                         </tr>
                       </thead>
                       <tbody>
-                        <tr>
-                          <td>
-                            <div className="d-flex align-items-center">
-                              <span className="file-type-icon">
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  width="24"
-                                  height="24"
-                                  viewBox="0 0 24 24"
-                                  fill="none"
-                                >
-                                  <path
-                                    d="M12.65 2.23994C12.4689 2.08503 12.2383 1.99992 12 1.99994H5C4.73478 1.99994 4.48043 2.1053 4.29289 2.29283C4.10536 2.48037 4 2.73472 4 2.99994V20.9999C4 21.2652 4.10536 21.5195 4.29289 21.7071C4.48043 21.8946 4.73478 21.9999 5 21.9999H19C19.2652 21.9999 19.5196 21.8946 19.7071 21.7071C19.8946 21.5195 20 21.2652 20 20.9999V8.99994C20 8.8555 19.9687 8.71277 19.9083 8.58157C19.8479 8.45038 19.7598 8.33383 19.65 8.23994L12.65 2.23994ZM13 5.16994L16.3 7.99994H13V5.16994ZM18 19.9999H6V3.99994H11V8.99994C11 9.26516 11.1054 9.51951 11.2929 9.70705C11.4804 9.89458 11.7348 9.99994 12 9.99994H18V19.9999Z"
-                                    fill="white"
-                                  />
-                                </svg>
-                              </span>
-                              <span className="text-elips">
-                                General documents
-                              </span>
-                            </div>
-                          </td>
-                          <td>2</td>
-                          <td>
-                            <span className="doc-status success"></span>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>
-                            {" "}
-                            <div className="d-flex align-items-center">
-                              <span className="file-type-icon">
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  width="24"
-                                  height="24"
-                                  viewBox="0 0 24 24"
-                                  fill="none"
-                                >
-                                  <path
-                                    d="M12.65 2.23994C12.4689 2.08503 12.2383 1.99992 12 1.99994H5C4.73478 1.99994 4.48043 2.1053 4.29289 2.29283C4.10536 2.48037 4 2.73472 4 2.99994V20.9999C4 21.2652 4.10536 21.5195 4.29289 21.7071C4.48043 21.8946 4.73478 21.9999 5 21.9999H19C19.2652 21.9999 19.5196 21.8946 19.7071 21.7071C19.8946 21.5195 20 21.2652 20 20.9999V8.99994C20 8.8555 19.9687 8.71277 19.9083 8.58157C19.8479 8.45038 19.7598 8.33383 19.65 8.23994L12.65 2.23994ZM13 5.16994L16.3 7.99994H13V5.16994ZM18 19.9999H6V3.99994H11V8.99994C11 9.26516 11.1054 9.51951 11.2929 9.70705C11.4804 9.89458 11.7348 9.99994 12 9.99994H18V19.9999Z"
-                                    fill="white"
-                                  />
-                                </svg>
-                              </span>
-                              <span className="text-elips">
-                                General documents
-                              </span>
-                            </div>
-                          </td>
-                          <td>2</td>
-                          <td>
-                            <span className="doc-status warning"></span>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>
-                            {" "}
-                            <div className="d-flex align-items-center">
-                              <span className="file-type-icon">
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  width="24"
-                                  height="24"
-                                  viewBox="0 0 24 24"
-                                  fill="none"
-                                >
-                                  <path
-                                    d="M12.65 2.23994C12.4689 2.08503 12.2383 1.99992 12 1.99994H5C4.73478 1.99994 4.48043 2.1053 4.29289 2.29283C4.10536 2.48037 4 2.73472 4 2.99994V20.9999C4 21.2652 4.10536 21.5195 4.29289 21.7071C4.48043 21.8946 4.73478 21.9999 5 21.9999H19C19.2652 21.9999 19.5196 21.8946 19.7071 21.7071C19.8946 21.5195 20 21.2652 20 20.9999V8.99994C20 8.8555 19.9687 8.71277 19.9083 8.58157C19.8479 8.45038 19.7598 8.33383 19.65 8.23994L12.65 2.23994ZM13 5.16994L16.3 7.99994H13V5.16994ZM18 19.9999H6V3.99994H11V8.99994C11 9.26516 11.1054 9.51951 11.2929 9.70705C11.4804 9.89458 11.7348 9.99994 12 9.99994H18V19.9999Z"
-                                    fill="white"
-                                  />
-                                </svg>
-                              </span>
-                              <span className="text-elips">Studies Report</span>
-                            </div>
-                          </td>
-                          <td>2</td>
-                          <td>
-                            <span className="doc-status danger"></span>
-                          </td>
-                        </tr>
+                        {dashboardDocumentFileList?.length > 0 ? (
+                          dashboardDocumentFileList?.map((data) => (
+                            <tr>
+                              <td>
+                                <div className="d-flex align-items-center">
+                                  <span className="file-type-icon">
+                                    <svg
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      width="24"
+                                      height="24"
+                                      viewBox="0 0 24 24"
+                                      fill="none"
+                                    >
+                                      <path
+                                        d="M12.65 2.23994C12.4689 2.08503 12.2383 1.99992 12 1.99994H5C4.73478 1.99994 4.48043 2.1053 4.29289 2.29283C4.10536 2.48037 4 2.73472 4 2.99994V20.9999C4 21.2652 4.10536 21.5195 4.29289 21.7071C4.48043 21.8946 4.73478 21.9999 5 21.9999H19C19.2652 21.9999 19.5196 21.8946 19.7071 21.7071C19.8946 21.5195 20 21.2652 20 20.9999V8.99994C20 8.8555 19.9687 8.71277 19.9083 8.58157C19.8479 8.45038 19.7598 8.33383 19.65 8.23994L12.65 2.23994ZM13 5.16994L16.3 7.99994H13V5.16994ZM18 19.9999H6V3.99994H11V8.99994C11 9.26516 11.1054 9.51951 11.2929 9.70705C11.4804 9.89458 11.7348 9.99994 12 9.99994H18V19.9999Z"
+                                        fill="white"
+                                      />
+                                    </svg>
+                                  </span>
+                                  <span className="text-elips">
+                                    {data.logical_block_name}
+                                  </span>
+                                </div>
+                              </td>
+                              <td>{`${data.registered}/${data.expected}`}</td>
+                            </tr>
+                          ))
+                        ) : (
+                          <tr style={{ textAlign: "center" }}>
+                            <td colSpan="2">{t("NorecordsfoundLabel")}</td>
+                          </tr>
+                        )}
                       </tbody>
                     </Table>
                   </div>
                 </div>
 
                 <div className="custom-grid-card mt-3">
-                  <h3>Intervenants # of registered Intervenants</h3>
+                  <h3>Intervenants enregistrés</h3>
                   <div className="table-wrap mt-24">
                     <Table responsive hover>
                       <thead>
                         <tr>
-                          <th>Name of Intervenants</th>
-                          <th>Number of Intervenants</th>
-                          <th>Status</th>
+                          <th>Intervenants</th>
+                          <th>Total Intervenants</th>
                         </tr>
                       </thead>
                       <tbody>
-                        <tr>
-                          <td>
-                            <div className="d-flex align-items-center">
-                              <span className="file-type-icon">
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  width="24"
-                                  height="24"
-                                  viewBox="0 0 24 24"
-                                  fill="none"
-                                >
-                                  <path
-                                    d="M12.65 2.23994C12.4689 2.08503 12.2383 1.99992 12 1.99994H5C4.73478 1.99994 4.48043 2.1053 4.29289 2.29283C4.10536 2.48037 4 2.73472 4 2.99994V20.9999C4 21.2652 4.10536 21.5195 4.29289 21.7071C4.48043 21.8946 4.73478 21.9999 5 21.9999H19C19.2652 21.9999 19.5196 21.8946 19.7071 21.7071C19.8946 21.5195 20 21.2652 20 20.9999V8.99994C20 8.8555 19.9687 8.71277 19.9083 8.58157C19.8479 8.45038 19.7598 8.33383 19.65 8.23994L12.65 2.23994ZM13 5.16994L16.3 7.99994H13V5.16994ZM18 19.9999H6V3.99994H11V8.99994C11 9.26516 11.1054 9.51951 11.2929 9.70705C11.4804 9.89458 11.7348 9.99994 12 9.99994H18V19.9999Z"
-                                    fill="white"
-                                  />
-                                </svg>
-                              </span>
-                              <span className="text-elips">
-                                General documents
-                              </span>
-                            </div>
-                          </td>
-                          <td>2</td>
-                          <td>
-                            <span className="doc-status success"></span>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>
-                            {" "}
-                            <div className="d-flex align-items-center">
-                              <span className="file-type-icon">
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  width="24"
-                                  height="24"
-                                  viewBox="0 0 24 24"
-                                  fill="none"
-                                >
-                                  <path
-                                    d="M12.65 2.23994C12.4689 2.08503 12.2383 1.99992 12 1.99994H5C4.73478 1.99994 4.48043 2.1053 4.29289 2.29283C4.10536 2.48037 4 2.73472 4 2.99994V20.9999C4 21.2652 4.10536 21.5195 4.29289 21.7071C4.48043 21.8946 4.73478 21.9999 5 21.9999H19C19.2652 21.9999 19.5196 21.8946 19.7071 21.7071C19.8946 21.5195 20 21.2652 20 20.9999V8.99994C20 8.8555 19.9687 8.71277 19.9083 8.58157C19.8479 8.45038 19.7598 8.33383 19.65 8.23994L12.65 2.23994ZM13 5.16994L16.3 7.99994H13V5.16994ZM18 19.9999H6V3.99994H11V8.99994C11 9.26516 11.1054 9.51951 11.2929 9.70705C11.4804 9.89458 11.7348 9.99994 12 9.99994H18V19.9999Z"
-                                    fill="white"
-                                  />
-                                </svg>
-                              </span>
-                              <span className="text-elips">
-                                General documents
-                              </span>
-                            </div>
-                          </td>
-                          <td>2</td>
-                          <td>
-                            <span className="doc-status warning"></span>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>
-                            {" "}
-                            <div className="d-flex align-items-center">
-                              <span className="file-type-icon">
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  width="24"
-                                  height="24"
-                                  viewBox="0 0 24 24"
-                                  fill="none"
-                                >
-                                  <path
-                                    d="M12.65 2.23994C12.4689 2.08503 12.2383 1.99992 12 1.99994H5C4.73478 1.99994 4.48043 2.1053 4.29289 2.29283C4.10536 2.48037 4 2.73472 4 2.99994V20.9999C4 21.2652 4.10536 21.5195 4.29289 21.7071C4.48043 21.8946 4.73478 21.9999 5 21.9999H19C19.2652 21.9999 19.5196 21.8946 19.7071 21.7071C19.8946 21.5195 20 21.2652 20 20.9999V8.99994C20 8.8555 19.9687 8.71277 19.9083 8.58157C19.8479 8.45038 19.7598 8.33383 19.65 8.23994L12.65 2.23994ZM13 5.16994L16.3 7.99994H13V5.16994ZM18 19.9999H6V3.99994H11V8.99994C11 9.26516 11.1054 9.51951 11.2929 9.70705C11.4804 9.89458 11.7348 9.99994 12 9.99994H18V19.9999Z"
-                                    fill="white"
-                                  />
-                                </svg>
-                              </span>
-                              <span className="text-elips">Studies Report</span>
-                            </div>
-                          </td>
-                          <td>2</td>
-                          <td>
-                            <span className="doc-status danger"></span>
-                          </td>
-                        </tr>
+                        {speakerDocumentFileList ? (
+                          <>
+                            <tr>
+                              <td>
+                                <div className="d-flex align-items-center">
+                                  <span className="file-type-icon">
+                                    <svg
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      width="24"
+                                      height="24"
+                                      viewBox="0 0 24 24"
+                                      fill="none"
+                                    >
+                                      <path
+                                        d="M12.65 2.23994C12.4689 2.08503 12.2383 1.99992 12 1.99994H5C4.73478 1.99994 4.48043 2.1053 4.29289 2.29283C4.10536 2.48037 4 2.73472 4 2.99994V20.9999C4 21.2652 4.10536 21.5195 4.29289 21.7071C4.48043 21.8946 4.73478 21.9999 5 21.9999H19C19.2652 21.9999 19.5196 21.8946 19.7071 21.7071C19.8946 21.5195 20 21.2652 20 20.9999V8.99994C20 8.8555 19.9687 8.71277 19.9083 8.58157C19.8479 8.45038 19.7598 8.33383 19.65 8.23994L12.65 2.23994ZM13 5.16994L16.3 7.99994H13V5.16994ZM18 19.9999H6V3.99994H11V8.99994C11 9.26516 11.1054 9.51951 11.2929 9.70705C11.4804 9.89458 11.7348 9.99994 12 9.99994H18V19.9999Z"
+                                        fill="white"
+                                      />
+                                    </svg>
+                                  </span>
+                                  <span className="text-elips">
+                                    Nombre total de fichiers invalides
+                                  </span>
+                                </div>
+                              </td>
+                              <td>
+                                {speakerDocumentFileList?.total_invalid_files}
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <div className="d-flex align-items-center">
+                                  <span className="file-type-icon">
+                                    <svg
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      width="24"
+                                      height="24"
+                                      viewBox="0 0 24 24"
+                                      fill="none"
+                                    >
+                                      <path
+                                        d="M12.65 2.23994C12.4689 2.08503 12.2383 1.99992 12 1.99994H5C4.73478 1.99994 4.48043 2.1053 4.29289 2.29283C4.10536 2.48037 4 2.73472 4 2.99994V20.9999C4 21.2652 4.10536 21.5195 4.29289 21.7071C4.48043 21.8946 4.73478 21.9999 5 21.9999H19C19.2652 21.9999 19.5196 21.8946 19.7071 21.7071C19.8946 21.5195 20 21.2652 20 20.9999V8.99994C20 8.8555 19.9687 8.71277 19.9083 8.58157C19.8479 8.45038 19.7598 8.33383 19.65 8.23994L12.65 2.23994ZM13 5.16994L16.3 7.99994H13V5.16994ZM18 19.9999H6V3.99994H11V8.99994C11 9.26516 11.1054 9.51951 11.2929 9.70705C11.4804 9.89458 11.7348 9.99994 12 9.99994H18V19.9999Z"
+                                        fill="white"
+                                      />
+                                    </svg>
+                                  </span>
+                                  <span className="text-elips">
+                                    Nombre total de fichiers manquants
+                                  </span>
+                                </div>
+                              </td>
+                              <td>
+                                {speakerDocumentFileList?.total_missing_files}
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <div className="d-flex align-items-center">
+                                  <span className="file-type-icon">
+                                    <svg
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      width="24"
+                                      height="24"
+                                      viewBox="0 0 24 24"
+                                      fill="none"
+                                    >
+                                      <path
+                                        d="M12.65 2.23994C12.4689 2.08503 12.2383 1.99992 12 1.99994H5C4.73478 1.99994 4.48043 2.1053 4.29289 2.29283C4.10536 2.48037 4 2.73472 4 2.99994V20.9999C4 21.2652 4.10536 21.5195 4.29289 21.7071C4.48043 21.8946 4.73478 21.9999 5 21.9999H19C19.2652 21.9999 19.5196 21.8946 19.7071 21.7071C19.8946 21.5195 20 21.2652 20 20.9999V8.99994C20 8.8555 19.9687 8.71277 19.9083 8.58157C19.8479 8.45038 19.7598 8.33383 19.65 8.23994L12.65 2.23994ZM13 5.16994L16.3 7.99994H13V5.16994ZM18 19.9999H6V3.99994H11V8.99994C11 9.26516 11.1054 9.51951 11.2929 9.70705C11.4804 9.89458 11.7348 9.99994 12 9.99994H18V19.9999Z"
+                                        fill="white"
+                                      />
+                                    </svg>
+                                  </span>
+                                  <span className="text-elips">
+                                    Nombre total d'intervenants connectés
+                                  </span>
+                                </div>
+                              </td>
+                              <td>
+                                {
+                                  speakerDocumentFileList?.total_speakers_attached
+                                }
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <div className="d-flex align-items-center">
+                                  <span className="file-type-icon">
+                                    <svg
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      width="24"
+                                      height="24"
+                                      viewBox="0 0 24 24"
+                                      fill="none"
+                                    >
+                                      <path
+                                        d="M12.65 2.23994C12.4689 2.08503 12.2383 1.99992 12 1.99994H5C4.73478 1.99994 4.48043 2.1053 4.29289 2.29283C4.10536 2.48037 4 2.73472 4 2.99994V20.9999C4 21.2652 4.10536 21.5195 4.29289 21.7071C4.48043 21.8946 4.73478 21.9999 5 21.9999H19C19.2652 21.9999 19.5196 21.8946 19.7071 21.7071C19.8946 21.5195 20 21.2652 20 20.9999V8.99994C20 8.8555 19.9687 8.71277 19.9083 8.58157C19.8479 8.45038 19.7598 8.33383 19.65 8.23994L12.65 2.23994ZM13 5.16994L16.3 7.99994H13V5.16994ZM18 19.9999H6V3.99994H11V8.99994C11 9.26516 11.1054 9.51951 11.2929 9.70705C11.4804 9.89458 11.7348 9.99994 12 9.99994H18V19.9999Z"
+                                        fill="white"
+                                      />
+                                    </svg>
+                                  </span>
+                                  <span className="text-elips">
+                                    Nombre total de fichiers à valider
+                                  </span>
+                                </div>
+                              </td>
+                              <td>
+                                {
+                                  speakerDocumentFileList?.total_to_be_validated_files
+                                }
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <div className="d-flex align-items-center">
+                                  <span className="file-type-icon">
+                                    <svg
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      width="24"
+                                      height="24"
+                                      viewBox="0 0 24 24"
+                                      fill="none"
+                                    >
+                                      <path
+                                        d="M12.65 2.23994C12.4689 2.08503 12.2383 1.99992 12 1.99994H5C4.73478 1.99994 4.48043 2.1053 4.29289 2.29283C4.10536 2.48037 4 2.73472 4 2.99994V20.9999C4 21.2652 4.10536 21.5195 4.29289 21.7071C4.48043 21.8946 4.73478 21.9999 5 21.9999H19C19.2652 21.9999 19.5196 21.8946 19.7071 21.7071C19.8946 21.5195 20 21.2652 20 20.9999V8.99994C20 8.8555 19.9687 8.71277 19.9083 8.58157C19.8479 8.45038 19.7598 8.33383 19.65 8.23994L12.65 2.23994ZM13 5.16994L16.3 7.99994H13V5.16994ZM18 19.9999H6V3.99994H11V8.99994C11 9.26516 11.1054 9.51951 11.2929 9.70705C11.4804 9.89458 11.7348 9.99994 12 9.99994H18V19.9999Z"
+                                        fill="white"
+                                      />
+                                    </svg>
+                                  </span>
+                                  <span className="text-elips">
+                                    Nombre total de fichiers validés
+                                  </span>
+                                </div>
+                              </td>
+                              <td>
+                                {speakerDocumentFileList?.total_validated_files}
+                              </td>
+                            </tr>
+                          </>
+                        ) : (
+                          <tr style={{ textAlign: "center" }}>
+                            <td colSpan="2">{t("NorecordsfoundLabel")}</td>
+                          </tr>
+                        )}
                       </tbody>
                     </Table>
                   </div>
                 </div>
-                <h2 className="mb-3 mt-3">Task</h2>
-                <div className="custom-grid-card mt-3">
-                  <h3>Coming Task - to be determined</h3>
+
+                <h2 className="mb-3 mt-3">Tâche</h2>
+                <div className="custom-grid-card">
+                  <h3>Tâche à venir - à déterminer</h3>
                   <div className="table-wrap mt-24">
                     <Table responsive hover>
                       <thead>
                         <tr>
-                          <th>Name of Task</th>
-                          <th>Dead line</th>
-                          <th>Task description</th>
-                          <th>Name of responsible</th>
-                          <th>status</th>
+                          <th>Nom de la tâche</th>
+                          <th>Date limite</th>
+                          <th>Description de la tâche</th>
+                          <th>Attribué par</th>
+                          <th>Attribué à</th>
+                          <th>{t("status")}</th>
                         </tr>
                       </thead>
                       <tbody>
-                        <tr>
-                          <td>Task 1</td>
-                          <td>dead line</td>
-                          <td>Task description</td>
-                          <td>Name of responsible</td>
-                          <td>
-                            <span className="checked badges">À vérifier</span>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>Task 1</td>
-                          <td>dead line</td>
-                          <td>Task description</td>
-                          <td>Name of responsible</td>
-                          <td>
-                            <span className="checked badges">À vérifier</span>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>Task 1</td>
-                          <td>dead line</td>
-                          <td>Task description</td>
-                          <td>Name of responsible</td>
-                          <td>
-                            <span className="checked badges">À vérifier</span>
-                          </td>
-                        </tr>
+                        {taskListData?.length > 0 ? (
+                          taskListData?.map((data) => (
+                            <tr>
+                              <td>
+                                <span className="text-elips">{data.title}</span>
+                              </td>
+                              <td>{data.due_date}</td>
+                              <td>
+                                <span className="text-elips">{data.description}</span>
+                              </td>
+                              <td>{(data.assigned_by?.first_name || "") + " " + (data.assigned_by?.last_name || "")}</td>
+                              <td>{(data.assigned_to?.first_name || "") + " " + (data.assigned_to?.last_name || "")}</td>
+                              <td>
+                                {/* {data.status == "to_be_checked" ? (
+                                  <span className="checked badges">
+                                    {t("toBeCheckedLabel")}
+                                  </span>
+                                ) : data.status == "verified" ? (
+                                  <span className="verified badges">
+                                    {t("verified")}
+                                  </span>
+                                ) : (
+                                  <span className="incomplete badges">
+                                    {t("invalidLabel")}
+                                  </span>
+                                )} */}
+                                <span className="checked badges">{data.status}</span>
+                              </td>
+                            </tr>
+                          ))) : (
+                          <tr style={{ textAlign: "center" }}>
+                            <td colSpan="6">{t("NorecordsfoundLabel")}</td>
+                          </tr>
+                        )}
                       </tbody>
                     </Table>
                   </div>
+                  {totalTaskRecords > 10 && (
+                    <Paginations
+                      currentPage={currentTaskPage}
+                      totalPages={totalTaskPages}
+                      onPageChange={handlePageChange}
+                      itemsPerPage={10}
+                      totalItems={totalTaskRecords}
+                    />
+                  )}
                 </div>
               </div>
+
               <div className="col-md-5">
-                <h2 className="mb-3">Events</h2>
+                <h2 className="mb-3">Événements</h2>
                 <div className="custom-grid-card">
                   <div className="last-event-card">
                     <div className="d-flex flex-wrap gap-2 mb-3">
@@ -2120,8 +1998,8 @@ const BrokerFileDetail = () => {
                         value={selectedType}
                         onChange={(e) => setSelectedType(e.target.value)}
                       >
-                        <option value="">Select Type</option>
-                        <option value="notes">Notes</option>
+                        <option value="">Sélectionnez le type</option>
+                        <option value="notes">Remarques</option>
                         <option value="action">Action</option>
                       </select>
 
@@ -2131,115 +2009,88 @@ const BrokerFileDetail = () => {
                         value={selectedUser}
                         onChange={(e) => setSelectedUser(e.target.value)}
                       >
-                        <option value="">Select User</option>
-                        <option value="user1">User 1</option>
-                        <option value="user2">User 2</option>
+                        <option value="">Sélectionnez un utilisateur</option>
+                        {eventHistoryUserList?.map((data, index) => (
+                          <option key={index} value={data.id}>{(data?.first_name || "") + " " + (data?.last_name || "")}</option>
+                        ))}
                       </select>
+
                       {/* Date Filter */}
                       <DatePicker
-                        selected={selectedDate}
-                        onChange={(date) => setSelectedDate(date)}
-                        className="form-control"
-                        placeholderText="Select Date"
+                        placeholderText="Sélectionnez une date"
+                        selected={selectedDate ? getFormattedDate(selectedDate) : null}
+                        onChange={(date) => setSelectedDate(formatDate(date))}
                         dateFormat="dd/MM/yyyy"
+                        locale={fr}
+                        isClearable
                       />
                     </div>
-                    5 last events
+                    <span>5 derniers événements</span>
                     <div className="timeline">
-                      <div className="timeline-item">
-                        <div className="timeline-dot"></div>
-                        <div className="timeline-content">
-                          <h5>January 2nd, 04:35 AM</h5>
-                          <p>
-                            {" "}
-                            <strong>Note :-</strong> Illum omnis quo illum nisi.
-                            Nesciunt est accusamus. Blanditiis nisi quae eum
-                            nisi similique. Modi consequuntur totam
-                          </p>
+                      {lastFiveEventList?.length > 0 ? (
+                        lastFiveEventList?.map((data) => {
+                          const [beforeColon, afterColon] = data.action_details
+                            .split(":")
+                            .map((s) => s.trim());
+                          return (
+                            <div className="timeline-item">
+                              <div className="timeline-dot"></div>
+                              <div className="timeline-content">
+                                <h5>{formatCreatedAt(data.created_at)}</h5>
+                                <p>
+                                  {beforeColon ? (
+                                    <>
+                                      <strong>{beforeColon} :-</strong>{" "}
+                                      {afterColon}
+                                    </>
+                                  ) : (
+                                    <>
+                                      <strong>{data.action_type} :-</strong>{" "}
+                                      {data.action_details}
+                                    </>
+                                  )}
+                                </p>
+                              </div>
+                            </div>
+                          );
+                        })
+                      ) : (
+                        <div className="timeline-item">
+                          {t("NorecordsfoundLabel")}
                         </div>
-                      </div>
-
-                      <div className="timeline-item">
-                        <div className="timeline-dot"></div>
-                        <div className="timeline-content">
-                          <h5>January 4th, 06:19 AM</h5>
-                          <p>
-                            <strong>Note :-</strong> Corrupti unde qui molestiae
-                            labore ad adipisci veniam perspiciatis quasi. Quae
-                            labore vel.
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="timeline-item">
-                        <div className="timeline-dot"></div>
-                        <div className="timeline-content">
-                          <h5>January 5th, 12:34 AM</h5>
-                          <p>
-                            <strong>Action :-</strong> Maiores doloribus qui.
-                            Repellat accusamus minima ipsa ipsam aut debitis
-                            quis sit voluptates. Amet necessitatibus non minus
-                            quaerat et quis.
-                          </p>
-                          <p>
-                            <strong>Action Name:-</strong>Lorem, ipsum dolor.
-                          </p>
-                          <p>
-                            <strong>User id:-</strong>Ipsum115880
-                          </p>
-                        </div>
-                      </div>
+                      )}
                     </div>
                     <button
-                      type="submit"
                       className="btn-secondary btn btn-primary"
+                      onClick={() => setActiveTab("history")}
                     >
-                      See All
+                      Tout voir
                     </button>
                   </div>
                   <div className="last-msg-card">
-                    3 Last Important Unread messages
+                    3 derniers messages importants non lus
                     <div className="timeline">
-                      <div className="timeline-item">
-                        <div className="timeline-dot"></div>
-                        <div className="timeline-content">
-                          <h5>January 2nd, 04:35 AM</h5>
-                          <p>
-                            Illum omnis quo illum nisi. Nesciunt est accusamus.
-                            Blanditiis nisi quae eum nisi similique. Modi
-                            consequuntur totam
-                          </p>
+                      {lastThreeNoteList?.length > 0 ? (
+                        lastThreeNoteList?.map((data) => (
+                          <div className="timeline-item">
+                            <div className="timeline-dot"></div>
+                            <div className="timeline-content">
+                              <h5>{formatCreatedAt(data.created_on)}</h5>
+                              <p>{data.reason}</p>
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="timeline-item">
+                          {t("NorecordsfoundLabel")}
                         </div>
-                      </div>
-
-                      <div className="timeline-item">
-                        <div className="timeline-dot"></div>
-                        <div className="timeline-content">
-                          <h5>January 4th, 06:19 AM</h5>
-                          <p>
-                            Corrupti unde qui molestiae labore ad adipisci
-                            veniam perspiciatis quasi. Quae labore vel.
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="timeline-item">
-                        <div className="timeline-dot"></div>
-                        <div className="timeline-content">
-                          <h5>January 5th, 12:34 AM</h5>
-                          <p>
-                            Maiores doloribus qui. Repellat accusamus minima
-                            ipsa ipsam aut debitis quis sit voluptates. Amet
-                            necessitatibus non minus quaerat et quis.
-                          </p>
-                        </div>
-                      </div>
+                      )}
                     </div>
                     <button
-                      type="submit"
                       className="btn-secondary btn btn-primary"
+                      onClick={handleNoteShow}
                     >
-                      See All
+                      Tout voir
                     </button>
                   </div>
                 </div>
@@ -2247,11 +2098,10 @@ const BrokerFileDetail = () => {
             </div>
           </Tab>
 
-          {/* Document  Tab */}
-
+          {/* Documents  Tab */}
           <Tab
             className="update-inside-tab"
-            eventKey="documents"
+            eventKey="otherdocument"
             title="Documents"
           >
             {isLoading && (
@@ -2259,10 +2109,15 @@ const BrokerFileDetail = () => {
                 <Loading />
               </div>
             )}
-            <Tabs defaultActiveKey="documentdddd" className="mt-0 mb-0 ">
-              {/* Other Document Tab */}
+            <Tabs 
+              defaultActiveKey="otherdocument" 
+              className="mt-0 mb-0 "
+              activeKey={activeDocumentTab}
+              onSelect={handleSelectDocument}
+            >
+              {/* Other Tab */}
               <Tab
-                eventKey="documentdddd"
+                eventKey="otherdocument"
                 title={`Documents (${totalRecordOther || 0})`}
               >
                 <div className="table-wrapper mt-16 p-0">
@@ -3164,14 +3019,17 @@ const BrokerFileDetail = () => {
                         {flashMessageStoreDoc.message}
                       </div>
                     )}
-                    {isLoading ? (
+                    {isSpeakerLoading ? (
                       <Loading />
                     ) : (
                       <Form>
                         <div className="d-block mb-2">
                           <span
                             className="back-screen"
-                            onClick={() => setShowSpeakerInner(false)}
+                            onClick={() => {
+                              setShowSpeakerInner(false);
+                              setActiveTab("speakerdocument");
+                            }}
                           >
                             <svg
                               xmlns="http://www.w3.org/2000/svg"
@@ -3308,7 +3166,8 @@ const BrokerFileDetail = () => {
                   <div className="col-md-8 flex-fill">
                     <Tabs
                       onSelect={handleSubTabSelect}
-                      defaultActiveKey="documents"
+                      defaultActiveKey="speakerdocument"
+                      activeKey={activeSubTab}
                       id="uncontrolled-tab-example"
                     >
                       <Tab
@@ -3409,7 +3268,6 @@ const BrokerFileDetail = () => {
                                               />
                                             </svg>
                                           </Link>
-                                          {/* {data.status !== "verified" && */}
                                           <Link
                                             className="delete"
                                             data-discover="true"
@@ -3433,7 +3291,6 @@ const BrokerFileDetail = () => {
                                               />
                                             </svg>
                                           </Link>
-                                          {/* } */}
                                         </td>
                                       </tr>
                                     ))
@@ -3884,7 +3741,7 @@ const BrokerFileDetail = () => {
                         {speakerList?.length > 0 &&
                         selectedSpeakerColumns.length > 0 ? (
                           speakerList?.map((data) => (
-                            <tr onClick={() => setShowSpeakerInner(true)}>
+                            <tr>
                               {selectedSpeakerColumns.includes(
                                 "N° de SIRET"
                               ) && <td>{data.siren_number}</td>}
@@ -3913,18 +3770,18 @@ const BrokerFileDetail = () => {
                                 <td>
                                   <div className="action-btn">
                                     <Link
-                                      // onClick={(e) => {
-                                      //   e.stopPropagation();
-                                      //   handleViewShowSpeaker();
-                                      //   setShowSpeakerId(data.id);
-                                      //   setTotalSpeakerDocument(
-                                      //     data.user_document_count
-                                      //   );
-                                      //   setTotalMissingDocument(
-                                      //     data.missing_document_count
-                                      //   );
-                                      // }}
-                                      onClick={() => setShowSpeakerInner(true)}
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleViewShowSpeaker();
+                                        setShowSpeakerId(data.id);
+                                        SpeakerDetail(data.id);
+                                        setTotalSpeakerDocument(
+                                          data.user_document_count
+                                        );
+                                        setTotalMissingDocument(
+                                          data.missing_document_count
+                                        );
+                                      }}
                                       className="view"
                                       href="/user-management"
                                       data-discover="true"
@@ -3973,7 +3830,7 @@ const BrokerFileDetail = () => {
                           ))
                         ) : (
                           <tr style={{ textAlign: "center" }}>
-                            <td colSpan="6">{t("NorecordsfoundLabel")}</td>
+                            <td colSpan="8">{t("NorecordsfoundLabel")}</td>
                           </tr>
                         )}
                       </tbody>
@@ -4116,6 +3973,143 @@ const BrokerFileDetail = () => {
           selectDocumentId={selectedAddNoteDocId}
           selectDocumentFileName={selectedAddNoteDocName}
         />
+
+        {/* View Note List */}
+        <Offcanvas
+          className="add-folder-panel broker-add-panel"
+          placement={"end"}
+          show={showNote}
+          onHide={handleNoteClose}
+        >
+          <Offcanvas.Header closeButton>
+            <Offcanvas.Title>Dossier incomplet</Offcanvas.Title>
+          </Offcanvas.Header>
+          <Offcanvas.Body
+            style={{ overflow: "hidden", maxHeight: "80vh" }}
+          >
+            <div className="step-1">
+              <div className="div">
+                <div className="step-2">
+                  <h2>Liste de notes</h2>
+                  <Select
+                    options={NotesOptions}
+                    onChange={(selectedOption) =>
+                      GetDocumentFileNotesList(
+                        id,
+                        selectedOption?.value
+                      )
+                    }
+                    styles={{
+                      container: (provided) => ({
+                        ...provided,
+                        width: "50%",
+                      }),
+                      menu: (provided) => ({
+                        ...provided,
+                        width: "100%",
+                      }),
+                    }}
+                    placeholder={"Sélectionnez le type de note"}
+                    isSearchable={true}
+                    className={isNoteLoading ? "mb-5" : ""}
+                  />
+
+                  {isNoteLoading ? (
+                    <Loading />
+                  ) : displayedRecordsNote?.length > 0 ? (
+                    <div
+                      ref={scrollRef}
+                      className="scroll-container mt-3"
+                      onScroll={handleScrollNote}
+                      style={{
+                        maxHeight: "calc(100vh - 300px)",
+                        overflowY: "auto",
+                        paddingRight: "5px",
+                        scrollbarWidth: "thin",
+                      }}
+                    >
+                      {displayedRecordsNote?.map((data) => (
+                        <Fragment key={data.id}>
+                          <div className="note-box mb-3">
+                            <div className="d-flex justify-content-between align-items-center top-part">
+                              <p className="m-0">
+                                {data.type == "note"
+                                  ? "Note"
+                                  : "Invalide"}
+                              </p>
+                              <div className="d-flex align-items-center gap-2">
+                                {data.is_important == 1 && (
+                                  <BsPatchExclamation
+                                    style={{
+                                      color: "red",
+                                      fontSize: "1.0rem",
+                                      cursor: "pointer",
+                                    }}
+                                    title="Remarque importante"
+                                  />
+                                )}
+                                <p className="m-0 create-date">
+                                  créé le {data.created_on}
+                                </p>
+                              </div>
+                            </div>
+                            <div className="inner-box">
+                              {data.type == "note" &&
+                                data.user_document_filename && (
+                                  <div className="d-flex align-items-center mb-3">
+                                    <div className="icon d-flex">
+                                      <svg
+                                        width="16"
+                                        height="16"
+                                        viewBox="0 0 8 14"
+                                        fill="none"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                      >
+                                        <path
+                                          d="M6.42457 3.36368V10.3334C6.42457 11.6728 5.33972 12.7576 4.00033 12.7576C2.66093 12.7576 1.57608 11.6728 1.57608 10.3334V2.75762C1.57608 1.92125 2.25487 1.24246 3.09123 1.24246C3.9276 1.24246 4.60639 1.92125 4.60639 2.75762V9.12125C4.60639 9.45459 4.33366 9.72731 4.00033 9.72731C3.66699 9.72731 3.39426 9.45459 3.39426 9.12125V3.36368H2.48517V9.12125C2.48517 9.95762 3.16396 10.6364 4.00033 10.6364C4.83669 10.6364 5.51548 9.95762 5.51548 9.12125V2.75762C5.51548 1.41822 4.43063 0.333374 3.09123 0.333374C1.75184 0.333374 0.666992 1.41822 0.666992 2.75762V10.3334C0.666992 12.1758 2.1579 13.6667 4.00033 13.6667C5.84275 13.6667 7.33366 12.1758 7.33366 10.3334V3.36368H6.42457Z"
+                                          fill="#683191"
+                                        ></path>
+                                      </svg>
+                                    </div>
+                                    <span className="file-names">
+                                      {data.user_document_filename}
+                                    </span>
+                                  </div>
+                                )}
+
+                              {data.added_by && (
+                                <p
+                                  className="position-absolute"
+                                  style={{
+                                    bottom: "5px",
+                                    right: "10px",
+                                    fontSize: "0.875rem",
+                                    color: "#999",
+                                    margin: 0,
+                                  }}
+                                >
+                                  —{" "}
+                                  {`${data.added_by?.first_name ?? ""
+                                    } ${data.added_by?.last_name ?? ""
+                                    }`}
+                                </p>
+                              )}
+                              <p className="">{data.reason}</p>
+                            </div>
+                          </div>
+                        </Fragment>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="mt-3">
+                      {t("NorecordsfoundLabel")}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </Offcanvas.Body>
+        </Offcanvas>
 
         {/* Replace Doc pannel */}
         <Offcanvas
@@ -4658,365 +4652,6 @@ const BrokerFileDetail = () => {
             </Button>
           </Modal.Footer>
         </Modal>
-
-        {/* View Speaker Pop Up Design */}
-        <Offcanvas
-          className="add-folder-panel"
-          placement={"end"}
-          show={showViewSpeaker}
-          onHide={handleViewCloseSpeaker}
-        >
-          <Offcanvas.Header className="" closeButton>
-            <Offcanvas.Title>Détail intervenant</Offcanvas.Title>
-          </Offcanvas.Header>
-          <Offcanvas.Body>
-            <Tabs
-              activeKey={activeSubTab}
-              onSelect={handleSubTabSelect}
-              id="uncontrolled-tab-example"
-            >
-              <Tab eventKey="speaker" title="Informations générales ">
-                {flashMessage.message && (
-                  <div
-                    className={`alert ${
-                      flashMessage.type === "success"
-                        ? "alert-success"
-                        : "alert-danger"
-                    } text-center`}
-                    role="alert"
-                  >
-                    {flashMessage.message}
-                  </div>
-                )}
-                {flashMessageStoreDoc.message && (
-                  <div
-                    className={`mt-3 alert ${
-                      flashMessageStoreDoc.type === "success"
-                        ? "alert-success"
-                        : "alert-danger"
-                    } text-center`}
-                    role="alert"
-                  >
-                    {flashMessageStoreDoc.message}
-                  </div>
-                )}
-                {isLoading ? (
-                  <Loading />
-                ) : (
-                  <Form>
-                    <Form.Label>
-                      N° de SIRET <span>*</span>
-                    </Form.Label>
-                    <Form.Control
-                      className="mb-3"
-                      type="text"
-                      placeholder="SIRET"
-                      name="siren_number"
-                      disabled
-                      value={
-                        speakerDetail?.siren_number
-                          ? speakerDetail?.siren_number
-                          : "-"
-                      }
-                      onChange={(e) =>
-                        setSpeakerDetail({
-                          ...speakerDetail,
-                          siren_number: e.target.value,
-                        })
-                      }
-                    />
-                    <Form.Label>
-                      Nom société <span>*</span>
-                    </Form.Label>
-                    <Form.Control
-                      className="mb-3"
-                      type="text"
-                      placeholder="Nom société"
-                      defaultValue="Mark"
-                      name="company_name"
-                      disabled
-                      value={
-                        speakerDetail?.company_name
-                          ? speakerDetail?.company_name
-                          : "-"
-                      }
-                      onChange={(e) =>
-                        setSpeakerDetail({
-                          ...speakerDetail,
-                          company_name: e.target.value,
-                        })
-                      }
-                    />
-                    <Form.Label>
-                      Adresse <span>*</span>
-                    </Form.Label>
-                    <Form.Control
-                      className="mb-3"
-                      type="text"
-                      placeholder="Adresse"
-                      name="address"
-                      disabled
-                      value={
-                        speakerDetail?.address ? speakerDetail?.address : "-"
-                      }
-                      onChange={(e) =>
-                        setSpeakerDetail({
-                          ...speakerDetail,
-                          address: e.target.value,
-                        })
-                      }
-                    />
-
-                    <div className="d-md-flex align-items-center side-col">
-                      <Form.Group className="post-code" controlId="postcode">
-                        <Form.Label>
-                          Code postal <span>*</span>
-                        </Form.Label>
-                        <Form.Control
-                          className="mb-3"
-                          type="text"
-                          placeholder="Code postal"
-                          name="postcode"
-                          disabled
-                          value={
-                            speakerDetail?.postcode
-                              ? speakerDetail?.postcode
-                              : "-"
-                          }
-                          onChange={(e) =>
-                            setSpeakerDetail({
-                              ...speakerDetail,
-                              postcode: e.target.value,
-                            })
-                          }
-                        />
-                      </Form.Group>
-
-                      <Form.Group className="" controlId="city">
-                        <Form.Label>
-                          Ville <span>*</span>
-                        </Form.Label>
-                        <Form.Control
-                          className="mb-3"
-                          type="text"
-                          placeholder="Ville"
-                          name="city"
-                          disabled
-                          value={
-                            speakerDetail?.city ? speakerDetail?.city : "-"
-                          }
-                          onChange={(e) =>
-                            setSpeakerDetail({
-                              ...speakerDetail,
-                              city: e.target.value,
-                            })
-                          }
-                        />
-                      </Form.Group>
-                    </div>
-                  </Form>
-                )}
-              </Tab>
-              <Tab
-                eventKey="documents"
-                title={`Documents (${totalSpeakerDocument})`}
-              >
-                {isLoading ? (
-                  <Loading />
-                ) : (
-                  <div className="table-wrapper mt-16 p-0">
-                    <div className="table-wrap mt-24">
-                      <Table responsive hover>
-                        <thead>
-                          <tr>
-                            <th>Nom du fichier</th>
-                            <th>Type de document</th>
-                            <th>Statut</th>
-                            <th>Actions</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {showSpeakerDocument?.length > 0 ? (
-                            showSpeakerDocument?.map((data) => (
-                              <tr>
-                                <td>{data.filename}</td>
-                                <td>{data.docType?.name}</td>
-                                <td>
-                                  {data.status == "to_be_checked" ? (
-                                    <span className="checked badges">
-                                      {t("toBeCheckedLabel")}
-                                    </span>
-                                  ) : data.status == "verified" ? (
-                                    <span className="verified badges">
-                                      {t("verified")}
-                                    </span>
-                                  ) : (
-                                    <span className="incomplete badges">
-                                      {t("invalidLabel")}
-                                    </span>
-                                  )}
-                                </td>
-                                <td>
-                                  <Link
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      e.preventDefault();
-                                      HandleDownloadFile(data);
-                                    }}
-                                    className="download"
-                                    href="/user-management"
-                                    data-discover="true"
-                                    title="Télécharger"
-                                  >
-                                    <svg
-                                      width="24"
-                                      height="24"
-                                      viewBox="0 0 24 24"
-                                      fill="none"
-                                      xmlns="http://www.w3.org/2000/svg"
-                                    >
-                                      <path
-                                        d="M14 2H6C4.9 2 4.01 2.9 4.01 4L4 20C4 21.1 4.89 22 5.99 22H18C19.1 22 20 21.1 20 20V8L14 2ZM18 20H6V4H13V9H18V20Z"
-                                        fill="#00366B"
-                                      />
-                                      <path
-                                        d="M8 14L12 18L16 14"
-                                        stroke="#00366B"
-                                        stroke-width="1.5"
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                      />
-                                      <path
-                                        d="M12 11V18"
-                                        stroke="#00366B"
-                                        stroke-width="1.5"
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                      />
-                                    </svg>
-                                  </Link>
-                                  {/* {data.status !== "verified" && */}
-                                  <Link
-                                    className="delete"
-                                    data-discover="true"
-                                    title="Supprimer"
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      handleShowDeleteModal();
-                                      setShowDocumentId(data.id);
-                                    }}
-                                  >
-                                    <svg
-                                      width="24"
-                                      height="24"
-                                      viewBox="0 0 24 24"
-                                      fill="none"
-                                      xmlns="http://www.w3.org/2000/svg"
-                                    >
-                                      <path
-                                        d="M16 9V19H8V9H16ZM14.5 3H9.5L8.5 4H5V6H19V4H15.5L14.5 3ZM18 7H6V19C6 20.1 6.9 21 8 21H16C17.1 21 18 20.1 18 19V7Z"
-                                        fill="#00366B"
-                                      />
-                                    </svg>
-                                  </Link>
-                                  {/* } */}
-                                </td>
-                              </tr>
-                            ))
-                          ) : (
-                            <tr style={{ textAlign: "center" }}>
-                              <td colSpan="3">{t("NorecordsfoundLabel")}</td>
-                            </tr>
-                          )}
-                        </tbody>
-                      </Table>
-                    </div>
-                    {totalSpeakerDocument > 10 && (
-                      <Paginations
-                        currentPage={currentPage}
-                        totalPages={totalPages}
-                        onPageChange={handlePageChangeView}
-                        itemsPerPage={10}
-                        totalItems={totalSpeakerDocument}
-                      />
-                    )}
-                  </div>
-                )}
-              </Tab>
-              <Tab
-                eventKey="documentType"
-                title={`Documents manquants (${totalMissingDocument})`}
-              >
-                {flashMessage.message && (
-                  <div
-                    className={`alert ${
-                      flashMessage.type === "success"
-                        ? "alert-success"
-                        : "alert-danger"
-                    } text-center`}
-                    role="alert"
-                  >
-                    {flashMessage.message}
-                  </div>
-                )}
-                {isLoading ? (
-                  <Loading />
-                ) : (
-                  <div className="table-wrapper mt-16 p-0">
-                    <div className="table-wrap mt-24">
-                      <Table responsive hover>
-                        <thead>
-                          <tr>
-                            <th>Type de document</th>
-                            <th>Action</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {speakerDocumentTypeList?.length > 0 ? (
-                            speakerDocumentTypeList?.map((data) => (
-                              <tr>
-                                <td>{data.documentType.name}</td>
-                                <td>
-                                  <Link
-                                    onClick={() => {
-                                      handleMissingDocShow();
-                                      setMissingDocumentId(data.id);
-                                    }}
-                                    className="doc"
-                                    href="/user-management"
-                                    data-discover="true"
-                                    title="Ajouter un document manquants"
-                                  >
-                                    <svg
-                                      width="16"
-                                      height="20"
-                                      viewBox="0 0 16 20"
-                                      fill="none"
-                                      xmlns="http://www.w3.org/2000/svg"
-                                    >
-                                      <path
-                                        d="M9 9H7V12H4V14H7V17H9V14H12V12H9V9ZM10 0H2C0.9 0 0 0.9 0 2V18C0 19.1 0.89 20 1.99 20H14C15.1 20 16 19.1 16 18V6L10 0ZM14 18H2V2H9V7H14V18Z"
-                                        fill="black"
-                                      />
-                                    </svg>
-                                  </Link>
-                                </td>
-                              </tr>
-                            ))
-                          ) : (
-                            <tr style={{ textAlign: "center" }}>
-                              <td colSpan="3">{t("NorecordsfoundLabel")}</td>
-                            </tr>
-                          )}
-                        </tbody>
-                      </Table>
-                    </div>
-                  </div>
-                )}
-              </Tab>
-            </Tabs>
-          </Offcanvas.Body>
-        </Offcanvas>
       </div>
 
       {/* Send To Manager, Broker, file  */}
@@ -5038,6 +4673,39 @@ const BrokerFileDetail = () => {
         <Modal.Footer>
           <div className="text-end">
             <Button variant="primary" onClick={() => SendFileToUpdate()}>
+              {t("confirmbtnLabel")}
+            </Button>
+          </div>
+        </Modal.Footer>
+      </Modal>
+
+      {/* Export Popup */}
+      <Modal
+        className="missing-doc-modal"
+        show={exportDocumentOpen}
+        onHide={() => setExportDocumentOpen(true)}
+      >
+        <Modal.Header closeButton onHide={handleExportDocumentClose}>
+          <Modal.Title>
+            <h2>Confirmer</h2>
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <span className="complete-process">
+            Êtes-vous sûr de vouloir télécharger les documents{" "}
+            {fileType == "pdf" ? "PDF" : fileType == "excel" ? "Exceller" : ""}?
+          </span>
+        </Modal.Body>
+        <Modal.Footer>
+          <div className="text-end">
+            <Button
+              variant="primary"
+              onClick={() =>
+                ExportDocumentFile(id, fileType, () =>
+                  setExportDocumentOpen(false)
+                )
+              }
+            >
               {t("confirmbtnLabel")}
             </Button>
           </div>

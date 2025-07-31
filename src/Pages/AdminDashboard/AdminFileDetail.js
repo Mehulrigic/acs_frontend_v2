@@ -2669,6 +2669,7 @@ const AdminFileDetail = () => {
                         onChange={(date) => setSelectedDate(formatDate(date))}
                         dateFormat="dd/MM/yyyy"
                         locale={fr}
+                        isClearable
                       />
                     </div>
                     <span>5 derniers événements</span>

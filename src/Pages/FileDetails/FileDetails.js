@@ -2039,7 +2039,7 @@ const FileDetails = () => {
                     <div className="col-md-3 mb-3">
                       <div className="d-flex align-items-start flex-column gap-2">
                         <p className="m-0">DOC </p>
-                        <div className="status">{showUserDocumentData?.created_at}</div>
+                        <div className="status">{showUserDocumentData?.created_at || ""}</div>
                       </div>
                     </div>
                     <div className="col-md-3 mb-3">
@@ -2072,7 +2072,7 @@ const FileDetails = () => {
           id="uncontrolled-tab-example"
           className=""
         >
-          {/* Dashboard Tab */}
+          {/* Dashboard  Tab */}
           <Tab className="dashboard-tab" eventKey="dashboard" title="Dashboard">
             {isLoading && (
               <div className="loading-overlay">
@@ -2389,6 +2389,7 @@ const FileDetails = () => {
                         onChange={(date) => setSelectedDate(formatDate(date))}
                         dateFormat="dd/MM/yyyy"
                         locale={fr}
+                        isClearable
                       />
                     </div>
                     <span>5 derniers événements</span>
