@@ -25,6 +25,9 @@ import AcsManagerFileService from "../../API/AcsManager/AcsManagerFileService";
 import AddNote from "../../Components/AddNote/AddNote";
 import Select from "react-select";
 import { BsPatchExclamation } from "react-icons/bs";
+import { parse, format } from "date-fns";
+import DashboardManagementService from "../../API/DashboardManagement/DashboardManagementService";
+import TaskManagementService from "../../API/TaskManagement/TaskManagementService";
 
 const FileDetails = () => {
   const [showSepeakerInner, setShowSpeakerInner] = useState(false);
@@ -65,6 +68,7 @@ const FileDetails = () => {
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [activeTab, setActiveTab] = useState("dashboard");
+  const [activeDocumentTab, setActiveDocumentTab] = useState("document");
   const [activeSubTab, setActiveSubTab] = useState("speaker");
   const [showSpeakerId, setShowSpeakerId] = useState("");
   const [history, setHistory] = useState([]);
@@ -309,6 +313,20 @@ const FileDetails = () => {
   const handleNoteShow = () => setShowNote(true);
   const handleNoteClose = () => setShowNote(false);
 
+  // File Dashboard
+  const [dashboardDocumentFileList, setDashboardDocumentFileList] = useState([]);
+  const [speakerDocumentFileList, setSpeakerDocumentFileList] = useState(null);
+  const [lastFiveEventList, setLastFiveEventList] = useState([]);
+  const [lastThreeNoteList, setLastThreeNoteList] = useState([]);
+  const [eventHistoryUserList, setEventHistoryUserList] = useState([]);
+
+  const [taskListData, setTaskListData] = useState([]);
+  const [taskStatus, setTaskStatus] = useState("");
+  const [taskPriority, setTaskPriority] = useState("");
+  const [currentTaskPage, setCurrentTaskPage] = useState(1);
+  const [totalTaskPages, setTotalTaskPages] = useState(1);
+  const [totalTaskRecords, setTotalTaskRecords] = useState(0);
+
   useEffect(() => {
     if (showNote) {
       GetDocumentFileNotesList(id, "");
@@ -353,6 +371,14 @@ const FileDetails = () => {
   }, []);
 
   useEffect(() => {
+    if (activeTab === "dashboard") {
+      DashboardRegisteredDocument(id);
+      DashboardSpeakerRegisteredDocument(id);
+      EventUserList(id);
+      DashboardLastFiveEvent(id);
+      DashboardLastThreeNote(id);
+      TaskList(search, sort, currentPage, taskStatus, taskPriority);
+    }
     if (activeTab === "contactinfo") {
       ShowUserDocumentData(id);
       setShowUserDocumentDataId(id);
@@ -372,7 +398,7 @@ const FileDetails = () => {
     if (activeTab === "history") {
       GetHistoryListDocument(id, sort, search, currentPage, selectActionType);
     }
-  }, [activeTab, sort]);
+  }, [activeTab, activeDocumentTab, sort]);
 
   useEffect(() => {
     if (showViewSpeaker) {
@@ -844,33 +870,11 @@ const FileDetails = () => {
     }
   };
 
-  // const MarkHistoryAsReadDocument = async (id) => {
-  //   try {
-  //     const response = await FilePageService.mark_history_as_read(id);
-  //     if (response.data.status) {
-  //       GetHistoryListDocument(showUserDocumentDataId);
-  //     }
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // };
-
-  // const MarkHistoryAsReadAllDocument = async (id) => {
-  //   try {
-  //     const response = await FilePageService.mark_history_all_as_read(id);
-  //     if (response.data.status) {
-  //       GetHistoryListDocument(id);
-  //     }
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // };
-
   const formatDate = (dateString) => {
     if (dateString) {
       const date = new Date(dateString);
       const day = String(date.getDate()).padStart(2, "0");
-      const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are zero-based
+      const month = String(date.getMonth() + 1).padStart(2, "0");
       const year = date.getFullYear();
       return `${day}/${month}/${year}`;
     } else {
@@ -880,30 +884,24 @@ const FileDetails = () => {
 
   const getFormattedDate = (dateString) => {
     const [day, month, year] = dateString.split("/");
-    return new Date(`${month}/${day}/${year}`); // Convert to MM/DD/YYYY format
+    return new Date(`${month}/${day}/${year}`);
   };
 
   const UpdateFolderInfo = async (e) => {
     e.preventDefault();
 
     var folderData = {
-      folder_name: e.target.elements.folderName.value
-        ? e.target.elements.folderName.value
-        : "",
+      folder_name: showUserFolderName || "",
       final_start_date: startDate ? startDate : "",
       final_completion_date: endDate ? endDate : "",
       contract_no: contractNo ? contractNo : "",
-      insurance_policyholder_name: policyholderName ? policyholderName : "",
+      insurance_policyholder_name: policyholderName || "",
       estimated_start_date: estimatedStartDate ? estimatedStartDate : "",
       estimated_completion_date: estimatedCompletionDate
         ? estimatedCompletionDate
         : "",
-      estimated_site_cost: e.target.elements.estimated_site_cost.value
-        ? e.target.elements.estimated_site_cost.value
-        : "",
-      final_site_cost: e.target.elements.final_site_cost.value
-        ? e.target.elements.final_site_cost.value
-        : "",
+      estimated_site_cost: estimatedSiteCost || "",
+      final_site_cost: finalSiteCost || "",
       broker_id: selectBroker ? selectBroker : "",
     };
     try {
@@ -1011,52 +1009,6 @@ const FileDetails = () => {
       });
     }
   };
-
-  // const HandleAddDocument = async (e) => {
-  //   e.preventDefault();
-  //   try {
-  //     const convertToBase64 = (file) => {
-  //       return new Promise((resolve, reject) => {
-  //         const reader = new FileReader();
-  //         reader.onload = () => resolve(reader.result.split(",")[1]);
-  //         reader.onerror = (error) => reject(error);
-  //         reader.readAsDataURL(file);
-  //       });
-  //     };
-
-  //     const filterDocType = documentTypeList?.find((doctype) => doctype.name === "Police");
-
-  //     const base64Files = await Promise.all(
-  //       fileList.map(async (file) => ({
-  //         filename: file.name,
-  //         file: await convertToBase64(file),
-  //         doc_type_id: filterDocType?.id,
-  //       }))
-  //     );
-
-  //     var useData = {
-  //       documents: base64Files,
-  //     };
-
-  //     const response = await FilePageService.add_document_files(id, useData);
-  //     if (response.data.status) {
-  //       setFileList([]);
-  //       ShowUserDocumentData(id);
-  //       handleClose();
-  //       setFlashMessage({
-  //         type: "success",
-  //         message: response.data.message || t("somethingWentWrong"),
-  //       });
-  //     } else {
-  //       setFlashMessage({
-  //         type: "error",
-  //         message: response.data.message || t("somethingWentWrong"),
-  //       });
-  //     }
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // };
 
   const AddMissingDocument = async (e) => {
     e.preventDefault();
@@ -1326,7 +1278,7 @@ const FileDetails = () => {
     }
 
     setUserDocumentFileDataChanges((prevData) => {
-      return prevData.map((file) => {
+      return prevData?.map((file) => {
         if (file.id == selectDocumentId) {
           return { ...file, doc_type_id: selectedDocument?.id };
         }
@@ -1672,6 +1624,7 @@ const FileDetails = () => {
 
   const handleAddNoteModalClose = () => {
     setShowAddNoteModal(false);
+    setSelectDocumentFileName("");
   };
 
   const NotesOptions = [
@@ -1687,6 +1640,206 @@ const FileDetails = () => {
       handleNoteShow();
     } else {
       return;
+    }
+  };
+
+  const DashboardRegisteredDocument = async (id) => {
+    try {
+      const response =
+        await DashboardManagementService.dashboard_registered_document_file(id);
+
+      if (response.data.status) {
+        setDashboardDocumentFileList(response.data.blocks);
+      } else {
+        setFlashMessage({
+          type: "error",
+          message: response.data.message || t("somethingWentWrong"),
+        });
+      }
+    } catch (error) {
+      setFlashMessage({
+        type: "error",
+        message: t("somethingWentWrong"),
+      });
+    }
+  };
+
+  const DashboardSpeakerRegisteredDocument = async (id) => {
+    try {
+      const response =
+        await DashboardManagementService.speaker_registered_document_file(id);
+
+      if (response.data.status) {
+        setSpeakerDocumentFileList(response.data.overall_statistics);
+      } else {
+        setFlashMessage({
+          type: "error",
+          message: response.data.message || t("somethingWentWrong"),
+        });
+      }
+    } catch (error) {
+      setFlashMessage({
+        type: "error",
+        message: t("somethingWentWrong"),
+      });
+    }
+  };
+
+  const DashboardLastFiveEvent = async (id) => {
+    try {
+      var userData = {
+        user_document_id: "",
+        type: "",
+        is_important: "",
+        is_read: "",
+      };
+
+      const response =
+        await DashboardManagementService.dashboard_last_five_event(
+          id,
+          userData
+        );
+
+      if (response.data.status) {
+        setLastFiveEventList(response.data.data);
+      } else {
+        setFlashMessage({
+          type: "error",
+          message: response.data.message || t("somethingWentWrong"),
+        });
+      }
+    } catch (error) {
+      setFlashMessage({
+        type: "error",
+        message: t("somethingWentWrong"),
+      });
+    }
+  };
+
+  const DashboardLastThreeNote = async (id) => {
+    try {
+      var userData = {
+        action_type: selectedType ?? "",
+        user_id: selectedUser ?? "",
+        start_date: "",
+        end_date: "",
+      };
+
+      const response =
+        await DashboardManagementService.dashboard_last_three_note(
+          id,
+          userData
+        );
+
+      if (response.data.status) {
+        setLastThreeNoteList(response.data.data);
+      } else {
+        setFlashMessage({
+          type: "error",
+          message: response.data.message || t("somethingWentWrong"),
+        });
+      }
+    } catch (error) {
+      setFlashMessage({
+        type: "error",
+        message: t("somethingWentWrong"),
+      });
+    }
+  };
+
+  const EventUserList = async (id) => {
+    setIsLoading(true);
+    try {
+      const response = await DashboardManagementService.event_history_users(id);
+
+      if (response.data.status) {
+        setIsLoading(false);
+        setEventHistoryUserList(response.data.user.data);
+      }
+    } catch (error) {
+      setIsLoading(false);
+      setFlashMessage({
+        type: "error",
+        message: t("somethingWentWrong"),
+      });
+    }
+  };
+
+  const formatCreatedAt = (dateStr) => {
+    try {
+      const parsedDate = parse(dateStr, "dd/MM/yyyy", new Date());
+      return format(parsedDate, "MMMM do, hh:mm a");
+    } catch (e) {
+      return dateStr;
+    }
+  };
+
+  const ExportDocumentFile = async (
+    id,
+    format = "pdf",
+    onFinish = () => {}
+  ) => {
+    try {
+      const response = await DashboardManagementService.export_folder(
+        id,
+        format
+      );
+      const blob = response.data;
+
+      const extension = format === "pdf" ? "pdf" : "xlsx";
+      const filename = `${showUserFolderName}.${extension}`;
+
+      const url = window.URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.style.display = "none";
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+
+      window.URL.revokeObjectURL(url);
+
+      onFinish();
+    } catch (error) {
+      console.error("Export failed", error);
+      setFlashMessage({
+        type: "error",
+        message: t("somethingWentWrong"),
+      });
+    }
+  };
+
+  const TaskList = async (search, sort, page = 1, status, priority) => {
+    setIsLoading(true);
+    try {
+      var userData = {
+        search: search ?? "",
+        sort: {
+          key: sort.key,
+          value: sort.value
+        },
+        page,
+        status: status ?? "",
+        priority: priority ?? ""
+      };
+
+      const response = await TaskManagementService.task_index(userData);
+
+      if (response.data.status) {
+        setIsLoading(false);
+        setTaskListData(response.data.task.data);
+        setCurrentTaskPage(response.data.task.meta.current_page);
+        setTotalTaskPages(response.data.task.meta.last_page);
+        setTotalTaskRecords(response.data.task.meta.total);
+      }
+    } catch (error) {
+      setIsLoading(false);
+      setFlashMessage({
+        type: "error",
+        message: t("somethingWentWrong"),
+      });
     }
   };
 
@@ -2329,251 +2482,280 @@ const FileDetails = () => {
 
             <div className="row">
               <div className="col-md-7">
-                <h2 className="mb-3">Detailed Information</h2>
+                <h2 className="mb-3">Informations détaillées</h2>
                 <div className="custom-grid-card">
-                  <h3>Documents # of registered documents</h3>
+                  <h3>Documents enregistrés</h3>
                   <div className="table-wrap mt-24">
                     <Table responsive hover>
                       <thead>
                         <tr>
-                          <th>Name of document</th>
-                          <th>Number of document</th>
-                          <th>Status</th>
+                          <th>Nom du bloc logique</th>
+                          <th>Nombre de blocs logiques</th>
                         </tr>
                       </thead>
                       <tbody>
-                        <tr>
-                          <td>
-                            <div className="d-flex align-items-center">
-                              <span className="file-type-icon">
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  width="24"
-                                  height="24"
-                                  viewBox="0 0 24 24"
-                                  fill="none"
-                                >
-                                  <path
-                                    d="M12.65 2.23994C12.4689 2.08503 12.2383 1.99992 12 1.99994H5C4.73478 1.99994 4.48043 2.1053 4.29289 2.29283C4.10536 2.48037 4 2.73472 4 2.99994V20.9999C4 21.2652 4.10536 21.5195 4.29289 21.7071C4.48043 21.8946 4.73478 21.9999 5 21.9999H19C19.2652 21.9999 19.5196 21.8946 19.7071 21.7071C19.8946 21.5195 20 21.2652 20 20.9999V8.99994C20 8.8555 19.9687 8.71277 19.9083 8.58157C19.8479 8.45038 19.7598 8.33383 19.65 8.23994L12.65 2.23994ZM13 5.16994L16.3 7.99994H13V5.16994ZM18 19.9999H6V3.99994H11V8.99994C11 9.26516 11.1054 9.51951 11.2929 9.70705C11.4804 9.89458 11.7348 9.99994 12 9.99994H18V19.9999Z"
-                                    fill="white"
-                                  />
-                                </svg>
-                              </span>
-                              <span className="text-elips">
-                                General documents
-                              </span>
-                            </div>
-                          </td>
-                          <td>2</td>
-                          <td>
-                            <span className="doc-status success"></span>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>
-                            {" "}
-                            <div className="d-flex align-items-center">
-                              <span className="file-type-icon">
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  width="24"
-                                  height="24"
-                                  viewBox="0 0 24 24"
-                                  fill="none"
-                                >
-                                  <path
-                                    d="M12.65 2.23994C12.4689 2.08503 12.2383 1.99992 12 1.99994H5C4.73478 1.99994 4.48043 2.1053 4.29289 2.29283C4.10536 2.48037 4 2.73472 4 2.99994V20.9999C4 21.2652 4.10536 21.5195 4.29289 21.7071C4.48043 21.8946 4.73478 21.9999 5 21.9999H19C19.2652 21.9999 19.5196 21.8946 19.7071 21.7071C19.8946 21.5195 20 21.2652 20 20.9999V8.99994C20 8.8555 19.9687 8.71277 19.9083 8.58157C19.8479 8.45038 19.7598 8.33383 19.65 8.23994L12.65 2.23994ZM13 5.16994L16.3 7.99994H13V5.16994ZM18 19.9999H6V3.99994H11V8.99994C11 9.26516 11.1054 9.51951 11.2929 9.70705C11.4804 9.89458 11.7348 9.99994 12 9.99994H18V19.9999Z"
-                                    fill="white"
-                                  />
-                                </svg>
-                              </span>
-                              <span className="text-elips">
-                                General documents
-                              </span>
-                            </div>
-                          </td>
-                          <td>2</td>
-                          <td>
-                            <span className="doc-status warning"></span>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>
-                            {" "}
-                            <div className="d-flex align-items-center">
-                              <span className="file-type-icon">
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  width="24"
-                                  height="24"
-                                  viewBox="0 0 24 24"
-                                  fill="none"
-                                >
-                                  <path
-                                    d="M12.65 2.23994C12.4689 2.08503 12.2383 1.99992 12 1.99994H5C4.73478 1.99994 4.48043 2.1053 4.29289 2.29283C4.10536 2.48037 4 2.73472 4 2.99994V20.9999C4 21.2652 4.10536 21.5195 4.29289 21.7071C4.48043 21.8946 4.73478 21.9999 5 21.9999H19C19.2652 21.9999 19.5196 21.8946 19.7071 21.7071C19.8946 21.5195 20 21.2652 20 20.9999V8.99994C20 8.8555 19.9687 8.71277 19.9083 8.58157C19.8479 8.45038 19.7598 8.33383 19.65 8.23994L12.65 2.23994ZM13 5.16994L16.3 7.99994H13V5.16994ZM18 19.9999H6V3.99994H11V8.99994C11 9.26516 11.1054 9.51951 11.2929 9.70705C11.4804 9.89458 11.7348 9.99994 12 9.99994H18V19.9999Z"
-                                    fill="white"
-                                  />
-                                </svg>
-                              </span>
-                              <span className="text-elips">Studies Report</span>
-                            </div>
-                          </td>
-                          <td>2</td>
-                          <td>
-                            <span className="doc-status danger"></span>
-                          </td>
-                        </tr>
+                        {dashboardDocumentFileList?.length > 0 ? (
+                          dashboardDocumentFileList?.map((data) => (
+                            <tr>
+                              <td>
+                                <div className="d-flex align-items-center">
+                                  <span className="file-type-icon">
+                                    <svg
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      width="24"
+                                      height="24"
+                                      viewBox="0 0 24 24"
+                                      fill="none"
+                                    >
+                                      <path
+                                        d="M12.65 2.23994C12.4689 2.08503 12.2383 1.99992 12 1.99994H5C4.73478 1.99994 4.48043 2.1053 4.29289 2.29283C4.10536 2.48037 4 2.73472 4 2.99994V20.9999C4 21.2652 4.10536 21.5195 4.29289 21.7071C4.48043 21.8946 4.73478 21.9999 5 21.9999H19C19.2652 21.9999 19.5196 21.8946 19.7071 21.7071C19.8946 21.5195 20 21.2652 20 20.9999V8.99994C20 8.8555 19.9687 8.71277 19.9083 8.58157C19.8479 8.45038 19.7598 8.33383 19.65 8.23994L12.65 2.23994ZM13 5.16994L16.3 7.99994H13V5.16994ZM18 19.9999H6V3.99994H11V8.99994C11 9.26516 11.1054 9.51951 11.2929 9.70705C11.4804 9.89458 11.7348 9.99994 12 9.99994H18V19.9999Z"
+                                        fill="white"
+                                      />
+                                    </svg>
+                                  </span>
+                                  <span className="text-elips">
+                                    {data.logical_block_name}
+                                  </span>
+                                </div>
+                              </td>
+                              <td>{`${data.registered}/${data.expected}`}</td>
+                            </tr>
+                          ))
+                        ) : (
+                          <tr style={{ textAlign: "center" }}>
+                            <td colSpan="2">{t("NorecordsfoundLabel")}</td>
+                          </tr>
+                        )}
                       </tbody>
                     </Table>
                   </div>
                 </div>
 
                 <div className="custom-grid-card mt-3">
-                  <h3>Intervenants # of registered Intervenants</h3>
+                  <h3>Intervenants enregistrés</h3>
                   <div className="table-wrap mt-24">
                     <Table responsive hover>
                       <thead>
                         <tr>
-                          <th>Name of Intervenants</th>
-                          <th>Number of Intervenants</th>
-                          <th>Status</th>
+                          <th>Intervenants</th>
+                          <th>Total Intervenants</th>
                         </tr>
                       </thead>
                       <tbody>
-                        <tr>
-                          <td>
-                            <div className="d-flex align-items-center">
-                              <span className="file-type-icon">
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  width="24"
-                                  height="24"
-                                  viewBox="0 0 24 24"
-                                  fill="none"
-                                >
-                                  <path
-                                    d="M12.65 2.23994C12.4689 2.08503 12.2383 1.99992 12 1.99994H5C4.73478 1.99994 4.48043 2.1053 4.29289 2.29283C4.10536 2.48037 4 2.73472 4 2.99994V20.9999C4 21.2652 4.10536 21.5195 4.29289 21.7071C4.48043 21.8946 4.73478 21.9999 5 21.9999H19C19.2652 21.9999 19.5196 21.8946 19.7071 21.7071C19.8946 21.5195 20 21.2652 20 20.9999V8.99994C20 8.8555 19.9687 8.71277 19.9083 8.58157C19.8479 8.45038 19.7598 8.33383 19.65 8.23994L12.65 2.23994ZM13 5.16994L16.3 7.99994H13V5.16994ZM18 19.9999H6V3.99994H11V8.99994C11 9.26516 11.1054 9.51951 11.2929 9.70705C11.4804 9.89458 11.7348 9.99994 12 9.99994H18V19.9999Z"
-                                    fill="white"
-                                  />
-                                </svg>
-                              </span>
-                              <span className="text-elips">
-                                General documents
-                              </span>
-                            </div>
-                          </td>
-                          <td>2</td>
-                          <td>
-                            <span className="doc-status success"></span>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>
-                            {" "}
-                            <div className="d-flex align-items-center">
-                              <span className="file-type-icon">
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  width="24"
-                                  height="24"
-                                  viewBox="0 0 24 24"
-                                  fill="none"
-                                >
-                                  <path
-                                    d="M12.65 2.23994C12.4689 2.08503 12.2383 1.99992 12 1.99994H5C4.73478 1.99994 4.48043 2.1053 4.29289 2.29283C4.10536 2.48037 4 2.73472 4 2.99994V20.9999C4 21.2652 4.10536 21.5195 4.29289 21.7071C4.48043 21.8946 4.73478 21.9999 5 21.9999H19C19.2652 21.9999 19.5196 21.8946 19.7071 21.7071C19.8946 21.5195 20 21.2652 20 20.9999V8.99994C20 8.8555 19.9687 8.71277 19.9083 8.58157C19.8479 8.45038 19.7598 8.33383 19.65 8.23994L12.65 2.23994ZM13 5.16994L16.3 7.99994H13V5.16994ZM18 19.9999H6V3.99994H11V8.99994C11 9.26516 11.1054 9.51951 11.2929 9.70705C11.4804 9.89458 11.7348 9.99994 12 9.99994H18V19.9999Z"
-                                    fill="white"
-                                  />
-                                </svg>
-                              </span>
-                              <span className="text-elips">
-                                General documents
-                              </span>
-                            </div>
-                          </td>
-                          <td>2</td>
-                          <td>
-                            <span className="doc-status warning"></span>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>
-                            {" "}
-                            <div className="d-flex align-items-center">
-                              <span className="file-type-icon">
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  width="24"
-                                  height="24"
-                                  viewBox="0 0 24 24"
-                                  fill="none"
-                                >
-                                  <path
-                                    d="M12.65 2.23994C12.4689 2.08503 12.2383 1.99992 12 1.99994H5C4.73478 1.99994 4.48043 2.1053 4.29289 2.29283C4.10536 2.48037 4 2.73472 4 2.99994V20.9999C4 21.2652 4.10536 21.5195 4.29289 21.7071C4.48043 21.8946 4.73478 21.9999 5 21.9999H19C19.2652 21.9999 19.5196 21.8946 19.7071 21.7071C19.8946 21.5195 20 21.2652 20 20.9999V8.99994C20 8.8555 19.9687 8.71277 19.9083 8.58157C19.8479 8.45038 19.7598 8.33383 19.65 8.23994L12.65 2.23994ZM13 5.16994L16.3 7.99994H13V5.16994ZM18 19.9999H6V3.99994H11V8.99994C11 9.26516 11.1054 9.51951 11.2929 9.70705C11.4804 9.89458 11.7348 9.99994 12 9.99994H18V19.9999Z"
-                                    fill="white"
-                                  />
-                                </svg>
-                              </span>
-                              <span className="text-elips">Studies Report</span>
-                            </div>
-                          </td>
-                          <td>2</td>
-                          <td>
-                            <span className="doc-status danger"></span>
-                          </td>
-                        </tr>
+                        {speakerDocumentFileList ? (
+                          <>
+                            <tr>
+                              <td>
+                                <div className="d-flex align-items-center">
+                                  <span className="file-type-icon">
+                                    <svg
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      width="24"
+                                      height="24"
+                                      viewBox="0 0 24 24"
+                                      fill="none"
+                                    >
+                                      <path
+                                        d="M12.65 2.23994C12.4689 2.08503 12.2383 1.99992 12 1.99994H5C4.73478 1.99994 4.48043 2.1053 4.29289 2.29283C4.10536 2.48037 4 2.73472 4 2.99994V20.9999C4 21.2652 4.10536 21.5195 4.29289 21.7071C4.48043 21.8946 4.73478 21.9999 5 21.9999H19C19.2652 21.9999 19.5196 21.8946 19.7071 21.7071C19.8946 21.5195 20 21.2652 20 20.9999V8.99994C20 8.8555 19.9687 8.71277 19.9083 8.58157C19.8479 8.45038 19.7598 8.33383 19.65 8.23994L12.65 2.23994ZM13 5.16994L16.3 7.99994H13V5.16994ZM18 19.9999H6V3.99994H11V8.99994C11 9.26516 11.1054 9.51951 11.2929 9.70705C11.4804 9.89458 11.7348 9.99994 12 9.99994H18V19.9999Z"
+                                        fill="white"
+                                      />
+                                    </svg>
+                                  </span>
+                                  <span className="text-elips">
+                                    Nombre total de fichiers invalides
+                                  </span>
+                                </div>
+                              </td>
+                              <td>
+                                {speakerDocumentFileList?.total_invalid_files}
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <div className="d-flex align-items-center">
+                                  <span className="file-type-icon">
+                                    <svg
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      width="24"
+                                      height="24"
+                                      viewBox="0 0 24 24"
+                                      fill="none"
+                                    >
+                                      <path
+                                        d="M12.65 2.23994C12.4689 2.08503 12.2383 1.99992 12 1.99994H5C4.73478 1.99994 4.48043 2.1053 4.29289 2.29283C4.10536 2.48037 4 2.73472 4 2.99994V20.9999C4 21.2652 4.10536 21.5195 4.29289 21.7071C4.48043 21.8946 4.73478 21.9999 5 21.9999H19C19.2652 21.9999 19.5196 21.8946 19.7071 21.7071C19.8946 21.5195 20 21.2652 20 20.9999V8.99994C20 8.8555 19.9687 8.71277 19.9083 8.58157C19.8479 8.45038 19.7598 8.33383 19.65 8.23994L12.65 2.23994ZM13 5.16994L16.3 7.99994H13V5.16994ZM18 19.9999H6V3.99994H11V8.99994C11 9.26516 11.1054 9.51951 11.2929 9.70705C11.4804 9.89458 11.7348 9.99994 12 9.99994H18V19.9999Z"
+                                        fill="white"
+                                      />
+                                    </svg>
+                                  </span>
+                                  <span className="text-elips">
+                                    Nombre total de fichiers manquants
+                                  </span>
+                                </div>
+                              </td>
+                              <td>
+                                {speakerDocumentFileList?.total_missing_files}
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <div className="d-flex align-items-center">
+                                  <span className="file-type-icon">
+                                    <svg
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      width="24"
+                                      height="24"
+                                      viewBox="0 0 24 24"
+                                      fill="none"
+                                    >
+                                      <path
+                                        d="M12.65 2.23994C12.4689 2.08503 12.2383 1.99992 12 1.99994H5C4.73478 1.99994 4.48043 2.1053 4.29289 2.29283C4.10536 2.48037 4 2.73472 4 2.99994V20.9999C4 21.2652 4.10536 21.5195 4.29289 21.7071C4.48043 21.8946 4.73478 21.9999 5 21.9999H19C19.2652 21.9999 19.5196 21.8946 19.7071 21.7071C19.8946 21.5195 20 21.2652 20 20.9999V8.99994C20 8.8555 19.9687 8.71277 19.9083 8.58157C19.8479 8.45038 19.7598 8.33383 19.65 8.23994L12.65 2.23994ZM13 5.16994L16.3 7.99994H13V5.16994ZM18 19.9999H6V3.99994H11V8.99994C11 9.26516 11.1054 9.51951 11.2929 9.70705C11.4804 9.89458 11.7348 9.99994 12 9.99994H18V19.9999Z"
+                                        fill="white"
+                                      />
+                                    </svg>
+                                  </span>
+                                  <span className="text-elips">
+                                    Nombre total d'intervenants connectés
+                                  </span>
+                                </div>
+                              </td>
+                              <td>
+                                {
+                                  speakerDocumentFileList?.total_speakers_attached
+                                }
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <div className="d-flex align-items-center">
+                                  <span className="file-type-icon">
+                                    <svg
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      width="24"
+                                      height="24"
+                                      viewBox="0 0 24 24"
+                                      fill="none"
+                                    >
+                                      <path
+                                        d="M12.65 2.23994C12.4689 2.08503 12.2383 1.99992 12 1.99994H5C4.73478 1.99994 4.48043 2.1053 4.29289 2.29283C4.10536 2.48037 4 2.73472 4 2.99994V20.9999C4 21.2652 4.10536 21.5195 4.29289 21.7071C4.48043 21.8946 4.73478 21.9999 5 21.9999H19C19.2652 21.9999 19.5196 21.8946 19.7071 21.7071C19.8946 21.5195 20 21.2652 20 20.9999V8.99994C20 8.8555 19.9687 8.71277 19.9083 8.58157C19.8479 8.45038 19.7598 8.33383 19.65 8.23994L12.65 2.23994ZM13 5.16994L16.3 7.99994H13V5.16994ZM18 19.9999H6V3.99994H11V8.99994C11 9.26516 11.1054 9.51951 11.2929 9.70705C11.4804 9.89458 11.7348 9.99994 12 9.99994H18V19.9999Z"
+                                        fill="white"
+                                      />
+                                    </svg>
+                                  </span>
+                                  <span className="text-elips">
+                                    Nombre total de fichiers à valider
+                                  </span>
+                                </div>
+                              </td>
+                              <td>
+                                {
+                                  speakerDocumentFileList?.total_to_be_validated_files
+                                }
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <div className="d-flex align-items-center">
+                                  <span className="file-type-icon">
+                                    <svg
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      width="24"
+                                      height="24"
+                                      viewBox="0 0 24 24"
+                                      fill="none"
+                                    >
+                                      <path
+                                        d="M12.65 2.23994C12.4689 2.08503 12.2383 1.99992 12 1.99994H5C4.73478 1.99994 4.48043 2.1053 4.29289 2.29283C4.10536 2.48037 4 2.73472 4 2.99994V20.9999C4 21.2652 4.10536 21.5195 4.29289 21.7071C4.48043 21.8946 4.73478 21.9999 5 21.9999H19C19.2652 21.9999 19.5196 21.8946 19.7071 21.7071C19.8946 21.5195 20 21.2652 20 20.9999V8.99994C20 8.8555 19.9687 8.71277 19.9083 8.58157C19.8479 8.45038 19.7598 8.33383 19.65 8.23994L12.65 2.23994ZM13 5.16994L16.3 7.99994H13V5.16994ZM18 19.9999H6V3.99994H11V8.99994C11 9.26516 11.1054 9.51951 11.2929 9.70705C11.4804 9.89458 11.7348 9.99994 12 9.99994H18V19.9999Z"
+                                        fill="white"
+                                      />
+                                    </svg>
+                                  </span>
+                                  <span className="text-elips">
+                                    Nombre total de fichiers validés
+                                  </span>
+                                </div>
+                              </td>
+                              <td>
+                                {speakerDocumentFileList?.total_validated_files}
+                              </td>
+                            </tr>
+                          </>
+                        ) : (
+                          <tr style={{ textAlign: "center" }}>
+                            <td colSpan="2">{t("NorecordsfoundLabel")}</td>
+                          </tr>
+                        )}
                       </tbody>
                     </Table>
                   </div>
                 </div>
-                <h2 className="mb-3 mt-3">Task</h2>
+
+                <h2 className="mb-3 mt-3">Tâche</h2>
                 <div className="custom-grid-card">
-                  <h3>Coming Task - to be determined</h3>
+                  <h3>Tâche à venir - à déterminer</h3>
                   <div className="table-wrap mt-24">
                     <Table responsive hover>
                       <thead>
                         <tr>
-                          <th>Name of Task</th>
-                          <th>Dead line</th>
-                          <th>Task description</th>
-                          <th>Name of responsible</th>
-                          <th>status</th>
+                          <th>Nom de la tâche</th>
+                          <th>Date limite</th>
+                          <th>Description de la tâche</th>
+                          <th>Attribué par</th>
+                          <th>Attribué à</th>
+                          <th>{t("status")}</th>
                         </tr>
                       </thead>
                       <tbody>
-                        <tr>
-                          <td>Task 1</td>
-                          <td>dead line</td>
-                          <td>Task description</td>
-                          <td>Name of responsible</td>
-                          <td>
-                            <span className="checked badges">À vérifier</span>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>Task 1</td>
-                          <td>dead line</td>
-                          <td>Task description</td>
-                          <td>Name of responsible</td>
-                          <td>
-                            <span className="checked badges">À vérifier</span>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>Task 1</td>
-                          <td>dead line</td>
-                          <td>Task description</td>
-                          <td>Name of responsible</td>
-                          <td>
-                            <span className="checked badges">À vérifier</span>
-                          </td>
-                        </tr>
+                        {taskListData?.length > 0 ? (
+                          taskListData?.map((data) => (
+                            <tr>
+                              <td>
+                                <span className="text-elips">{data.title}</span>
+                              </td>
+                              <td>{data.due_date}</td>
+                              <td>
+                                <span className="text-elips">{data.description}</span>
+                              </td>
+                              <td>{(data.assigned_by?.first_name || "") + " " + (data.assigned_by?.last_name || "")}</td>
+                              <td>{(data.assigned_to?.first_name || "") + " " + (data.assigned_to?.last_name || "")}</td>
+                              <td>
+                                {/* {data.status == "to_be_checked" ? (
+                                  <span className="checked badges">
+                                    {t("toBeCheckedLabel")}
+                                  </span>
+                                ) : data.status == "verified" ? (
+                                  <span className="verified badges">
+                                    {t("verified")}
+                                  </span>
+                                ) : (
+                                  <span className="incomplete badges">
+                                    {t("invalidLabel")}
+                                  </span>
+                                )} */}
+                                <span className="checked badges">{data.status}</span>
+                              </td>
+                            </tr>
+                          ))) : (
+                          <tr style={{ textAlign: "center" }}>
+                            <td colSpan="6">{t("NorecordsfoundLabel")}</td>
+                          </tr>
+                        )}
                       </tbody>
                     </Table>
                   </div>
+                  {totalTaskRecords > 10 && (
+                    <Paginations
+                      currentPage={currentTaskPage}
+                      totalPages={totalTaskPages}
+                      onPageChange={handlePageChange}
+                      itemsPerPage={10}
+                      totalItems={totalTaskRecords}
+                    />
+                  )}
                 </div>
               </div>
+
               <div className="col-md-5">
-                <h2 className="mb-3">Events</h2>
+                <h2 className="mb-3">Événements</h2>
                 <div className="custom-grid-card">
                   <div className="last-event-card">
                     <div className="d-flex flex-wrap gap-2 mb-3">
@@ -2583,8 +2765,8 @@ const FileDetails = () => {
                         value={selectedType}
                         onChange={(e) => setSelectedType(e.target.value)}
                       >
-                        <option value="">Select Type</option>
-                        <option value="notes">Notes</option>
+                        <option value="">Sélectionnez le type</option>
+                        <option value="notes">Remarques</option>
                         <option value="action">Action</option>
                       </select>
 
@@ -2594,121 +2776,94 @@ const FileDetails = () => {
                         value={selectedUser}
                         onChange={(e) => setSelectedUser(e.target.value)}
                       >
-                        <option value="">Select User</option>
-                        <option value="user1">User 1</option>
-                        <option value="user2">User 2</option>
+                        <option value="">Sélectionnez un utilisateur</option>
+                        {eventHistoryUserList?.map((data, index) => (
+                          <option key={index} value={data.id}>{(data?.first_name || "") + " " + (data?.last_name || "")}</option>
+                        ))}
                       </select>
+
                       {/* Date Filter */}
                       <DatePicker
-                        selected={selectedDate}
-                        onChange={(date) => setSelectedDate(date)}
-                        className="form-control"
-                        placeholderText="Select Date"
+                        placeholderText="Sélectionnez une date"
+                        selected={selectedDate ? getFormattedDate(selectedDate) : null}
+                        onChange={(date) => setSelectedDate(formatDate(date))}
                         dateFormat="dd/MM/yyyy"
+                        locale={fr}
                       />
                     </div>
-                    5 last events
+                    <span>5 derniers événements</span>
                     <div className="timeline">
-                      <div className="timeline-item">
-                        <div className="timeline-dot"></div>
-                        <div className="timeline-content">
-                          <h5>January 2nd, 04:35 AM</h5>
-                          <p>
-                            {" "}
-                            <strong>Note :-</strong> Illum omnis quo illum nisi.
-                            Nesciunt est accusamus. Blanditiis nisi quae eum
-                            nisi similique. Modi consequuntur totam
-                          </p>
+                      {lastFiveEventList?.length > 0 ? (
+                        lastFiveEventList?.map((data) => {
+                          const [beforeColon, afterColon] = data.action_details
+                            .split(":")
+                            .map((s) => s.trim());
+                          return (
+                            <div className="timeline-item">
+                              <div className="timeline-dot"></div>
+                              <div className="timeline-content">
+                                <h5>{formatCreatedAt(data.created_at)}</h5>
+                                <p>
+                                  {beforeColon ? (
+                                    <>
+                                      <strong>{beforeColon} :-</strong>{" "}
+                                      {afterColon}
+                                    </>
+                                  ) : (
+                                    <>
+                                      <strong>{data.action_type} :-</strong>{" "}
+                                      {data.action_details}
+                                    </>
+                                  )}
+                                </p>
+                              </div>
+                            </div>
+                          );
+                        })
+                      ) : (
+                        <div className="timeline-item">
+                          {t("NorecordsfoundLabel")}
                         </div>
-                      </div>
-
-                      <div className="timeline-item">
-                        <div className="timeline-dot"></div>
-                        <div className="timeline-content">
-                          <h5>January 4th, 06:19 AM</h5>
-                          <p>
-                            <strong>Note :-</strong> Corrupti unde qui molestiae
-                            labore ad adipisci veniam perspiciatis quasi. Quae
-                            labore vel.
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="timeline-item">
-                        <div className="timeline-dot"></div>
-                        <div className="timeline-content">
-                          <h5>January 5th, 12:34 AM</h5>
-                          <p>
-                            <strong>Action :-</strong> Maiores doloribus qui.
-                            Repellat accusamus minima ipsa ipsam aut debitis
-                            quis sit voluptates. Amet necessitatibus non minus
-                            quaerat et quis.
-                          </p>
-                          <p>
-                            <strong>Action Name:-</strong>Lorem, ipsum dolor.
-                          </p>
-                          <p>
-                            <strong>User id:-</strong>Ipsum115880
-                          </p>
-                        </div>
-                      </div>
+                      )}
                     </div>
                     <button
-                      type="submit"
                       className="btn-secondary btn btn-primary"
+                      onClick={() => setActiveTab("history")}
                     >
-                      See All
+                      Tout voir
                     </button>
                   </div>
                   <div className="last-msg-card">
-                    3 Last Important Unread messages
+                    3 derniers messages importants non lus
                     <div className="timeline">
-                      <div className="timeline-item">
-                        <div className="timeline-dot"></div>
-                        <div className="timeline-content">
-                          <h5>January 2nd, 04:35 AM</h5>
-                          <p>
-                            Illum omnis quo illum nisi. Nesciunt est accusamus.
-                            Blanditiis nisi quae eum nisi similique. Modi
-                            consequuntur totam
-                          </p>
+                      {lastThreeNoteList?.length > 0 ? (
+                        lastThreeNoteList?.map((data) => (
+                          <div className="timeline-item">
+                            <div className="timeline-dot"></div>
+                            <div className="timeline-content">
+                              <h5>{formatCreatedAt(data.created_on)}</h5>
+                              <p>{data.reason}</p>
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="timeline-item">
+                          {t("NorecordsfoundLabel")}
                         </div>
-                      </div>
-
-                      <div className="timeline-item">
-                        <div className="timeline-dot"></div>
-                        <div className="timeline-content">
-                          <h5>January 4th, 06:19 AM</h5>
-                          <p>
-                            Corrupti unde qui molestiae labore ad adipisci
-                            veniam perspiciatis quasi. Quae labore vel.
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="timeline-item">
-                        <div className="timeline-dot"></div>
-                        <div className="timeline-content">
-                          <h5>January 5th, 12:34 AM</h5>
-                          <p>
-                            Maiores doloribus qui. Repellat accusamus minima
-                            ipsa ipsam aut debitis quis sit voluptates. Amet
-                            necessitatibus non minus quaerat et quis.
-                          </p>
-                        </div>
-                      </div>
+                      )}
                     </div>
                     <button
-                      type="submit"
                       className="btn-secondary btn btn-primary"
+                      onClick={handleNoteShow}
                     >
-                      See All
+                      Tout voir
                     </button>
                   </div>
                 </div>
               </div>
             </div>
           </Tab>
+
           {/* Information Tab */}
           <Tab eventKey="contactinfo" title="Information dossier">
             {/* <h2>Informations dossier</h2> */}
@@ -2740,8 +2895,8 @@ const FileDetails = () => {
                       <Form.Control
                         type="text"
                         placeholder="N° de dossier"
-                        name="folderName"
-                        defaultValue={showUserDocumentData?.folder_name || ""}
+                        value={showUserFolderName}
+                        onChange={(e) =>setShowUserFolderName(e.target.value)}
                       />
                     </Form.Group>
 
@@ -2895,7 +3050,11 @@ const FileDetails = () => {
                     </Form.Group>
                   </div>
                 </div>
-                <Button className="btn-secondary" type="submit">
+                <Button 
+                  className="btn-secondary" 
+                  type="submit"
+                  onClick={(e) => UpdateFolderInfo(e)}
+                >
                   Valider
                 </Button>
                 <Button
@@ -2908,6 +3067,7 @@ const FileDetails = () => {
             )}
           </Tab>
 
+          {/* Documents Tab */}
           <Tab
             className="update-inside-tab"
             eventKey="documents"
@@ -3496,6 +3656,8 @@ const FileDetails = () => {
                       currentPage={currentPage}
                       totalPages={totalPages}
                       onPageChange={handlePageChange}
+                      itemsPerPage={10}
+                      totalItems={totalRecordOther}
                     />
                   )}
                 </div>
@@ -3796,14 +3958,14 @@ const FileDetails = () => {
                       currentPage={currentPage}
                       totalPages={totalPages}
                       onPageChange={handlePageChange}
+                      itemsPerPage={10}
+                      totalItems={totalMissingRecords}
                     />
                   )}
                 </div>
               </Tab>
             </Tabs>
           </Tab>
-
-          {/* Other Tab */}
 
           {/* Speakers Tab */}
           <Tab
@@ -3985,6 +4147,7 @@ const FileDetails = () => {
                       defaultActiveKey="documents"
                       id="uncontrolled-tab-example"
                     >
+                      {/* Other Tab */}
                       <Tab
                         eventKey="documents"
                         title={`Documents (${totalSpeakerDocument})`}
@@ -4126,11 +4289,15 @@ const FileDetails = () => {
                                 currentPage={currentPage}
                                 totalPages={totalPages}
                                 onPageChange={handlePageChangeView}
+                                itemsPerPage={10}
+                                totalItems={totalSpeakerDocument}
                               />
                             )}
                           </div>
                         )}
                       </Tab>
+
+                      {/* Missing Document Tab */}
                       <Tab
                         eventKey="documentType"
                         title={`Documents manquants (${totalMissingDocument})`}
@@ -4656,13 +4823,13 @@ const FileDetails = () => {
                     currentPage={currentPage}
                     totalPages={totalPages}
                     onPageChange={handlePageChange}
+                    itemsPerPage={10}
+                    totalItems={totalSpeaker}
                   />
                 )}
               </div>
             )}
           </Tab>
-
-          {/* Missing Document Tab */}
 
           {/* History Tab */}
           <Tab eventKey="history" title="Historique">
@@ -4774,6 +4941,8 @@ const FileDetails = () => {
                   currentPage={currentPage}
                   totalPages={totalPages}
                   onPageChange={handlePageChange}
+                  itemsPerPage={10}
+                  totalItems={totalHistoryRecords}
                 />
               )}
             </div>
@@ -5464,6 +5633,8 @@ const FileDetails = () => {
                       currentPage={currentPage}
                       totalPages={totalPages}
                       onPageChange={handlePageChangeView}
+                      itemsPerPage={10}
+                      totalItems={totalSpeakerDocument}
                     />
                   )}
                 </div>
