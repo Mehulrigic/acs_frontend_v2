@@ -2009,10 +2009,21 @@ const BrokerFileDetail = () => {
                         value={selectedUser}
                         onChange={(e) => setSelectedUser(e.target.value)}
                       >
-                        <option value="">Sélectionnez un utilisateur</option>
-                        {eventHistoryUserList?.map((data, index) => (
-                          <option key={index} value={data.id}>{(data?.first_name || "") + " " + (data?.last_name || "")}</option>
-                        ))}
+                        {eventHistoryUserList?.length > 0 ? (
+                          <>
+                            <option value="">Sélectionnez un utilisateur</option>
+                            {eventHistoryUserList.map((data, index) => (
+                              <option key={index} value={data.id}>
+                                {(data?.first_name || "") + " " + (data?.last_name || "")}
+                              </option>
+                            ))}
+                          </>
+                        ) : (
+                          <>
+                            <option value="">Sélectionnez un utilisateur</option>
+                            <option value="" disabled>{t("NorecordsfoundLabel")}</option>
+                          </>
+                        )}
                       </select>
 
                       {/* Date Filter */}
