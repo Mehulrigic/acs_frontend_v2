@@ -4073,7 +4073,7 @@ const FileDetails = () => {
                                     ))
                                   ) : (
                                     <tr style={{ textAlign: "center" }}>
-                                      <td colSpan="3">
+                                      <td colSpan="2">
                                         {t("NorecordsfoundLabel")}
                                       </td>
                                     </tr>
@@ -4521,7 +4521,7 @@ const FileDetails = () => {
                           ))
                         ) : (
                           <tr style={{ textAlign: "center" }}>
-                            <td colSpan="7">{t("NorecordsfoundLabel")}</td>
+                            <td colSpan="8">{t("NorecordsfoundLabel")}</td>
                           </tr>
                         )}
                       </tbody>
@@ -4637,7 +4637,7 @@ const FileDetails = () => {
                         ))
                       ) : (
                         <tr style={{ textAlign: "left" }}>
-                          <td colSpan={7}>{t("NorecordsfoundLabel")}</td>
+                          <td colSpan="7">{t("NorecordsfoundLabel")}</td>
                         </tr>
                       )}
                     </tbody>

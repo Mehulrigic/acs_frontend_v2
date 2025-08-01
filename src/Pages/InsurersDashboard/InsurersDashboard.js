@@ -1621,7 +1621,7 @@ const InsurersDashboard = () => {
                           ))
                         ) : (
                           <tr>
-                            <td colSpan="10" style={{ textAlign: "left" }}>
+                            <td colSpan="11" style={{ textAlign: "left" }}>
                               {t("NorecordsfoundLabel")}
                             </td>
                           </tr>
@@ -2391,7 +2391,7 @@ const InsurersDashboard = () => {
                           ))
                         ) : (
                           <tr>
-                            <td colSpan="10" style={{ textAlign: "left" }}>
+                            <td colSpan="11" style={{ textAlign: "left" }}>
                               {t("NorecordsfoundLabel")}
                             </td>
                           </tr>
@@ -3160,7 +3160,7 @@ const InsurersDashboard = () => {
                           ))
                         ) : (
                           <tr>
-                            <td colSpan="10" style={{ textAlign: "left" }}>
+                            <td colSpan="11" style={{ textAlign: "left" }}>
                               {t("NorecordsfoundLabel")}
                             </td>
                           </tr>

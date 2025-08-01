@@ -335,7 +335,7 @@ const LogicalBlock = () => {
                     :
                     (
                       <tr style={{ textAlign: "center" }}>
-                        <td colSpan="6">
+                        <td colSpan="4">
                           {t("NorecordsfoundLabel")}
                         </td>
                       </tr>

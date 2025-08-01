@@ -468,7 +468,7 @@ const DocumentType = () => {
                     :
                     (
                       <tr style={{ textAlign: "center" }}>
-                        <td colSpan="6">
+                        <td colSpan="7">
                           {t("NorecordsfoundLabel")}
                         </td>
                       </tr>

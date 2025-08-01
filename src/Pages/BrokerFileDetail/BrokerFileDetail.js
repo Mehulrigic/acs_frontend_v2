@@ -3045,7 +3045,7 @@ const BrokerFileDetail = () => {
                             ))
                           ) : (
                             <tr style={{ textAlign: "center" }}>
-                              <td colSpan="4">{t("NorecordsfoundLabel")}</td>
+                              <td colSpan="3">{t("NorecordsfoundLabel")}</td>
                             </tr>
                           )}
                         </tbody>
@@ -3376,7 +3376,7 @@ const BrokerFileDetail = () => {
                                     ))
                                   ) : (
                                     <tr style={{ textAlign: "center" }}>
-                                      <td colSpan="3">
+                                      <td colSpan="4">
                                         {t("NorecordsfoundLabel")}
                                       </td>
                                     </tr>
@@ -3458,7 +3458,7 @@ const BrokerFileDetail = () => {
                                     ))
                                   ) : (
                                     <tr style={{ textAlign: "center" }}>
-                                      <td colSpan="3">
+                                      <td colSpan="2">
                                         {t("NorecordsfoundLabel")}
                                       </td>
                                     </tr>
@@ -4026,7 +4026,7 @@ const BrokerFileDetail = () => {
                         ))
                       ) : (
                         <tr style={{ textAlign: "left" }}>
-                          <td colSpan={7}>{t("NorecordsfoundLabel")}</td>
+                          <td colSpan="7">{t("NorecordsfoundLabel")}</td>
                         </tr>
                       )}
                     </tbody>

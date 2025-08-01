@@ -4394,7 +4394,7 @@ const ManagerFileDetail = () => {
                             ))
                           ) : (
                             <tr style={{ textAlign: "center" }}>
-                              <td colSpan="6">{t("NorecordsfoundLabel")}</td>
+                              <td colSpan="7">{t("NorecordsfoundLabel")}</td>
                             </tr>
                           )}
                         </tbody>
@@ -4778,7 +4778,7 @@ const ManagerFileDetail = () => {
                             ))
                           ) : (
                             <tr style={{ textAlign: "center" }}>
-                              <td colSpan="4">{t("NorecordsfoundLabel")}</td>
+                              <td colSpan="5">{t("NorecordsfoundLabel")}</td>
                             </tr>
                           )}
                         </tbody>
@@ -5080,7 +5080,6 @@ const ManagerFileDetail = () => {
                                               />
                                             </svg>
                                           </Link>
-                                          {/* {data.status !== "verified" && */}
                                           <Link
                                             className="delete"
                                             data-discover="true"
@@ -5104,7 +5103,6 @@ const ManagerFileDetail = () => {
                                               />
                                             </svg>
                                           </Link>
-                                          {/* } */}
                                         </td>
                                       </tr>
                                     ))
@@ -5768,7 +5766,7 @@ const ManagerFileDetail = () => {
                           ))
                         ) : (
                           <tr style={{ textAlign: "center" }}>
-                            <td colSpan="6">{t("NorecordsfoundLabel")}</td>
+                            <td colSpan="7">{t("NorecordsfoundLabel")}</td>
                           </tr>
                         )}
                       </tbody>
@@ -5886,7 +5884,7 @@ const ManagerFileDetail = () => {
                         ))
                       ) : (
                         <tr style={{ textAlign: "left" }}>
-                          <td colSpan={7}>{t("NorecordsfoundLabel")}</td>
+                          <td colSpan="7">{t("NorecordsfoundLabel")}</td>
                         </tr>
                       )}
                     </tbody>

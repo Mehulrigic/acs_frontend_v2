@@ -458,8 +458,8 @@ const TaskManagementDashboard = () => {
                                             ))
                                         ) : (
                                             <tr>
-                                                <td colSpan={10} style={{ textAlign: "center" }}>
-                                                    No records found.
+                                                <td colSpan="8" style={{ textAlign: "center" }}>
+                                                    {t("NorecordsfoundLabel")}
                                                 </td>
                                             </tr>
                                         )}

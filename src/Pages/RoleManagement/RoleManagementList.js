@@ -313,7 +313,7 @@ const RoleManagementList = () => {
                     :
                     (
                       <tr style={{ textAlign: "center" }}>
-                        <td colSpan="2">
+                        <td colSpan="4">
                           {t("NorecordsfoundLabel")}
                         </td>
                       </tr>

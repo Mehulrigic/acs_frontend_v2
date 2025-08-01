@@ -4393,7 +4393,7 @@ const AdminFileDetail = () => {
                             ))
                           ) : (
                             <tr style={{ textAlign: "center" }}>
-                              <td colSpan="6">{t("NorecordsfoundLabel")}</td>
+                              <td colSpan="7">{t("NorecordsfoundLabel")}</td>
                             </tr>
                           )}
                         </tbody>
@@ -4777,7 +4777,7 @@ const AdminFileDetail = () => {
                             ))
                           ) : (
                             <tr style={{ textAlign: "center" }}>
-                              <td colSpan="4">{t("NorecordsfoundLabel")}</td>
+                              <td colSpan="5">{t("NorecordsfoundLabel")}</td>
                             </tr>
                           )}
                         </tbody>
@@ -5079,7 +5079,6 @@ const AdminFileDetail = () => {
                                               />
                                             </svg>
                                           </Link>
-                                          {/* {data.status !== "verified" && */}
                                           <Link
                                             className="delete"
                                             data-discover="true"
@@ -5103,7 +5102,6 @@ const AdminFileDetail = () => {
                                               />
                                             </svg>
                                           </Link>
-                                          {/* } */}
                                         </td>
                                       </tr>
                                     ))
@@ -5767,7 +5765,7 @@ const AdminFileDetail = () => {
                           ))
                         ) : (
                           <tr style={{ textAlign: "center" }}>
-                            <td colSpan="6">{t("NorecordsfoundLabel")}</td>
+                            <td colSpan="7">{t("NorecordsfoundLabel")}</td>
                           </tr>
                         )}
                       </tbody>
@@ -5885,7 +5883,7 @@ const AdminFileDetail = () => {
                         ))
                       ) : (
                         <tr style={{ textAlign: "left" }}>
-                          <td colSpan={7}>{t("NorecordsfoundLabel")}</td>
+                          <td colSpan="7">{t("NorecordsfoundLabel")}</td>
                         </tr>
                       )}
                     </tbody>

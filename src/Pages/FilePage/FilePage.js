@@ -637,7 +637,7 @@ const FilePage = () => {
                     ))
                   ) : (
                     <tr style={{ textAlign: "center" }}>
-                      <td colSpan="10">{t("NorecordsfoundLabel")}</td>
+                      <td colSpan="11">{t("NorecordsfoundLabel")}</td>
                     </tr>
                   )}
                 </tbody>
