@@ -1857,6 +1857,10 @@ const AdminFileDetail = () => {
 
   const handleAddNoteModalClose = () => {
     setShowAddNoteModal(false);
+  };
+
+  const handleAddNoteModalCloseAfterAPICall = () => {
+    setShowAddNoteModal(false);
     if (activeTab === "dashboard") {
       DashboardRegisteredDocument(id);
       DashboardSpeakerRegisteredDocument(id);
@@ -5884,6 +5888,7 @@ const AdminFileDetail = () => {
           handleModalClose={handleAddNoteModalClose}
           selectDocumentId={selectedAddNoteDocId}
           selectDocumentFileName={selectedAddNoteDocName}
+          handleAddNoteModalCloseAfterAPICall={handleAddNoteModalCloseAfterAPICall}
         />
 
         {/* View Show Paper Document */}

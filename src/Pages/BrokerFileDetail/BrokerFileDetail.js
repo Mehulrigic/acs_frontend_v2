@@ -1265,6 +1265,10 @@ const BrokerFileDetail = () => {
 
   const handleAddNoteModalClose = () => {
     setShowAddNoteModal(false);
+  };
+
+  const handleAddNoteModalCloseAfterAPICall = () => {
+    setShowAddNoteModal(false);
     if (activeTab === "dashboard") {
       DashboardRegisteredDocument(id);
       DashboardSpeakerRegisteredDocument(id);
@@ -4046,6 +4050,7 @@ const BrokerFileDetail = () => {
           handleModalClose={handleAddNoteModalClose}
           selectDocumentId={selectedAddNoteDocId}
           selectDocumentFileName={selectedAddNoteDocName}
+          handleAddNoteModalCloseAfterAPICall={handleAddNoteModalCloseAfterAPICall}
         />
 
         {/* View Note List */}

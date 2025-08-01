@@ -1650,6 +1650,10 @@ const FileDetails = () => {
 
   const handleAddNoteModalClose = () => {
     setShowAddNoteModal(false);
+  };
+
+  const handleAddNoteModalCloseAfterAPICall = () => {
+    setShowAddNoteModal(false);
     if (activeTab === "dashboard") {
       DashboardRegisteredDocument(id);
       DashboardSpeakerRegisteredDocument(id);
@@ -4628,6 +4632,7 @@ const FileDetails = () => {
         handleModalClose={handleAddNoteModalClose}
         selectDocumentId={selectedAddNoteDocId}
         selectDocumentFileName={selectedAddNoteDocName}
+        handleAddNoteModalCloseAfterAPICall={handleAddNoteModalCloseAfterAPICall}
       />
 
       {/* Add Document */}

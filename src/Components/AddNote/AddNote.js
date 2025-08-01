@@ -10,7 +10,7 @@ const AddNote = (props) => {
     const { t } = useTranslation();
     const { id } = useParams();
 
-    const { showmodal, handleModalClose, selectDocumentId, selectDocumentFileName } = props;
+    const { showmodal, handleModalClose, selectDocumentId, selectDocumentFileName, handleAddNoteModalCloseAfterAPICall } = props;
     const [reasonMessage, setReasonMessage] = useState("");
     const [isImportant, setIsImportant] = useState(false);
     const [flashMessage, setFlashMessage] = useState({ type: "", message: "" });
@@ -51,7 +51,7 @@ const AddNote = (props) => {
             if (response.data.status) {
                 setLoading(false);
                 setReasonMessage("");
-                handleModalClose();
+                handleAddNoteModalCloseAfterAPICall();
             } else {
                 setLoading(false);
                 setFlashMessage({
