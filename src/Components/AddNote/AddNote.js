@@ -40,10 +40,10 @@ const AddNote = (props) => {
 
         var addNoteData = {
             user_document_id: id,
-            user_document_file_id: selectDocumentId,
             reason: reasonMessage,
             is_important: isImportant ? 1 : 0,
-            type: "note"
+            type: "note",
+            ...(selectDocumentId ? { user_document_file_id: selectDocumentId } : {})
         };
         
         try {

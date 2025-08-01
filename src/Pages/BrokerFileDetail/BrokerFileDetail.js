@@ -1228,6 +1228,29 @@ const BrokerFileDetail = () => {
       if (response.data.status) {
         handleSendFileClose();
         ShowUserDocumentData(id);
+        if (activeTab === "dashboard") {
+          DashboardRegisteredDocument(id);
+          DashboardSpeakerRegisteredDocument(id);
+          EventUserList(id);
+          DashboardLastFiveEvent(id);
+          DashboardLastThreeNote(id);
+          TaskList(search, sort, currentPage, taskStatus, taskPriority);
+        }
+        if (activeTab === "otherdocument") {
+          if (activeDocumentTab === "missingdocument") {
+            GetMissingDocumentList(id, sort, currentPage);
+          } else {
+            ShowOtherDocument(id, sort, currentPage, editUserStatus, selectDocumentType);
+            SpeakerDropDownList("", 1);
+            DocumentTypeList();
+          }
+        }
+        if (activeTab === "speakerdocument") {
+          SpeakerList(id, sort, search, currentPage);
+        }
+        if (activeTab === "history") {
+          GetHistoryListDocument(id, sort, search, currentPage, selectActionType);
+        }
       }
     } catch (error) {
       console.log(error);
@@ -1242,6 +1265,29 @@ const BrokerFileDetail = () => {
 
   const handleAddNoteModalClose = () => {
     setShowAddNoteModal(false);
+    if (activeTab === "dashboard") {
+      DashboardRegisteredDocument(id);
+      DashboardSpeakerRegisteredDocument(id);
+      EventUserList(id);
+      DashboardLastFiveEvent(id);
+      DashboardLastThreeNote(id);
+      TaskList(search, sort, currentPage, taskStatus, taskPriority);
+    }
+    if (activeTab === "otherdocument") {
+      if (activeDocumentTab === "missingdocument") {
+        GetMissingDocumentList(id, sort, currentPage);
+      } else {
+        ShowOtherDocument(id, sort, currentPage, editUserStatus, selectDocumentType);
+        SpeakerDropDownList("", 1);
+        DocumentTypeList();
+      }
+    }
+    if (activeTab === "speakerdocument") {
+      SpeakerList(id, sort, search, currentPage);
+    }
+    if (activeTab === "history") {
+      GetHistoryListDocument(id, sort, search, currentPage, selectActionType);
+    }
   };
 
   const NotesOptions = [

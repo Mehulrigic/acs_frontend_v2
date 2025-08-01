@@ -1062,6 +1062,33 @@ const FileDetails = () => {
       if (response.data.status) {
         handleSendFileClose();
         ShowUserDocumentData(id);
+        if (activeTab === "dashboard") {
+          DashboardRegisteredDocument(id);
+          DashboardSpeakerRegisteredDocument(id);
+          EventUserList(id);
+          DashboardLastFiveEvent(id);
+          DashboardLastThreeNote(id);
+          TaskList(search, sort, currentPage, taskStatus, taskPriority);
+        }
+        if (activeTab === "contactinfo") {
+          ShowUserDocumentData(id);
+          BrokerList();
+        }
+        if (activeTab === "otherdocument") {
+          if (activeDocumentTab === "missingdocument") {
+            GetMissingDocumentList(id, sort, 1);
+          } else {
+            ShowOtherDocument(id, sort, 1, editUserStatus, selectDocumentType);
+            SpeakerDropDownList("", 1);
+            DocumentTypeList();
+          }
+        }
+        if (activeTab === "speakerdocument") {
+          SpeakerList(id, sort, search, 1);
+        }
+        if (activeTab === "history") {
+          GetHistoryListDocument(id, sort, search, currentPage, selectActionType);
+        }
       }
     } catch (error) {
       console.log(error);
@@ -1623,6 +1650,33 @@ const FileDetails = () => {
 
   const handleAddNoteModalClose = () => {
     setShowAddNoteModal(false);
+    if (activeTab === "dashboard") {
+      DashboardRegisteredDocument(id);
+      DashboardSpeakerRegisteredDocument(id);
+      EventUserList(id);
+      DashboardLastFiveEvent(id);
+      DashboardLastThreeNote(id);
+      TaskList(search, sort, currentPage, taskStatus, taskPriority);
+    }
+    if (activeTab === "contactinfo") {
+      ShowUserDocumentData(id);
+      BrokerList();
+    }
+    if (activeTab === "otherdocument") {
+      if (activeDocumentTab === "missingdocument") {
+        GetMissingDocumentList(id, sort, 1);
+      } else {
+        ShowOtherDocument(id, sort, 1, editUserStatus, selectDocumentType);
+        SpeakerDropDownList("", 1);
+        DocumentTypeList();
+      }
+    }
+    if (activeTab === "speakerdocument") {
+      SpeakerList(id, sort, search, 1);
+    }
+    if (activeTab === "history") {
+      GetHistoryListDocument(id, sort, search, currentPage, selectActionType);
+    }
   };
 
   const NotesOptions = [

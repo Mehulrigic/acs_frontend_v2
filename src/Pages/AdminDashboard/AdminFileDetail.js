@@ -513,6 +513,40 @@ const AdminFileDetail = () => {
       if (response.data.status) {
         handleSendFileClose();
         ShowUserDocumentData(id);
+        if (activeTab === "dashboard") {
+          DashboardRegisteredDocument(id);
+          DashboardSpeakerRegisteredDocument(id);
+          EventUserList(id);
+          DashboardLastFiveEvent(id);
+          DashboardLastThreeNote(id);
+          TaskList(search, sort, currentPage, taskStatus, taskPriority);
+        }
+        if (activeTab === "information") {
+          FolderDetail(id);
+          SpeakerDropDownList("", 1);
+        }
+        if (activeTab === "document") {
+          if (activeDocumentTab === "missingdocument") {
+            GetMissingDocumentList(id, sort, 1, selectIsRequired);
+          } else {
+            PaperList(
+              id,
+              sort,
+              1,
+              editUserStatus,
+              selectDocumentType,
+              selectSpeakerId
+            );
+            DocumentTypeList();
+            SpeakerDropDownList("", 1);
+          }
+        }
+        if (activeTab === "intervenants") {
+          SpeakerList(id, sort, currentPage);
+        }
+        if (activeTab === "history") {
+          GetHistoryListDocument(id, sort, search, currentPage, selectActionType);
+        }
       }
     } catch (error) {
       console.log(error);
@@ -1656,6 +1690,14 @@ const AdminFileDetail = () => {
       if (response.data.status) {
         handleSiteStatusChangeClose();
         ShowUserDocumentData(id);
+        if (activeTab === "dashboard") {
+          DashboardRegisteredDocument(id);
+          DashboardSpeakerRegisteredDocument(id);
+          EventUserList(id);
+          DashboardLastFiveEvent(id);
+          DashboardLastThreeNote(id);
+          TaskList(search, sort, currentPage, taskStatus, taskPriority);
+        }
         if (activeTab === "information") {
           FolderDetail(id);
           SpeakerDropDownList("", 1);
@@ -1679,17 +1721,8 @@ const AdminFileDetail = () => {
         if (activeTab === "intervenants") {
           SpeakerList(id, sort, currentPage);
         }
-        if (activeTab === "missingdocument") {
-          GetMissingDocumentList(id, sort, currentPage, selectIsRequired);
-        }
         if (activeTab === "history") {
-          GetHistoryListDocument(
-            id,
-            sort,
-            search,
-            currentPage,
-            selectActionType
-          );
+          GetHistoryListDocument(id, sort, search, currentPage, selectActionType);
         }
       }
     } catch (error) {
@@ -1824,6 +1857,40 @@ const AdminFileDetail = () => {
 
   const handleAddNoteModalClose = () => {
     setShowAddNoteModal(false);
+    if (activeTab === "dashboard") {
+      DashboardRegisteredDocument(id);
+      DashboardSpeakerRegisteredDocument(id);
+      EventUserList(id);
+      DashboardLastFiveEvent(id);
+      DashboardLastThreeNote(id);
+      TaskList(search, sort, currentPage, taskStatus, taskPriority);
+    }
+    if (activeTab === "information") {
+      FolderDetail(id);
+      SpeakerDropDownList("", 1);
+    }
+    if (activeTab === "document") {
+      if (activeDocumentTab === "missingdocument") {
+        GetMissingDocumentList(id, sort, 1, selectIsRequired);
+      } else {
+        PaperList(
+          id,
+          sort,
+          1,
+          editUserStatus,
+          selectDocumentType,
+          selectSpeakerId
+        );
+        DocumentTypeList();
+        SpeakerDropDownList("", 1);
+      }
+    }
+    if (activeTab === "intervenants") {
+      SpeakerList(id, sort, currentPage);
+    }
+    if (activeTab === "history") {
+      GetHistoryListDocument(id, sort, search, currentPage, selectActionType);
+    }
   };
 
   const handleScrollNote = (e) => {
