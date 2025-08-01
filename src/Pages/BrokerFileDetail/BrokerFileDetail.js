@@ -876,15 +876,17 @@ const BrokerFileDetail = () => {
         if (activeTab === "speakerdocument") {
           if (activeSubTab === "documentType") {
             SpeakerDocumentTypeList(id, showSpeakerId);
-          } else {
-            SpeakerList(id, sort, search, currentPage);
           }
         }
-        if (activeTab === "missingdocument") {
-          GetMissingDocumentList(id, sort, currentPage);
+        if (activeTab === "otherdocument") {
+          if (activeDocumentTab === "missingdocument") {
+            GetMissingDocumentList(id, sort, currentPage);
+          } else {
+            ShowOtherDocument(id, sort, currentPage, editUserStatus, selectDocumentType);
+            SpeakerDropDownList("", 1);
+            DocumentTypeList();
+          }
         }
-
-        ShowUserDocumentData(id);
       } else {
         setDocumentUploading(false);
         setFlashMessageStoreDoc({

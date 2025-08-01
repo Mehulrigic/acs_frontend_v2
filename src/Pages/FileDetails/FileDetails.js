@@ -934,8 +934,35 @@ const FileDetails = () => {
       if (response.data.status) {
         setFileList([]);
         ShowUserDocumentData(id);
-        handleClose();
+        if (activeTab === "dashboard") {
+          DashboardRegisteredDocument(id);
+          DashboardSpeakerRegisteredDocument(id);
+          EventUserList(id);
+          DashboardLastFiveEvent(id);
+          DashboardLastThreeNote(id);
+          TaskList(search, sort, currentPage, taskStatus, taskPriority);
+        }
+        if (activeTab === "contactinfo") {
+          ShowUserDocumentData(id);
+          BrokerList();
+        }
+        if (activeTab === "otherdocument") {
+          if (activeDocumentTab === "missingdocument") {
+            GetMissingDocumentList(id, sort, 1);
+          } else {
+            ShowOtherDocument(id, sort, 1, editUserStatus, selectDocumentType);
+            SpeakerDropDownList("", 1);
+            DocumentTypeList();
+          }
+        }
+        if (activeTab === "speakerdocument") {
+          SpeakerList(id, sort, search, 1);
+        }
+        if (activeTab === "history") {
+          GetHistoryListDocument(id, sort, search, currentPage, selectActionType);
+        }
 
+        handleClose();
         setFlashMessage({
           type: "success",
           message: response.data.message || t("somethingWentWrong"),
@@ -1032,6 +1059,11 @@ const FileDetails = () => {
             ShowOtherDocument(id, sort, currentPage, editUserStatus, selectDocumentType);
             SpeakerDropDownList("", 1);
             DocumentTypeList();
+          }
+        }
+        if (activeTab === "speakerdocument") {
+          if (activeSubTab === "documentType") {
+            SpeakerDocumentTypeList(id, showSpeakerId);
           }
         }
       } else {
