@@ -93,6 +93,7 @@ const ManagerFileDetail = () => {
   const [paperList, setPaperList] = useState([]);
   const [documentTypeList, setDocumentTypeList] = useState([]);
   const [selectDocumentType, setSelectDocumentType] = useState("");
+  const [selectGEDStatus, setSelectGEDStatus] = useState("");
   const [selectSpeakerId, setSelectSpeakerId] = useState("");
   const [selectIsRequired, setSelectIsRequired] = useState("0");
 
@@ -211,7 +212,7 @@ const ManagerFileDetail = () => {
     setSelectDocumentType("");
     setSelectSpeakerId("");
     setActiveTab(activeTab);
-    PaperList(id, sort, currentPage, "", "", "");
+    PaperList(id, sort, currentPage, "", "", "", "");
     ShowUserDocumentData(id);
     DocumentTypeList();
     SpeakerDropDownList("", 1);
@@ -374,7 +375,8 @@ const ManagerFileDetail = () => {
           1,
           editUserStatus,
           selectDocumentType,
-          selectSpeakerId
+          selectSpeakerId,
+          selectGEDStatus
         );
         DocumentTypeList();
         SpeakerDropDownList("", 1);
@@ -536,7 +538,8 @@ const ManagerFileDetail = () => {
               1,
               editUserStatus,
               selectDocumentType,
-              selectSpeakerId
+              selectSpeakerId,
+              selectGEDStatus
             );
             DocumentTypeList();
             SpeakerDropDownList("", 1);
@@ -644,7 +647,8 @@ const ManagerFileDetail = () => {
               currentPage,
               editUserStatus,
               selectDocumentType,
-              selectSpeakerId
+              selectSpeakerId,
+              selectGEDStatus
             );
             DocumentTypeList();
             SpeakerDropDownList("", 1);
@@ -758,7 +762,7 @@ const ManagerFileDetail = () => {
     }
   };
 
-  const PaperList = async (id, sort, page = 1, status, type, speaker_id) => {
+  const PaperList = async (id, sort, page = 1, status, type, speaker_id, gedstatus) => {
     setIsLoading(true);
     try {
       var userData = {
@@ -770,6 +774,7 @@ const ManagerFileDetail = () => {
         status: status,
         type: type,
         speaker: speaker_id,
+        GED_status: gedstatus
       };
       const response = await AcsManagerFileService.paperList(id, userData);
       if (response.data.status) {
@@ -894,7 +899,8 @@ const ManagerFileDetail = () => {
         currentPage,
         editUserStatus,
         selectedDocument?.id,
-        selectSpeakerId
+        selectSpeakerId,
+        selectGEDStatus
       );
     }
 
@@ -917,7 +923,8 @@ const ManagerFileDetail = () => {
       currentPage,
       editUserStatus,
       selectDocumentType,
-      selectedValue
+      selectedValue,
+      selectGEDStatus
     );
 
     setUserDocumentFileDataChanges((prevData) => {
@@ -946,7 +953,8 @@ const ManagerFileDetail = () => {
         currentPage,
         editUserStatus,
         selectDocumentType,
-        selectedValue
+        selectedValue,
+        selectGEDStatus
       );
     }
     SpeakerDetail(selectedValue);
@@ -973,13 +981,29 @@ const ManagerFileDetail = () => {
   const handleModalCloseInvalid = () => setShowmodalInvalid(false);
   const [showmodalInvalid, setShowmodalInvalid] = useState(false);
 
+  const handleGEDStatusChange = (gedstatus) => {
+    setSelectGEDStatus(gedstatus);
+    if (!showCheck) {
+      PaperList(id, sort, 1, editUserStatus, selectDocumentType, selectSpeakerId, gedstatus);
+    }
+
+    setUserDocumentFileDataChanges((prevData) => {
+      return prevData.map((file) => {
+        if (file.id == selectDocumentId) {
+          return { ...file, GED_status: gedstatus };
+        }
+        return file;
+      });
+    });
+  };
+
   const handleStatusChange = (status) => {
     if (status === "invalid") {
       handleModalShowInvalid();
     }
     setEditUserStatus(status);
     if (!showCheck) {
-      PaperList(id, sort, 1, status, selectDocumentType, selectSpeakerId);
+      PaperList(id, sort, 1, status, selectDocumentType, selectSpeakerId, selectGEDStatus);
     }
 
     setUserDocumentFileDataChanges((prevData) => {
@@ -1165,7 +1189,8 @@ const ManagerFileDetail = () => {
           page,
           editUserStatus,
           selectDocumentType,
-          selectSpeakerId
+          selectSpeakerId,
+          selectGEDStatus
         );
       }
     }
@@ -1430,7 +1455,8 @@ const ManagerFileDetail = () => {
               1,
               editUserStatus,
               selectDocumentType,
-              selectSpeakerId
+              selectSpeakerId,
+              selectGEDStatus
             );
             DocumentTypeList();
             SpeakerDropDownList("", 1);
@@ -1485,7 +1511,7 @@ const ManagerFileDetail = () => {
         setSelectDocumentType("");
         setSelectSpeakerId("");
         setShowUserDocumentDataId(id);
-        PaperList(id, sort, currentPage, "", "", "");
+        PaperList(id, sort, currentPage, "", "", "", "");
         ShowUserDocumentData(id);
         DocumentTypeList();
         SpeakerDropDownList("", 1);
@@ -1713,7 +1739,8 @@ const ManagerFileDetail = () => {
               1,
               editUserStatus,
               selectDocumentType,
-              selectSpeakerId
+              selectSpeakerId,
+              selectGEDStatus
             );
             DocumentTypeList();
             SpeakerDropDownList("", 1);
@@ -1884,7 +1911,8 @@ const ManagerFileDetail = () => {
           1,
           editUserStatus,
           selectDocumentType,
-          selectSpeakerId
+          selectSpeakerId,
+          selectGEDStatus
         );
         DocumentTypeList();
         SpeakerDropDownList("", 1);
@@ -3978,24 +4006,13 @@ const ManagerFileDetail = () => {
                                     <div>
                                       <Form.Select
                                         aria-label="Choisir un type de document"
-                                        // value={selectDocumentType}
-                                        // onChange={handleDocumentTypeChange}
+                                        value={selectGEDStatus}
+                                        onChange={(e) => handleGEDStatusChange(e.target.value)}
                                       >
                                         <option value="">GED status</option>
-                                        {/* {documentTypeList?.length > 0 ? (
-                                          documentTypeList?.map((doctype) => (
-                                            <option
-                                              key={doctype.id}
-                                              value={doctype.id}
-                                            >
-                                              {doctype.name}
-                                            </option>
-                                          ))
-                                        ) : (
-                                          <option value="">
-                                            {t("NorecordsfoundLabel")}
-                                          </option>
-                                        )} */}
+                                        <option value="sent">envoyé</option>
+                                        <option value="to_be_sent">A envoyer</option>
+                                        <option value="error">Erreur d’envoi</option>
                                       </Form.Select>
                                     </div>
                                     <div>
@@ -4188,9 +4205,15 @@ const ManagerFileDetail = () => {
                                 {selectedSpeakerColumns.includes(
                                   "Type de document"
                                 ) && <td>{data.docType.name}</td>}
-                                {selectedSpeakerColumns.includes(
-                                  "GED status"
-                                ) && <td>{data.GED_status}</td>}
+                                {selectedSpeakerColumns.includes("GED status") && 
+                                  <td>
+                                    {
+                                      data.GED_status == "sent" ? "envoyé" :
+                                      data.GED_status == "to_be_sent" ? "A envoyer":
+                                      data.GED_status == "error" ? "Erreur d’envoi" : ""
+                                    }
+                                  </td>
+                                }
                                 {selectedSpeakerColumns.includes("status") && (
                                   <td>
                                     {data.status == "to_be_checked" ? (
