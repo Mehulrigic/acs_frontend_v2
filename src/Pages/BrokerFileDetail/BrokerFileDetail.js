@@ -2039,25 +2039,44 @@ const BrokerFileDetail = () => {
                     <span>5 derniers événements</span>
                     <div className="timeline">
                       {lastFiveEventList?.length > 0 ? (
-                        lastFiveEventList?.map((data) => {
-                          const [beforeColon, afterColon] = data.action_details
-                            .split(":")
-                            .map((s) => s.trim());
+                        lastFiveEventList.map((data) => {
+                          const createdAt = formatCreatedAt(data.created_at);
+
+                          // Split at first " - "
+                          const dashIndex = data.action_details.indexOf(" - ");
+                          const firstPart = dashIndex !== -1
+                            ? data.action_details.slice(0, dashIndex).trim()
+                            : data.action_details.trim();
+                          const secondPart = dashIndex !== -1
+                            ? data.action_details.slice(dashIndex + 3).trim()
+                            : "";
+
+                          // Function to split by colon and bold before-colon part
+                          const renderColonBold = (text) => {
+                            const colonIndex = text.indexOf(":");
+                            if (colonIndex !== -1) {
+                              const beforeColon = text.slice(0, colonIndex).trim();
+                              const afterColon = text.slice(colonIndex + 1).trim();
+                              return (
+                                <>
+                                  <strong>{beforeColon}:</strong> {afterColon}
+                                </>
+                              );
+                            }
+                            return text;
+                          };
+
                           return (
-                            <div className="timeline-item">
+                            <div className="timeline-item" key={data.id}>
                               <div className="timeline-dot"></div>
                               <div className="timeline-content">
-                                <h5>{formatCreatedAt(data.created_at)}</h5>
+                                <h5>{createdAt}</h5>
                                 <p>
-                                  {beforeColon ? (
+                                  {renderColonBold(firstPart)}
+                                  {secondPart && (
                                     <>
-                                      <strong>{beforeColon} :-</strong>{" "}
-                                      {afterColon}
-                                    </>
-                                  ) : (
-                                    <>
-                                      <strong>{data.action_type} :-</strong>{" "}
-                                      {data.action_details}
+                                      <br />
+                                      {renderColonBold(secondPart)}
                                     </>
                                   )}
                                 </p>
@@ -2066,9 +2085,7 @@ const BrokerFileDetail = () => {
                           );
                         })
                       ) : (
-                        <div className="timeline-item">
-                          {t("NorecordsfoundLabel")}
-                        </div>
+                        <div className="timeline-item">{t("NorecordsfoundLabel")}</div>
                       )}
                     </div>
                     <button
