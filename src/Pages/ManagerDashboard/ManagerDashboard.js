@@ -14,93 +14,94 @@ import Loading from '../../Common/Loading';
 import DashboardManagementService from "../../API/DashboardManagement/DashboardManagementService";
 import { Tab,Tabs } from 'react-bootstrap';
 import { BsPatchExclamation } from "react-icons/bs";
-import { Row, Col } from "react-bootstrap";
-import DatePicker from "react-datepicker";
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-  CartesianGrid,
-} from "recharts";
+// import { Row, Col } from "react-bootstrap";
+// import DatePicker from "react-datepicker";
+// import {
+//   LineChart,
+//   Line,
+//   XAxis,
+//   YAxis,
+//   Tooltip,
+//   Legend,
+//   ResponsiveContainer,
+//   CartesianGrid,
+// } from "recharts";
 
 const ManagerDashboard = () => {
-    const [showFilterForm, setShowFilterForm] = useState(true);
-    const toggleFilter = () => {
-      setShowFilterForm(!showFilterForm);
-    };
+
+    // const [showFilterForm, setShowFilterForm] = useState(true);
+    // const toggleFilter = () => {
+    //   setShowFilterForm(!showFilterForm);
+    // };
   
-    const [selectedDate, setSelectedDate] = useState(null);
-    const [filters, setFilters] = useState({
-      date: "",
-      assureur: "",
-      courtier: "",
-      gestionnaire: "",
-      etatDossier: "",
-      risques: "",
-      preneur: "",
-    });
+    // const [selectedDate, setSelectedDate] = useState(null);
+    // const [filters, setFilters] = useState({
+    //   date: "",
+    //   assureur: "",
+    //   courtier: "",
+    //   gestionnaire: "",
+    //   etatDossier: "",
+    //   risques: "",
+    //   preneur: "",
+    // });
   
-    const handleChange = (e) => {
-      const { name, value } = e.target;
-      setFilters({ ...filters, [name]: value });
-    };
+    // const handleChange = (e) => {
+    //   const { name, value } = e.target;
+    //   setFilters({ ...filters, [name]: value });
+    // };
   
-    const handleReset = () => {
-      setFilters({
-        date: "",
-        assureur: "",
-        courtier: "",
-        gestionnaire: "",
-        etatDossier: "",
-        risques: "",
-        preneur: "",
-      });
-    };
-    const data = [
-      { time: "14.10", serverA: 20, serverB: 10 },
-      { time: "14.20", serverA: 35, serverB: 22 },
-      { time: "14.30", serverA: 50, serverB: 30 },
-      { time: "14.40", serverA: 15, serverB: 5 },
-      { time: "14.50", serverA: 60, serverB: 25 },
-      { time: "14.60", serverA: 48, serverB: 20 },
-      { time: "15.00", serverA: 70, serverB: 40 },
-      { time: "15.10", serverA: 55, serverB: 35 },
-      { time: "15.20", serverA: 50, serverB: 28 },
-      { time: "15.30", serverA: 80, serverB: 55 },
-    ];
+    // const handleReset = () => {
+    //   setFilters({
+    //     date: "",
+    //     assureur: "",
+    //     courtier: "",
+    //     gestionnaire: "",
+    //     etatDossier: "",
+    //     risques: "",
+    //     preneur: "",
+    //   });
+    // };
+    // const data = [
+    //   { time: "14.10", serverA: 20, serverB: 10 },
+    //   { time: "14.20", serverA: 35, serverB: 22 },
+    //   { time: "14.30", serverA: 50, serverB: 30 },
+    //   { time: "14.40", serverA: 15, serverB: 5 },
+    //   { time: "14.50", serverA: 60, serverB: 25 },
+    //   { time: "14.60", serverA: 48, serverB: 20 },
+    //   { time: "15.00", serverA: 70, serverB: 40 },
+    //   { time: "15.10", serverA: 55, serverB: 35 },
+    //   { time: "15.20", serverA: 50, serverB: 28 },
+    //   { time: "15.30", serverA: 80, serverB: 55 },
+    // ];
   
-    const CustomTooltip = ({ active, payload }) => {
-      if (active && payload && payload.length) {
-        const item = payload[0];
-        const serverName =
-          item.name === "serverA" ? "Web Server A" : "Web Server B";
-        const color = item.name === "serverA" ? "#00C49F" : "#FDB528";
+    // const CustomTooltip = ({ active, payload }) => {
+    //   if (active && payload && payload.length) {
+    //     const item = payload[0];
+    //     const serverName =
+    //       item.name === "serverA" ? "Web Server A" : "Web Server B";
+    //     const color = item.name === "serverA" ? "#00C49F" : "#FDB528";
   
-        return (
-          <div
-            style={{
-              backgroundColor: "#fff",
-              borderRadius: 10,
-              padding: "12px 16px",
-              boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-            }}
-          >
-            <p style={{ margin: 0, fontWeight: 600, fontSize: 14 }}>
-              {item.value} Request
-            </p>
-            <p
-              style={{ margin: 0, fontSize: 12, color }}
-            >{`From ${serverName}`}</p>
-          </div>
-        );
-      }
+    //     return (
+    //       <div
+    //         style={{
+    //           backgroundColor: "#fff",
+    //           borderRadius: 10,
+    //           padding: "12px 16px",
+    //           boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+    //         }}
+    //       >
+    //         <p style={{ margin: 0, fontWeight: 600, fontSize: 14 }}>
+    //           {item.value} Request
+    //         </p>
+    //         <p
+    //           style={{ margin: 0, fontSize: 12, color }}
+    //         >{`From ${serverName}`}</p>
+    //       </div>
+    //     );
+    //   }
   
-      return null;
-    };
+    //   return null;
+    // };
 
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -289,8 +290,8 @@ const ManagerDashboard = () => {
           </div>
         </div>
 
-                    {/* New Global Dashboard Design */}
-            <div className="top-global-filter">
+            {/* New Global Dashboard Design */}
+            {/* <div className="top-global-filter">
               <div className="d-flex justify-content-between align-items-center">
                 <h2 className="mb-2">Cumulatives filters</h2>
                 <div className="filter-toggle" onClick={toggleFilter}>
@@ -460,9 +461,9 @@ const ManagerDashboard = () => {
                   </Row>
                 </Form>
               )}
-            </div>
+            </div> */}
 
-            <div className="row">
+            {/* <div className="row">
               <div className="col-md-6">
                                 <div className="col-md-12">
                 <div className="">
@@ -843,13 +844,13 @@ const ManagerDashboard = () => {
                 </div>
               </div>
 
-            </div>
+            </div> */}
 
 
 
            
 
-        {/* <Tabs
+        <Tabs
           id="controlled-tab-example"
           activeKey={activeTab}
           onSelect={handleTabSelect}
@@ -2152,7 +2153,7 @@ const ManagerDashboard = () => {
               }
             </div>
           </Tab>
-        </Tabs> */}
+        </Tabs>
       </div>
 
       {/* Add Col Modal */}
