@@ -4009,7 +4009,7 @@ const ManagerFileDetail = () => {
                                         value={selectGEDStatus}
                                         onChange={(e) => handleGEDStatusChange(e.target.value)}
                                       >
-                                        <option value="">GED status</option>
+                                        <option value="">GED Statut</option>
                                         <option value="sent">envoyé</option>
                                         <option value="to_be_sent">A envoyer</option>
                                         <option value="error">Erreur d’envoi</option>
