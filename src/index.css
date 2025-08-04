@@ -887,6 +887,7 @@ color: #212836;
     align-items: center;border-radius: 18px;
 }.second-header select.form-select {
     font-size: 13px;
+    min-height: 45px;
 }
 .side-panel-container .link-section ul li a svg {
     flex: 0 0 24px;

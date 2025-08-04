@@ -2326,7 +2326,6 @@ const ManagerFileDetail = () => {
                     <label class="form-label">Etat du chantier</label>
                     <Form.Select
                       aria-label="Etat du chantier"
-                      style={{ minHeight: "45px" }}
                       value={editUserSiteStatus}
                       onChange={(e) => handleSiteStatusChange(e.target.value)}
                     >
@@ -2339,7 +2338,6 @@ const ManagerFileDetail = () => {
                     <label class="form-label">Exporter sous</label>
                     <Form.Select
                       aria-label="Export As"
-                      style={{ minHeight: "45px", minWidth: "110px" }}
                       onChange={(e) => handleExportDocumentShow(e.target.value)}
                       defaultValue=""
                     >
@@ -2361,11 +2359,6 @@ const ManagerFileDetail = () => {
                     <Form.Select
                       aria-label="Etat du chantier"
                       className="form-select"
-                      style={{
-                        minHeight: "45px",
-                        width: "25%",
-                        fontFamily: "Manrope",
-                      }}
                       value={sendToFileStatus}
                       onChange={(e) => handleSendFileShow(e.target.value)}
                     >

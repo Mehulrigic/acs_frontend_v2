@@ -1647,7 +1647,7 @@ const BrokerFileDetail = () => {
                     <label class="form-label">Export As</label>
                     <Form.Select
                       aria-label="Export As"
-                      style={{ minHeight: "45px", minWidth: "110px" }}
+
                       onChange={(e) => handleExportDocumentShow(e.target.value)}
                       defaultValue=""
                     >
@@ -1668,7 +1668,6 @@ const BrokerFileDetail = () => {
                     <label class="form-label">Envoyer à</label>
                     <Form.Select
                       aria-label="Etat du chantier"
-                      style={{ minHeight: "45px", fontFamily: "Manrope" }}
                       value={sendToFileStatus}
                       onChange={(e) => handleSendFileShow(e.target.value)}
                     >
