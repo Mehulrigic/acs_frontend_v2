@@ -990,6 +990,8 @@ color: var(--bs-body-color);
 .fold-unfold-link svg {
     height: 30px;
     width: 30px;
+}th.custom-field {
+    min-width: 120px;
 }
 @media(max-width:1350px){
   .top-header > div:nth-child(2) {

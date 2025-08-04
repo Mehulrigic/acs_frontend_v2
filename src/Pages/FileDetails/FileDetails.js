@@ -2385,7 +2385,7 @@ const FileDetails = () => {
                       <thead>
                         <tr>
                           <th>Nom de la tâche</th>
-                          <th>Date limite</th>
+                          <th className="custom-field">Date limite</th>
                           <th>Description de la tâche</th>
                           <th>Attribué par</th>
                           <th>Attribué à</th>
