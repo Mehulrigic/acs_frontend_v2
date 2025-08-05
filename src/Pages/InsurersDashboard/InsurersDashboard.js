@@ -2,68 +2,79 @@ import React, { Fragment, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import SidePanel from "../../Components/SidePanel/SidePanel";
 import "./InsurersDashboard.css";
-import StatisticsData from "../../Components/StatisticsData/StatisticsData";
-import Table from "react-bootstrap/Table";
 import Form from "react-bootstrap/Form";
-import AddfolderPanel from "../../Components/AddfolderPanel/AddfolderPanel";
-import DashboardManagementService from "../../API/DashboardManagement/DashboardManagementService";
 import logo from "../../ass-logo.png";
-import Paginations from "../../Components/Paginations/Paginations";
+import AddfolderPanel from "../../Components/AddfolderPanel/AddfolderPanel";
 import { useNavigate } from "react-router-dom";
-import { Link } from "react-router-dom";
-import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 import Loading from "../../Common/Loading";
-import { Tab, Tabs } from "react-bootstrap";
-import { BsPatchExclamation } from "react-icons/bs";
-// import { Row, Col } from "react-bootstrap";
-// import DatePicker from "react-datepicker";
-// import {
-//   LineChart,
-//   Line,
-//   XAxis,
-//   YAxis,
-//   Tooltip,
-//   Legend,
-//   ResponsiveContainer,
-//   CartesianGrid,
-// } from "recharts";
+import { Row, Col } from "react-bootstrap";
+import DatePicker from "react-datepicker";
+import DashboardManagementService from "../../API/DashboardManagement/DashboardManagementService";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+  CartesianGrid,
+} from "recharts";
+
+// import StatisticsData from "../../Components/StatisticsData/StatisticsData";
+// import Table from "react-bootstrap/Table";
+// import Paginations from "../../Components/Paginations/Paginations";
+// import { Link } from "react-router-dom";
+// import Modal from "react-bootstrap/Modal";
+// import { Tab, Tabs } from "react-bootstrap";
+// import { BsPatchExclamation } from "react-icons/bs";
 
 const InsurersDashboard = () => {
+  const { t } = useTranslation();
+  const navigate = useNavigate();
 
-  // const [showFilterForm, setShowFilterForm] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const [userRole, setUserRole] = useState("");
+  const [userId, setUserId] = useState("");
+  const [userName, setUserName] = useState("");
+  const [logoImageShow, setLogoImageShow] = useState("");
+  const [rightPanelThemeColor, setRightPanelThemeColor] = useState("");
+  const [taskStatisticsData, setTaskStatisticsData] = useState({});
+  const [data, setData] = useState([]);
 
-  // const toggleFilter = () => {
-  //   setShowFilterForm(!showFilterForm);
-  // };
+  const [showFilterForm, setShowFilterForm] = useState(true);
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [filters, setFilters] = useState({
+    date: "",
+    assureur: "",
+    courtier: "",
+    gestionnaire: "",
+    etatDossier: "",
+    risques: "",
+    preneur: "",
+  });
 
-  // const [selectedDate, setSelectedDate] = useState(null);
-  // const [filters, setFilters] = useState({
-  //   date: "",
-  //   assureur: "",
-  //   courtier: "",
-  //   gestionnaire: "",
-  //   etatDossier: "",
-  //   risques: "",
-  //   preneur: "",
-  // });
+  const toggleFilter = () => {
+    setShowFilterForm(!showFilterForm);
+  };
 
-  // const handleChange = (e) => {
-  //   const { name, value } = e.target;
-  //   setFilters({ ...filters, [name]: value });
-  // };
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFilters({ ...filters, [name]: value });
+  };
 
-  // const handleReset = () => {
-  //   setFilters({
-  //     date: "",
-  //     assureur: "",
-  //     courtier: "",
-  //     gestionnaire: "",
-  //     etatDossier: "",
-  //     risques: "",
-  //     preneur: "",
-  //   });
-  // };
+  const handleReset = () => {
+    setFilters({
+      date: "",
+      assureur: "",
+      courtier: "",
+      gestionnaire: "",
+      etatDossier: "",
+      risques: "",
+      preneur: "",
+    });
+  };
 
   // const data = [
   //   { time: "14.10", serverA: 20, serverB: 10 },
@@ -78,220 +89,192 @@ const InsurersDashboard = () => {
   //   { time: "15.30", serverA: 80, serverB: 55 },
   // ];
 
-  // const CustomTooltip = ({ active, payload }) => {
-  //   if (active && payload && payload.length) {
-  //     const item = payload[0];
-  //     const serverName =
-  //       item.name === "serverA" ? "Web Server A" : "Web Server B";
-  //     const color = item.name === "serverA" ? "#00C49F" : "#FDB528";
+  // const [userDocumentData, setUserDocumentData] = useState([]);
+  // const [statisticsData, setStatisticsData] = useState({});
+  // const [editUserStatus, setEditUserStatus] = useState("");
+  // const [search, setSearch] = useState("");
+  // const [currentPage, setCurrentPage] = useState(1);
+  // const [totalPages, setTotalPages] = useState(1);
+  // const [totalRecords, setTotalRecords] = useState(0);
+  // const [startDate, setStartDate] = useState(null);
+  // const [selectedMonth, setSelectedMonth] = useState("all");
+  // const [isRotated, setIsRotated] = useState(false);
+  // const [sort, setSort] = useState({ key: "created_at", value: "desc" });
+  // const [deletePermission, setDeletePermission] = useState(false);
+  // const [showFolderId, setShowFolderId] = useState("");
 
-  //     return (
-  //       <div
-  //         style={{
-  //           backgroundColor: "#fff",
-  //           borderRadius: 10,
-  //           padding: "12px 16px",
-  //           boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-  //         }}
-  //       >
-  //         <p style={{ margin: 0, fontWeight: 600, fontSize: 14 }}>
-  //           {item.value} Request
-  //         </p>
-  //         <p
-  //           style={{ margin: 0, fontSize: 12, color }}
-  //         >{`From ${serverName}`}</p>
-  //       </div>
-  //     );
-  //   }
+  // const [showAddcol, setShowAddcol] = useState(false);
+  // const handleAddcolClose = () => setShowAddcol(false);
+  // const handleAddcolShow = () => setShowAddcol(true);
 
-  //   return null;
-  // };
+  // const [showDeleteModal, setShowDeleteModal] = useState(false);
+  // const handleShowDeleteModal = () => setShowDeleteModal(true);
+  // const handleCloseDeleteModal = () => setShowDeleteModal(false);
 
-  const { t } = useTranslation();
-  const navigate = useNavigate();
+  // const [editUserSiteStatus, setEditUserSiteStatus] = useState("");
+  // const [activeTab, setActiveTab] = useState("toProcess");
 
-  const [isLoading, setIsLoading] = useState(false);
-  const [userDocumentData, setUserDocumentData] = useState([]);
-  const [statisticsData, setStatisticsData] = useState({});
-  const [editUserStatus, setEditUserStatus] = useState("");
-  const [search, setSearch] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [totalRecords, setTotalRecords] = useState(0);
-  const [startDate, setStartDate] = useState(null);
-  const [selectedMonth, setSelectedMonth] = useState("all");
-  const [logoImageShow, setLogoImageShow] = useState("");
-  const [rightPanelThemeColor, setRightPanelThemeColor] = useState("");
-  const [isRotated, setIsRotated] = useState(false);
-  const [sort, setSort] = useState({ key: "created_at", value: "desc" });
-  const [userRole, setUserRole] = useState("");
-  const [userName, setUserName] = useState("");
-  const [userId, setUserId] = useState("");
-  const [deletePermission, setDeletePermission] = useState(false);
-  const [showFolderId, setShowFolderId] = useState("");
+  // const [modalColumns, setModalColumns] = useState({
+  //   fileNumber: true,
+  //   // client: true,
+  //   "Nom du preneur d'assurance": true,
+  //   brokerlabel: true,
+  //   "Date de création": true,
+  //   lastModifiedDateLabel: true,
+  //   "Date de début de chantier": true,
+  //   "Date de fin de chantier": true,
+  //   status: true,
+  //   "Etat du chantier": true,
+  // });
 
-  const [showAddcol, setShowAddcol] = useState(false);
-  const handleAddcolClose = () => setShowAddcol(false);
-  const handleAddcolShow = () => setShowAddcol(true);
-
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const handleShowDeleteModal = () => setShowDeleteModal(true);
-  const handleCloseDeleteModal = () => setShowDeleteModal(false);
-
-  const [editUserSiteStatus, setEditUserSiteStatus] = useState("");
-
-  const [modalColumns, setModalColumns] = useState({
-    fileNumber: true,
-    // client: true,
-    "Nom du preneur d'assurance": true,
-    brokerlabel: true,
-    "Date de création": true,
-    lastModifiedDateLabel: true,
-    "Date de début de chantier": true,
-    "Date de fin de chantier": true,
-    status: true,
-    "Etat du chantier": true,
-  });
-
-  const [selectedColumns, setSelectedColumns] = useState(
-    Object.keys(modalColumns).filter((key) => modalColumns[key])
-  );
-
-  useEffect(() => {
-    if (deletePermission) {
-      setModalColumns((prev) => ({
-        ...prev,
-        Action: true,
-      }));
-      const newSelectedColumns = Object.keys(modalColumns).filter(
-        (key) => modalColumns[key]
-      );
-      newSelectedColumns.push("Action");
-      setSelectedColumns(newSelectedColumns);
-    }
-  }, [deletePermission]);
+  // const [selectedColumns, setSelectedColumns] = useState(
+  //   Object.keys(modalColumns).filter((key) => modalColumns[key])
+  // );
 
   useEffect(() => {
     const userRole = JSON.parse(localStorage.getItem("userRole"));
     const token = localStorage.getItem("authToken");
-    const can_delete_folder = localStorage.getItem("can_delete_folder");
-    setDeletePermission(can_delete_folder == 1 ? true : false);
+    // const can_delete_folder = localStorage.getItem("can_delete_folder");
+    // setDeletePermission(can_delete_folder == 1 ? true : false);
     if (token && userRole.includes("Assureur")) {
       const user = JSON.parse(localStorage.getItem("user"));
       const logo_image = JSON.parse(localStorage.getItem("logo_image"));
-      const right_panel_color = JSON.parse(
-        localStorage.getItem("right_panel_color")
-      );
+      const right_panel_color = JSON.parse(localStorage.getItem("right_panel_color"));
       setRightPanelThemeColor(right_panel_color);
-      setLogoImageShow(logo_image);
+      // UserDocument(search, sort, currentPage, editUserStatus, activeTab, editUserSiteStatus);
+      GetTaskStatistics();
+      GetAptAtotFromTransferHistory();
       setUserRole(userRole);
-      setUserName(user?.first_name + " " + user?.last_name);
       setUserId(user?.id);
-      UserDocument(
-        search,
-        sort,
-        currentPage,
-        editUserStatus,
-        activeTab,
-        editUserSiteStatus
-      );
+      setUserName(user?.first_name + " " + user?.last_name);
+      setLogoImageShow(logo_image);
     } else {
       navigate("/");
     }
-  }, [sort]);
+  }, []);
 
-  useEffect(() => {
-    const userRole = JSON.parse(localStorage.getItem("userRole"));
-    const token = localStorage.getItem("authToken");
-    const can_delete_folder = localStorage.getItem("can_delete_folder");
-    setDeletePermission(can_delete_folder == 1 ? true : false);
-    if (token && userRole.includes("Assureur")) {
-      if (selectedMonth != "custom") {
-        GetStatistics();
-      }
-    } else {
-      navigate("/");
-    }
-  }, [selectedMonth]);
+  // useEffect(() => {
+  //   if (deletePermission) {
+  //     setModalColumns((prev) => ({
+  //       ...prev,
+  //       Action: true,
+  //     }));
+  //     const newSelectedColumns = Object.keys(modalColumns).filter(
+  //       (key) => modalColumns[key]
+  //     );
+  //     newSelectedColumns.push("Action");
+  //     setSelectedColumns(newSelectedColumns);
+  //   }
+  // }, [deletePermission]);
 
-  useEffect(() => {
-    if (startDate) {
-      GetStatistics();
-    }
-  }, [startDate]);
+  // useEffect(() => {
+  //   const userRole = JSON.parse(localStorage.getItem("userRole"));
+  //   const token = localStorage.getItem("authToken");
+  //   const can_delete_folder = localStorage.getItem("can_delete_folder");
+  //   setDeletePermission(can_delete_folder == 1 ? true : false);
+  //   if (token && userRole.includes("Assureur")) {
+  //     if (selectedMonth != "custom") {
+  //       GetStatistics();
+  //     }
+  //   } else {
+  //     navigate("/");
+  //   }
+  // }, [selectedMonth]);
 
-  const UserDocument = async (
-    search,
-    sort,
-    page = 1,
-    status,
-    key,
-    siteStatus
-  ) => {
+  // useEffect(() => {
+  //   if (startDate) {
+  //     GetStatistics();
+  //   }
+  // }, [startDate]);
+
+  // const UserDocument = async (
+  //   search,
+  //   sort,
+  //   page = 1,
+  //   status,
+  //   key,
+  //   siteStatus
+  // ) => {
+  //   setIsLoading(true);
+  //   try {
+  //     var userData = {
+  //       search: search ?? "",
+  //       sort: {
+  //         key: sort.key,
+  //         value: sort.value,
+  //       },
+  //       page,
+  //       status: status ?? "",
+  //       filter_type: key,
+  //       site_status: siteStatus,
+  //       tab_type: "dashboard",
+  //     };
+  //     const response = await DashboardManagementService.user_document(userData);
+  //     if (response.data.status) {
+  //       setIsLoading(false);
+  //       setUserDocumentData(response.data.documents.data);
+  //       setCurrentPage(response.data.documents.meta.current_page);
+  //       setTotalPages(response.data.documents.meta.last_page);
+  //       setTotalRecords(response.data.documents.meta.total);
+  //       localStorage.setItem(
+  //         "assureur_dashboard",
+  //         response.data.documents.meta.total
+  //       );
+  //     }
+  //   } catch (error) {
+  //     setIsLoading(false);
+  //     console.log(error);
+  //   }
+  // };
+
+  // const formatDate = (dateString) => {
+  //   if (dateString) {
+  //     const date = new Date(dateString);
+  //     const day = String(date.getDate()).padStart(2, "0");
+  //     const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are zero-based
+  //     const year = date.getFullYear();
+  //     return `${day}/${month}/${year}`;
+  //   } else {
+  //     return "";
+  //   }
+  // };
+
+  // const getFormattedDate = (dateString) => {
+  //   const [day, month, year] = dateString.split("/");
+  //   return new Date(`${month}/${day}/${year}`); // Convert to MM/DD/YYYY format
+  // };
+
+  // const GetStatistics = async () => {
+  //   setIsLoading(true);
+  //   try {
+  //     var userData = {
+  //       filter_by: selectedMonth,
+  //     };
+  //     if (selectedMonth === "custom") {
+  //       userData.filter_date = startDate ? startDate : "";
+  //     }
+  //     const response = await DashboardManagementService.get_statistics(
+  //       userData
+  //     );
+  //     if (response.data) {
+  //       setIsLoading(false);
+  //       setStatisticsData(response.data);
+  //     }
+  //   } catch (error) {
+  //     setIsLoading(false);
+  //     console.log(error);
+  //   }
+  // };
+
+  const GetTaskStatistics = async () => {
     setIsLoading(true);
     try {
-      var userData = {
-        search: search ?? "",
-        sort: {
-          key: sort.key,
-          value: sort.value,
-        },
-        page,
-        status: status ?? "",
-        filter_type: key,
-        site_status: siteStatus,
-        tab_type: "dashboard",
-      };
-      const response = await DashboardManagementService.user_document(userData);
-      if (response.data.status) {
-        setIsLoading(false);
-        setUserDocumentData(response.data.documents.data);
-        setCurrentPage(response.data.documents.meta.current_page);
-        setTotalPages(response.data.documents.meta.last_page);
-        setTotalRecords(response.data.documents.meta.total);
-        localStorage.setItem(
-          "assureur_dashboard",
-          response.data.documents.meta.total
-        );
-      }
-    } catch (error) {
-      setIsLoading(false);
-      console.log(error);
-    }
-  };
 
-  const formatDate = (dateString) => {
-    if (dateString) {
-      const date = new Date(dateString);
-      const day = String(date.getDate()).padStart(2, "0");
-      const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are zero-based
-      const year = date.getFullYear();
-      return `${day}/${month}/${year}`;
-    } else {
-      return "";
-    }
-  };
+      const response = await DashboardManagementService.get_task_statistics();
 
-  const getFormattedDate = (dateString) => {
-    const [day, month, year] = dateString.split("/");
-    return new Date(`${month}/${day}/${year}`); // Convert to MM/DD/YYYY format
-  };
-
-  const GetStatistics = async () => {
-    setIsLoading(true);
-    try {
-      var userData = {
-        filter_by: selectedMonth,
-      };
-      if (selectedMonth === "custom") {
-        userData.filter_date = startDate ? startDate : "";
-      }
-      const response = await DashboardManagementService.get_statistics(
-        userData
-      );
       if (response.data) {
         setIsLoading(false);
-        setStatisticsData(response.data);
+        setTaskStatisticsData(response.data.dashboard);
       }
     } catch (error) {
       setIsLoading(false);
@@ -299,121 +282,164 @@ const InsurersDashboard = () => {
     }
   };
 
-  const handleStatusChange = (status) => {
-    setEditUserStatus(status);
-    UserDocument(search, sort, 1, status, activeTab, editUserSiteStatus);
-  };
-
-  const handleSearchChange = (search) => {
-    setSearch(search);
-    UserDocument(
-      search,
-      sort,
-      1,
-      editUserStatus,
-      activeTab,
-      editUserSiteStatus
-    );
-  };
-
-  const handleKeyPress = (e) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      handleSearchChange(search);
-    }
-  };
-
-  const handlePageChange = (page) => {
-    setCurrentPage(page);
-    UserDocument(
-      search,
-      sort,
-      page,
-      editUserStatus,
-      activeTab,
-      editUserSiteStatus
-    );
-  };
-
-  const handleCheckboxChange = (key) => {
-    setModalColumns((prev) => ({ ...prev, [key]: !prev[key] }));
-  };
-
-  const handleAddcolSubmit = () => {
-    const newSelectedColumns = Object.keys(modalColumns).filter(
-      (key) => modalColumns[key]
-    );
-    setSelectedColumns(newSelectedColumns);
-    handleAddcolClose(); // Close the modal
-  };
-
-  const handleClickRotate = (column) => {
-    const direction =
-      sort.key === column ? (sort.value === "desc" ? "asc" : "desc") : "asc";
-    setSort({ key: column, value: direction });
-    setIsRotated(!isRotated); // Toggle the class on click
-  };
-
-  const HandleDeleteDocumentFile = async () => {
+  const GetAptAtotFromTransferHistory = async () => {
+    setIsLoading(true);
     try {
-      const response = await DashboardManagementService.delete_user_document(
-        showFolderId
-      );
-      if (response.data.status) {
-        handleCloseDeleteModal();
-        setShowFolderId("");
-        UserDocument(
-          search,
-          sort,
-          currentPage,
-          editUserStatus,
-          activeTab,
-          editUserSiteStatus
-        );
-        GetStatistics();
+
+      const response = await DashboardManagementService.apt_atot_stats();
+
+      if (response.data) {
+        setIsLoading(false);
+        const dashboard = response.data.dashboard;
+        const treated = dashboard.TREATED_BY_LAST_ACTION_DATE || {};
+
+        const transformedData = [
+          { time: "0", treated: 0 },
+          ...Object.entries(treated).map(([key, value]) => ({
+            time: key,
+            treated: value,
+          }))
+        ];
+
+        setData(transformedData);
       }
     } catch (error) {
+      setIsLoading(false);
       console.log(error);
     }
   };
-  const [activeTab, setActiveTab] = useState("toProcess");
 
-  const handleTabSelect = (key) => {
-    setActiveTab(key);
-    UserDocument(
-      search,
-      sort,
-      currentPage,
-      editUserStatus,
-      key,
-      editUserSiteStatus
-    );
-  };
+  // const handleStatusChange = (status) => {
+  //   setEditUserStatus(status);
+  //   UserDocument(search, sort, 1, status, activeTab, editUserSiteStatus);
+  // };
 
-  const handleSiteStatusChange = (siteStatus) => {
-    setEditUserSiteStatus(siteStatus);
-    UserDocument(search, sort, 1, editUserStatus, activeTab, siteStatus);
+  // const handleSearchChange = (search) => {
+  //   setSearch(search);
+  //   UserDocument(
+  //     search,
+  //     sort,
+  //     1,
+  //     editUserStatus,
+  //     activeTab,
+  //     editUserSiteStatus
+  //   );
+  // };
+
+  // const handleKeyPress = (e) => {
+  //   if (e.key === "Enter") {
+  //     e.preventDefault();
+  //     handleSearchChange(search);
+  //   }
+  // };
+
+  // const handlePageChange = (page) => {
+  //   setCurrentPage(page);
+  //   UserDocument(
+  //     search,
+  //     sort,
+  //     page,
+  //     editUserStatus,
+  //     activeTab,
+  //     editUserSiteStatus
+  //   );
+  // };
+
+  // const handleCheckboxChange = (key) => {
+  //   setModalColumns((prev) => ({ ...prev, [key]: !prev[key] }));
+  // };
+
+  // const handleAddcolSubmit = () => {
+  //   const newSelectedColumns = Object.keys(modalColumns).filter(
+  //     (key) => modalColumns[key]
+  //   );
+  //   setSelectedColumns(newSelectedColumns);
+  //   handleAddcolClose(); // Close the modal
+  // };
+
+  // const handleClickRotate = (column) => {
+  //   const direction =
+  //     sort.key === column ? (sort.value === "desc" ? "asc" : "desc") : "asc";
+  //   setSort({ key: column, value: direction });
+  //   setIsRotated(!isRotated); // Toggle the class on click
+  // };
+
+  // const HandleDeleteDocumentFile = async () => {
+  //   try {
+  //     const response = await DashboardManagementService.delete_user_document(
+  //       showFolderId
+  //     );
+  //     if (response.data.status) {
+  //       handleCloseDeleteModal();
+  //       setShowFolderId("");
+  //       UserDocument(
+  //         search,
+  //         sort,
+  //         currentPage,
+  //         editUserStatus,
+  //         activeTab,
+  //         editUserSiteStatus
+  //       );
+  //       GetStatistics();
+  //     }
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
+
+  // const handleTabSelect = (key) => {
+  //   setActiveTab(key);
+  //   UserDocument(
+  //     search,
+  //     sort,
+  //     currentPage,
+  //     editUserStatus,
+  //     key,
+  //     editUserSiteStatus
+  //   );
+  // };
+
+  // const handleSiteStatusChange = (siteStatus) => {
+  //   setEditUserSiteStatus(siteStatus);
+  //   UserDocument(search, sort, 1, editUserStatus, activeTab, siteStatus);
+  // };
+
+  const CustomTooltip = ({ active, payload }) => {
+    if (active && payload && payload.length) {
+      const item = payload[0];
+      return (
+        <div
+          style={{
+            backgroundColor: "#fff",
+            borderRadius: 10,
+            padding: "12px 16px",
+            boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+          }}
+        >
+          <p style={{ margin: 0, fontWeight: 600, fontSize: 14 }}>
+            {item.value} Demandes
+          </p>
+          <p
+            style={{
+              margin: 0,
+              fontSize: 12,
+              color: item.stroke,
+            }}
+          >
+            Temps: {item.payload.time}
+          </p>
+        </div>
+      );
+    }
+    return null;
   };
 
   return (
     <Fragment>
-      <style>
-        {" "}
-        {` button.btn.btn-primary  { background-color: ${
-          localStorage.getItem("button_color")
-            ? JSON.parse(localStorage.getItem("button_color"))
-            : "#e84455"
-        } !Important};`}{" "}
-      </style>
+      <style> {` button.btn.btn-primary  { background-color: ${localStorage.getItem("button_color") ? JSON.parse(localStorage.getItem("button_color")) : "#e84455"} !Important};`} </style>
 
       <SidePanel
-        sidebarLogo={
-          logoImageShow == "" ||
-          logoImageShow == null ||
-          logoImageShow == undefined
-            ? logo
-            : `${process.env.REACT_APP_IMAGE_URL}/${logoImageShow}`
-        }
+        sidebarLogo={(logoImageShow == "" || logoImageShow == null || logoImageShow == undefined) ? logo : `${process.env.REACT_APP_IMAGE_URL}/${logoImageShow}`}
       />
       <div
         className="dashboard-main-content insurers-dashboard"
@@ -427,20 +453,18 @@ const InsurersDashboard = () => {
               userRole={userRole}
               userName={userName}
               userId={userId}
-              search={search}
-              sort={sort}
-              currentPage={currentPage}
-              editUserStatus={editUserStatus}
-              UserDocument={UserDocument}
-              GetStatistics={GetStatistics}
+            // search={search}
+            // sort={sort}
+            // currentPage={currentPage}
+            // editUserStatus={editUserStatus}
+            // UserDocument={UserDocument}
+            // GetStatistics={GetStatistics}
             />
           </div>
         </div>
-        {isLoading ? (
-          <Loading />
-        ) : (
+        {isLoading ? <Loading /> :
           <>
-            <StatisticsData
+            {/* <StatisticsData
               statisticsData={statisticsData}
               startDate={startDate}
               setStartDate={setStartDate}
@@ -448,10 +472,10 @@ const InsurersDashboard = () => {
               setSelectedMonth={setSelectedMonth}
               getFormattedDate={getFormattedDate}
               formatDate={formatDate}
-            />
+            /> */}
 
-            {/* New Global Dashboard Design */}
-            {/* <div className="top-global-filter">
+            {/* Top Filter */}
+            <div className="top-global-filter">
               <div className="d-flex justify-content-between align-items-center">
                 <h2 className="mb-2">Cumulatives filters</h2>
                 <div className="filter-toggle" onClick={toggleFilter}>
@@ -621,9 +645,10 @@ const InsurersDashboard = () => {
                   </Row>
                 </Form>
               )}
-            </div> */}
+            </div>
 
-            {/* <div className="row">
+            <div className="row">
+              {/* Portfolio */}
               <div className="col-md-6">
                 <div className="">
                   <h2 className="my-4">Portfolio</h2>
@@ -743,15 +768,17 @@ const InsurersDashboard = () => {
                   </div>
                 </div>
               </div>
+
+              {/* Task Statistics */}
               <div className="col-md-6">
-                <h2 className="my-4">Task</h2>
+                <h2 className="my-4">Tâche</h2>
                 <div className="row">
                   <div className="col-md-6">
                     <div className="task-card planned-task">
                       <div className="d-flex justify-content-between">
                         <div className="task-detail">
-                          <h2>982</h2>
-                          <div className="task-status">Planned Task</div>
+                          <h2>{taskStatisticsData?.planned_tasks}</h2>
+                          <div className="task-status">Tâche planifiée</div>
                         </div>
                         <div className="task-icon"></div>
                       </div>
@@ -759,8 +786,8 @@ const InsurersDashboard = () => {
                     <div className="task-card completed-task">
                       <div className="d-flex justify-content-between">
                         <div className="task-detail">
-                          <h2>982</h2>
-                          <div className="task-status">Completed Task</div>
+                          <h2>{taskStatisticsData?.completed_tasks}</h2>
+                          <div className="task-status">Tâche terminée</div>
                         </div>
                         <div className="task-icon"></div>
                       </div>
@@ -770,8 +797,8 @@ const InsurersDashboard = () => {
                     <div className="task-card coming-task">
                       <div className="d-flex justify-content-between">
                         <div className="task-detail">
-                          <h2>982</h2>
-                          <div className="task-status">Coming Task</div>
+                          <h2>{taskStatisticsData?.coming_tasks}</h2>
+                          <div className="task-status">Tâche à venir</div>
                         </div>
                         <div className="task-icon"></div>
                       </div>
@@ -779,8 +806,8 @@ const InsurersDashboard = () => {
                     <div className="task-card late-task">
                       <div className="d-flex justify-content-between">
                         <div className="task-detail">
-                          <h2>982</h2>
-                          <div className="task-status">Late Task</div>
+                          <h2>{taskStatisticsData?.late_tasks}</h2>
+                          <div className="task-status">Tâche en retard</div>
                         </div>
                         <div className="task-icon"></div>
                       </div>
@@ -788,9 +815,10 @@ const InsurersDashboard = () => {
                   </div>
                 </div>
               </div>
-            </div> */}
+            </div>
 
-            {/* <div className="row pt-3">
+            {/* Activity Graph  */}
+            <div className="row pt-3">
               <div className="col-md-12">
                 <div className="activity-card">
                   <div
@@ -808,64 +836,52 @@ const InsurersDashboard = () => {
                         color: "#2f2e41",
                       }}
                     >
-                      Activity
+                      Activité
                     </h3>
-                    <ResponsiveContainer width="100%" height={300}>
-                      <LineChart
-                        data={data}
-                        margin={{ top: 20, right: 20, left: 0, bottom: 0 }}
-                      >
-                        <CartesianGrid vertical={false} strokeDasharray="3 3" />
-                        <XAxis dataKey="time" tick={{ fontSize: 12 }} />
-                        <YAxis tick={{ fontSize: 12 }} domain={[0, 80]} />
-                        <Tooltip content={<CustomTooltip />} />
-                        <Legend
-                          wrapperStyle={{ marginBottom: "16px" }}
-                          iconType="circle"
-                          align="right"
-                          verticalAlign="top"
-                          formatter={(value) =>
-                            value === "serverA"
-                              ? "Web Server A"
-                              : "Web Server B"
-                          }
-                        />
-                        <Line
-                          type="monotone"
-                          dataKey="serverA"
-                          name="serverA"
-                          stroke="#00C49F"
-                          strokeWidth={3}
-                          dot={{
-                            r: 6,
-                            strokeWidth: 2,
-                            stroke: "#fff",
-                            fill: "#00C49F",
-                          }}
-                          activeDot={{ r: 8 }}
-                        />
-                        <Line
-                          type="monotone"
-                          dataKey="serverB"
-                          name="serverB"
-                          stroke="#FDB528"
-                          strokeWidth={3}
-                          dot={{
-                            r: 6,
-                            strokeWidth: 2,
-                            stroke: "#fff",
-                            fill: "#FDB528",
-                          }}
-                          activeDot={{ r: 8 }}
-                        />
-                      </LineChart>
-                    </ResponsiveContainer>
+
+                    {isLoading ? (
+                      <Loading />
+                    ) : (
+                      <ResponsiveContainer width="100%" height={300}>
+                        <LineChart
+                          data={data}
+                          margin={{ top: 20, right: 20, left: 0, bottom: 0 }}
+                        >
+                          <CartesianGrid vertical={false} strokeDasharray="3 3" />
+                          <XAxis dataKey="time" tick={{ fontSize: 12 }} />
+                          <YAxis tick={{ fontSize: 12 }} />
+                          <Tooltip content={CustomTooltip} />
+                          <Legend
+                            wrapperStyle={{ marginBottom: "14px" }}
+                            iconType="circle"
+                            align="right"
+                            verticalAlign="top"
+                            formatter={() => "Traité"}
+                          />
+                          <Line
+                            type="monotone"
+                            dataKey="treated"
+                            name="Treated"
+                            stroke="#8884d8"
+                            strokeWidth={3}
+                            dot={{
+                              r: 6,
+                              strokeWidth: 2,
+                              stroke: "#fff",
+                              fill: "#8884d8",
+                            }}
+                            activeDot={{ r: 8 }}
+                          />
+                        </LineChart>
+                      </ResponsiveContainer>
+                    )}
                   </div>
                 </div>
               </div>
-            </div> */}
+            </div>
 
-            <Tabs
+            {/* Old Dashboard */}
+            {/* <Tabs
               id="controlled-tab-example"
               activeKey={activeTab}
               onSelect={handleTabSelect}
@@ -3179,23 +3195,22 @@ const InsurersDashboard = () => {
                   )}
                 </div>
               </Tab>
-            </Tabs>
+            </Tabs> */}
           </>
-        )}
+        }
       </div>
 
       {/* Add Col Modal */}
-      <Modal show={showAddcol} onHide={handleAddcolClose}>
+      {/* <Modal show={showAddcol} onHide={handleAddcolClose}>
         <Modal.Header closeButton>
           <Modal.Title>Ajouter une colonne</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <h2 className="mb-4">Liste des colonnes</h2>
-          {/* Select All Checkbox */}
           <Form.Check
             id="select-all-checkbox"
             label="Sélectionner tout"
-            checked={Object.values(modalColumns).every((value) => value)} // All true
+            checked={Object.values(modalColumns).every((value) => value)}
             onChange={(e) => {
               const isChecked = e.target.checked;
               setModalColumns((prev) =>
@@ -3206,7 +3221,6 @@ const InsurersDashboard = () => {
             }}
           />
 
-          {/* Individual Column Checkboxes */}
           {Object.keys(modalColumns).map((key) => (
             <Form.Check
               key={key}
@@ -3229,10 +3243,10 @@ const InsurersDashboard = () => {
             Ajouter
           </Button>
         </Modal.Footer>
-      </Modal>
+      </Modal> */}
 
       {/* Delete Confirmation Popup */}
-      <Modal
+      {/* <Modal
         className="final-modal"
         show={showDeleteModal}
         onHide={handleCloseDeleteModal}
@@ -3257,7 +3271,7 @@ const InsurersDashboard = () => {
             {t("confirmbtnLabel")}
           </Button>
         </Modal.Footer>
-      </Modal>
+      </Modal> */}
     </Fragment>
   );
 };
