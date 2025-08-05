@@ -2172,6 +2172,23 @@ const BrokerFileDetail = () => {
                       Tout voir
                     </button>
                   </div>
+                                    <div className="last-task-card">
+                    Tâche à venir - à déterminer
+                    <div class="timeline">
+                      <div class="timeline-item">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-content">
+                          <h5>August 5th, 12:00 AM</h5>
+                          <p>common.action_details.document_created</p>
+                        </div>
+                      </div>
+                    </div>
+                    <button
+                      className="btn-secondary btn btn-primary"
+                    >
+                      Tout voir
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
