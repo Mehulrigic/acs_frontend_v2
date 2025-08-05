@@ -1758,6 +1758,7 @@ const FileDetails = () => {
         await DashboardManagementService.speaker_registered_document_file(id);
 
       if (response.data.status) {
+        debugger
         setSpeakerDocumentFileList(response.data.overall_statistics);
       } else {
         setFlashMessage({
@@ -2255,7 +2256,7 @@ const FileDetails = () => {
                                 </div>
                               </td>
                               <td>
-                                {speakerDocumentFileList?.total_invalid_files}
+                                {speakerDocumentFileList?.total_invalid_speakers}
                               </td>
                             </tr>
                             <tr>
@@ -2276,12 +2277,12 @@ const FileDetails = () => {
                                     </svg>
                                   </span>
                                   <span className="text-elips">
-                                    Nombre total de fichiers manquants
+                                    Nombre total d'enceintes manquantes
                                   </span>
                                 </div>
                               </td>
                               <td>
-                                {speakerDocumentFileList?.total_missing_files}
+                                {speakerDocumentFileList?.total_missing_speakers}
                               </td>
                             </tr>
                             <tr>
@@ -2302,14 +2303,12 @@ const FileDetails = () => {
                                     </svg>
                                   </span>
                                   <span className="text-elips">
-                                    Nombre total d'intervenants connectés
+                                    Nombre total d'enceintes connectées
                                   </span>
                                 </div>
                               </td>
                               <td>
-                                {
-                                  speakerDocumentFileList?.total_speakers_attached
-                                }
+                                {speakerDocumentFileList?.total_speakers_attached}
                               </td>
                             </tr>
                             <tr>
@@ -2330,14 +2329,12 @@ const FileDetails = () => {
                                     </svg>
                                   </span>
                                   <span className="text-elips">
-                                    Nombre total de fichiers à valider
+                                    Nombre total d'intervenants à valider
                                   </span>
                                 </div>
                               </td>
                               <td>
-                                {
-                                  speakerDocumentFileList?.total_to_be_validated_files
-                                }
+                                {speakerDocumentFileList?.total_to_be_validated_speakers}
                               </td>
                             </tr>
                             <tr>
@@ -2358,12 +2355,12 @@ const FileDetails = () => {
                                     </svg>
                                   </span>
                                   <span className="text-elips">
-                                    Nombre total de fichiers validés
+                                    Total d'intervenants validés
                                   </span>
                                 </div>
                               </td>
                               <td>
-                                {speakerDocumentFileList?.total_validated_files}
+                                {speakerDocumentFileList?.total_validated_speakers}
                               </td>
                             </tr>
                           </>

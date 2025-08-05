@@ -284,7 +284,7 @@ const AdminFileDetail = () => {
   const [fileType, setFileType] = useState("");
   const [exportDocumentOpen, setExportDocumentOpen] = useState(false);
   const handleExportDocumentShow = (type) => {
-    if(type){
+    if (type) {
       setFileType(type);
       setExportDocumentOpen(true);
     }
@@ -292,7 +292,7 @@ const AdminFileDetail = () => {
   const handleExportDocumentClose = () => setExportDocumentOpen(false);
 
   const handleNoteAddOrShow = (seletedValue) => {
-    if(seletedValue == "add_note") {
+    if (seletedValue == "add_note") {
       handleAddNoteModalOpen();
     } else if (seletedValue == "view_note") {
       handleNoteShow();
@@ -548,7 +548,13 @@ const AdminFileDetail = () => {
           SpeakerList(id, sort, currentPage);
         }
         if (activeTab === "history") {
-          GetHistoryListDocument(id, sort, search, currentPage, selectActionType);
+          GetHistoryListDocument(
+            id,
+            sort,
+            search,
+            currentPage,
+            selectActionType
+          );
         }
       }
     } catch (error) {
@@ -761,7 +767,15 @@ const AdminFileDetail = () => {
     }
   };
 
-  const PaperList = async (id, sort, page = 1, status, type, speaker_id, gedstatus) => {
+  const PaperList = async (
+    id,
+    sort,
+    page = 1,
+    status,
+    type,
+    speaker_id,
+    gedstatus
+  ) => {
     setIsLoading(true);
     try {
       var userData = {
@@ -773,7 +787,7 @@ const AdminFileDetail = () => {
         status: status,
         type: type,
         speaker: speaker_id,
-        GED_status: gedstatus
+        GED_status: gedstatus,
       };
       const response = await AcsManagerFileService.paperList(id, userData);
       if (response.data.status) {
@@ -983,7 +997,15 @@ const AdminFileDetail = () => {
   const handleGEDStatusChange = (gedstatus) => {
     setSelectGEDStatus(gedstatus);
     if (!showCheck) {
-      PaperList(id, sort, 1, editUserStatus, selectDocumentType, selectSpeakerId, gedstatus);
+      PaperList(
+        id,
+        sort,
+        1,
+        editUserStatus,
+        selectDocumentType,
+        selectSpeakerId,
+        gedstatus
+      );
     }
 
     setUserDocumentFileDataChanges((prevData) => {
@@ -1002,7 +1024,15 @@ const AdminFileDetail = () => {
     }
     setEditUserStatus(status);
     if (!showCheck) {
-      PaperList(id, sort, 1, status, selectDocumentType, selectSpeakerId, selectGEDStatus);
+      PaperList(
+        id,
+        sort,
+        1,
+        status,
+        selectDocumentType,
+        selectSpeakerId,
+        selectGEDStatus
+      );
     }
 
     setUserDocumentFileDataChanges((prevData) => {
@@ -1700,7 +1730,7 @@ const AdminFileDetail = () => {
   };
 
   const handleSiteStatusChange = (status) => {
-    if(status){
+    if (status) {
       setEditUserSiteStatus(status);
       handleSiteStatusChangeShow();
     }
@@ -1749,7 +1779,13 @@ const AdminFileDetail = () => {
           SpeakerList(id, sort, currentPage);
         }
         if (activeTab === "history") {
-          GetHistoryListDocument(id, sort, search, currentPage, selectActionType);
+          GetHistoryListDocument(
+            id,
+            sort,
+            search,
+            currentPage,
+            selectActionType
+          );
         }
       }
     } catch (error) {
@@ -1871,7 +1907,7 @@ const AdminFileDetail = () => {
   };
 
   const handleAddNoteModalOpen = (docId, docName) => {
-    if (docId && docName) { 
+    if (docId && docName) {
       setSelectedAddNoteDocId(docId);
       setSelectedAddNoteDocName(docName);
       setShowAddNoteModal(true);
@@ -2121,11 +2157,11 @@ const AdminFileDetail = () => {
         search: search ?? "",
         sort: {
           key: sort.key,
-          value: sort.value
+          value: sort.value,
         },
         page,
         status: status ?? "",
-        priority: priority ?? ""
+        priority: priority ?? "",
       };
 
       const response = await TaskManagementService.task_index(userData);
@@ -2347,7 +2383,10 @@ const AdminFileDetail = () => {
                   </div>
                   <div className="col-md-3">
                     <label class="form-label">Note</label>
-                    <Form.Select name="Ajouter" onChange={(e) => handleNoteAddOrShow(e.target.value)}>
+                    <Form.Select
+                      name="Ajouter"
+                      onChange={(e) => handleNoteAddOrShow(e.target.value)}
+                    >
                       <option value="">Sélectionner...</option>
                       <option value="add_note">Ajouter une note</option>
                       <option value="view_note">Voir les raisons</option>
@@ -2384,45 +2423,54 @@ const AdminFileDetail = () => {
                             ? t("toBeCheckedLabel")
                             : showUserDocumentData?.status === "validated"
                             ? t("validatedLabel")
-                            : showUserDocumentData?.status === "transfer_to_insurer"
+                            : showUserDocumentData?.status ===
+                              "transfer_to_insurer"
                             ? "Transfert à l'assureur"
-                            : showUserDocumentData?.status === "transfer_to_broker"
+                            : showUserDocumentData?.status ===
+                              "transfer_to_broker"
                             ? "Transfert au Courtier"
-                            : showUserDocumentData?.status === "transfer_to_manager"
+                            : showUserDocumentData?.status ===
+                              "transfer_to_manager"
                             ? "Transfert au Gestionnaire"
                             : showUserDocumentData?.status === "to_be_decided"
                             ? "A statuer"
                             : showUserDocumentData?.status === "formal_notice"
-                            ? "Mise en demeure" : t("invalidLabel")
-                          }
+                            ? "Mise en demeure"
+                            : t("invalidLabel")}
                         </div>
                       </div>
                     </div>
                     <div className="col-md-3 mb-3">
                       <div className="d-flex align-items-start flex-column gap-2">
                         <p className="m-0">DOC </p>
-                        <div className="status">{showUserDocumentData?.created_at || ""}</div>
+                        <div className="status">
+                          {showUserDocumentData?.created_at || ""}
+                        </div>
                       </div>
                     </div>
                     <div className="col-md-3 mb-3">
                       <div className="d-flex align-items-start flex-column gap-2">
                         <p className="m-0">Date fin prévisionnelle </p>
                         <div className="status">
-                          {showUserDocumentData?.estimated_completion_date || ""}
+                          {showUserDocumentData?.estimated_completion_date ||
+                            ""}
                         </div>
                       </div>
                     </div>
                     <div className="col-md-3 mb-3">
                       <div className="d-flex align-items-start flex-column gap-2">
                         <p className="m-0">Coût prévisionnel </p>
-                        <div className="status">{showUserDocumentData?.estimated_site_cost || ""}</div>
+                        <div className="status">
+                          {showUserDocumentData?.estimated_site_cost || ""}
+                        </div>
                       </div>
                     </div>
                     <div className="col-md-3 mb-2">
                       <div className="d-flex align-items-start flex-column gap-2">
                         <p className="m-0">Nom du preneur assurance </p>
                         <div className="status">
-                          {showUserDocumentData?.insurance_policyholder_name || ""}
+                          {showUserDocumentData?.insurance_policyholder_name ||
+                            ""}
                         </div>
                       </div>
                     </div>
@@ -2539,7 +2587,7 @@ const AdminFileDetail = () => {
                                 </div>
                               </td>
                               <td>
-                                {speakerDocumentFileList?.total_invalid_files}
+                                {speakerDocumentFileList?.total_invalid_speakers}
                               </td>
                             </tr>
                             <tr>
@@ -2560,12 +2608,12 @@ const AdminFileDetail = () => {
                                     </svg>
                                   </span>
                                   <span className="text-elips">
-                                    Nombre total de fichiers manquants
+                                    Nombre total d'enceintes manquantes
                                   </span>
                                 </div>
                               </td>
                               <td>
-                                {speakerDocumentFileList?.total_missing_files}
+                                {speakerDocumentFileList?.total_missing_speakers}
                               </td>
                             </tr>
                             <tr>
@@ -2586,14 +2634,12 @@ const AdminFileDetail = () => {
                                     </svg>
                                   </span>
                                   <span className="text-elips">
-                                    Nombre total d'intervenants connectés
+                                    Nombre total d'enceintes connectées
                                   </span>
                                 </div>
                               </td>
                               <td>
-                                {
-                                  speakerDocumentFileList?.total_speakers_attached
-                                }
+                                {speakerDocumentFileList?.total_speakers_attached}
                               </td>
                             </tr>
                             <tr>
@@ -2614,14 +2660,12 @@ const AdminFileDetail = () => {
                                     </svg>
                                   </span>
                                   <span className="text-elips">
-                                    Nombre total de fichiers à valider
+                                    Nombre total d'intervenants à valider
                                   </span>
                                 </div>
                               </td>
                               <td>
-                                {
-                                  speakerDocumentFileList?.total_to_be_validated_files
-                                }
+                                {speakerDocumentFileList?.total_to_be_validated_speakers}
                               </td>
                             </tr>
                             <tr>
@@ -2642,12 +2686,12 @@ const AdminFileDetail = () => {
                                     </svg>
                                   </span>
                                   <span className="text-elips">
-                                    Nombre total de fichiers validés
+                                    Total d'intervenants validés
                                   </span>
                                 </div>
                               </td>
                               <td>
-                                {speakerDocumentFileList?.total_validated_files}
+                                {speakerDocumentFileList?.total_validated_speakers}
                               </td>
                             </tr>
                           </>
@@ -2685,10 +2729,20 @@ const AdminFileDetail = () => {
                               </td>
                               <td>{data.due_date}</td>
                               <td>
-                                <span className="text-elips">{data.description}</span>
+                                <span className="text-elips">
+                                  {data.description}
+                                </span>
                               </td>
-                              <td>{(data.assigned_by?.first_name || "") + " " + (data.assigned_by?.last_name || "")}</td>
-                              <td>{(data.assigned_to?.first_name || "") + " " + (data.assigned_to?.last_name || "")}</td>
+                              <td>
+                                {(data.assigned_by?.first_name || "") +
+                                  " " +
+                                  (data.assigned_by?.last_name || "")}
+                              </td>
+                              <td>
+                                {(data.assigned_to?.first_name || "") +
+                                  " " +
+                                  (data.assigned_to?.last_name || "")}
+                              </td>
                               <td>
                                 {/* {data.status == "to_be_checked" ? (
                                   <span className="checked badges">
@@ -2703,14 +2757,17 @@ const AdminFileDetail = () => {
                                     {t("invalidLabel")}
                                   </span>
                                 )} */}
-                                <span className="checked badges">{data.status}</span>
+                                <span className="checked badges">
+                                  {data.status}
+                                </span>
                               </td>
                             </tr>
-                          ))) : (
-                            <tr style={{ textAlign: "center" }}>
-                              <td colSpan="6">{t("NorecordsfoundLabel")}</td>
-                            </tr>
-                          )}
+                          ))
+                        ) : (
+                          <tr style={{ textAlign: "center" }}>
+                            <td colSpan="6">{t("NorecordsfoundLabel")}</td>
+                          </tr>
+                        )}
                       </tbody>
                     </Table>
                   </div>
@@ -2750,17 +2807,25 @@ const AdminFileDetail = () => {
                       >
                         {eventHistoryUserList?.length > 0 ? (
                           <>
-                            <option value="">Sélectionnez un utilisateur</option>
+                            <option value="">
+                              Sélectionnez un utilisateur
+                            </option>
                             {eventHistoryUserList.map((data, index) => (
                               <option key={index} value={data.id}>
-                                {(data?.first_name || "") + " " + (data?.last_name || "")}
+                                {(data?.first_name || "") +
+                                  " " +
+                                  (data?.last_name || "")}
                               </option>
                             ))}
                           </>
                         ) : (
                           <>
-                            <option value="">Sélectionnez un utilisateur</option>
-                            <option value="" disabled>{t("NorecordsfoundLabel")}</option>
+                            <option value="">
+                              Sélectionnez un utilisateur
+                            </option>
+                            <option value="" disabled>
+                              {t("NorecordsfoundLabel")}
+                            </option>
                           </>
                         )}
                       </select>
@@ -2768,7 +2833,9 @@ const AdminFileDetail = () => {
                       {/* Date Filter */}
                       <DatePicker
                         placeholderText="Sélectionnez une date"
-                        selected={selectedDate ? getFormattedDate(selectedDate) : null}
+                        selected={
+                          selectedDate ? getFormattedDate(selectedDate) : null
+                        }
                         onChange={(date) => setSelectedDate(formatDate(date))}
                         dateFormat="dd/MM/yyyy"
                         locale={fr}
@@ -2783,19 +2850,25 @@ const AdminFileDetail = () => {
 
                           // Split at first " - "
                           const dashIndex = data.action_details.indexOf(" - ");
-                          const firstPart = dashIndex !== -1
-                            ? data.action_details.slice(0, dashIndex).trim()
-                            : data.action_details.trim();
-                          const secondPart = dashIndex !== -1
-                            ? data.action_details.slice(dashIndex + 3).trim()
-                            : "";
+                          const firstPart =
+                            dashIndex !== -1
+                              ? data.action_details.slice(0, dashIndex).trim()
+                              : data.action_details.trim();
+                          const secondPart =
+                            dashIndex !== -1
+                              ? data.action_details.slice(dashIndex + 3).trim()
+                              : "";
 
                           // Function to split by colon and bold before-colon part
                           const renderColonBold = (text) => {
                             const colonIndex = text.indexOf(":");
                             if (colonIndex !== -1) {
-                              const beforeColon = text.slice(0, colonIndex).trim();
-                              const afterColon = text.slice(colonIndex + 1).trim();
+                              const beforeColon = text
+                                .slice(0, colonIndex)
+                                .trim();
+                              const afterColon = text
+                                .slice(colonIndex + 1)
+                                .trim();
                               return (
                                 <>
                                   <strong>{beforeColon}:</strong> {afterColon}
@@ -2824,7 +2897,9 @@ const AdminFileDetail = () => {
                           );
                         })
                       ) : (
-                        <div className="timeline-item">{t("NorecordsfoundLabel")}</div>
+                        <div className="timeline-item">
+                          {t("NorecordsfoundLabel")}
+                        </div>
                       )}
                     </div>
                     <button
@@ -2860,7 +2935,8 @@ const AdminFileDetail = () => {
                       Tout voir
                     </button>
                   </div>
-                                    <div className="last-task-card">
+
+                  <div className="last-task-card">
                     Tâche à venir - à déterminer
                     <div class="timeline">
                       <div class="timeline-item">
@@ -2941,7 +3017,9 @@ const AdminFileDetail = () => {
                     </Form.Label>
                     <DatePicker
                       placeholderText="Selectionner une date"
-                      selected={startDate4 ? getFormattedDate(startDate4) : null}
+                      selected={
+                        startDate4 ? getFormattedDate(startDate4) : null
+                      }
                       onChange={(date) => setStartDate4(formatDate(date))}
                       dateFormat="dd/MM/yyyy"
                       locale={fr}
@@ -3983,73 +4061,77 @@ const AdminFileDetail = () => {
                                         </svg>
                                       )}
 
-                                        {sort.value === "desc" && (
-                                          <svg
-                                            width="24"
-                                            height="24"
-                                            viewBox="0 0 24 24"
-                                            fill="none"
-                                            xmlns="http://www.w3.org/2000/svg"
-                                          >
-                                            <path
-                                              d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
-                                              fill="black"
-                                              fillOpacity="0.5"
-                                            />
-                                            <path
-                                              d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
-                                              fill="black"
-                                            />
-                                          </svg>
-                                        )}
-                                      </Link>
-                                    </div>
+                                      {sort.value === "desc" && (
+                                        <svg
+                                          width="24"
+                                          height="24"
+                                          viewBox="0 0 24 24"
+                                          fill="none"
+                                          xmlns="http://www.w3.org/2000/svg"
+                                        >
+                                          <path
+                                            d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
+                                            fill="black"
+                                            fillOpacity="0.5"
+                                          />
+                                          <path
+                                            d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
+                                            fill="black"
+                                          />
+                                        </svg>
+                                      )}
+                                    </Link>
                                   </div>
-                                </th>
-                              )}
-                            {selectedSpeakerColumns.includes(
-                              "GED status"
-                            ) && (
-                                <th className="select-drop elips-dropdown">
-                                  <div className="d-flex align-items-center">
-                                    <div>
-                                      <Form.Select
-                                        aria-label="Choisir un type de document"
-                                        value={selectGEDStatus}
-                                        onChange={(e) => handleGEDStatusChange(e.target.value)}
-                                      >
-                                        <option value="">GED Statut</option>
-                                        <option value="sent">envoyé</option>
-                                        <option value="to_be_sent">A envoyer</option>
-                                        <option value="error">Erreur d’envoi</option>
-                                      </Form.Select>
-                                    </div>
-                                    <div>
-                                      <Link
-                                        className={`sorting-icon ms-2`}
-                                        onClick={() =>
-                                          handleClickRotate("GED_status")
-                                        }
-                                      >
-                                        {sort.value === "asc" && (
-                                          <svg
-                                            width="24"
-                                            height="24"
-                                            viewBox="0 0 24 24"
-                                            fill="none"
-                                            xmlns="http://www.w3.org/2000/svg"
-                                          >
-                                            <path
-                                              d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
-                                              fill="black"
-                                            />
-                                            <path
-                                              d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
-                                              fill="black"
-                                              fillOpacity="0.5"
-                                            />
-                                          </svg>
-                                        )}
+                                </div>
+                              </th>
+                            )}
+                            {selectedSpeakerColumns.includes("GED status") && (
+                              <th className="select-drop elips-dropdown">
+                                <div className="d-flex align-items-center">
+                                  <div>
+                                    <Form.Select
+                                      aria-label="Choisir un type de document"
+                                      value={selectGEDStatus}
+                                      onChange={(e) =>
+                                        handleGEDStatusChange(e.target.value)
+                                      }
+                                    >
+                                      <option value="">GED Statut</option>
+                                      <option value="sent">envoyé</option>
+                                      <option value="to_be_sent">
+                                        A envoyer
+                                      </option>
+                                      <option value="error">
+                                        Erreur d’envoi
+                                      </option>
+                                    </Form.Select>
+                                  </div>
+                                  <div>
+                                    <Link
+                                      className={`sorting-icon ms-2`}
+                                      onClick={() =>
+                                        handleClickRotate("GED_status")
+                                      }
+                                    >
+                                      {sort.value === "asc" && (
+                                        <svg
+                                          width="24"
+                                          height="24"
+                                          viewBox="0 0 24 24"
+                                          fill="none"
+                                          xmlns="http://www.w3.org/2000/svg"
+                                        >
+                                          <path
+                                            d="M9 3L5 6.99H8V14H10V6.99H13L9 3ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z"
+                                            fill="black"
+                                          />
+                                          <path
+                                            d="M16 10V17.01H19L15 21L11 17.01H14V10H16Z"
+                                            fill="black"
+                                            fillOpacity="0.5"
+                                          />
+                                        </svg>
+                                      )}
 
                                       {sort.value === "desc" && (
                                         <svg
@@ -4214,15 +4296,19 @@ const AdminFileDetail = () => {
                                 {selectedSpeakerColumns.includes(
                                   "Type de document"
                                 ) && <td>{data.docType.name}</td>}
-                                {selectedSpeakerColumns.includes("GED status") && 
+                                {selectedSpeakerColumns.includes(
+                                  "GED status"
+                                ) && (
                                   <td>
-                                    {
-                                      data.GED_status == "sent" ? "envoyé" :
-                                      data.GED_status == "to_be_sent" ? "A envoyer":
-                                      data.GED_status == "error" ? "Erreur d’envoi" : ""
-                                    }
+                                    {data.GED_status == "sent"
+                                      ? "envoyé"
+                                      : data.GED_status == "to_be_sent"
+                                      ? "A envoyer"
+                                      : data.GED_status == "error"
+                                      ? "Erreur d’envoi"
+                                      : ""}
                                   </td>
-                                }
+                                )}
                                 {selectedSpeakerColumns.includes("status") && (
                                   <td>
                                     {data.status == "to_be_checked" ? (
@@ -5919,7 +6005,9 @@ const AdminFileDetail = () => {
           handleModalClose={handleAddNoteModalClose}
           selectDocumentId={selectedAddNoteDocId}
           selectDocumentFileName={selectedAddNoteDocName}
-          handleAddNoteModalCloseAfterAPICall={handleAddNoteModalCloseAfterAPICall}
+          handleAddNoteModalCloseAfterAPICall={
+            handleAddNoteModalCloseAfterAPICall
+          }
         />
 
         {/* View Show Paper Document */}
