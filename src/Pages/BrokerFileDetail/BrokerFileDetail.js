@@ -1765,7 +1765,7 @@ const BrokerFileDetail = () => {
             )}
 
             <div className="row">
-              <div className="col-md-7">
+              <div className="col-md-6">
                 <h2 className="mb-3">Informations détaillées</h2>
                 <div className="custom-grid-card">
                   <h3>Documents enregistrés</h3>
@@ -2038,7 +2038,7 @@ const BrokerFileDetail = () => {
                 </div>
               </div>
 
-              <div className="col-md-5">
+              <div className="col-md-6">
                 <h2 className="mb-3">Événements</h2>
                 <div className="custom-grid-card">
                   <div className="last-event-card">

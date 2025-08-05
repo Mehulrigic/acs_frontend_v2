@@ -738,6 +738,10 @@ position: absolute;
   color: #a3a3a3;
   font-size: 14px;
   line-height: 1.6;
+      display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 .last-event-card .react-datepicker-wrapper {
     width: auto;
@@ -1235,4 +1239,25 @@ h6 {
     flex-direction: column !important;
   }
 
+}
+
+@media(min-width:1024px) and (max-width:1400px){
+  .last-event-card select.form-select {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+    width: 130px !important;
+}
+.last-event-card .react-datepicker-wrapper input {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+    width: 130px !important;
+    padding: 6px 12px;
+}
+.react-datepicker-popper{
+  left: -30px !important;
+}
 }
