@@ -99,30 +99,6 @@ const InsurersDashboard = () => {
     return new Date(`${month}/${day}/${year}`);
   };
 
-  const GetStatistics = async () => {
-    setIsLoading(true);
-    try {
-      const userData = {
-        ...(selectedDate && { date: selectedDate }),
-        ...(brokerId && { broker_id: brokerId }),
-        ...(fileStatus && { status: fileStatus }),
-        ...(riskType && { risk_type: riskType }),
-        ...(policyholderName && { insurance_policyholder_name: policyholderName }),
-      };
-
-      const response = await DashboardManagementService.get_statistics(userData);
-
-      if (response.data) {
-        setIsLoading(false);
-        setStatisticsData(response.data);
-        localStorage.setItem("assureur_dashboard", response.data.files_total);
-      }
-    } catch (error) {
-      setIsLoading(false);
-      console.log(error);
-    }
-  };
-
   const GetBrokerList = async () => {
     setIsLoading(true);
     try {
@@ -148,6 +124,30 @@ const InsurersDashboard = () => {
       if (response.data) {
         setIsLoading(false);
         setPolicyholdersList(response.data.policy_holders);
+      }
+    } catch (error) {
+      setIsLoading(false);
+      console.log(error);
+    }
+  };
+
+  const GetStatistics = async () => {
+    setIsLoading(true);
+    try {
+      const userData = {
+        ...(selectedDate && { date: selectedDate }),
+        ...(brokerId && { broker_id: brokerId }),
+        ...(fileStatus && { status: fileStatus }),
+        ...(riskType && { risk_type: riskType }),
+        ...(policyholderName && { insurance_policyholder_name: policyholderName }),
+      };
+
+      const response = await DashboardManagementService.get_statistics(userData);
+
+      if (response.data) {
+        setIsLoading(false);
+        setStatisticsData(response.data);
+        localStorage.setItem("assureur_dashboard", response.data.files_total);
       }
     } catch (error) {
       setIsLoading(false);
@@ -454,7 +454,7 @@ const InsurersDashboard = () => {
                         <div className="d-flex align-items-center justify-content-between">
                           <div className="d-flex flex-column justify-content-between">
                             <div className="div">
-                              <h2>{statisticsData?.files_total}</h2>
+                              <h2>{statisticsData?.files_total || 0}</h2>
                             </div>
                           </div>
 
@@ -482,7 +482,7 @@ const InsurersDashboard = () => {
                         <div className="d-flex align-items-center justify-content-between">
                           <div className="d-flex flex-column justify-content-between">
                             <div className="div">
-                              <h2>{statisticsData?.files_by_product}</h2>
+                              <h2>{statisticsData?.files_by_product || 0}</h2>
                             </div>
                           </div>
 
@@ -510,7 +510,7 @@ const InsurersDashboard = () => {
                         <div className="d-flex align-items-center justify-content-between">
                           <div className="d-flex flex-column justify-content-between">
                             <div className="div">
-                              <h2>{statisticsData?.files_by_risk_type}</h2>
+                              <h2>{statisticsData?.files_by_risk_type || 0}</h2>
                             </div>
                           </div>
 
@@ -538,7 +538,7 @@ const InsurersDashboard = () => {
                         <div className="d-flex align-items-center justify-content-between">
                           <div className="d-flex flex-column justify-content-between">
                             <div className="div">
-                              <h2>{statisticsData?.files_warning}</h2>
+                              <h2>{statisticsData?.files_warning || 0}</h2>
                             </div>
                           </div>
 

@@ -96,6 +96,22 @@ const BrokerDashboard = () => {
     return new Date(`${month}/${day}/${year}`);
   };
 
+  const GetPolicyholders = async () => {
+    setIsLoading(true);
+    try {
+
+      const response = await DashboardManagementService.policy_holders();
+
+      if (response.data) {
+        setIsLoading(false);
+        setPolicyholdersList(response.data.policy_holders);
+      }
+    } catch (error) {
+      setIsLoading(false);
+      console.log(error);
+    }
+  };
+
   const GetStatistics = async () => {
     setIsLoading(true);
     try {
@@ -112,22 +128,6 @@ const BrokerDashboard = () => {
         setIsLoading(false);
         setStatisticsData(response.data);
         localStorage.setItem("courtier_dashboard", response.data.files_total);
-      }
-    } catch (error) {
-      setIsLoading(false);
-      console.log(error);
-    }
-  };
-
-  const GetPolicyholders = async () => {
-    setIsLoading(true);
-    try {
-
-      const response = await DashboardManagementService.policy_holders();
-
-      if (response.data) {
-        setIsLoading(false);
-        setPolicyholdersList(response.data.policy_holders);
       }
     } catch (error) {
       setIsLoading(false);
@@ -405,7 +405,7 @@ const BrokerDashboard = () => {
               {/* Portfolio */}
               <div className="col-md-6">
                 <div className="">
-                  <h2 className="my-4">Portfolio</h2>
+                  <h2 className="my-4">Portefeuille</h2>
                   <div className="row">
                     <div className="col-md-6">
                       <div className="numeric-graph">
@@ -413,7 +413,7 @@ const BrokerDashboard = () => {
                         <div className="d-flex align-items-center justify-content-between">
                           <div className="d-flex flex-column justify-content-between">
                             <div className="div">
-                              <h2>{statisticsData?.files_total}</h2>
+                              <h2>{statisticsData?.files_total || 0}</h2>
                             </div>
                           </div>
 
@@ -441,7 +441,7 @@ const BrokerDashboard = () => {
                         <div className="d-flex align-items-center justify-content-between">
                           <div className="d-flex flex-column justify-content-between">
                             <div className="div">
-                              <h2>{statisticsData?.files_by_product}</h2>
+                              <h2>{statisticsData?.files_by_product || 0}</h2>
                             </div>
                           </div>
 
@@ -469,7 +469,7 @@ const BrokerDashboard = () => {
                         <div className="d-flex align-items-center justify-content-between">
                           <div className="d-flex flex-column justify-content-between">
                             <div className="div">
-                              <h2>{statisticsData?.files_by_risk_type}</h2>
+                              <h2>{statisticsData?.files_by_risk_type || 0}</h2>
                             </div>
                           </div>
 
@@ -497,7 +497,7 @@ const BrokerDashboard = () => {
                         <div className="d-flex align-items-center justify-content-between">
                           <div className="d-flex flex-column justify-content-between">
                             <div className="div">
-                              <h2>{statisticsData?.files_warning}</h2>
+                              <h2>{statisticsData?.files_warning || 0}</h2>
                             </div>
                           </div>
 
@@ -531,7 +531,7 @@ const BrokerDashboard = () => {
                     <div className="task-card planned-task">
                       <div className="d-flex justify-content-between">
                         <div className="task-detail">
-                          <h2>{taskStatisticsData?.planned_tasks}</h2>
+                          <h2>{taskStatisticsData?.planned_tasks || 0}</h2>
                           <div className="task-status">Tâche planifiée</div>
                         </div>
                         <div className="task-icon"></div>
@@ -540,7 +540,7 @@ const BrokerDashboard = () => {
                     <div className="task-card completed-task">
                       <div className="d-flex justify-content-between">
                         <div className="task-detail">
-                          <h2>{taskStatisticsData?.completed_tasks}</h2>
+                          <h2>{taskStatisticsData?.completed_tasks || 0}</h2>
                           <div className="task-status">Tâche terminée</div>
                         </div>
                         <div className="task-icon"></div>
@@ -551,7 +551,7 @@ const BrokerDashboard = () => {
                     <div className="task-card coming-task">
                       <div className="d-flex justify-content-between">
                         <div className="task-detail">
-                          <h2>{taskStatisticsData?.coming_tasks}</h2>
+                          <h2>{taskStatisticsData?.coming_tasks || 0}</h2>
                           <div className="task-status">Tâche à venir</div>
                         </div>
                         <div className="task-icon"></div>
@@ -560,7 +560,7 @@ const BrokerDashboard = () => {
                     <div className="task-card late-task">
                       <div className="d-flex justify-content-between">
                         <div className="task-detail">
-                          <h2>{taskStatisticsData?.late_tasks}</h2>
+                          <h2>{taskStatisticsData?.late_tasks || 0}</h2>
                           <div className="task-status">Tâche en retard</div>
                         </div>
                         <div className="task-icon"></div>
