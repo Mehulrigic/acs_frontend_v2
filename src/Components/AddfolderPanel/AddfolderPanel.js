@@ -13,7 +13,7 @@ import { fr } from "date-fns/locale";
 const AddfolderPanel = (props) => {
   const { t } = useTranslation();
 
-  const { data, userRole, userName, userId, UserDocument, GetStatistics, FolderList, search, sort, currentPage, editUserStatus, file } = props;
+  const { data, userRole, userName, userId, GetStatistics, GetTaskStatistics, GetAptAtotFromTransferHistory, FolderList, search, sort, currentPage, editUserStatus, file } = props;
   const [show, setShow] = useState(false);
   const [uploadingDoc, setUploadingDoc] = useState(false);
   const [brokerList, setBrokerList] = useState([]);
@@ -211,8 +211,9 @@ const AddfolderPanel = (props) => {
         if ((userRole.includes("Courtier") || userRole.includes("Assureur")) && file) {
           FolderList(search, sort, currentPage, editUserStatus);
         } else {
-          UserDocument(search, sort, currentPage, editUserStatus);
           GetStatistics();
+          GetTaskStatistics();
+          GetAptAtotFromTransferHistory();
         }
       } else {
         setFlashMessage({

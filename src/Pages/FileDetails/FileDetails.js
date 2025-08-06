@@ -1758,7 +1758,6 @@ const FileDetails = () => {
         await DashboardManagementService.speaker_registered_document_file(id);
 
       if (response.data.status) {
-        debugger
         setSpeakerDocumentFileList(response.data.overall_statistics);
       } else {
         setFlashMessage({

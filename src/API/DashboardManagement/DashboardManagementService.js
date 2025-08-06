@@ -28,8 +28,11 @@ apiClient.interceptors.response.use((response) => response,
 const DashboardManagementService = {
   user_document: (userData) => apiClient.post("/user/user_document/index", userData),
   get_statistics: (userData) => apiClient.post("/user/dashboard/get-statistics", userData),
-  get_task_statistics: () => apiClient.get("/user/dashboard/get-task-statistics"),
-  apt_atot_stats: () => apiClient.get("/user/dashboard/apt-atot-stats"),
+  get_task_statistics: (userData) => apiClient.post("/user/dashboard/get-task-statistics", userData),
+  broker_list: () => apiClient.get("/admin/user/broker-list"),
+  insurer_list: () => apiClient.get("/admin/user/insurer-list"),
+  policy_holders: () => apiClient.get("/user/dashboard/policy-holders"),
+  apt_atot_stats: (userData) => apiClient.post("/user/dashboard/apt-atot-stats", userData),
   delete_user_document: (id) => apiClient.get(`/user/user_document/delete-user-document/${id}`),
 
   // Dashboard Tab
