@@ -759,7 +759,7 @@ position: absolute;
 .last-event-card .react-datepicker-wrapper input[type=text]::-webkit-input-placeholder{
 color: #212836;
 }
-.last-event-card,.last-msg-card {
+.last-event-card {
     border-bottom: 1px solid #cccccc;
     margin-bottom: 20px;
     padding-bottom: 20px;

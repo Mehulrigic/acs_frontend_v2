@@ -290,6 +290,9 @@ const BrokerFileDetail = () => {
     if (activeTab === "history") {
       GetHistoryListDocument(id, sort, search, currentPage, selectActionType);
     }
+    if (activeTab === "task") {
+      TaskList(search, sort, currentPage, taskStatus, taskPriority);
+    }
   }, [activeTab, activeDocumentTab, sort, selectedType, selectedDate, selectedUser]);
 
   useEffect(() => {
@@ -627,6 +630,16 @@ const BrokerFileDetail = () => {
   const handleStatusChange = (status) => {
     setEditUserStatus(status);
     ShowOtherDocument(id, sort, 1, status, selectDocumentType);
+  };
+
+  const handleTaskStatusChange = (status) => {
+    setTaskStatus(status);
+    TaskList(search, sort, currentPage, status, taskPriority);      
+  };
+
+  const handleTaskPriorityChange = (priority) => {
+    setTaskPriority(priority);
+    TaskList(search, sort, currentPage, taskStatus, priority);      
   };
 
   const handleTableSpeakerChange = (e) => {
@@ -1047,6 +1060,9 @@ const BrokerFileDetail = () => {
     if (activeTab === "history") {
       GetHistoryListDocument(id, sort, search, page, selectActionType);
     }
+    if (activeTab === "task") {
+      TaskList(search, sort, page, taskStatus, taskPriority);
+    }
   };
 
   const handlePageChangeView = (page) => {
@@ -1148,6 +1164,8 @@ const BrokerFileDetail = () => {
       SpeakerList(id, sort, search, page);
     } else if (activeTab === "history") {
       GetHistoryListDocument(id, sort, search, page, selectActionType);
+    } else if (activeTab === "task") {
+      TaskList(search, sort, page, taskStatus, taskPriority);
     } else {
       return;
     }
@@ -1253,6 +1271,9 @@ const BrokerFileDetail = () => {
         if (activeTab === "history") {
           GetHistoryListDocument(id, sort, search, currentPage, selectActionType);
         }
+        if (activeTab === "task") {
+          TaskList(search, sort, currentPage, taskStatus, taskPriority);
+        }
       }
     } catch (error) {
       console.log(error);
@@ -1293,6 +1314,9 @@ const BrokerFileDetail = () => {
     }
     if (activeTab === "history") {
       GetHistoryListDocument(id, sort, search, currentPage, selectActionType);
+    }
+    if (activeTab === "task") {
+      TaskList(search, sort, currentPage, taskStatus, taskPriority);
     }
   };
 
@@ -1978,7 +2002,7 @@ const BrokerFileDetail = () => {
                         <tr>
                           <th>Nom de la tâche</th>
                           <th className="custom-field">Date limite</th>
-                          <th>Description de la tâche</th>
+                          {/* <th>Description de la tâche</th> */}
                           <th>Attribué par</th>
                           <th>Attribué à</th>
                           <th>{t("status")}</th>
@@ -1992,9 +2016,9 @@ const BrokerFileDetail = () => {
                                 <span className="text-elips">{data.title}</span>
                               </td>
                               <td>{data.due_date}</td>
-                              <td>
+                              {/* <td>
                                 <span className="text-elips">{data.description}</span>
-                              </td>
+                              </td> */}
                               <td>{(data.assigned_by?.first_name || "") + " " + (data.assigned_by?.last_name || "")}</td>
                               <td>{(data.assigned_to?.first_name || "") + " " + (data.assigned_to?.last_name || "")}</td>
                               <td>
@@ -2164,23 +2188,6 @@ const BrokerFileDetail = () => {
                     <button
                       className="btn-secondary btn btn-primary"
                       onClick={handleNoteShow}
-                    >
-                      Tout voir
-                    </button>
-                  </div>
-                                    <div className="last-task-card">
-                    Tâche à venir - à déterminer
-                    <div className="timeline">
-                      <div className="timeline-item">
-                        <div className="timeline-dot"></div>
-                        <div className="timeline-content">
-                          <h5>August 5th, 12:00 AM</h5>
-                          <p>common.action_details.document_created</p>
-                        </div>
-                      </div>
-                    </div>
-                    <button
-                      className="btn-secondary btn btn-primary"
                     >
                       Tout voir
                     </button>
@@ -4053,6 +4060,141 @@ const BrokerFileDetail = () => {
                   onPageChange={handlePageChange}
                   itemsPerPage={10}
                   totalItems={totalHistoryRecords}
+                />
+              )}
+            </div>
+          </Tab>
+
+          {/* Task Tab */}
+          <Tab eventKey="task" title="Tâche">
+            <div className="table-wrapper mt-16 p-0">
+              <div className="d-md-flex align-items-center gap-2 justify-content-between">
+                <div className=""></div>
+                <Form.Group
+                  className="relative"
+                  controlId="exampleForm.ControlInput1"
+                >
+                  <Form.Control
+                    type="search"
+                    placeholder="Rechercher"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    onKeyDown={handleKeyPress}
+                  />
+                  <div
+                    className="search-icon"
+                    style={{ cursor: "pointer" }}
+                    onClick={() => handleSearchChange(search, 1)}
+                  >
+                    <svg
+                      width="18"
+                      height="18"
+                      viewBox="0 0 18 18"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M12.7549 11.2549H11.9649L11.6849 10.9849C12.6649 9.84488 13.2549 8.36488 13.2549 6.75488C13.2549 3.16488 10.3449 0.254883 6.75488 0.254883C3.16488 0.254883 0.254883 3.16488 0.254883 6.75488C0.254883 10.3449 3.16488 13.2549 6.75488 13.2549C8.36488 13.2549 9.84488 12.6649 10.9849 11.6849L11.2549 11.9649V12.7549L16.2549 17.7449L17.7449 16.2549L12.7549 11.2549ZM6.75488 11.2549C4.26488 11.2549 2.25488 9.24488 2.25488 6.75488C2.25488 4.26488 4.26488 2.25488 6.75488 2.25488C9.24488 2.25488 11.2549 4.26488 11.2549 6.75488C11.2549 9.24488 9.24488 11.2549 6.75488 11.2549Z"
+                        fill="#998f90"
+                      />
+                    </svg>
+                  </div>
+                </Form.Group>
+              </div>
+              {isLoading ? (
+                <Loading />
+              ) : (
+                <div className="table-wrap mt-24">
+                  <Table responsive hover>
+                    <thead>
+                      <tr>
+                        <th>Nom de la tâche</th>
+                        <th className="custom-field">Date limite</th>
+                        <th>Description de la tâche</th>
+                        <th>Attribué par</th>
+                        <th>Attribué à</th>
+                        <th className="select-drop elips-dropdown">
+                          <div className="d-flex align-items-center">
+                            <div>
+                              <Form.Select
+                                aria-label="statusSelectAria"
+                                value={taskPriority}
+                                onChange={(e) => handleTaskPriorityChange(e.target.value)}
+                              >
+                                <option value="">Priorité</option>
+                                <option value="low">Faible</option>
+                                <option value="medium">Moyen</option>
+                                <option value="high">Haut</option>
+                              </Form.Select>
+                            </div>
+                          </div>
+                        </th>
+                        <th className="select-drop elips-dropdown">
+                          <div className="d-flex align-items-center">
+                            <div>
+                              <Form.Select
+                                aria-label="statusSelectAria"
+                                value={taskStatus}
+                                onChange={(e) => handleTaskStatusChange(e.target.value)}
+                              >
+                                <option value="">{t("status")}</option>
+                                <option value="pending">{t("pending")}</option>
+                                <option value="in_progress">{t("in_progress")}</option>
+                                <option value="completed">{t("completed")}</option>
+                                <option value="cancelled">{t("cancelled")}</option>
+                              </Form.Select>
+                            </div>
+                          </div>
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {taskListData?.length > 0 ? (
+                        taskListData?.map((data, index) => (
+                          <tr key={index}>
+                            <td>
+                              <span className="text-elips">{data.title}</span>
+                            </td>
+                            <td>{data.due_date}</td>
+                            <td>
+                              <span className="text-elips">{data.description}</span>
+                            </td>
+                            <td>{(data.assigned_by?.first_name || "") + " " + (data.assigned_by?.last_name || "")}</td>
+                            <td>{(data.assigned_to?.first_name || "") + " " + (data.assigned_to?.last_name || "")}</td>
+                            <td>{data.priority}</td>
+                            <td>
+                              {/* {data.status == "to_be_checked" ? (
+                                <span className="checked badges">
+                                  {t("toBeCheckedLabel")}
+                                </span>
+                              ) : data.status == "verified" ? (
+                                <span className="verified badges">
+                                  {t("verified")}
+                                </span>
+                              ) : (
+                                <span className="incomplete badges">
+                                  {t("invalidLabel")}
+                                </span>
+                              )} */}
+                              <span className="checked badges">{data.status}</span>
+                            </td>
+                          </tr>
+                        ))) : (
+                        <tr style={{ textAlign: "center" }}>
+                          <td colSpan="7">{t("NorecordsfoundLabel")}</td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </Table>
+                </div>
+              )}
+              {totalTaskRecords > 10 && (
+                <Paginations
+                  currentPage={currentTaskPage}
+                  totalPages={totalTaskPages}
+                  onPageChange={handlePageChange}
+                  itemsPerPage={10}
+                  totalItems={totalTaskRecords}
                 />
               )}
             </div>
