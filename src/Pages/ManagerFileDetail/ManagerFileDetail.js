@@ -2359,7 +2359,7 @@ const ManagerFileDetail = () => {
               <div className="dropdown-part">
                 <div className="row mb-3">
                   <div className="col-md-3">
-                    <label class="form-label">Etat du chantier</label>
+                    <label className="form-label">Etat du chantier</label>
                     <Form.Select
                       aria-label="Etat du chantier"
                       value={editUserSiteStatus}
@@ -2371,7 +2371,7 @@ const ManagerFileDetail = () => {
                     </Form.Select>
                   </div>
                   <div className="col-md-3">
-                    <label class="form-label">Exporter sous</label>
+                    <label className="form-label">Exporter sous</label>
                     <Form.Select
                       aria-label="Export As"
                       onChange={(e) => handleExportDocumentShow(e.target.value)}
@@ -2383,7 +2383,7 @@ const ManagerFileDetail = () => {
                     </Form.Select>
                   </div>
                   <div className="col-md-3">
-                    <label class="form-label">Note</label>
+                    <label className="form-label">Note</label>
                     <Form.Select
                       name="Ajouter"
                       onChange={(e) => handleNoteAddOrShow(e.target.value)}
@@ -2394,7 +2394,7 @@ const ManagerFileDetail = () => {
                     </Form.Select>
                   </div>
                   <div className="col-md-3">
-                    <label class="form-label">Envoyer à</label>
+                    <label className="form-label">Envoyer à</label>
                     <Form.Select
                       aria-label="Etat du chantier"
                       className="form-select"
@@ -2939,10 +2939,10 @@ const ManagerFileDetail = () => {
 
                   <div className="last-task-card">
                     Tâche à venir - à déterminer
-                    <div class="timeline">
-                      <div class="timeline-item">
-                        <div class="timeline-dot"></div>
-                        <div class="timeline-content">
+                    <div className="timeline">
+                      <div className="timeline-item">
+                        <div className="timeline-dot"></div>
+                        <div className="timeline-content">
                           <h5>August 5th, 12:00 AM</h5>
                           <p>common.action_details.document_created</p>
                         </div>
@@ -4375,7 +4375,7 @@ const ManagerFileDetail = () => {
                                             height="18"
                                             rx="2"
                                             stroke="#e84455"
-                                            stroke-width="2"
+                                            strokeWidth="2"
                                           />
                                           <line
                                             x1="8"
@@ -4383,8 +4383,8 @@ const ManagerFileDetail = () => {
                                             x2="16"
                                             y2="7"
                                             stroke="#e84455"
-                                            stroke-width="2"
-                                            stroke-linecap="round"
+                                            strokeWidth="2"
+                                            strokeLinecap="round"
                                           />
                                           <line
                                             x1="8"
@@ -4392,8 +4392,8 @@ const ManagerFileDetail = () => {
                                             x2="16"
                                             y2="11"
                                             stroke="#e84455"
-                                            stroke-width="2"
-                                            stroke-linecap="round"
+                                            strokeWidth="2"
+                                            strokeLinecap="round"
                                           />
                                           <line
                                             x1="8"
@@ -4401,8 +4401,8 @@ const ManagerFileDetail = () => {
                                             x2="13"
                                             y2="15"
                                             stroke="#e84455"
-                                            stroke-width="2"
-                                            stroke-linecap="round"
+                                            strokeWidth="2"
+                                            strokeLinecap="round"
                                           />
                                         </svg>
                                       </Link>
@@ -5163,15 +5163,15 @@ const ManagerFileDetail = () => {
                                               <path
                                                 d="M8 14L12 18L16 14"
                                                 stroke="#e84455"
-                                                stroke-width="1.5"
-                                                stroke-linecap="round"
+                                                strokeWidth="1.5"
+                                                strokeLinecap="round"
                                                 stroke-linejoin="round"
                                               />
                                               <path
                                                 d="M12 11V18"
                                                 stroke="#e84455"
-                                                stroke-width="1.5"
-                                                stroke-linecap="round"
+                                                strokeWidth="1.5"
+                                                strokeLinecap="round"
                                                 stroke-linejoin="round"
                                               />
                                             </svg>

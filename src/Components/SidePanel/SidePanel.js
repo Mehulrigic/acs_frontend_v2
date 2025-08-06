@@ -122,15 +122,15 @@ const SidePanel = ({ sidebarLogo, backgroundColor, leftPanelChange, logoChange ,
                   <li title={t("RoleManagement")} className={location.pathname === "/role-management" ? "active" : ""}>
                     <Link to="/role-management">
                       <svg width="24px" height="24px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="12" cy="6" r="4" stroke="#fff" stroke-width="1.5" />
-                        <ellipse cx="12" cy="17" rx="7" ry="4" stroke="#fff" stroke-width="1.5" />
+                        <circle cx="12" cy="6" r="4" stroke="#fff" strokeWidth="1.5" />
+                        <ellipse cx="12" cy="17" rx="7" ry="4" stroke="#fff" strokeWidth="1.5" />
                       </svg>
                       <span className="menu-title">{t("RoleManagement")}</span></Link>
                   </li>
                   <li title={t("userManagementLabel")} className={location.pathname === "/user-management" ? "active" : ""}>
                     <Link className="fill-svg" to="/user-management">
                       <svg width="24px" height="24px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M3 19H1V18C1 16.1362 2.27477 14.57 4 14.126M6 10.8293C4.83481 10.4175 4 9.30623 4 8.00001C4 6.69379 4.83481 5.58255 6 5.17072M21 19H23V18C23 16.1362 21.7252 14.57 20 14.126M18 5.17072C19.1652 5.58255 20 6.69379 20 8.00001C20 9.30623 19.1652 10.4175 18 10.8293M10 14H14C16.2091 14 18 15.7909 18 18V19H6V18C6 15.7909 7.79086 14 10 14ZM15 8C15 9.65685 13.6569 11 12 11C10.3431 11 9 9.65685 9 8C9 6.34315 10.3431 5 12 5C13.6569 5 15 6.34315 15 8Z" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                        <path d="M3 19H1V18C1 16.1362 2.27477 14.57 4 14.126M6 10.8293C4.83481 10.4175 4 9.30623 4 8.00001C4 6.69379 4.83481 5.58255 6 5.17072M21 19H23V18C23 16.1362 21.7252 14.57 20 14.126M18 5.17072C19.1652 5.58255 20 6.69379 20 8.00001C20 9.30623 19.1652 10.4175 18 10.8293M10 14H14C16.2091 14 18 15.7909 18 18V19H6V18C6 15.7909 7.79086 14 10 14ZM15 8C15 9.65685 13.6569 11 12 11C10.3431 11 9 9.65685 9 8C9 6.34315 10.3431 5 12 5C13.6569 5 15 6.34315 15 8Z" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" stroke-linejoin="round" />
                       </svg>
 
                       <span className="menu-title">{t("userManagementLabel")}</span></Link>
@@ -139,7 +139,7 @@ const SidePanel = ({ sidebarLogo, backgroundColor, leftPanelChange, logoChange ,
                   <li title="Bloc logique" className={location.pathname === "/logical-block" ? "active" : ""}>
                     <Link to="/logical-block">
                       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <polygon points="12,2 22,12 12,22 2,12" stroke="#fff" stroke-width="2" fill="none" />
+                        <polygon points="12,2 22,12 12,22 2,12" stroke="#fff" strokeWidth="2" fill="none" />
                         <text x="12" y="16" text-anchor="middle" fill="#fff" font-size="10" font-family="Arial" font-weight="bold">IF</text>
                       </svg>
                       <span className="menu-title">Bloc logique</span></Link>
@@ -155,12 +155,12 @@ const SidePanel = ({ sidebarLogo, backgroundColor, leftPanelChange, logoChange ,
                   <li title={t("SpeakerManagement")} className={location.pathname === "/speaker-management" ? "active" : ""} style={{ textWrap: "nowrap" }}>
                     <Link className="fill-svg" to="/speaker-management">
                       <svg width="24px" height="24px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="12" cy="6" r="4" stroke="#fff" stroke-width="1.5" />
-                        <path d="M18 9C19.6569 9 21 7.88071 21 6.5C21 5.11929 19.6569 4 18 4" stroke="#fff" stroke-width="1.5" stroke-linecap="round" />
-                        <path d="M6 9C4.34315 9 3 7.88071 3 6.5C3 5.11929 4.34315 4 6 4" stroke="#fff" stroke-width="1.5" stroke-linecap="round" />
-                        <ellipse cx="12" cy="17" rx="6" ry="4" stroke="#fff" stroke-width="1.5" />
-                        <path d="M20 19C21.7542 18.6153 23 17.6411 23 16.5C23 15.3589 21.7542 14.3847 20 14" stroke="#fff" stroke-width="1.5" stroke-linecap="round" />
-                        <path d="M4 19C2.24575 18.6153 1 17.6411 1 16.5C1 15.3589 2.24575 14.3847 4 14" stroke="#fff" stroke-width="1.5" stroke-linecap="round" />
+                        <circle cx="12" cy="6" r="4" stroke="#fff" strokeWidth="1.5" />
+                        <path d="M18 9C19.6569 9 21 7.88071 21 6.5C21 5.11929 19.6569 4 18 4" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" />
+                        <path d="M6 9C4.34315 9 3 7.88071 3 6.5C3 5.11929 4.34315 4 6 4" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" />
+                        <ellipse cx="12" cy="17" rx="6" ry="4" stroke="#fff" strokeWidth="1.5" />
+                        <path d="M20 19C21.7542 18.6153 23 17.6411 23 16.5C23 15.3589 21.7542 14.3847 20 14" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" />
+                        <path d="M4 19C2.24575 18.6153 1 17.6411 1 16.5C1 15.3589 2.24575 14.3847 4 14" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" />
                       </svg>
                       <span className="menu-title">{t("SpeakerManagement")}</span></Link>
                   </li>
@@ -171,7 +171,7 @@ const SidePanel = ({ sidebarLogo, backgroundColor, leftPanelChange, logoChange ,
                   </li>
                   <li title={t("TaskManagementLabel")} className={location.pathname === "/taskmanagement-dashboard" ? "active" : ""}>
                     <Link to="/taskmanagement-dashboard">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-file-earmark-font" viewBox="0 0 16 16">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" className="bi bi-file-earmark-font" viewBox="0 0 16 16">
                         <path d="M10.943 6H5.057L5 8h.5c.18-1.096.356-1.192 1.694-1.235l.293-.01v5.09c0 .47-.1.582-.898.655v.5H9.41v-.5c-.803-.073-.903-.184-.903-.654V6.755l.298.01c1.338.043 1.514.14 1.694 1.235h.5l-.057-2z" />
                         <path d="M14 4.5V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h5.5zm-3 0A1.5 1.5 0 0 1 9.5 3V1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V4.5z" />
                       </svg>

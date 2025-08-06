@@ -215,6 +215,9 @@ const FileDetails = () => {
     if (activeTab === "history") {
       GetHistoryListDocument(id, sort, search, currentPage, selectActionType);
     }
+    if (activeTab === "task") {
+      TaskList(search, sort, currentPage, taskStatus, taskPriority);
+    }
   };
 
   const [showReplace, setShowReplace] = useState(false);
@@ -337,6 +340,9 @@ const FileDetails = () => {
     if (activeTab === "history") {
       GetHistoryListDocument(id, sort, search, currentPage, selectActionType);
     }
+    if (activeTab === "task") {
+      TaskList(search, sort, currentPage, taskStatus, taskPriority);
+    }
   }, [activeTab, activeDocumentTab, sort, selectedType, selectedDate, selectedUser]);
 
   useEffect(() => {
@@ -391,6 +397,9 @@ const FileDetails = () => {
     if (activeTab === "history") {
       GetHistoryListDocument(id, sort, search, currentPage, selectActionType);
     }
+    if (activeTab === "task") {
+      TaskList(search, sort, currentPage, taskStatus, taskPriority);
+    }
   };
 
   const handlePageChange = (page) => {
@@ -412,6 +421,9 @@ const FileDetails = () => {
     }
     if (activeTab === "history") {
       GetHistoryListDocument(id, sort, search, page, selectActionType);
+    }
+    if (activeTab === "task") {
+      TaskList(search, sort, page, taskStatus, taskPriority);
     }
   };
 
@@ -498,7 +510,7 @@ const FileDetails = () => {
         );
         setTotalSpeaker(response.data.documents.total_speakers);
         setUserDocumentFileDataChanges(fileDataChanges);
-        setShowDocumentId(fileDataChanges[0].id);
+        setShowDocumentId(fileDataChanges[0]?.id);
       }
     } catch (error) {
       setIsLoading(false);
@@ -961,6 +973,9 @@ const FileDetails = () => {
         if (activeTab === "history") {
           GetHistoryListDocument(id, sort, search, currentPage, selectActionType);
         }
+        if (activeTab === "task") {
+          TaskList(search, sort, currentPage, taskStatus, taskPriority);
+        }
 
         handleClose();
         setFlashMessage({
@@ -1120,6 +1135,9 @@ const FileDetails = () => {
         }
         if (activeTab === "history") {
           GetHistoryListDocument(id, sort, search, currentPage, selectActionType);
+        }
+        if (activeTab === "task") {
+          TaskList(search, sort, currentPage, taskStatus, taskPriority);
         }
       }
     } catch (error) {
@@ -1713,6 +1731,9 @@ const FileDetails = () => {
     if (activeTab === "history") {
       GetHistoryListDocument(id, sort, search, currentPage, selectActionType);
     }
+    if (activeTab === "task") {
+      TaskList(search, sort, currentPage, taskStatus, taskPriority);
+    }
   };
 
   const NotesOptions = [
@@ -2039,7 +2060,7 @@ const FileDetails = () => {
               <div className="dropdown-part">
                 <div className="row mb-3">
                   <div className="col-md-3">
-                    <label class="form-label">Export As</label>
+                    <label className="form-label">Export As</label>
                     <Form.Select
                       aria-label="Export As"
                       onChange={(e) => handleExportDocumentShow(e.target.value)}
@@ -2051,7 +2072,7 @@ const FileDetails = () => {
                     </Form.Select>
                   </div>
                   <div className="col-md-3">
-                    <label class="form-label">{t("addDocumentLabel")}</label>
+                    <label className="form-label">{t("addDocumentLabel")}</label>
                     <Form.Select name="Ajouter" onChange={(e) => {
                       if (e.target.value == "adddocument") {
                         handleShow();
@@ -2063,7 +2084,7 @@ const FileDetails = () => {
                     </Form.Select>
                   </div>
                   <div className="col-md-3">
-                    <label class="form-label">Ajouter une note</label>
+                    <label className="form-label">Ajouter une note</label>
                     <Form.Select name="Ajouter" onChange={(e) => handleNoteAddOrShow(e.target.value)}>
                       <option value="">Sélectionner...</option>
                       <option value="add_note">Ajouter une note</option>
@@ -2071,21 +2092,15 @@ const FileDetails = () => {
                     </Form.Select>
                   </div>
                   <div className="col-md-3">
-                    <label class="form-label">Envoyer à</label>
+                    <label className="form-label">Envoyer à</label>
                     <Form.Select
                       aria-label="Etat du chantier"
                       value={sendToFileStatus}
                       onChange={(e) => handleSendFileShow(e.target.value)}
                     >
-                      <option value="" disabled selected>
-                        Envoyer à
-                      </option>
-                      <option value="transfer_to_manager">
-                        Transfert au Gestionnaire
-                      </option>
-                      <option value="transfer_to_broker">
-                        Transfert au Courtier
-                      </option>
+                      <option value="" disabled>Envoyer à</option>
+                      <option value="transfer_to_manager">Transfert au Gestionnaire</option>
+                      <option value="transfer_to_broker">Transfert au Courtier</option>
                       <option value="formal_notice">Mise en demeure</option>
                     </Form.Select>
                   </div>
@@ -2183,8 +2198,8 @@ const FileDetails = () => {
                       </thead>
                       <tbody>
                         {dashboardDocumentFileList?.length > 0 ? (
-                          dashboardDocumentFileList?.map((data) => (
-                            <tr>
+                          dashboardDocumentFileList?.map((data, index) => (
+                            <tr key={index}>
                               <td>
                                 <div className="d-flex align-items-center">
                                   <span className="file-type-icon">
@@ -2373,7 +2388,8 @@ const FileDetails = () => {
                   </div>
                 </div>
 
-                <h2 className="mb-3 mt-3">Tâche</h2>
+                {/* Task List Dashboard tab */}
+                {/* <h2 className="mb-3 mt-3">Tâche</h2>
                 <div className="custom-grid-card">
                   <h3>Tâche à venir - à déterminer</h3>
                   <div className="table-wrap mt-24">
@@ -2402,19 +2418,6 @@ const FileDetails = () => {
                               <td>{(data.assigned_by?.first_name || "") + " " + (data.assigned_by?.last_name || "")}</td>
                               <td>{(data.assigned_to?.first_name || "") + " " + (data.assigned_to?.last_name || "")}</td>
                               <td>
-                                {/* {data.status == "to_be_checked" ? (
-                                  <span className="checked badges">
-                                    {t("toBeCheckedLabel")}
-                                  </span>
-                                ) : data.status == "verified" ? (
-                                  <span className="verified badges">
-                                    {t("verified")}
-                                  </span>
-                                ) : (
-                                  <span className="incomplete badges">
-                                    {t("invalidLabel")}
-                                  </span>
-                                )} */}
                                 <span className="checked badges">{data.status}</span>
                               </td>
                             </tr>
@@ -2435,7 +2438,7 @@ const FileDetails = () => {
                       totalItems={totalTaskRecords}
                     />
                   )}
-                </div>
+                </div> */}
               </div>
 
               <div className="col-md-6">
@@ -2550,8 +2553,8 @@ const FileDetails = () => {
                     3 derniers messages importants non lus
                     <div className="timeline">
                       {lastThreeNoteList?.length > 0 ? (
-                        lastThreeNoteList?.map((data) => (
-                          <div className="timeline-item">
+                        lastThreeNoteList?.map((data, index) => (
+                          <div className="timeline-item" key={index}>
                             <div className="timeline-dot"></div>
                             <div className="timeline-content">
                               <h5>{formatCreatedAt(data.created_on)}</h5>
@@ -2574,10 +2577,10 @@ const FileDetails = () => {
                   </div>
                                     <div className="last-task-card">
                     Tâche à venir - à déterminer
-                    <div class="timeline">
-                      <div class="timeline-item">
-                        <div class="timeline-dot"></div>
-                        <div class="timeline-content">
+                    <div className="timeline">
+                      <div className="timeline-item">
+                        <div className="timeline-dot"></div>
+                        <div className="timeline-content">
                           <h5>August 5th, 12:00 AM</h5>
                           <p>common.action_details.document_created</p>
                         </div>
@@ -2718,9 +2721,7 @@ const FileDetails = () => {
                         value={selectBroker}
                         onChange={handleBrokerChange}
                       >
-                        <option value="" disabled selected>
-                          Choisir un Courtier
-                        </option>
+                        <option value="" disabled>Choisir un Courtier</option>
                         {brokerList?.length > 0 ? (
                           brokerList?.map((broker) => (
                             <option value={broker.id}>
@@ -3249,7 +3250,7 @@ const FileDetails = () => {
                                               height="18"
                                               rx="2"
                                               stroke="#00366B"
-                                              stroke-width="2"
+                                              strokeWidth="2"
                                             />
                                             <line
                                               x1="8"
@@ -3257,8 +3258,8 @@ const FileDetails = () => {
                                               x2="16"
                                               y2="7"
                                               stroke="#00366B"
-                                              stroke-width="2"
-                                              stroke-linecap="round"
+                                              strokeWidth="2"
+                                              strokeLinecap="round"
                                             />
                                             <line
                                               x1="8"
@@ -3266,8 +3267,8 @@ const FileDetails = () => {
                                               x2="16"
                                               y2="11"
                                               stroke="#00366B"
-                                              stroke-width="2"
-                                              stroke-linecap="round"
+                                              strokeWidth="2"
+                                              strokeLinecap="round"
                                             />
                                             <line
                                               x1="8"
@@ -3275,8 +3276,8 @@ const FileDetails = () => {
                                               x2="13"
                                               y2="15"
                                               stroke="#00366B"
-                                              stroke-width="2"
-                                              stroke-linecap="round"
+                                              strokeWidth="2"
+                                              strokeLinecap="round"
                                             />
                                           </svg>
                                         </Link>
@@ -3305,15 +3306,15 @@ const FileDetails = () => {
                                             <path
                                               d="M8 14L12 18L16 14"
                                               stroke="#00366B"
-                                              stroke-width="1.5"
-                                              stroke-linecap="round"
+                                              strokeWidth="1.5"
+                                              strokeLinecap="round"
                                               stroke-linejoin="round"
                                             />
                                             <path
                                               d="M12 11V18"
                                               stroke="#00366B"
-                                              stroke-width="1.5"
-                                              stroke-linecap="round"
+                                              strokeWidth="1.5"
+                                              strokeLinecap="round"
                                               stroke-linejoin="round"
                                             />
                                           </svg>
@@ -3962,15 +3963,15 @@ const FileDetails = () => {
                                               <path
                                                 d="M8 14L12 18L16 14"
                                                 stroke="#00366B"
-                                                stroke-width="1.5"
-                                                stroke-linecap="round"
+                                                strokeWidth="1.5"
+                                                strokeLinecap="round"
                                                 stroke-linejoin="round"
                                               />
                                               <path
                                                 d="M12 11V18"
                                                 stroke="#00366B"
-                                                stroke-width="1.5"
-                                                stroke-linecap="round"
+                                                strokeWidth="1.5"
+                                                strokeLinecap="round"
                                                 stroke-linejoin="round"
                                               />
                                             </svg>
@@ -4667,6 +4668,76 @@ const FileDetails = () => {
               )}
             </div>
           </Tab>
+          <Tab eventKey="task" title="Tâche">
+            <div className="table-wrapper mt-16 p-0">
+              <div className="d-md-flex align-items-center gap-2 justify-content-between">
+                <div className=""></div>
+              </div>
+              {isLoading ? (
+                <Loading />
+              ) : (
+                <div className="table-wrap mt-24">
+                  <Table responsive hover>
+                    <thead>
+                      <tr>
+                        <th>Nom de la tâche</th>
+                        <th>Date limite</th>
+                        <th>Description de la tâche</th>
+                        <th>Attribué par</th>
+                        <th>Attribué à</th>
+                        <th>{t("status")}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {taskListData?.length > 0 ? (
+                        taskListData?.map((data, index) => (
+                          <tr key={index}>
+                            <td>
+                              <span className="text-elips">{data.title}</span>
+                            </td>
+                            <td>{data.due_date}</td>
+                            <td>
+                              <span className="text-elips">{data.description}</span>
+                            </td>
+                            <td>{(data.assigned_by?.first_name || "") + " " + (data.assigned_by?.last_name || "")}</td>
+                            <td>{(data.assigned_to?.first_name || "") + " " + (data.assigned_to?.last_name || "")}</td>
+                            <td>
+                              {/* {data.status == "to_be_checked" ? (
+                                  <span className="checked badges">
+                                    {t("toBeCheckedLabel")}
+                                  </span>
+                                ) : data.status == "verified" ? (
+                                  <span className="verified badges">
+                                    {t("verified")}
+                                  </span>
+                                ) : (
+                                  <span className="incomplete badges">
+                                    {t("invalidLabel")}
+                                  </span>
+                                )} */}
+                              <span className="checked badges">{data.status}</span>
+                            </td>
+                          </tr>
+                        ))) : (
+                        <tr style={{ textAlign: "center" }}>
+                          <td colSpan="6">{t("NorecordsfoundLabel")}</td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </Table>
+                </div>
+              )}
+              {totalTaskRecords > 10 && (
+                <Paginations
+                  currentPage={currentTaskPage}
+                  totalPages={totalTaskPages}
+                  onPageChange={handlePageChange}
+                  itemsPerPage={10}
+                  totalItems={totalTaskRecords}
+                />
+              )}
+            </div>
+          </Tab>
         </Tabs>
       </div>
 
@@ -4999,15 +5070,15 @@ const FileDetails = () => {
                             <path
                               d="M8 14L12 18L16 14"
                               stroke="#00366B"
-                              stroke-width="1.5"
-                              stroke-linecap="round"
+                              strokeWidth="1.5"
+                              strokeLinecap="round"
                               stroke-linejoin="round"
                             />
                             <path
                               d="M12 11V18"
                               stroke="#00366B"
-                              stroke-width="1.5"
-                              stroke-linecap="round"
+                              strokeWidth="1.5"
+                              strokeLinecap="round"
                               stroke-linejoin="round"
                             />
                           </svg>
