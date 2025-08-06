@@ -74,11 +74,6 @@ const EditTask = (props) => {
   useEffect(() => {
     if (editTaskFormShow) {
       ShowTaskDetail(taskId);
-    }
-  }, [editTaskFormShow]);
-
-  useEffect(() => {
-    if (editTaskFormShow) {
       UserList();
     }
   }, [editTaskFormShow]);
@@ -268,7 +263,7 @@ const EditTask = (props) => {
                   <Form.Label>{t("status")} <span>*</span></Form.Label>
                   <Select
                     options={TaskStatusOptions}
-                    value={taskStatus == "in_progress" ? "En cours" : taskStatus == "pending" ? "En attente" : taskStatus == "cancelled" ? "Annulé" : "" }
+                    value={taskStatus}
                     onChange={(selectedOption) => setTaskStatus(selectedOption)}
                     styles={{
                       container: (provided) => ({
