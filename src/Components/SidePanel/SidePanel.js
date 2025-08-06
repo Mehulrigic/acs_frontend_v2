@@ -193,7 +193,7 @@ const SidePanel = ({ sidebarLogo, backgroundColor, leftPanelChange, logoChange ,
                       </svg>
                       <span className="menu-title">
                         {t("tobetreat")} 
-                        {/* {`(${localStorage.getItem("total_proceed") || 0})`} */}
+                        {`(${localStorage.getItem("total_proceed") || 0})`}
                       </span>
                     </Link>
                   </li>

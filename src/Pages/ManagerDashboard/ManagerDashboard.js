@@ -160,7 +160,7 @@ const ManagerDashboard = () => {
       if (response.data) {
         setIsLoading(false);
         setStatisticsData(response.data);
-        localStorage.setItem("assureur_dashboard", response.data.files_total);
+        localStorage.setItem("total_proceed", response.data.files_total);
       }
     } catch (error) {
       setIsLoading(false);
@@ -352,8 +352,8 @@ const ManagerDashboard = () => {
           <h4>{t("folders")}</h4>
           <div className="mt-3 d-flex justify-content-between align-items-center">
             <h1 className="m-0">
-              Dossier à traiter
-              {/* ({totalRecords}) */}
+              Dossier à traiter 
+              {/* ({statisticsData?.files_total || 0}) */}
             </h1>
           </div>
         </div>
