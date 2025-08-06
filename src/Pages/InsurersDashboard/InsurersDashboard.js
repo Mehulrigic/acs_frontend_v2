@@ -433,7 +433,7 @@ const InsurersDashboard = () => {
                       >
                         Filtre
                       </Button>
-                      <Button variant="primary" onClick={HandleReset}>
+                      <Button variant="primary" onClick={() => HandleReset()}>
                         Réinitialiser
                       </Button>
                     </Col>
